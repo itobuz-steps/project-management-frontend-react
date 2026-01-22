@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
 import Dashboard from './pages/Dashboard';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { SignupPage } from './pages/SignupPage';
+import { LoginPage } from './pages/LoginPage';
 
 function App() {
   const isAuthenticated = true;
@@ -8,15 +11,17 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* <Route path="/login" element={<Login />} /> */}
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
         {isAuthenticated && (
           <Route
-            path="/*"
+            path="/dashboard"
             element={
               <MainLayout>
-                <Dashboard />;
-                <h1 className="text-2xl font-semibold">Hello world</h1>
+                <Dashboard />
+                {/* <h1 className="text-2xl font-semibold">Hello world</h1> */}
               </MainLayout>
             }
           />
