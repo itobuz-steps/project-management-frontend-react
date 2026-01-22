@@ -17,7 +17,7 @@ function App() {
 
         {isAuthenticated && (
           <Route
-            path="/dashboard"
+            path="/*"
             element={
               <MainLayout>
                 <Dashboard />
