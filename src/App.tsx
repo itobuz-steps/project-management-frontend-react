@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   const isAuthenticated = true;
@@ -14,6 +15,7 @@ function App() {
             path="/*"
             element={
               <MainLayout>
+                <Dashboard />;
                 <h1 className="text-2xl font-semibold">Hello world</h1>
               </MainLayout>
             }
@@ -23,5 +25,4 @@ function App() {
     </BrowserRouter>
   );
 }
-
 export default App;
