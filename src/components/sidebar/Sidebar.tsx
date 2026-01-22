@@ -5,12 +5,9 @@ import InviteSection from './InviteSection';
 import LogoutButton from './LogoutButton';
 
 import { User, FolderKanban, Users, Plus } from 'lucide-react';
+import type { Props } from '../../types/sidebar.types';
 
-type SidebarProps = {
-  collapsed: boolean;
-};
-
-export default function Sidebar({ collapsed }: SidebarProps) {
+export default function Sidebar({ collapsed }: Props) {
   return (
     <aside
       id="sidebar"

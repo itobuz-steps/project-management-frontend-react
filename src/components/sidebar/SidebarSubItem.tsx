@@ -1,6 +1,4 @@
-type SidebarSubItemProps = {
-  label: string;
-};
+import type { SidebarSubItemProps } from "../../types/sidebar.types";
 
 export default function SidebarSubItem({ label }: SidebarSubItemProps) {
   return (

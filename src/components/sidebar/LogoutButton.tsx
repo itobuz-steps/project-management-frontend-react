@@ -1,8 +1,5 @@
 import { LogOut } from 'lucide-react';
-
-type Props = {
-  collapsed: boolean;
-};
+import type { Props } from '../../types/sidebar.types';
 
 export default function LogoutButton({ collapsed }: Props) {
   return (

@@ -1,13 +1,4 @@
-import type { ReactNode } from 'react';
-
-type SidebarGroupProps = {
-  id: string;
-  label: string;
-  icon: ReactNode;
-  action?: ReactNode;
-  children: ReactNode;
-  collapsed: boolean;
-};
+import type { SidebarGroupProps } from '../../types/sidebar.types';
 
 export default function SidebarGroup({
   id,

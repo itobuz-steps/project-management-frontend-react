@@ -1,8 +1,5 @@
 import { PanelLeft } from 'lucide-react';
-
-type SidebarToggleProps = {
-  onToggle: () => void;
-};
+import type { SidebarToggleProps } from '../../types/sidebar.types';
 
 export default function SidebarToggle({ onToggle }: SidebarToggleProps) {
   return (

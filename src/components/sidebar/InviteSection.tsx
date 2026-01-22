@@ -1,8 +1,5 @@
 import { Mail } from 'lucide-react';
-
-type Props = {
-  collapsed: boolean;
-};
+import type { Props } from '../../types/sidebar.types';
 
 export default function InviteSection({ collapsed }: Props) {
   return (

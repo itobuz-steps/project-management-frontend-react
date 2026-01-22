@@ -1,12 +1,4 @@
-import type { ReactNode } from 'react';
-
-type SidebarItemProps = {
-  id: string;
-  label: string;
-  icon: ReactNode;
-  collapsed: boolean;
-  buttonId?: string;
-};
+import type { SidebarItemProps } from "../../types/sidebar.types";
 
 export default function SidebarItem({
   id,
