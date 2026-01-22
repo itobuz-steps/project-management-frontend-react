@@ -1,4 +1,6 @@
-export function ForgetPasswordForm() {
+import { Link } from 'react-router';
+
+export function ForgotPasswordForm() {
   return (
     <form className="forgot-form xs:min-w-75 flex flex-col items-center gap-3">
       <div className="email xs:grid-cols-[3fr_1fr] xs:grid-rows-none mt-4 grid w-full grid-rows-[1fr_1fr] items-center gap-2">
@@ -41,12 +43,12 @@ export function ForgetPasswordForm() {
         Reset Password
       </button>
       <p className="back-to-login mt-4">
-        <a
-          href="../pages/signup.html"
+        <Link
+          to="/login"
           className="text-primary-300 hover:text-primary-400 self-end text-sm font-semibold transition-colors duration-300"
         >
           ← Back to Login
-        </a>
+        </Link>
       </p>
     </form>
   );

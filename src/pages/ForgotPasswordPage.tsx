@@ -1,12 +1,12 @@
 import { AuthLayout } from '../components/auth/AuthLayout';
 import bgImage from '../assets/bg-signup.svg';
-import { ForgetPasswordContainer } from '../components/auth/ForgetPasswordContainer';
+import { ForgotPasswordContainer } from '../components/auth/ForgotPasswordContainer';
 
-export function ForgetPasswordPage() {
+export function ForgotPasswordPage() {
   return (
     <AuthLayout backgroundImageUrl={bgImage}>
       <div className="relative flex h-full w-full flex-col items-center justify-center gap-10">
-        <ForgetPasswordContainer />
+        <ForgotPasswordContainer />
       </div>
     </AuthLayout>
   );
