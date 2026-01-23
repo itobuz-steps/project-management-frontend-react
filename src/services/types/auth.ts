@@ -1,7 +1,8 @@
-interface SignupPayload {
-  name: string;
-  email: string;
-  password: string;
+import type { IResponse } from './common';
+
+interface ILoginResponse extends IResponse {
+  accessToken: string;
+  refreshToken: string;
 }
 
-export type { SignupPayload };
+export type { ILoginResponse };

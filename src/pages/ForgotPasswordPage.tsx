@@ -1,5 +1,5 @@
 import { AuthLayout } from '../components/auth/AuthLayout';
-import bgImage from '../assets/bg-signup.svg';
+import bgImage from '../assets/bg-forget-password.svg';
 import { ForgotPasswordContainer } from '../components/auth/ForgotPasswordContainer';
 
 export function ForgotPasswordPage() {
