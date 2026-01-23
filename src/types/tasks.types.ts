@@ -20,7 +20,7 @@ export interface Task {
 
   parentTask?: string;
   assignee?: User;
-  subTask?: string[];
+  subtasks?: SubTask[];
   labels?: string[];
 
   tags: string[];
@@ -30,6 +30,12 @@ export interface Task {
   createdAt?: string | number | Date;
   updatedAt?: string | number | Date;
 }
+
+export type SubTask = {
+  _id?: string;
+  title: string;
+  isCompleted: boolean;
+};
 
 export type User = {
   _id: string;

@@ -36,7 +36,9 @@ function Dashboard() {
         activeUsers={[]}
       />
       <main className="p-2">
-        {viewMode === 'backlog' && <BacklogView columns={activeProject?.columns || []} />}
+        {viewMode === 'backlog' && (
+          <BacklogView columns={activeProject?.columns || []} />
+        )}
         {viewMode === 'board' && <BoardView />}
         {viewMode === 'list' && <ListView />}
       </main>

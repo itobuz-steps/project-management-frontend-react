@@ -3,7 +3,7 @@ import { fetchWithAuth } from '../api/interceptor';
 import { useSearchParams } from 'react-router-dom';
 import type { Sprint } from '../../types/sprint.types';
 import type { Task } from '../../types/tasks.types';
-import { RenderTaskTable } from '../sprint/RenderTaskTable';
+import { TaskTable } from '../backlog/TaskTable';
 
 interface BacklogViewProps {
   columns?: string[];
@@ -99,7 +99,7 @@ function BacklogView({ columns }: BacklogViewProps) {
                 );
 
                 return (
-                  <RenderTaskTable
+                  <TaskTable
                     key={sprint._id}
                     sprint={sprint}
                     tasks={sprintTasks}
@@ -121,7 +121,7 @@ function BacklogView({ columns }: BacklogViewProps) {
       ) : (
         <>
           {/* <h2 className="mb-2 font-semibold">Backlog</h2> */}
-          <RenderTaskTable
+          <TaskTable
             key={'Backlog'}
             sprint={undefined}
             tasks={backlogTasks}
