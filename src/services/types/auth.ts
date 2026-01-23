@@ -1,7 +1,11 @@
-interface SignupPayload {
-  name: string;
-  email: string;
-  password: string;
+interface IResponse {
+  success: boolean;
+  message?: string;
 }
 
-export type { SignupPayload };
+interface ILoginResponse extends IResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export type { IResponse, ILoginResponse };
