@@ -7,7 +7,6 @@ export default function EditProfileContainer() {
   const [profileImage, setProfileImage] = useState('profile.png');
   const [email, setEmail] = useState(null);
   const [username, setUsername] = useState('');
-  const [updated, setUpdated] = useState(false);
 
   useEffect(() => {
     async function fetchUserData() {
@@ -25,7 +24,7 @@ export default function EditProfileContainer() {
     }
 
     fetchUserData();
-  }, [updated]);
+  }, []);
 
   return (
     <div className="card xs:p-8 align-center xs:rounded-xl xs:h-auto bg-primary-50 flex h-screen w-full max-w-100 flex-col justify-center border border-gray-200 p-4 shadow-md">
