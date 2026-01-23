@@ -3,9 +3,13 @@ import { fetchWithAuth } from '../api/interceptor';
 import { useSearchParams } from 'react-router-dom';
 import type { Sprint } from '../../types/sprint.types';
 import type { Task } from '../../types/tasks.types';
-import { SprintTable } from '../sprint/SprintTable';
+import { RenderTaskTable } from '../sprint/RenderTaskTable';
 
-function BacklogView() {
+interface BacklogViewProps {
+  columns?: string[];
+}
+
+function BacklogView({ columns }: BacklogViewProps) {
   const [searchParams] = useSearchParams();
   const projectId = searchParams.get('projectId');
   const type = searchParams.get('type');
@@ -95,10 +99,11 @@ function BacklogView() {
                 );
 
                 return (
-                  <SprintTable
+                  <RenderTaskTable
                     key={sprint._id}
                     sprint={sprint}
                     tasks={sprintTasks}
+                    columns={columns || []}
                   />
                 );
               })}
@@ -108,27 +113,23 @@ function BacklogView() {
       )}
 
       {/* BACKLOG */}
-      <section className="rounded border bg-gray-50 p-3">
-        {backlogTasks.length === 0 ? (
-          <div className="rounded border bg-gray-50 p-6 text-center text-gray-400">
-            <h2 className="mb-2 font-semibold text-gray-500">
-              No backlog tasks
-            </h2>
-            <p className="text-sm">Create a sprint to organize your tasks.</p>
-          </div>
-        ) : (
-          <>
-            <h2 className="mb-2 font-semibold">Backlog</h2>
-            <ul className="space-y-1">
-              {backlogTasks.map((task) => (
-                <li key={task._id} className="rounded border p-2 text-sm">
-                  {task.title}
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </section>
+      {backlogTasks.length === 0 ? (
+        <section className="rounded border bg-gray-50 p-6 text-center text-gray-400">
+          <h2 className="mb-2 font-semibold text-gray-500">No backlog tasks</h2>
+          <p className="text-sm">Create a sprint to organize your tasks.</p>
+        </section>
+      ) : (
+        <>
+          {/* <h2 className="mb-2 font-semibold">Backlog</h2> */}
+          <RenderTaskTable
+            key={'Backlog'}
+            sprint={undefined}
+            tasks={backlogTasks}
+            columns={columns || []}
+            title="Backlog"
+          />
+        </>
+      )}
     </div>
   );
 }

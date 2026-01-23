@@ -20,6 +20,7 @@ function Dashboard() {
       .then(setProjects)
       .catch(() => setProjects([]));
   }, []);
+
   const [viewMode, setViewMode] = useState<ViewMode>('backlog');
 
   return (
@@ -35,7 +36,7 @@ function Dashboard() {
         activeUsers={[]}
       />
       <main className="p-2">
-        {viewMode === 'backlog' && <BacklogView />}
+        {viewMode === 'backlog' && <BacklogView columns={activeProject?.columns || []} />}
         {viewMode === 'board' && <BoardView />}
         {viewMode === 'list' && <ListView />}
       </main>

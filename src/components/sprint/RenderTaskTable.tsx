@@ -1,14 +1,11 @@
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import type { Sprint } from '../../types/sprint.types';
-import type { Task } from '../../types/tasks.types';
+import { StatusSelect } from '../../utils/StatusSelect';
+import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
+import { getPriorityBorder } from '../../utils/utils';
+import type { TaskTableProps } from './type';
 
-interface SprintTableProps {
-  sprint: Sprint;
-  tasks: Task[];
-}
-
-export function SprintTable({ sprint, tasks }: SprintTableProps) {
+export function RenderTaskTable({ sprint, tasks, columns, title }: TaskTableProps) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -22,9 +19,9 @@ export function SprintTable({ sprint, tasks }: SprintTableProps) {
           <ChevronDown
             className={`h-4 w-4 transition ${open ? '' : '-rotate-90'}`}
           />
-          <span className="font-semibold">{sprint.key}</span>
+          <span className="font-semibold">{title || sprint?.key}</span>
 
-          {sprint.dueDate && (
+          {sprint?.dueDate && (
             <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
               Due {new Date(sprint.dueDate).toLocaleDateString()}
             </span>
@@ -64,9 +61,6 @@ export function SprintTable({ sprint, tasks }: SprintTableProps) {
                 <th scope="col" className="p-2 px-6">
                   Status
                 </th>
-                <th scope="col" className="px-6 py-3">
-                  Sprint
-                </th>
                 <th scope="col" className="p-2 px-6">
                   Assignee
                 </th>
@@ -100,26 +94,41 @@ export function SprintTable({ sprint, tasks }: SprintTableProps) {
                 </tr>
               ) : (
                 tasks.map((task) => (
-                  <tr key={task._id} className="hover:bg-gray-50">
+                  <tr
+                    key={task._id}
+                    className={`whitespace-nowrap hover:bg-gray-50 ${getPriorityBorder(
+                      task.priority
+                    )}`}
+                  >
                     <td className="p-2 text-center whitespace-nowrap">
-                      <span className="rounded bg-gray-200 px-2 py-0.5 text-xs">
-                        {task.type ?? 'Task'}
-                      </span>
+                      <div className="flex justify-center">
+                        <TaskTypeIcon type={task.type} />
+                      </div>
                     </td>
 
                     <td className="p-2 font-medium whitespace-nowrap text-blue-600">
                       {task.key}
                     </td>
 
-                    <td className="p-2 px-6 whitespace-nowrap">{task.title}</td>
-
-                    <td className="p-2 px-6 whitespace-nowrap">
-                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs">
-                        {task.status}
-                      </span>
+                    <td
+                      className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline"
+                      // onClick={() => showTaskDrawer(task._id)}
+                    >
+                      {task.title}
                     </td>
 
-                    <td className="p-2 px-6 whitespace-nowrap">{sprint.key}</td>
+                    <td className="p-2 px-6 whitespace-nowrap">
+                      <StatusSelect
+                        taskId={task._id}
+                        value={task.status}
+                        columns={columns}
+                        // onChange={async (newStatus) => {
+                        //   await taskService.updateTask(task._id, {
+                        //     status: newStatus,
+                        //   });
+                        // }}
+                      />
+                    </td>
 
                     <td className="p-2 px-6 whitespace-nowrap">
                       <div className="flex items-center">
@@ -132,23 +141,41 @@ export function SprintTable({ sprint, tasks }: SprintTableProps) {
                     </td>
 
                     <td className="p-2 px-6 whitespace-nowrap">
-                      {task.dueDate
-                        ? new Date(task.dueDate).toLocaleDateString()
-                        : '—'}
+                      <input
+                        type="date"
+                        value={task.dueDate?.split('T')[0] ?? ''}
+                        onChange={async (e) => {
+
+                          const newDate = e.target.value;
+                          if (!newDate) return;
+
+                          // await taskService.updateTask(task._id, {
+                          //   dueDate: newDate,
+                          // });
+                        }}
+                        className={`w-28 rounded-md border bg-gray-50 p-1 text-sm outline-none ${
+                          task.dueDate && new Date(task.dueDate) < new Date() ? 'text-red-600' : ''
+                        }`}
+                      />
                     </td>
 
                     <td className="p-2 px-6 whitespace-nowrap">
                       <div className="flex gap-1">
-                        {task.labels?.length
-                          ? task.labels.map((label) => (
-                              <span
-                                key={label}
-                                className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700"
-                              >
-                                {label}
-                              </span>
-                            ))
-                          : '—'}
+                        {task.tags?.slice(0, 3).map((label) => (
+                          
+                          <span
+                            key={label}
+                            className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700"
+                          >
+                            {label}
+                          </span>
+                        ))}
+
+                        {task.tags && task.tags.length > 3 && (
+                          <span className="rounded bg-gray-200 px-2 py-0.5 text-xs">
+                            +{task.tags.length - 3}
+                          </span>
+                        )}
                       </div>
                     </td>
 
