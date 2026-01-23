@@ -19,7 +19,7 @@ function Dashboard() {
         hasActiveFilters={true}
         activeUsers={[]}
       />
-      <main className="p-6">
+      <main className="p-2">
         {viewMode === 'backlog' && <BacklogView />}
         {viewMode === 'board' && <BoardView />}
         {viewMode === 'list' && <ListView />}
