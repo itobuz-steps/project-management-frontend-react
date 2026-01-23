@@ -3,42 +3,54 @@ import { fetchWithAuth } from '../api/interceptor';
 import { useSearchParams } from 'react-router-dom';
 import type { Sprint } from '../../types/sprint.types';
 import type { Task } from '../../types/tasks.types';
+import { SprintTable } from '../sprint/SprintTable';
 
 function BacklogView() {
   const [searchParams] = useSearchParams();
   const projectId = searchParams.get('projectId');
+  const type = searchParams.get('type');
+  const isScrum = type === 'scrum';
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    async function loadData(projectId: string) {
+      try {
+        setLoading(true);
+
+        const tasksPromise = fetchWithAuth<{ result: Task[] }>('/tasks', {
+          params: { projectId },
+        });
+
+        const sprintsPromise =
+          type === 'scrum'
+            ? fetchWithAuth<{ result: Sprint[] }>('/sprint', {
+                params: { projectId },
+              })
+            : Promise.resolve({ result: [] as Sprint[] });
+
+        const [tasksRes, sprintsRes] = await Promise.all([
+          tasksPromise,
+          sprintsPromise,
+        ]);
+
+        setTasks(tasksRes.result);
+        setSprints(sprintsRes.result.filter((s) => !s.isCompleted));
+      } catch (err) {
+        console.error('Failed to load backlog', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     if (!projectId) {
       return;
     }
 
     loadData(projectId);
-  }, [projectId]);
-
-  async function loadData(projectId: string) {
-    try {
-      setLoading(true);
-
-      const [tasksRes, sprintsRes] = await Promise.all([
-        fetchWithAuth<{ result: Task[] }>('/tasks', { params: { projectId } }),
-        fetchWithAuth<{ result: Sprint[] }>('/sprint', {
-          params: { projectId },
-        }),
-      ]);
-
-      setTasks(tasksRes.result);
-      setSprints(sprintsRes.result.filter((s) => !s.isCompleted));
-    } catch (err) {
-      console.error('Failed to load backlog', err);
-    } finally {
-      setLoading(false);
-    }
-  }
+  }, [projectId, type]);
 
   if (!projectId) {
     return (
@@ -64,48 +76,57 @@ function BacklogView() {
   );
 
   return (
-    <div className="space-y-6 rounded-lg border bg-white p-4">
+    <div className="rounded-lg border bg-white p-4">
       {/* SPRINTS */}
-      <section className="space-y-4">
-        {sprints.map((sprint) => {
-          const sprintTasks = tasks.filter((task) =>
-            sprint.tasks.includes(task._id)
-          );
-
-          return (
-            <div key={sprint._id} className="rounded border bg-gray-50 p-3">
-              <h3 className="mb-2 font-semibold">{sprint.key}</h3>
-
-              {sprintTasks.length === 0 ? (
-                <p className="text-sm text-gray-400">No tasks in this sprint</p>
-              ) : (
-                <ul className="space-y-1">
-                  {sprintTasks.map((task) => (
-                    <li key={task._id} className="rounded bg-white p-2 text-sm">
-                      {task.title}
-                    </li>
-                  ))}
-                </ul>
-              )}
+      {isScrum && (
+        <section className="mb-4 w-full">
+          {sprints.length === 0 ? (
+            <div className="rounded border bg-gray-50 p-6 text-center text-gray-400">
+              <h2 className="mb-2 font-semibold text-gray-500">
+                No sprints found
+              </h2>
+              <p className="text-sm">Create a sprint to organize your tasks.</p>
             </div>
-          );
-        })}
-      </section>
+          ) : (
+            <div className="w-full space-y-4 overflow-x-auto">
+              {sprints.map((sprint) => {
+                const sprintTasks = tasks.filter((t) =>
+                  sprint.tasks.includes(t._id)
+                );
+
+                return (
+                  <SprintTable
+                    key={sprint._id}
+                    sprint={sprint}
+                    tasks={sprintTasks}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* BACKLOG */}
       <section className="rounded border bg-gray-50 p-3">
-        <h2 className="mb-2 font-semibold">Backlog</h2>
-
         {backlogTasks.length === 0 ? (
-          <p className="text-sm text-gray-400">No backlog tasks</p>
+          <div className="rounded border bg-gray-50 p-6 text-center text-gray-400">
+            <h2 className="mb-2 font-semibold text-gray-500">
+              No backlog tasks
+            </h2>
+            <p className="text-sm">Create a sprint to organize your tasks.</p>
+          </div>
         ) : (
-          <ul className="space-y-1">
-            {backlogTasks.map((task) => (
-              <li key={task._id} className="rounded border p-2 text-sm">
-                {task.title}
-              </li>
-            ))}
-          </ul>
+          <>
+            <h2 className="mb-2 font-semibold">Backlog</h2>
+            <ul className="space-y-1">
+              {backlogTasks.map((task) => (
+                <li key={task._id} className="rounded border p-2 text-sm">
+                  {task.title}
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </section>
     </div>

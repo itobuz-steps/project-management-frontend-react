@@ -25,8 +25,8 @@ function SidebarProjectsDropdown() {
     loadProjects();
   }, []);
 
-  function handleProjectClick(projectId: string) {
-    navigate(`?projectId=${projectId}`);
+  function handleProjectClick(projectId: string, type: string) {
+    navigate(`?projectId=${projectId}&type=${type}`);
   }
 
   return (
@@ -34,7 +34,7 @@ function SidebarProjectsDropdown() {
       {projects.map((project) => (
         <li
           key={project._id}
-          onClick={() => handleProjectClick(project._id)}
+          onClick={() => handleProjectClick(project._id, project.projectType)}
           className={`hover:bg-primary-100 cursor-pointer rounded px-2 py-1 text-sm ${
             activeProjectId === project._id ? 'bg-primary-200 font-medium' : ''
           }`}

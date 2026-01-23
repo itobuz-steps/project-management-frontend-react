@@ -16,7 +16,7 @@ export default function MainLayout({
 
       <Sidebar collapsed={collapsed} />
 
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col overflow-x-auto w-full">
         <Navbar />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
