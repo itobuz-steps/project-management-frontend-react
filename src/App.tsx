@@ -31,7 +31,6 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/" element={<LoginPage />} />
           <Route path="/verify-otp" element={<VerifyOtpPage />} />
 
           {isAuthenticated && (
