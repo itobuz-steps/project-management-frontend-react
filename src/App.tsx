@@ -6,6 +6,7 @@ import { SignupPage } from './pages/SignupPage';
 import { LoginPage } from './pages/LoginPage';
 import { VerifyOtpPage } from './pages/VerifyOtpPage';
 import { Flip, ToastContainer } from 'react-toastify';
+import { EditProfilePage } from './pages/EditProfilePage';
 
 function App() {
   const isAuthenticated = true;
@@ -14,7 +15,7 @@ function App() {
     <>
       <ToastContainer
         position="bottom-right"
-        autoClose={5000}
+        autoClose={3000}
         hideProgressBar
         newestOnTop={false}
         closeOnClick={false}
@@ -34,15 +35,18 @@ function App() {
           <Route path="/verify-otp" element={<VerifyOtpPage />} />
 
           {isAuthenticated && (
-            <Route
-              path="/dashboard"
-              element={
-                <MainLayout>
-                  <Dashboard />
-                  {/* <h1 className="text-2xl font-semibold">Hello world</h1> */}
-                </MainLayout>
-              }
-            />
+            <>
+              <Route path="/edit-profile" element={<EditProfilePage />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <MainLayout>
+                    <Dashboard />
+                    {/* <h1 className="text-2xl font-semibold">Hello world</h1> */}
+                  </MainLayout>
+                }
+              />
+            </>
           )}
         </Routes>
       </BrowserRouter>

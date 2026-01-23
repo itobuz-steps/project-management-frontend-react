@@ -61,3 +61,7 @@ h1 {
 .smaller-text {
   font-size: 12px;
 }
+
+.btn-primary {
+  @apply bg-primary-500 hover:bg-primary-600 mt-4 rounded-lg py-3 font-medium text-white transition-all duration-300;
+}

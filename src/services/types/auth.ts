@@ -1,11 +1,8 @@
-interface IResponse {
-  success: boolean;
-  message?: string;
-}
+import type { IResponse } from './common';
 
 interface ILoginResponse extends IResponse {
   accessToken: string;
   refreshToken: string;
 }
 
-export type { IResponse, ILoginResponse };
+export type { ILoginResponse };
