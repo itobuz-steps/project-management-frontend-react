@@ -1,30 +1,74 @@
-import { Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+import authService from '../../services/authService';
+import { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
+import { Input } from '../common/Input';
+
+interface ILoginInput {
+  email: string;
+  password: string;
+}
 
 export function LoginForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ILoginInput>();
+
+  const navigate = useNavigate();
+
+  const submitHandler = async (data: ILoginInput) => {
+    try {
+      const response = await authService.login(data.email, data.password);
+
+      toast.success('Login successful');
+      localStorage.setItem('access_token', response.accessToken);
+      localStorage.setItem('refresh_token', response.refreshToken);
+      navigate('/dashboard');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(
+          'Login failed: ' + (error.response?.data?.message || error.message)
+        );
+      }
+    }
+  };
+
   return (
-    <form className="login-form xs:min-w-75 flex flex-col items-center gap-4">
-      <input
-        id="email-input"
+    <form
+      onSubmit={handleSubmit(submitHandler)}
+      className="login-form xs:min-w-75 flex flex-col items-center gap-4"
+    >
+      <Input
+        {...register('email', { required: true })}
         type="email"
         placeholder="Email"
         required
-        className="input-field focus:border-primary-300 w-full rounded-lg border border-gray-300 bg-white p-3 text-sm shadow-xs transition-all duration-300 outline-none"
       />
-      <input
-        id="password-input"
+      <Input
+        {...register('password', { required: true, minLength: 6 })}
         type="password"
         placeholder="Password"
-        required
-        className="input-field focus:border-primary-300 w-full rounded-lg border border-gray-300 bg-white p-3 text-sm shadow-xs transition-all duration-300 outline-none"
       />
-      <div className="forgot-password -mt-2 ml-auto">
+      <div className="flex w-full justify-between">
+        <div className="flex flex-col">
+          {errors.password &&
+            errors.password.type === 'minLength' &&
+            'Password must be at least 6 characters long.'}
+          {errors.email &&
+            errors.email.type === 'required' &&
+            'Email is required.'}
+        </div>
         <Link
           to={'/forgot-password'}
-          className="text-primary-300 hover:text-primary-400 w-full font-semibold transition-colors duration-300"
+          className="text-primary-300 hover:text-primary-400 font-semibold text-nowrap transition-colors duration-300"
         >
           Forgot password?
         </Link>
       </div>
+
       <button
         className="login-button bg-primary-500 hover:bg-primary-600 mt-8 w-full cursor-pointer rounded-lg py-3 font-semibold text-white transition-all duration-300"
         type="submit"
