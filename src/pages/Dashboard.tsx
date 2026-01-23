@@ -1,16 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TopBar from '../components/common/TopBar';
 import type { ViewMode } from '../types/TopBar.types';
 import BacklogView from '../components/views/BacklogView';
 import BoardView from '../components/views/BoardView';
 import ListView from '../components/views/ListView';
+import type { Project } from '../types/project.types';
+import { useSearchParams } from 'react-router-dom';
+import { fetchWithAuth } from '../components/api/interceptor';
 
 function Dashboard() {
+  const [searchParams] = useSearchParams();
+  const projectId = searchParams.get('projectId');
+
+  const [projects, setProjects] = useState<Project[]>([]);
+  const activeProject = projects.find((p) => p._id === projectId);
+
+  useEffect(() => {
+    fetchWithAuth<Project[]>('/project')
+      .then(setProjects)
+      .catch(() => setProjects([]));
+  }, []);
   const [viewMode, setViewMode] = useState<ViewMode>('backlog');
 
   return (
     <div className="min-h-screen bg-gray-50">
       <TopBar
+        projectName={activeProject?.name}
         viewMode={viewMode}
         onViewChange={setViewMode}
         onAddTask={() => alert('Add task clicked')}

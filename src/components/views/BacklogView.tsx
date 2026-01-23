@@ -13,13 +13,11 @@ function BacklogView() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     if (!projectId) {
       return;
     }
 
     loadData(projectId);
-    
   }, [projectId]);
 
   async function loadData(projectId: string) {
@@ -40,6 +38,19 @@ function BacklogView() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (!projectId) {
+    return (
+      <div className="rounded-lg border bg-white p-6 text-center text-gray-500">
+        <h2 className="mb-2 text-lg font-semibold text-gray-700">
+          No project selected
+        </h2>
+        <p className="text-sm">
+          Select a project from the sidebar or create a new one to get started.
+        </p>
+      </div>
+    );
   }
 
   if (loading) {
