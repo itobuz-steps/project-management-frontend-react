@@ -7,11 +7,6 @@ const views: { label: string; value: ViewMode }[] = [
   { label: 'Board', value: 'board' },
   { label: 'List', value: 'list' },
 ];
-const projects: { id: string; name: string }[] = [
-  { id: '1', name: 'Project A' },
-  { id: '2', name: 'Project B' },
-  { id: '3', name: 'Project C' },
-];
 
 function TopBar({
   viewMode,
@@ -21,12 +16,13 @@ function TopBar({
   onClearFilters,
   hasActiveFilters,
   activeUsers,
+  projectName,
 }: TopBarProps) {
   return (
     <>
       <header className="mb-3 border-b border-gray-200 bg-white px-4 py-3 shadow-sm sm:px-6">
         <h2 className="mb-2 text-lg font-semibold text-gray-900 sm:mb-3 sm:text-xl">
-          Project A
+          {projectName ?? 'No project selected'}
         </h2>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* LEFT: View Switcher */}
