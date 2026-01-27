@@ -1,11 +1,17 @@
 import { fetchWithAuth } from '../components/api/interceptor';
 import type { Task } from '../types/tasks.types';
 
+interface TaskResponse {
+  result: Task;
+}
+
 class TaskService {
   async getTaskById(taskId: string): Promise<Task> {
-    return fetchWithAuth<Task>(`/tasks/${taskId}`, {
+    const res = await fetchWithAuth<TaskResponse>(`/tasks/${taskId}`, {
       method: 'GET',
     });
+
+    return res.result;
   }
 }
 

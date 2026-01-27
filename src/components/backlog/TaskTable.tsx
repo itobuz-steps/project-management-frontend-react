@@ -4,13 +4,11 @@ import { StatusSelect } from '../../utils/StatusSelect';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { getPriorityBorder } from '../../utils/utils';
 import type { TaskTableProps } from './type';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-export function TaskTable({
-  sprint,
-  tasks,
-  columns,
-  title,
-}: TaskTableProps) {
+export function TaskTable({ sprint, tasks, columns, title }: TaskTableProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [open, setOpen] = useState(true);
 
   return (
@@ -119,9 +117,15 @@ export function TaskTable({
                       className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline"
                       // onClick={() => showTaskDrawer(task._id)}
                       onClick={() => {
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('taskId', task._id);
-                        window.history.pushState({}, '', url.toString());
+                        // const url = new URL(window.location.href);
+                        // url.searchParams.set('taskId', task._id);
+                        // window.history.pushState({}, '', url.toString());
+                        const params = new URLSearchParams(location.search);
+                        params.set('taskId', task._id);
+                        navigate({
+                          pathname: location.pathname,
+                          search: params.toString(),
+                        });
                         // setDrawerTaskId(task._id);
                       }}
                     >

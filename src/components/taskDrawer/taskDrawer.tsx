@@ -1,53 +1,44 @@
-import { X } from 'lucide-react';
+import { X, Calendar } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import TaskService from '../../services/taskService';
 import type { Task } from '../../types/tasks.types';
 
 interface TaskDrawerProps {
-  taskId: string | null;
+  taskId: string;
   onClose: () => void;
 }
 
 export default function TaskDrawer({ taskId, onClose }: TaskDrawerProps) {
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    if (!taskId) return;
-
     let cancelled = false;
 
-    const loadTask = async () => {
+    async function loadTask() {
       try {
         setLoading(true);
+        const data = await TaskService.getTaskById(taskId);
 
-        const task = await TaskService.getTaskById(taskId);
-
-        if (!cancelled) {
-          setTask(task);
-        }
+        if (!cancelled) setTask(data);
       } catch (err) {
-        if (!cancelled) {
-          console.error('Failed to fetch task', err);
-        }
+        console.error('Failed to fetch task', err);
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       }
-    };
+    }
 
     loadTask();
-
     return () => {
       cancelled = true;
     };
   }, [taskId]);
 
   const closeDrawer = () => {
-    const url = new URL(window.location.href);
-    url.searchParams.delete('taskId');
-    window.history.pushState({}, '', url.toString());
+    searchParams.delete('taskId');
+    setSearchParams(searchParams);
     onClose();
   };
 
@@ -55,91 +46,66 @@ export default function TaskDrawer({ taskId, onClose }: TaskDrawerProps) {
 
   return (
     <>
-      {/* Backdrop */}
       <div className="fixed inset-0 z-40 bg-black/30" onClick={closeDrawer} />
 
-      {/* Drawer */}
-      <aside className="fixed top-0 right-0 z-50 h-full w-[420px] bg-white shadow-xl transition-transform">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b px-4 py-3">
-          <h2 className="text-sm font-semibold text-gray-700">
-            {task?.key ?? 'Loading…'}
-          </h2>
+      <aside className="fixed top-0 right-0 z-50 h-full w-[420px] bg-white shadow-xl">
+        <div className="flex items-start justify-between gap-3 border-b p-4">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <span className="bg-primary-500 rounded-sm px-2 py-0.5 text-xs font-semibold text-white">
+                {task?.key ?? '—'}
+              </span>
+            </div>
+            <h2 className="text-[16px] font-semibold">
+              {loading ? 'Loading…' : task?.title}
+            </h2>
+          </div>
+
           <button
             onClick={closeDrawer}
             className="rounded p-1 hover:bg-gray-200"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="h-full overflow-y-auto p-4">
+        <div className="flex h-full flex-col gap-4 overflow-y-auto p-4">
           {loading && <p className="text-sm text-gray-400">Loading task…</p>}
 
           {!loading && task && (
             <>
-              {/* Title */}
-              <h1 className="mb-4 text-lg font-semibold">{task.title}</h1>
-
-              {/* Meta */}
-              <div className="mb-6 space-y-2 text-sm">
-                <MetaRow label="Status" value={task.status} />
-                <MetaRow label="Type" value={task.type ?? 'Task'} />
-                <MetaRow
-                  label="Assignee"
-                  value={task.assignee?.name ?? 'Unassigned'}
+              <div className="flex items-center gap-3">
+                <img
+                  src="/assets/img/profile.png"
+                  className="h-8 w-8 rounded-full border"
                 />
-                <MetaRow
-                  label="Reporter"
-                  value={task.reporter?.name ?? 'Unknown'}
-                />
-                <MetaRow
-                  label="Due Date"
-                  value={
-                    task.dueDate
-                      ? new Date(task.dueDate).toLocaleDateString()
-                      : '—'
-                  }
-                />
+                <div>
+                  <p className="text-xs text-gray-500">Assignee</p>
+                  <p className="text-primary-500 font-medium">
+                    {task.assignee?.name ?? 'Unassigned'}
+                  </p>
+                </div>
               </div>
 
-              {/* Description */}
-              <section className="mb-6">
-                <h3 className="mb-1 text-sm font-semibold text-gray-600">
-                  Description
-                </h3>
-                <p className="text-sm whitespace-pre-wrap text-gray-700">
-                  {task.description || 'No description'}
-                </p>
-              </section>
+              <div className="flex flex-col gap-1">
+                <p className="text-sm text-gray-500">Due Date</p>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Calendar className="h-4 w-4 text-gray-400" />
+                  {task.dueDate
+                    ? new Date(task.dueDate).toLocaleDateString()
+                    : '—'}
+                </div>
+              </div>
 
-              {/* Labels */}
-              <section className="mb-6">
-                <h3 className="mb-1 text-sm font-semibold text-gray-600">
-                  Labels
-                </h3>
-                <div className="flex flex-wrap gap-1">
-                  {task.labels?.length ? (
-                    task.labels.map((label) => (
-                      <span
-                        key={label}
-                        className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700"
-                      >
-                        {label}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="text-xs text-gray-400">—</span>
-                  )}
+              <section className="flex flex-col gap-2">
+                <h3 className="font-semibold">Description</h3>
+                <div className="prose max-h-28 overflow-auto rounded-md border p-2 text-sm">
+                  {task.description || 'No description added…'}
                 </div>
               </section>
 
-              {/* Subtasks */}
-              <section>
-                <h3 className="mb-2 text-sm font-semibold text-gray-600">
-                  Subtasks
-                </h3>
+              <section className="flex flex-col gap-2">
+                <h3 className="font-semibold">Subtasks</h3>
 
                 {task.subtasks?.length ? (
                   <ul className="space-y-1">
@@ -156,6 +122,18 @@ export default function TaskDrawer({ taskId, onClose }: TaskDrawerProps) {
                   <p className="text-sm text-gray-400">No subtasks</p>
                 )}
               </section>
+
+              <section className="flex flex-col gap-3">
+                <h3 className="font-semibold">Details</h3>
+
+                <DetailRow label="Status" value={task.status} />
+                <DetailRow label="Priority" value={task.priority} />
+                <DetailRow label="Type" value={task.type} />
+                <DetailRow
+                  label="Reporter"
+                  value={task.reporter?.name ?? '—'}
+                />
+              </section>
             </>
           )}
         </div>
@@ -164,11 +142,11 @@ export default function TaskDrawer({ taskId, onClose }: TaskDrawerProps) {
   );
 }
 
-function MetaRow({ label, value }: { label: string; value: string }) {
+function DetailRow({ label, value }: { label: string; value?: string }) {
   return (
-    <div className="flex justify-between">
+    <div className="flex items-center justify-between text-sm">
       <span className="text-gray-500">{label}</span>
-      <span className="font-medium text-gray-800">{value}</span>
+      <span className="font-medium">{value ?? '—'}</span>
     </div>
   );
 }

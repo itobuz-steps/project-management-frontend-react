@@ -13,7 +13,7 @@ export default function MainLayout({
   const [collapsed, setCollapsed] = useState(false);
   const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
   const [openTaskId, setOpenTaskId] = useState<string | null>(null);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     async function syncTaskDrawerWithUrl() {
@@ -42,7 +42,10 @@ export default function MainLayout({
       {taskDrawerOpen && openTaskId && (
         <TaskDrawer
           taskId={openTaskId}
-          onClose={() => setTaskDrawerOpen(false)}
+          onClose={() => {
+            searchParams.delete('taskId');
+            setSearchParams(searchParams);
+          }}
         />
       )}
     </div>
