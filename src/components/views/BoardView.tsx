@@ -5,6 +5,8 @@ import { getProjectById } from '../../services/projects.service';
 import { getTasks } from '../../services/tasks.service';
 import type { Task } from '../../services/types/tasks.types';
 import type { Sprint } from '../../types/sprint.types';
+import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
+import { TaskTypeColor } from '../../utils/TaskTypeColor';
 
 function BoardView() {
   const [searchParams] = useSearchParams();
@@ -185,8 +187,12 @@ function BoardView() {
                     >
                       {task.title}
                     </p>
-                    <p className="mt-1 text-xs text-gray-500">
-                      {task.key ?? task._id}
+
+                    <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+                      <TaskTypeIcon type={task.type} />
+                      <TaskTypeColor type={task.type}>
+                        {task.key ?? task._id}
+                      </TaskTypeColor>
                     </p>
                   </div>
                 ))}
