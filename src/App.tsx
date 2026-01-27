@@ -7,6 +7,7 @@ import { LoginPage } from './pages/LoginPage';
 import { VerifyOtpPage } from './pages/VerifyOtpPage';
 import { Flip, ToastContainer } from 'react-toastify';
 import { EditProfilePage } from './pages/EditProfilePage';
+import { AcceptInvitePage } from './pages/AcceptInvitePage';
 
 function App() {
   const isAuthenticated = true;
@@ -33,6 +34,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/verify-otp" element={<VerifyOtpPage />} />
+          <Route path="/invite/join" element={<AcceptInvitePage />} />
 
           {isAuthenticated && (
             <>
