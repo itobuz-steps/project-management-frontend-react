@@ -20,7 +20,7 @@ export interface Task {
 
   parentTask?: string;
   assignee?: User;
-  subtasks?: SubTask[];
+  subTask?: SubTask[];
   labels?: string[];
 
   tags: string[];
