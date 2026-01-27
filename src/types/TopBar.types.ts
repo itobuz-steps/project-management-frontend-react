@@ -16,4 +16,6 @@ export interface TopBarProps {
 
   hasActiveFilters: boolean;
   activeUsers: ActiveUser[];
+
+  projectName?: string;
 }
