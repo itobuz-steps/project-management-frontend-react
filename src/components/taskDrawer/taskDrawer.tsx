@@ -1,8 +1,8 @@
 import { X, Calendar } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import TaskService from '../../services/taskService';
 import type { Task } from '../../types/tasks.types';
+import getTaskById from '../../services/taskService';
 
 interface TaskDrawerProps {
   taskId: string;
@@ -20,7 +20,8 @@ export default function TaskDrawer({ taskId, onClose }: TaskDrawerProps) {
     async function loadTask() {
       try {
         setLoading(true);
-        const data = await TaskService.getTaskById(taskId);
+        const data = await getTaskById(taskId);
+        console.log('Fetched task:', data);
 
         if (!cancelled) setTask(data);
       } catch (err) {

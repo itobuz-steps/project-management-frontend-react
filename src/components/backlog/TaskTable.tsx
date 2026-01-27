@@ -5,6 +5,7 @@ import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { getPriorityBorder } from '../../utils/utils';
 import type { TaskTableProps } from './type';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { updateTask } from '../../services/taskService';
 
 export function TaskTable({ sprint, tasks, columns, title }: TaskTableProps) {
   const navigate = useNavigate();
@@ -115,18 +116,13 @@ export function TaskTable({ sprint, tasks, columns, title }: TaskTableProps) {
 
                     <td
                       className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline"
-                      // onClick={() => showTaskDrawer(task._id)}
                       onClick={() => {
-                        // const url = new URL(window.location.href);
-                        // url.searchParams.set('taskId', task._id);
-                        // window.history.pushState({}, '', url.toString());
                         const params = new URLSearchParams(location.search);
                         params.set('taskId', task._id);
                         navigate({
                           pathname: location.pathname,
                           search: params.toString(),
                         });
-                        // setDrawerTaskId(task._id);
                       }}
                     >
                       {task.title}
@@ -137,11 +133,11 @@ export function TaskTable({ sprint, tasks, columns, title }: TaskTableProps) {
                         taskId={task._id}
                         value={task.status}
                         columns={columns}
-                        // onChange={async (newStatus) => {
-                        //   await taskService.updateTask(task._id, {
-                        //     status: newStatus,
-                        //   });
-                        // }}
+                        onChange={async (newStatus) => {
+                          await updateTask(task._id, {
+                            status: newStatus,
+                          });
+                        }}
                       />
                     </td>
 
@@ -163,9 +159,9 @@ export function TaskTable({ sprint, tasks, columns, title }: TaskTableProps) {
                           const newDate = e.target.value;
                           if (!newDate) return;
 
-                          // await taskService.updateTask(task._id, {
-                          //   dueDate: newDate,
-                          // });
+                          await updateTask(task._id, {
+                            dueDate: newDate,
+                          });
                         }}
                         className={`w-28 rounded-md border bg-gray-50 p-1 text-sm outline-none ${
                           task.dueDate && new Date(task.dueDate) < new Date()

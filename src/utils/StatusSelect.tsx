@@ -2,17 +2,17 @@ export function StatusSelect({
 //   taskId,
   value,
   columns,
-//   onChange,
+  onChange,
 }: {
   taskId: string;
   value: string;
   columns: string[];
-//   onChange: (value: string) => void;
+  onChange: (value: string) => void;
 }) {
   return (
     <select
       value={value}
-    //   onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => onChange(e.target.value)}
       className="bg-primary-400 rounded-md px-2 py-1 text-white outline-none"
     >
       {columns.map((col) => (
