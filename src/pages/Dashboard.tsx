@@ -7,8 +7,10 @@ import ListView from '../components/views/ListView';
 import type { Project } from '../types/project.types';
 import { useSearchParams } from 'react-router-dom';
 import { fetchWithAuth } from '../components/api/interceptor';
+import { useProject } from '../context/ProjectContext';
 
 function Dashboard() {
+  const { setProject } = useProject();
   const [searchParams] = useSearchParams();
   const projectId = searchParams.get('projectId');
 
@@ -17,9 +19,18 @@ function Dashboard() {
 
   useEffect(() => {
     fetchWithAuth<Project[]>('/project')
-      .then(setProjects)
-      .catch(() => setProjects([]));
-  }, []);
+      .then((projects) => {
+        setProjects(projects);
+
+        const active = projects.find((p) => p._id === projectId);
+
+        setProject(active);
+      })
+      .catch(() => {
+        setProjects([]);
+        setProject(undefined);
+      });
+  }, [projectId, setProject]);
 
   const [viewMode, setViewMode] = useState<ViewMode>('backlog');
 

@@ -7,6 +7,7 @@ import { LoginPage } from './pages/LoginPage';
 import { VerifyOtpPage } from './pages/VerifyOtpPage';
 import { Flip, ToastContainer } from 'react-toastify';
 import { EditProfilePage } from './pages/EditProfilePage';
+import { ProjectProvider } from './context/ProjectProvider';
 
 function App() {
   const isAuthenticated = true;
@@ -40,10 +41,12 @@ function App() {
               <Route
                 path="/dashboard"
                 element={
-                  <MainLayout>
-                    <Dashboard />
-                    {/* <h1 className="text-2xl font-semibold">Hello world</h1> */}
-                  </MainLayout>
+                  <ProjectProvider>
+                    <MainLayout>
+                      <Dashboard />
+                      {/* <h1 className="text-2xl font-semibold">Hello world</h1> */}
+                    </MainLayout>
+                  </ProjectProvider>
                 }
               />
             </>
