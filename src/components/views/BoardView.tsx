@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   DndContext,
@@ -23,6 +29,7 @@ import type { Task, TaskStatus } from '../../services/types/tasks.types';
 import type { Sprint } from '../../services/types/sprints.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../utils/TaskTypeColor';
+import { useProject } from '../../context/ProjectContext';
 
 function TaskCard({ task, column }: { task: Task; column: string }) {
   const {
@@ -65,7 +72,7 @@ function ColumnDropZone({ id, children }: { id: string; children: ReactNode }) {
   });
 
   return (
-    <div ref={setNodeRef} className={`min-h-[120px] rounded-md`}>
+    <div ref={setNodeRef} className={`min-h-30 rounded-md`}>
       {children}
     </div>
   );
@@ -74,8 +81,9 @@ function ColumnDropZone({ id, children }: { id: string; children: ReactNode }) {
 function BoardView() {
   const navigate = useNavigate();
 
-  const { projectId, type } = useParams();
-
+  const { projectId } = useParams();
+  const { project } = useProject();
+  const type = project?.projectType;
   const isScrum = type === 'scrum';
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -85,7 +93,10 @@ function BoardView() {
   const [error, setError] = useState<string | null>(null);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
 
-  const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
+  const normalize = useCallback(
+    (value?: string) => (value ?? '').toLowerCase().trim(),
+    []
+  );
 
   const sprintTaskIds = useMemo(() => {
     if (!isScrum) return null;

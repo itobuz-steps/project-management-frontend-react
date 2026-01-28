@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/sidebar/Sidebar';
 import SidebarToggle from '../components/sidebar/SidebarToggle';
 import Navbar from '../components/navbar/Navbar';
-import TaskDrawer from '../components/taskDrawer/TaskDrawer';
+import TaskDrawer from '../components/taskDrawer/taskDrawer';
 
 export default function MainLayout({
   children,
@@ -12,7 +12,7 @@ export default function MainLayout({
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
-  const { projectId, type, taskId } = useParams();
+  const { projectId, taskId } = useParams();
 
   const taskDrawerOpen = Boolean(taskId);
   const openTaskId = taskId ?? null;
@@ -32,7 +32,7 @@ export default function MainLayout({
         <TaskDrawer
           taskId={openTaskId}
           onClose={() => {
-            navigate(`/dashboard/${projectId}/${type}`, { replace: true });
+            navigate(`/dashboard/${projectId}`, { replace: true });
           }}
         />
       )}

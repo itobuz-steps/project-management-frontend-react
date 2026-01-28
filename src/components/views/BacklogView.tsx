@@ -16,13 +16,16 @@ import {
   addTasksToSprint,
   removeTaskFromSprint,
 } from '../../services/sprints.service';
+import { useProject } from '../../context/ProjectContext';
 
 interface BacklogViewProps {
   columns?: string[];
 }
 
 function BacklogView({ columns }: BacklogViewProps) {
-  const { projectId, type } = useParams();
+  const { projectId } = useParams();
+  const { project } = useProject();
+  const type = project?.projectType;
   const isScrum = type === 'scrum';
 
   const [tasks, setTasks] = useState<Task[]>([]);

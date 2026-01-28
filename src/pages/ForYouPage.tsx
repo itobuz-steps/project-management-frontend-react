@@ -12,10 +12,6 @@ export function ForYouPage() {
           <h1 className="bg-clip-text text-xl font-semibold text-black sm:text-2xl">
             For You
           </h1>
-          <button
-            className="group cursor-pointer rounded-md p-1"
-            id="forYouGoBackBtn"
-          />
         </div>
         <ProjectContainer />
         <TaskContainer />

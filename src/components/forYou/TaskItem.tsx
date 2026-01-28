@@ -1,9 +1,15 @@
+import { useNavigate } from 'react-router-dom';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 
 export function TaskItem({ task }: { task: TaskPopulated }) {
+  const navigate = useNavigate();
+
   return (
-    <li className="hover:bg-primary-50 flex items-center justify-between rounded-sm border border-gray-100 bg-white p-2 shadow-sm hover:cursor-pointer">
+    <li
+      onClick={() => navigate(`/dashboard/${task.projectId._id}/${task._id}`)}
+      className="hover:bg-primary-50 flex items-center justify-between rounded-sm border border-gray-100 bg-white p-2 shadow-sm hover:cursor-pointer"
+    >
       <div className="flex items-center justify-start gap-2">
         <div className="flex items-center justify-center">
           <TaskTypeIcon type={task.type} />

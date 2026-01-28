@@ -24,7 +24,7 @@ export function NotificationDropdown({
   return (
     <div
       id="notificationDropdownMenu"
-      className="absolute right-0 z-15 mt-2 mr-3 max-h-125 min-w-full flex-col overflow-auto rounded-lg bg-white py-2 shadow-lg max-md:w-[220px] md:w-[340px]"
+      className="absolute right-0 z-15 mt-2 mr-3 max-h-125 min-w-full flex-col overflow-auto rounded-lg bg-white py-2 shadow-lg max-md:w-55 md:w-85"
     >
       <h3 className="px-6 py-2 text-lg font-semibold">Notification</h3>
 
