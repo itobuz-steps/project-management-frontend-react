@@ -6,4 +6,5 @@ export interface TaskTableProps {
   tasks: Task[];
   columns: string[];
   title?: string;
+  containerId: string;
 }

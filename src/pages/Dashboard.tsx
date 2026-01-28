@@ -8,6 +8,7 @@ import type { Project } from '../types/project.types';
 import { useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../components/api/interceptor';
 import { useProject } from '../context/ProjectContext';
+import { setupPushNotifications } from '../utils/setupNotification';
 
 function Dashboard() {
   const { setProject } = useProject();
@@ -30,6 +31,10 @@ function Dashboard() {
         setProject(undefined);
       });
   }, [projectId, setProject]);
+
+  useEffect(() => {
+    setupPushNotifications();
+  }, []);
 
   const [viewMode, setViewMode] = useState<ViewMode>('backlog');
 

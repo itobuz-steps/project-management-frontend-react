@@ -6,7 +6,7 @@ import type {
   UpdateProjectPayload,
 } from './types/projects.types';
 
-const BASE_URL = `${config.api_base_url}/projects`;
+const BASE_URL = `${config.api_base_url}/project`;
 
 const getAuthHeaders = (): HeadersInit => {
   const token = localStorage.getItem('access_token');
