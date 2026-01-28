@@ -27,3 +27,7 @@ export interface UpdateSprintPayload {
   dueDate?: string;
   isCompleted?: boolean;
 }
+
+export interface AddTasks {
+  taskIds?: string[];
+}

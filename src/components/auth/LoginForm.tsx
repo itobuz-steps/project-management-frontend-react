@@ -11,11 +11,7 @@ interface ILoginInput {
 }
 
 export function LoginForm() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ILoginInput>();
+  const { register, handleSubmit } = useForm<ILoginInput>();
 
   const navigate = useNavigate();
 
@@ -52,22 +48,12 @@ export function LoginForm() {
         type="password"
         placeholder="Password"
       />
-      <div className="flex w-full justify-between">
-        <div className="flex flex-col">
-          {errors.password &&
-            errors.password.type === 'minLength' &&
-            'Password must be at least 6 characters long.'}
-          {errors.email &&
-            errors.email.type === 'required' &&
-            'Email is required.'}
-        </div>
-        <Link
-          to={'/forgot-password'}
-          className="text-primary-300 hover:text-primary-400 font-semibold text-nowrap transition-colors duration-300"
-        >
-          Forgot password?
-        </Link>
-      </div>
+      <Link
+        to={'/forgot-password'}
+        className="text-primary-300 hover:text-primary-400 font-semibold text-nowrap transition-colors duration-300"
+      >
+        Forgot password?
+      </Link>
 
       <button
         className="login-button bg-primary-500 hover:bg-primary-600 mt-8 w-full cursor-pointer rounded-lg py-3 font-semibold text-white transition-all duration-300"
