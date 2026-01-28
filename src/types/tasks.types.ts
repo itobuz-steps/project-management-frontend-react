@@ -11,7 +11,7 @@ export interface Task {
   //     | string;
 
   title: string;
-  storyPoint: number;
+  storyPoint?: number;
   description: string;
   type: TaskType;
   key?: string;
@@ -25,7 +25,7 @@ export interface Task {
   subTask?: string[];
   labels?: string[];
 
-  tags: string[];
+  tags?: string[];
 
   attachments?: FileList | File[];
 

@@ -84,7 +84,7 @@ export const addTasksToSprint = async (
   const res = await fetch(`${BASE_URL}/${sprintId}/addTasks`, {
     method: 'PATCH',
     headers: getAuthHeaders(),
-    body: JSON.stringify(tasks),
+    body: JSON.stringify({ tasks }),
   });
 
   if (!res.ok) {
@@ -103,7 +103,7 @@ export const removeTaskFromSprint = async (
   const res = await fetch(`${BASE_URL}/${sprintId}/removeTasks`, {
     method: 'PATCH',
     headers: getAuthHeaders(),
-    body: JSON.stringify({ taskId }),
+    body: JSON.stringify({ task: taskId }),
   });
 
   if (!res.ok) {
