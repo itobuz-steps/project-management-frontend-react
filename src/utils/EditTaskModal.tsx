@@ -1,8 +1,17 @@
-import { DatePicker, Form, Input, message, Modal, Select } from "antd";
-import type { Task } from "../types/tasks.types";
-import { useState } from "react";
-import dayjs from "dayjs";
-import { updateTask } from "../services/taskService";
+import {
+  DatePicker,
+  Form,
+  Input,
+  message,
+  Modal,
+  Select,
+  InputNumber,
+} from 'antd';
+import type { Task } from '../types/tasks.types';
+import { useState } from 'react';
+import dayjs from 'dayjs';
+import { updateTask } from '../services/taskService';
+import { useProject } from '../context/ProjectContext';
 
 interface Props {
   open: boolean;
@@ -12,6 +21,7 @@ interface Props {
 }
 
 export function EditTaskModal({ open, task, onClose, onUpdated }: Props) {
+  const { columns } = useProject();
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
 
@@ -38,11 +48,12 @@ export function EditTaskModal({ open, task, onClose, onUpdated }: Props) {
   return (
     <Modal
       open={open}
-      title="Edit Task"
+      title="Update Task"
       onCancel={onClose}
       onOk={onSave}
       confirmLoading={saving}
       destroyOnHidden
+      width={700}
     >
       <Form
         form={form}
@@ -50,51 +61,100 @@ export function EditTaskModal({ open, task, onClose, onUpdated }: Props) {
         initialValues={{
           title: task.title,
           description: task.description,
-          status: task.status,
-          priority: task.priority,
+          storyPoint: task.storyPoint,
           type: task.type,
+          priority: task.priority,
+          status: task.status,
           tags: task.tags,
+          assignee: task.assignee,
           dueDate: task.dueDate ? dayjs(task.dueDate) : null,
+          // blocks: task.blocks,
+          // blockedBy: task.blockedBy,
+          // relatedTo: task.relatedTo,
         }}
       >
-        <Form.Item name="title" label="Title" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
+        {/* Title + Story Point */}
+        <div className="grid grid-cols-3 gap-4">
+          <Form.Item
+            name="title"
+            label="Title"
+            rules={[{ required: true }]}
+            className="col-span-2"
+          >
+            <Input />
+          </Form.Item>
 
+          <Form.Item name="storyPoint" label="Story Point">
+            <InputNumber min={0} className="w-full" />
+          </Form.Item>
+        </div>
+
+        {/* Description */}
         <Form.Item name="description" label="Description">
-          <Input.TextArea rows={4} />
+          <Input.TextArea rows={3} />
         </Form.Item>
 
-        <Form.Item name="status" label="Status">
-          <Select
-            options={[
-              { value: 'todo' },
-              { value: 'in-progress' },
-              { value: 'qa' },
-              { value: 'done' },
-            ]}
-          />
-        </Form.Item>
+        {/* Type / Priority / Status */}
+        <div className="grid grid-cols-3 gap-4">
+          <Form.Item name="type" label="Type">
+            <Select
+              options={[
+                { value: 'Bug', label: 'Bug' },
+                { value: 'Task', label: 'Task' },
+                { value: 'Story', label: 'Story' },
+              ]}
+            />
+          </Form.Item>
 
-        <Form.Item name="priority" label="Priority">
-          <Select
-            options={[{ value: 'low' }, { value: 'medium' }, { value: 'high' }]}
-          />
-        </Form.Item>
+          <Form.Item name="priority" label="Priority">
+            <Select
+              options={[
+                { value: 'Low', label: 'Low' },
+                { value: 'Medium', label: 'Medium' },
+                { value: 'High', label: 'High' },
+                { value: 'Critical', label: 'Critical' },
+              ]}
+            />
+          </Form.Item>
 
-        <Form.Item name="type" label="Type">
-          <Select
-            options={[{ value: 'task' }, { value: 'bug' }, { value: 'story' }]}
-          />
-        </Form.Item>
+          <Form.Item label="Status" name="status">
+            <Select
+              options={columns.map((col) => ({
+                label: col,
+                value: col,
+              }))}
+            />
+          </Form.Item>
+        </div>
 
-        <Form.Item name="tags" label="Tags">
-          <Select mode="tags" placeholder="Add tags" />
-        </Form.Item>
+        {/* Tags / Due Date / Assignee */}
+        <div className="grid grid-cols-3 gap-4">
+          <Form.Item name="tags" label="Tags">
+            <Select mode="tags" placeholder="Add tags" />
+          </Form.Item>
 
-        <Form.Item name="dueDate" label="Due Date">
-          <DatePicker className="w-full" />
-        </Form.Item>
+          <Form.Item name="dueDate" label="Due Date">
+            <DatePicker className="w-full" />
+          </Form.Item>
+
+          <Form.Item name="assignee" label="Assignee">
+            <Select placeholder="Select assignee" />
+          </Form.Item>
+        </div>
+
+        {/* <div className="grid grid-cols-3 gap-4">
+          <Form.Item name="blocks" label="Blocks">
+            <Select mode="multiple" placeholder="Select tasks" />
+          </Form.Item>
+
+          <Form.Item name="blockedBy" label="Blocked by Issue">
+            <Select mode="multiple" placeholder="Select issues" />
+          </Form.Item>
+
+          <Form.Item name="relatedTo" label="Related To">
+            <Select mode="multiple" placeholder="Select tasks" />
+          </Form.Item>
+        </div> */}
       </Form>
     </Modal>
   );

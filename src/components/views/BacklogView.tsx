@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { fetchWithAuth } from '../api/interceptor';
-import { useSearchParams } from 'react-router-dom';
-import type { Sprint } from '../../types/sprint.types';
+import { useParams } from 'react-router-dom';
+import type { Sprint } from '../../services/types/sprints.types';
 import type { Task } from '../../types/tasks.types';
 import { TaskTable } from '../backlog/TaskTable';
 import {
@@ -22,9 +22,7 @@ interface BacklogViewProps {
 }
 
 function BacklogView({ columns }: BacklogViewProps) {
-  const [searchParams] = useSearchParams();
-  const projectId = searchParams.get('projectId');
-  const type = searchParams.get('type');
+  const { projectId, type } = useParams();
   const isScrum = type === 'scrum';
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -32,7 +30,13 @@ function BacklogView({ columns }: BacklogViewProps) {
   const [loading, setLoading] = useState(true);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 6,
+      },
+    })
+  );
 
   const taskById = useMemo(
     () => new Map(tasks.map((t) => [t._id, t])),
@@ -40,6 +44,8 @@ function BacklogView({ columns }: BacklogViewProps) {
   );
 
   useEffect(() => {
+    if (!projectId) return;
+
     async function loadData(projectId: string) {
       try {
         setLoading(true);

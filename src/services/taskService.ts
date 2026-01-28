@@ -29,3 +29,21 @@ export async function updateTask(
 
   return res.data.result;
 }
+
+export async function getAllTasks(): Promise<Task[]> {
+  const res = await api.get<{ result: Task[] }>(`/`);
+
+  return res.data.result;
+}
+
+export async function getTaskByProjectId(
+    projectId: string,
+    filter: string | null = '',
+    searchInput: string | null = ''
+  ) {
+    const response = await api.get(
+      `/?projectId=${projectId}&filter=${filter}&searchInput=${searchInput}`
+    );
+
+    return response.data.result;
+  }

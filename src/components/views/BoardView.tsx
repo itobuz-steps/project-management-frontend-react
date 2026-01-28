@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   DndContext,
   DragOverlay,
@@ -20,7 +20,7 @@ import { fetchWithAuth } from '../api/interceptor';
 import { getProjectById } from '../../services/projects.service';
 import { getTasks, updateTask } from '../../services/tasks.service';
 import type { Task, TaskStatus } from '../../services/types/tasks.types';
-import type { Sprint } from '../../types/sprint.types';
+import type { Sprint } from '../../services/types/sprints.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../utils/TaskTypeColor';
 
@@ -72,10 +72,10 @@ function ColumnDropZone({ id, children }: { id: string; children: ReactNode }) {
 }
 
 function BoardView() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const projectId = searchParams.get('projectId');
-  const type = searchParams.get('type');
+
+  const { projectId, type } = useParams();
+
   const isScrum = type === 'scrum';
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -123,7 +123,13 @@ function BoardView() {
     return map;
   }, [columns, normalize, visibleTasks]);
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 6,
+      },
+    })
+  );
 
   useEffect(() => {
     if (!projectId) {
@@ -173,7 +179,7 @@ function BoardView() {
           setTasks(taskPayload);
           setSprints(sprintPayload);
         }
-      } catch (err) {
+      } catch {
         if (isMounted) setError('Failed to load tasks.');
       } finally {
         if (isMounted) setLoading(false);
@@ -298,10 +304,9 @@ function BoardView() {
                           onClick={() => {
                             const params = new URLSearchParams(location.search);
                             params.set('taskId', task._id);
-                            navigate({
-                              pathname: location.pathname,
-                              search: params.toString(),
-                            });
+                            navigate(
+                              `/dashboard/${projectId}/${type}/${task._id}`
+                            );
                           }}
                         >
                           <TaskCard task={task} column={col} />
