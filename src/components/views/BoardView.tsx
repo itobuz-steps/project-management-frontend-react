@@ -123,7 +123,11 @@ function BoardView() {
     return map;
   }, [columns, normalize, visibleTasks]);
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 6 },
+    })
+  );
 
   useEffect(() => {
     if (!projectId) {
@@ -143,10 +147,16 @@ function BoardView() {
         setError(null);
         const [projectResp, tasksResp, sprintsResp] = await Promise.all([
           getProjectById(projectId),
-          getTasks({ projectId }),
+          getTasks({
+            projectId,
+            searchInput: searchParams.get('searchInput') || '',
+          }),
           isScrum
             ? fetchWithAuth<{ result?: Sprint[] } | Sprint[]>('/sprint', {
-                params: { projectId },
+                params: {
+                  projectId,
+                  searchInput: searchParams.get('searchInput') || '',
+                },
               })
             : Promise.resolve([] as Sprint[]),
         ]);
@@ -185,7 +195,7 @@ function BoardView() {
     return () => {
       isMounted = false;
     };
-  }, [isScrum, projectId]);
+  }, [isScrum, projectId, searchParams]);
 
   if (!projectId) {
     return (

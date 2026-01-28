@@ -32,7 +32,11 @@ function BacklogView({ columns }: BacklogViewProps) {
   const [loading, setLoading] = useState(true);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 6 },
+    })
+  );
 
   const taskById = useMemo(
     () => new Map(tasks.map((t) => [t._id, t])),
@@ -45,13 +49,19 @@ function BacklogView({ columns }: BacklogViewProps) {
         setLoading(true);
 
         const tasksPromise = fetchWithAuth<{ result: Task[] }>('/tasks', {
-          params: { projectId },
+          params: {
+            projectId,
+            searchInput: searchParams.get('searchInput') || '',
+          },
         });
 
         const sprintsPromise =
           type === 'scrum'
             ? fetchWithAuth<{ result: Sprint[] }>('/sprint', {
-                params: { projectId },
+                params: {
+                  projectId,
+                  searchInput: searchParams.get('searchInput') || '',
+                },
               })
             : Promise.resolve({ result: [] as Sprint[] });
 
@@ -72,7 +82,7 @@ function BacklogView({ columns }: BacklogViewProps) {
     if (projectId) {
       loadData(projectId);
     }
-  }, [projectId, type]);
+  }, [projectId, type, searchParams]);
 
   if (!projectId) {
     return (
