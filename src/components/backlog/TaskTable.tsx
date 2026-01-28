@@ -12,6 +12,7 @@ import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { getPriorityBorder } from '../../utils/utils';
 import type { TaskTableProps } from './type';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { updateTask } from '../../services/taskService';
 import type { Task } from '../../types/tasks.types';
 
 function TaskRow({
