@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { getTasks } from '../../services/tasks.service';
 import type { Task } from '../../services/types/tasks.types';
 
@@ -20,7 +20,8 @@ export function CommandPalette({
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const projectId = searchParams.get('projectId');
+  const { projectId: routeProjectId } = useParams();
+  const projectId = routeProjectId ?? searchParams.get('projectId');
   const type = searchParams.get('type');
 
   const [recentTasks, setRecentTasks] = useState<Task[]>([]);
@@ -43,7 +44,7 @@ export function CommandPalette({
 
     getTasks({ projectId })
       .then((res: any) => {
-        const tasks: Task[] = res.result ?? [];
+        const tasks: Task[] = Array.isArray(res) ? res : (res.result ?? []);
 
         const recent = [...tasks]
           .filter((t) => t.createdAt)
@@ -115,9 +116,18 @@ export function CommandPalette({
                   <button
                     key={task._id}
                     onClick={() => {
-                      navigate(
-                        `/dashboard?projectId=${projectId}&type=${type}&taskId=${task._id}`
-                      );
+                      if (!projectId) return;
+                      const next = new URLSearchParams(searchParams);
+                      if (type) {
+                        next.set('type', type);
+                      } else {
+                        next.delete('type');
+                      }
+
+                      navigate({
+                        pathname: `/dashboard/${projectId}/${task._id}`,
+                        search: next.toString(),
+                      });
                       onClose();
                     }}
                     className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-neutral-100"
