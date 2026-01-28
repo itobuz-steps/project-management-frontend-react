@@ -59,7 +59,7 @@ function TaskCard({ task, column }: { task: Task; column: string }) {
 }
 
 function ColumnDropZone({ id, children }: { id: string; children: ReactNode }) {
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef } = useDroppable({
     id: `column:${id}`,
     data: { type: 'column', column: id },
   });
@@ -173,7 +173,7 @@ function BoardView() {
           setTasks(taskPayload);
           setSprints(sprintPayload);
         }
-      } catch (err) {
+      } catch {
         if (isMounted) setError('Failed to load tasks.');
       } finally {
         if (isMounted) setLoading(false);
@@ -323,10 +323,17 @@ function BoardView() {
               {tasks.find((task) => task._id === activeTaskId) ? (
                 <span className="mt-1 flex items-center gap-1 text-xs text-gray-500">
                   <TaskTypeIcon
-                    type={tasks.find((task) => task._id === activeTaskId)?.type}
+                    type={
+                      tasks.find((task) => task._id === activeTaskId)?.type ||
+                      'task'
+                    }
                   />
+
                   <TaskTypeColor
-                    type={tasks.find((task) => task._id === activeTaskId)?.type}
+                    type={
+                      tasks.find((task) => task._id === activeTaskId)?.type ||
+                      'task'
+                    }
                   >
                     {tasks.find((task) => task._id === activeTaskId)?.key ??
                       activeTaskId}

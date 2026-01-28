@@ -3,7 +3,6 @@ import type {
   Sprint,
   CreateSprintPayload,
   UpdateSprintPayload,
-  AddTasks,
 } from './types/sprints.types';
 import { config } from '../config/config';
 
