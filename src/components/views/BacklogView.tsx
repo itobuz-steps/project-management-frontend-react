@@ -8,13 +8,14 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
-  MouseSensor,
-  TouchSensor,
   closestCorners,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { updateSprint } from '../../services/sprints.service';
+import {
+  addTasksToSprint,
+  removeTaskFromSprint,
+} from '../../services/sprints.service';
 
 interface BacklogViewProps {
   columns?: string[];
@@ -31,22 +32,13 @@ function BacklogView({ columns }: BacklogViewProps) {
   const [loading, setLoading] = useState(true);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 6 },
-    }),
-    useSensor(MouseSensor, {
-      activationConstraint: { distance: 6 },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 150, tolerance: 5 },
-    })
-  );
+  const sensors = useSensors(useSensor(PointerSensor));
 
   const taskById = useMemo(
     () => new Map(tasks.map((t) => [t._id, t])),
     [tasks]
   );
+
   useEffect(() => {
     async function loadData(projectId: string) {
       try {
@@ -77,11 +69,9 @@ function BacklogView({ columns }: BacklogViewProps) {
       }
     }
 
-    if (!projectId) {
-      return;
+    if (projectId) {
+      loadData(projectId);
     }
-
-    loadData(projectId);
   }, [projectId, type]);
 
   if (!projectId) {
@@ -115,12 +105,12 @@ function BacklogView({ columns }: BacklogViewProps) {
         onDragStart={(event) => setActiveTaskId(String(event.active.id))}
         onDragEnd={({ active, over }) => {
           setActiveTaskId(null);
-          if (!over) return;
-          if (active.id === over.id) return;
+          if (!over || active.id === over.id) return;
 
           const activeContainer = active.data.current?.containerId as
             | string
             | undefined;
+
           const overContainer =
             (over.data.current?.containerId as string | undefined) ??
             (typeof over.id === 'string' && over.id.startsWith('container:')
@@ -130,52 +120,50 @@ function BacklogView({ columns }: BacklogViewProps) {
           if (!activeContainer || !overContainer) return;
           if (activeContainer === overContainer) return;
 
-          const activeTaskId = String(active.id);
+          const taskId = String(active.id);
+
           const previousSprints = sprints;
-          const updateSprintTasks = (
-            sprint: Sprint,
-            updater: (tasks: string[]) => string[]
-          ) => ({
-            ...sprint,
-            tasks: updater(sprint.tasks),
+
+          const nextSprints = sprints.map((sprint) => {
+            if (sprint._id === activeContainer) {
+              return {
+                ...sprint,
+                tasks: sprint.tasks.filter((id) => id !== taskId),
+              };
+            }
+
+            if (sprint._id === overContainer) {
+              return {
+                ...sprint,
+                tasks: sprint.tasks.includes(taskId)
+                  ? sprint.tasks
+                  : [...sprint.tasks, taskId],
+              };
+            }
+
+            return sprint;
           });
 
-          let nextSprints = sprints;
-          setSprints((prev) => {
-            nextSprints = prev.map((s) => {
-              if (s._id === activeContainer) {
-                return updateSprintTasks(s, (t) =>
-                  t.filter((id) => id !== activeTaskId)
-                );
-              }
-              if (s._id === overContainer) {
-                return updateSprintTasks(s, (t) =>
-                  t.includes(activeTaskId) ? t : [...t, activeTaskId]
-                );
-              }
-              return s;
-            });
-            return nextSprints;
-          });
+          setSprints(nextSprints);
+
           const sourceSprint =
             activeContainer !== 'backlog'
-              ? nextSprints.find((s) => s._id === activeContainer)
-              : null;
-          const targetSprint =
-            overContainer !== 'backlog'
-              ? nextSprints.find((s) => s._id === overContainer)
+              ? sprints.find((s) => s._id === activeContainer)
               : null;
 
-          const calls: Array<ReturnType<typeof updateSprint>> = [];
+          const targetSprint =
+            overContainer !== 'backlog'
+              ? sprints.find((s) => s._id === overContainer)
+              : null;
+
+          const calls: Promise<unknown>[] = [];
+
           if (sourceSprint) {
-            calls.push(
-              updateSprint(sourceSprint._id, { tasks: sourceSprint.tasks })
-            );
+            calls.push(removeTaskFromSprint(sourceSprint._id, taskId));
           }
-          if (targetSprint && targetSprint._id !== sourceSprint?._id) {
-            calls.push(
-              updateSprint(targetSprint._id, { tasks: targetSprint.tasks })
-            );
+
+          if (targetSprint) {
+            calls.push(addTasksToSprint(targetSprint._id, [taskId]));
           }
 
           if (calls.length > 0) {
@@ -228,18 +216,16 @@ function BacklogView({ columns }: BacklogViewProps) {
             <p className="text-sm">Create a sprint to organize your tasks.</p>
           </section>
         ) : (
-          <>
-            {/* <h2 className="mb-2 font-semibold">Backlog</h2> */}
-            <TaskTable
-              key={'Backlog'}
-              sprint={undefined}
-              tasks={backlogTasks}
-              columns={columns || []}
-              title="Backlog"
-              containerId="backlog"
-            />
-          </>
+          <TaskTable
+            key="Backlog"
+            sprint={undefined}
+            tasks={backlogTasks}
+            columns={columns || []}
+            title="Backlog"
+            containerId="backlog"
+          />
         )}
+
         <DragOverlay>
           {activeTaskId ? (
             <div className="w-64 cursor-move rounded-md border bg-white p-3 shadow-lg">
