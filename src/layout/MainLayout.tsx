@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/sidebar/Sidebar';
 import SidebarToggle from '../components/sidebar/SidebarToggle';
 import Navbar from '../components/navbar/Navbar';
-import TaskDrawer from '../components/taskDrawer/TaskDrawer';
+import TaskDrawer from '../components/taskDrawer/taskDrawer';
 
 export default function MainLayout({
   children,
