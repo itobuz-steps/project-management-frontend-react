@@ -2,6 +2,7 @@ import axios from 'axios';
 import { config } from '../config/config';
 import { attachInterceptor } from '../utils/attachInterceptor';
 import type { IResponse } from './types/common';
+import type { IUserResponse } from './types/user';
 
 const API_URL = `${config.api_base_url}/auth`;
 
@@ -27,8 +28,8 @@ async function updateUserProfile(
   return response.data;
 }
 
-async function getUserInfo() {
-  const response = await api.get('/user');
+async function getUserInfo(): Promise<IUserResponse> {
+  const response = await api.get<IUserResponse>('/user');
 
   return response.data;
 }
