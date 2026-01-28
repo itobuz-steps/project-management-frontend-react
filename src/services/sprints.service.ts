@@ -3,6 +3,7 @@ import type {
   Sprint,
   CreateSprintPayload,
   UpdateSprintPayload,
+  AddTasks,
 } from './types/sprints.types';
 import { config } from '../config/config';
 
@@ -74,4 +75,42 @@ export const deleteSprint = async (sprintId: string): Promise<void> => {
   });
 
   if (!res.ok) throw new Error('Failed to delete sprint');
+};
+
+/* ---------------- ADD TASKS TO SPRINT ---------------- */
+export const addTasksToSprint = async (
+  sprintId: string,
+  tasks: string[]
+): Promise<Sprint> => {
+  const res = await fetch(`${BASE_URL}/${sprintId}/addTasks`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(tasks),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.message || 'Failed to update sprint');
+  }
+
+  return res.json();
+};
+
+/* ---------------- REMOVE TASK FROM SPRINT ---------------- */
+export const removeTaskFromSprint = async (
+  sprintId: string,
+  taskId: string
+): Promise<Sprint> => {
+  const res = await fetch(`${BASE_URL}/${sprintId}/removeTasks`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ taskId }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.message || 'Failed to update sprint');
+  }
+
+  return res.json();
 };
