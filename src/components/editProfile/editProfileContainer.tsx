@@ -5,7 +5,7 @@ import userService from '../../services/userService';
 
 export default function EditProfileContainer() {
   const [profileImage, setProfileImage] = useState('profile.png');
-  const [email, setEmail] = useState(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [username, setUsername] = useState('');
 
   useEffect(() => {
@@ -39,12 +39,14 @@ export default function EditProfileContainer() {
           className="border-primary-300 aspect-square h-24 w-24 rounded-full border-4 object-cover shadow-md"
         />
       </div>
-      <p
-        id="user-email"
-        className="text-primary-400 mb-4 text-center font-semibold"
-      >
-        {email}
-      </p>
+      {email && (
+        <p
+          id="user-email"
+          className="text-primary-400 mb-4 text-center font-semibold"
+        >
+          {email}
+        </p>
+      )}
       <EditProfileForm
         setSelectedFile={setProfileImage}
         initialUsername={username}

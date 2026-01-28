@@ -15,7 +15,6 @@ function TopBar({
   onOpenFilters,
   onClearFilters,
   hasActiveFilters,
-  activeUsers,
   projectName,
 }: TopBarProps) {
   return (

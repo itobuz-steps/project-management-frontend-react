@@ -7,6 +7,7 @@ import ListView from '../components/views/ListView';
 import type { Project } from '../types/project.types';
 import { useSearchParams } from 'react-router-dom';
 import { fetchWithAuth } from '../components/api/interceptor';
+import { setupPushNotifications } from '../utils/setupNotification';
 
 function Dashboard() {
   const [searchParams] = useSearchParams();
@@ -19,6 +20,10 @@ function Dashboard() {
     fetchWithAuth<Project[]>('/project')
       .then(setProjects)
       .catch(() => setProjects([]));
+  }, []);
+
+  useEffect(() => {
+    setupPushNotifications();
   }, []);
 
   const [viewMode, setViewMode] = useState<ViewMode>('backlog');
