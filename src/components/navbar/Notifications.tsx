@@ -1,51 +1,82 @@
 import { Bell } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { NotificationDropdown } from './NotificationDropdown';
+import notificationService from '../../services/notificationService';
+import type { INotification } from '../../types/notification.types';
 
 export default function Notifications() {
+  const [open, setOpen] = useState(false);
+  const [notifications, setNotifications] = useState<INotification[]>([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [newNotificationCount, setNewNotificationCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchNotifications() {
+      const notifications = await notificationService.getAllNotification(
+        'null',
+        page,
+        5
+      );
+      console.log(notifications);
+      setNotifications((prev) => [...prev, ...notifications.result]);
+      setHasMore(notifications.pagination.hasMore);
+    }
+    fetchNotifications();
+  }, [page]);
+
+  useEffect(() => {
+    const channel = new BroadcastChannel('sw-messages');
+
+    channel.onmessage = (event) => {
+      const { type, payload } = event.data;
+      console.log(event.data.payload);
+      console.log('Received message from service worker:', event.data);
+
+      if (type === 'PUSH_NOTIFICATION') {
+        setNotifications((prev) => [payload, ...prev]);
+        setNewNotificationCount((prev) => prev + 1);
+      }
+    };
+  }, []);
+
+  function loadMore() {
+    if (hasMore) {
+      setPage((prev) => prev + 1);
+    }
+  }
+
   return (
     <div className="relative mx-auto w-max">
       <button
         type="button"
-        id="dropdownToggle"
         className="flex h-12 w-12 items-center justify-center border-none outline-none"
+        onClick={() => {
+          setNewNotificationCount(0);
+          setOpen(!open);
+        }}
       >
         <span className="relative inline-flex">
           <Bell className="h-8 w-8 stroke-black max-md:size-6" />
 
-          <span
-            id="notificationBadge"
-            className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-semibold text-white"
-          />
+          {newNotificationCount > 0 && !open && (
+            <span
+              id="notificationBadge"
+              className="absolute -top-1 -right-0.5 flex min-h-3 min-w-3 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-semibold text-white"
+            >
+              {newNotificationCount}
+            </span>
+          )}
         </span>
       </button>
 
-      <div
-        id="notificationDropdownMenu"
-        className="absolute right-0 z-15 mt-2 mr-3 hidden max-h-[500px] min-w-full flex-col overflow-auto rounded-lg bg-white py-2 shadow-lg max-md:w-[220px] md:w-[340px]"
-      >
-        <h3 className="px-6 py-2 text-lg font-semibold">Notification</h3>
-
-        <ul className="w-full">
-          <li
-            id="notificationListEmpty"
-            className="w-full p-2 text-center text-gray-500"
-          >
-            Nothing to see here
-          </li>
-        </ul>
-
-        <li
-          id="targetElement"
-          className="flex w-full items-center justify-center p-3"
-        >
-          <svg
-            aria-hidden="true"
-            className="fill-primary-500 hidden h-4 w-4 animate-spin"
-            viewBox="0 0 20 20"
-          >
-            <path d="M100 50.5908C100 78.2051..." fill="inherit" />
-          </svg>
-        </li>
-      </div>
+      {open && (
+        <NotificationDropdown
+          notifications={notifications}
+          loadMore={loadMore}
+          hasMore={hasMore}
+        />
+      )}
     </div>
   );
 }

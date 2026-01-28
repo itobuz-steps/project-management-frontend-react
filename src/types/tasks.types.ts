@@ -1,3 +1,5 @@
+import type { TaskType } from '../services/types/tasks.types';
+
 export interface Task {
   _id: string;
 
@@ -11,7 +13,7 @@ export interface Task {
   title: string;
   storyPoint: number;
   description: string;
-  type: string;
+  type: TaskType;
   key?: string;
   status: string;
   priority: string;
@@ -20,7 +22,7 @@ export interface Task {
 
   parentTask?: string;
   assignee?: User;
-  subtasks?: SubTask[];
+  subTask?: string[];
   labels?: string[];
 
   tags: string[];
@@ -34,7 +36,7 @@ export interface Task {
 export type SubTask = {
   _id?: string;
   title: string;
-  isCompleted: boolean;
+  isCompleted?: boolean;
 };
 
 export type User = {

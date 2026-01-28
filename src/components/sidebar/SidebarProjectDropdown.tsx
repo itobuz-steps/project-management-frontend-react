@@ -1,20 +1,19 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../api/interceptor';
 import type { Project } from '../../types/project.types';
 
 function SidebarProjectsDropdown() {
   const [projects, setProjects] = useState<Project[]>([]);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
-  const activeProjectId = searchParams.get('projectId');
+  const { projectId: activeProjectId } = useParams();
 
   useEffect(() => {
     async function loadProjects() {
       try {
         const res = await fetchWithAuth<Project[]>('/project');
-        console.log(res)
+        console.log(res);
         setProjects(res);
       } catch (err) {
         console.error(err);
@@ -25,8 +24,8 @@ function SidebarProjectsDropdown() {
     loadProjects();
   }, []);
 
-  function handleProjectClick(projectId: string, type: string) {
-    navigate(`?projectId=${projectId}&type=${type}`);
+  function handleProjectClick(projectId: string) {
+    navigate(`/dashboard/${projectId}`);
   }
 
   return (
@@ -34,7 +33,7 @@ function SidebarProjectsDropdown() {
       {projects.map((project) => (
         <li
           key={project._id}
-          onClick={() => handleProjectClick(project._id, project.projectType)}
+          onClick={() => handleProjectClick(project._id)}
           className={`hover:bg-primary-100 cursor-pointer rounded px-2 py-1 text-sm ${
             activeProjectId === project._id ? 'bg-primary-200 font-medium' : ''
           }`}

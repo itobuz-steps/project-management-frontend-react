@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { config } from '../../config/config';
-import type { IResponse } from './common';
-import { attachInterceptor } from '../../utils/attachInterceptor';
+import { config } from '../config/config';
+import type { IResponse } from './types/common';
+import { attachInterceptor } from '../utils/attachInterceptor';
 
 const API_URL = `${config.api_base_url}/invite/join`;
 

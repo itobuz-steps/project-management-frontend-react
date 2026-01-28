@@ -1,5 +1,11 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   DndContext,
   DragOverlay,
@@ -20,9 +26,11 @@ import { fetchWithAuth } from '../api/interceptor';
 import { getProjectById } from '../../services/projects.service';
 import { getTasks, updateTask } from '../../services/tasks.service';
 import type { Task, TaskStatus } from '../../services/types/tasks.types';
-import type { Sprint } from '../../types/sprint.types';
+import type { Sprint } from '../../services/types/sprints.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../utils/TaskTypeColor';
+import { useProject } from '../../context/ProjectContext';
+import { useSearchParams } from 'react-router-dom';
 
 function TaskCard({ task, column }: { task: Task; column: string }) {
   const {
@@ -59,23 +67,25 @@ function TaskCard({ task, column }: { task: Task; column: string }) {
 }
 
 function ColumnDropZone({ id, children }: { id: string; children: ReactNode }) {
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef } = useDroppable({
     id: `column:${id}`,
     data: { type: 'column', column: id },
   });
 
   return (
-    <div ref={setNodeRef} className={`min-h-[120px] rounded-md`}>
+    <div ref={setNodeRef} className={`min-h-30 rounded-md`}>
       {children}
     </div>
   );
 }
 
 function BoardView() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const projectId = searchParams.get('projectId');
-  const type = searchParams.get('type');
+  const [searchParams] = useSearchParams();
+
+  const { projectId } = useParams();
+  const { project } = useProject();
+  const type = project?.projectType;
   const isScrum = type === 'scrum';
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -85,7 +95,10 @@ function BoardView() {
   const [error, setError] = useState<string | null>(null);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
 
-  const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
+  const normalize = useCallback(
+    (value?: string) => (value ?? '').toLowerCase().trim(),
+    []
+  );
 
   const sprintTaskIds = useMemo(() => {
     if (!isScrum) return null;
@@ -125,7 +138,9 @@ function BoardView() {
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 6 },
+      activationConstraint: {
+        distance: 6,
+      },
     })
   );
 
@@ -183,7 +198,7 @@ function BoardView() {
           setTasks(taskPayload);
           setSprints(sprintPayload);
         }
-      } catch (err) {
+      } catch {
         if (isMounted) setError('Failed to load tasks.');
       } finally {
         if (isMounted) setLoading(false);
@@ -308,10 +323,9 @@ function BoardView() {
                           onClick={() => {
                             const params = new URLSearchParams(location.search);
                             params.set('taskId', task._id);
-                            navigate({
-                              pathname: location.pathname,
-                              search: params.toString(),
-                            });
+                            navigate(
+                              `/dashboard/${projectId}/${type}/${task._id}`
+                            );
                           }}
                         >
                           <TaskCard task={task} column={col} />
@@ -333,10 +347,17 @@ function BoardView() {
               {tasks.find((task) => task._id === activeTaskId) ? (
                 <span className="mt-1 flex items-center gap-1 text-xs text-gray-500">
                   <TaskTypeIcon
-                    type={tasks.find((task) => task._id === activeTaskId)?.type}
+                    type={
+                      tasks.find((task) => task._id === activeTaskId)?.type ||
+                      'task'
+                    }
                   />
+
                   <TaskTypeColor
-                    type={tasks.find((task) => task._id === activeTaskId)?.type}
+                    type={
+                      tasks.find((task) => task._id === activeTaskId)?.type ||
+                      'task'
+                    }
                   >
                     {tasks.find((task) => task._id === activeTaskId)?.key ??
                       activeTaskId}

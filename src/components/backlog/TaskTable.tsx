@@ -11,7 +11,9 @@ import { StatusSelect } from '../../utils/StatusSelect';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { getPriorityBorder } from '../../utils/utils';
 import type { TaskTableProps } from './type';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { updateTask } from '../../services/taskService';
+// import { useNavigate, useLocation } from 'react-router-dom';
 import type { Task } from '../../types/tasks.types';
 
 function TaskRow({
@@ -24,7 +26,8 @@ function TaskRow({
   columns: string[];
 }) {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { projectId } = useParams();
+  // const location = useLocation();
   const {
     attributes,
     listeners,
@@ -41,6 +44,7 @@ function TaskRow({
 
   return (
     <tr
+      key={task._id}
       ref={setNodeRef}
       className={`whitespace-nowrap hover:bg-gray-50 ${getPriorityBorder(
         task.priority
@@ -50,8 +54,7 @@ function TaskRow({
       {...listeners}
     >
       <td className="p-2 text-center whitespace-nowrap">
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-gray-400">⋮⋮</span>
+        <div className="flex justify-center">
           <TaskTypeIcon type={task.type} />
         </div>
       </td>
@@ -63,19 +66,23 @@ function TaskRow({
       <td
         className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline"
         onClick={() => {
-          const params = new URLSearchParams(location.search);
-          params.set('taskId', task._id);
-          navigate({
-            pathname: location.pathname,
-            search: params.toString(),
-          });
+          navigate(`/dashboard/${projectId}/${task._id}`);
         }}
       >
         {task.title}
       </td>
 
       <td className="p-2 px-6 whitespace-nowrap">
-        <StatusSelect taskId={task._id} value={task.status} columns={columns} />
+        <StatusSelect
+          taskId={task._id}
+          value={task.status}
+          columns={columns}
+          onChange={async (newStatus) => {
+            await updateTask(task._id, {
+              status: newStatus,
+            });
+          }}
+        />
       </td>
 
       <td className="p-2 px-6 whitespace-nowrap">
@@ -95,6 +102,10 @@ function TaskRow({
           onChange={async (e) => {
             const newDate = e.target.value;
             if (!newDate) return;
+
+            await updateTask(task._id, {
+              dueDate: newDate,
+            });
           }}
           className={`w-28 rounded-md border bg-gray-50 p-1 text-sm outline-none ${
             task.dueDate && new Date(task.dueDate) < new Date()

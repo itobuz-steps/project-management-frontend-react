@@ -2,6 +2,7 @@ import type {
   Task,
   CreateTaskPayload,
   UpdateTaskPayload,
+  TaskPopulated,
 } from './types/tasks.types';
 import { config } from '../config/config';
 
@@ -79,4 +80,13 @@ export const deleteTask = async (taskId: string): Promise<void> => {
   });
 
   if (!res.ok) throw new Error('Failed to delete task');
+};
+
+export const getUserTasks = async (): Promise<{ result: TaskPopulated[] }> => {
+  const res = await fetch(`${BASE_URL}/me`, {
+    headers: getAuthHeaders(),
+  });
+
+  if (!res.ok) throw new Error('Failed to fetch user tasks');
+  return res.json();
 };

@@ -1,4 +1,4 @@
-import EditProfileContainer from '../components/editProfile/editProfileContainer';
+import EditProfileContainer from '../components/editProfile/EditProfileContainer';
 
 export function EditProfilePage() {
   return (
