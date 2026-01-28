@@ -97,7 +97,7 @@ export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
             {
               key: 'attachments',
               label: 'Attachments',
-              children: <AttachmentsTab />,
+              children: <AttachmentsTab task={task}/>,
             },
             {
               key: 'comments',
