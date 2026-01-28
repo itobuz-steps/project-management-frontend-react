@@ -14,7 +14,13 @@ export function SubtasksTab({ task }: { task: Task }) {
   const navigate = useNavigate();
   const { projectId, type, taskId: currentTaskId } = useParams();
 
-  const selectedIds = (task.subTask ?? []) as string[];
+  const [selectedIds, setSelectedIds] = useState<string[]>(
+    (task.subTask ?? []) as string[]
+  );
+
+  useEffect(() => {
+    setSelectedIds((task.subTask ?? []) as string[]);
+  }, [task.subTask]);
 
   const [subtasks, setSubtasks] = useState<Task[]>([]);
   const [projectTasks, setProjectTasks] = useState<Task[]>([]);
@@ -54,40 +60,40 @@ export function SubtasksTab({ task }: { task: Task }) {
     setProjectTasks(tasks.filter((t: Task) => t._id !== task._id));
   };
 
-  const toggleSubtask = async (subtaskId: string, checked: boolean) => {
-    const updated = checked
-      ? [...new Set([...selectedIds, subtaskId])]
-      : selectedIds.filter((id) => id !== subtaskId);
-
-    try {
-      await updateTask(task._id, {
-        subTask: updated,
-      });
-
-      message.success(
-        checked ? 'Subtask added successfully' : 'Subtask removed successfully'
-      );
-    } catch (error) {
-      console.error(error);
-      message.error('Failed to update subtask');
-    }
+  const toggleSubtask = (subtaskId: string, checked: boolean) => {
+    setSelectedIds((prev) =>
+      checked
+        ? [...new Set([...prev, subtaskId])]
+        : prev.filter((id) => id !== subtaskId)
+    );
   };
 
   const removeSubtask = async (subtaskId: string) => {
-    const updated = selectedIds.filter((id) => id !== subtaskId);
-
-    // optimistic UI
+    setSelectedIds((prev) => prev.filter((id) => id !== subtaskId));
     setSubtasks((prev) => prev.filter((t) => t._id !== subtaskId));
 
     try {
       await updateTask(task._id, {
-        subTask: updated,
+        subTask: selectedIds.filter((id) => id !== subtaskId),
       });
 
       message.success('Subtask removed');
+    } catch {
+      message.error('Failed to remove subtask');
+    }
+  };
+
+  const handleSaveSubtasks = async () => {
+    try {
+      await updateTask(task._id, {
+        subTask: selectedIds,
+      });
+
+      message.success('Subtasks updated');
+      setModalOpen(false);
     } catch (error) {
       console.error(error);
-      message.error('Failed to remove subtask');
+      message.error('Failed to update subtasks');
     }
   };
 
@@ -160,6 +166,7 @@ export function SubtasksTab({ task }: { task: Task }) {
         title="Manage Subtasks"
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
+        onOk={handleSaveSubtasks}
         footer={null}
       >
         <div className="max-h-[420px] space-y-2 overflow-y-auto">
