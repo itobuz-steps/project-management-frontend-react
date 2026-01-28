@@ -17,6 +17,7 @@ import {
   removeTaskFromSprint,
 } from '../../services/sprints.service';
 import { useProject } from '../../context/ProjectContext';
+import { useSearchParams } from 'react-router-dom';
 
 interface BacklogViewProps {
   columns?: string[];
@@ -25,6 +26,7 @@ interface BacklogViewProps {
 function BacklogView({ columns }: BacklogViewProps) {
   const { projectId } = useParams();
   const { project } = useProject();
+  const [searchParams] = useSearchParams();
   const type = project?.projectType;
   const isScrum = type === 'scrum';
 
@@ -54,13 +56,19 @@ function BacklogView({ columns }: BacklogViewProps) {
         setLoading(true);
 
         const tasksPromise = fetchWithAuth<{ result: Task[] }>('/tasks', {
-          params: { projectId },
+          params: {
+            projectId,
+            searchInput: searchParams.get('searchInput') || '',
+          },
         });
 
         const sprintsPromise =
           type === 'scrum'
             ? fetchWithAuth<{ result: Sprint[] }>('/sprint', {
-                params: { projectId },
+                params: {
+                  projectId,
+                  searchInput: searchParams.get('searchInput') || '',
+                },
               })
             : Promise.resolve({ result: [] as Sprint[] });
 
@@ -81,7 +89,7 @@ function BacklogView({ columns }: BacklogViewProps) {
     if (projectId) {
       loadData(projectId);
     }
-  }, [projectId, type]);
+  }, [projectId, type, searchParams]);
 
   if (!projectId) {
     return (

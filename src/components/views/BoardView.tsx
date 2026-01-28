@@ -30,6 +30,7 @@ import type { Sprint } from '../../services/types/sprints.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../utils/TaskTypeColor';
 import { useProject } from '../../context/ProjectContext';
+import { useSearchParams } from 'react-router-dom';
 
 function TaskCard({ task, column }: { task: Task; column: string }) {
   const {
@@ -80,6 +81,7 @@ function ColumnDropZone({ id, children }: { id: string; children: ReactNode }) {
 
 function BoardView() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const { projectId } = useParams();
   const { project } = useProject();
@@ -160,10 +162,16 @@ function BoardView() {
         setError(null);
         const [projectResp, tasksResp, sprintsResp] = await Promise.all([
           getProjectById(projectId),
-          getTasks({ projectId }),
+          getTasks({
+            projectId,
+            searchInput: searchParams.get('searchInput') || '',
+          }),
           isScrum
             ? fetchWithAuth<{ result?: Sprint[] } | Sprint[]>('/sprint', {
-                params: { projectId },
+                params: {
+                  projectId,
+                  searchInput: searchParams.get('searchInput') || '',
+                },
               })
             : Promise.resolve([] as Sprint[]),
         ]);
@@ -202,7 +210,7 @@ function BoardView() {
     return () => {
       isMounted = false;
     };
-  }, [isScrum, projectId]);
+  }, [isScrum, projectId, searchParams]);
 
   if (!projectId) {
     return (
