@@ -22,7 +22,7 @@ export interface Task {
 
   parentTask?: string;
   assignee?: User;
-  subtasks?: SubTask[];
+  subTask?: string[];
   labels?: string[];
 
   tags: string[];
@@ -36,7 +36,7 @@ export interface Task {
 export type SubTask = {
   _id?: string;
   title: string;
-  isCompleted: boolean;
+  isCompleted?: boolean;
 };
 
 export type User = {

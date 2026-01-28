@@ -9,6 +9,7 @@ export interface Sprint {
   projectId: string;
   createdAt?: string;
   updatedAt?: string;
+  storyPoint: number;
 }
 
 export interface CreateSprintPayload {

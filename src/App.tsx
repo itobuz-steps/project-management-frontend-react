@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
 import Dashboard from './pages/Dashboard';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
@@ -7,6 +7,7 @@ import { LoginPage } from './pages/LoginPage';
 import { VerifyOtpPage } from './pages/VerifyOtpPage';
 import { Flip, ToastContainer } from 'react-toastify';
 import { EditProfilePage } from './pages/EditProfilePage';
+import { ProjectProvider } from './context/ProjectProvider';
 import { AcceptInvitePage } from './pages/AcceptInvitePage';
 
 function App() {
@@ -41,11 +42,17 @@ function App() {
               <Route path="/edit-profile" element={<EditProfilePage />} />
               <Route
                 path="/dashboard"
+                element={<Navigate to="/dashboard/default" replace />}
+              />
+              <Route
+                path="/dashboard/:projectId?/:type/:taskId?"
                 element={
-                  <MainLayout>
-                    <Dashboard />
-                    {/* <h1 className="text-2xl font-semibold">Hello world</h1> */}
-                  </MainLayout>
+                  <ProjectProvider>
+                    <MainLayout>
+                      <Dashboard />
+                      {/* <h1 className="text-2xl font-semibold">Hello world</h1> */}
+                    </MainLayout>
+                  </ProjectProvider>
                 }
               />
             </>

@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/sidebar/Sidebar';
 import SidebarToggle from '../components/sidebar/SidebarToggle';
 import Navbar from '../components/navbar/Navbar';
-import { useSearchParams } from 'react-router-dom';
-import TaskDrawer from '../components/taskDrawer/taskDrawer';
+import TaskDrawer from '../components/taskDrawer/TaskDrawer';
 
 export default function MainLayout({
   children,
@@ -11,23 +11,11 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
-  const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
-  const [openTaskId, setOpenTaskId] = useState<string | null>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { projectId, type, taskId } = useParams();
 
-  useEffect(() => {
-    async function syncTaskDrawerWithUrl() {
-      if (searchParams.get('taskId')) {
-        setOpenTaskId(searchParams.get('taskId'));
-        setTaskDrawerOpen(true);
-      } else {
-        setOpenTaskId(null);
-        setTaskDrawerOpen(false);
-      }
-    }
-
-    syncTaskDrawerWithUrl();
-  }, [searchParams]);
+  const taskDrawerOpen = Boolean(taskId);
+  const openTaskId = taskId ?? null;
 
   return (
     <div className="relative flex h-screen w-full overflow-hidden">
@@ -39,12 +27,12 @@ export default function MainLayout({
         <Navbar />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
+
       {taskDrawerOpen && openTaskId && (
         <TaskDrawer
           taskId={openTaskId}
           onClose={() => {
-            searchParams.delete('taskId');
-            setSearchParams(searchParams);
+            navigate(`/dashboard/${projectId}/${type}`, { replace: true });
           }}
         />
       )}

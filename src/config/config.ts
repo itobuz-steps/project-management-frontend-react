@@ -3,5 +3,5 @@ interface Config {
 }
 
 export const config: Config = {
-  api_base_url: 'http://localhost:3001',
+  api_base_url: 'http://localhost:3050',
 };
