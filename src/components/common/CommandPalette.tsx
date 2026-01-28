@@ -1,5 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { getTasks } from '../../services/tasks.service';
+import type { Task } from '../../services/types/tasks.types';
 
 interface CommandPaletteProps {
   open: boolean;
@@ -15,6 +18,13 @@ export function CommandPalette({
   onChange,
 }: CommandPaletteProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const projectId = searchParams.get('projectId');
+  const type = searchParams.get('type');
+
+  const [recentTasks, setRecentTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // focus input when opened
   useEffect(() => {
@@ -24,6 +34,32 @@ export function CommandPalette({
       });
     }
   }, [open]);
+
+  // fetch recently created tasks when palette opens
+  useEffect(() => {
+    if (!open || !projectId) return;
+
+    setLoading(true);
+
+    getTasks({ projectId })
+      .then((res: any) => {
+        const tasks: Task[] = res.result ?? [];
+
+        const recent = [...tasks]
+          .filter((t) => t.createdAt)
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt!).getTime() -
+              new Date(a.createdAt!).getTime()
+          )
+          .slice(0, 5);
+
+        setRecentTasks(recent);
+      })
+
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [open, projectId]);
 
   // esc to close
   useEffect(() => {
@@ -57,7 +93,46 @@ export function CommandPalette({
           className="w-full rounded-t-xl bg-white px-4 py-4 text-lg outline-none placeholder:text-neutral-400"
         />
 
-        <div className="border-t border-neutral-800 px-4 py-3 text-sm text-neutral-400">
+        {/* RESULTS */}
+        <div className="max-h-[360px] overflow-y-auto">
+          {value.trim() === '' && (
+            <>
+              <div className="px-4 py-2 text-xs font-semibold text-neutral-400 uppercase">
+                Recently created
+              </div>
+              {loading && (
+                <div className="px-4 py-3 text-sm text-neutral-400">
+                  Loading…
+                </div>
+              )}
+              {!loading && recentTasks.length === 0 && (
+                <div className="px-4 py-3 text-sm text-neutral-400">
+                  No recent tasks
+                </div>
+              )}
+              {!loading &&
+                recentTasks.map((task) => (
+                  <button
+                    key={task._id}
+                    onClick={() => {
+                      navigate(
+                        `/dashboard?projectId=${projectId}&type=${type}&taskId=${task._id}`
+                      );
+                      onClose();
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-neutral-100"
+                  >
+                    <span className="rounded bg-neutral-200 px-2 py-0.5 font-mono text-xs">
+                      {task.key}
+                    </span>
+                    <span className="truncate">{task.title}</span>
+                  </button>
+                ))}
+            </>
+          )}
+        </div>
+
+        <div className="border-t border-neutral-200 px-4 py-3 text-sm text-neutral-400">
           Press <kbd>Esc</kbd> to close
         </div>
       </div>
