@@ -45,7 +45,7 @@ function App() {
                 element={<Navigate to="/dashboard/default" replace />}
               />
               <Route
-                path="/dashboard/:projectId?/:type/:taskId?"
+                path="/dashboard/:projectId?/:taskId?"
                 element={
                   <ProjectProvider>
                     <MainLayout>

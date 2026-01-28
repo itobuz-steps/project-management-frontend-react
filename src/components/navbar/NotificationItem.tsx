@@ -1,14 +1,21 @@
 import { DateTime } from 'luxon';
 import type { INotification } from '../../types/notification.types';
 import { config } from '../../config/config';
+import { useNavigate } from 'react-router-dom';
 
 export function NotificationItem({ data }: { data: INotification }) {
+  const navigate = useNavigate();
+
+  function handleClick() {
+    navigate(`/dashboard/${data.projectId}/${data.taskId}`);
+  }
+
   const profileImage = data.profileImage
     ? `${config.api_base_url}/uploads/profile/${data.profileImage}`
     : 'profile.png';
 
   return (
-    <li>
+    <li onClick={handleClick} className="cursor-pointer">
       <div className="flex items-start gap-2 bg-white p-2 transition hover:bg-gray-100">
         <div className="relative shrink-0">
           <img

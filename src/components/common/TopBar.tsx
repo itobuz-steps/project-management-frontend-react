@@ -6,6 +6,7 @@ const views: { label: string; value: ViewMode }[] = [
   { label: 'Backlog', value: 'backlog' },
   { label: 'Board', value: 'board' },
   { label: 'List', value: 'list' },
+  { label: 'For You', value: 'forYou' },
 ];
 
 function TopBar({

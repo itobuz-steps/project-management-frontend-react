@@ -25,7 +25,7 @@ export async function setupPushNotifications(): Promise<PushSubscription | void>
 
   try {
     const registration =
-      await navigator.serviceWorker.register('service-worker.js');
+      await navigator.serviceWorker.register('/service-worker.js');
 
     const permission = await Notification.requestPermission();
 

@@ -30,7 +30,7 @@ export default function Notifications() {
 
     channel.onmessage = (event) => {
       const { type, payload } = event.data;
-
+      console.log(event.data.payload);
       console.log('Received message from service worker:', event.data);
 
       if (type === 'PUSH_NOTIFICATION') {

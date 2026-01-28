@@ -1,6 +1,7 @@
 import { Bug, FileText, Tag } from 'lucide-react';
+import type { TaskType } from '../services/types/tasks.types';
 
-export function TaskTypeIcon({ type }: { type?: string }) {
+export function TaskTypeIcon({ type }: { type: TaskType }) {
   switch (type) {
     case 'bug':
       return <Bug className="h-4 w-4 text-red-500" />;

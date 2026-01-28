@@ -26,7 +26,7 @@ function TaskRow({
   columns: string[];
 }) {
   const navigate = useNavigate();
-  const { projectId, type } = useParams();
+  const { projectId } = useParams();
   // const location = useLocation();
   const {
     attributes,
@@ -66,7 +66,7 @@ function TaskRow({
       <td
         className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline"
         onClick={() => {
-          navigate(`/dashboard/${projectId}/${type}/${task._id}`);
+          navigate(`/dashboard/${projectId}/${task._id}`);
         }}
       >
         {task.title}

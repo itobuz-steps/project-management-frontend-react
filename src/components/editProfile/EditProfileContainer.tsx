@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { EditProfileForm } from './editProfileForm';
+import { EditProfileForm } from './EditProfileForm';
 import { Link } from 'react-router-dom';
 import userService from '../../services/userService';
 

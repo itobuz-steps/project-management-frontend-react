@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../components/api/interceptor';
 import { useProject } from '../context/ProjectContext';
 import { setupPushNotifications } from '../utils/setupNotification';
+import { ForYouPage } from './ForYouPage';
 
 function Dashboard() {
   const { setProject } = useProject();
@@ -39,7 +40,7 @@ function Dashboard() {
   const [viewMode, setViewMode] = useState<ViewMode>('backlog');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <TopBar
         projectName={activeProject?.name}
         viewMode={viewMode}
@@ -50,12 +51,13 @@ function Dashboard() {
         hasActiveFilters={true}
         activeUsers={[]}
       />
-      <main className="p-2">
+      <main>
         {viewMode === 'backlog' && (
           <BacklogView columns={activeProject?.columns || []} />
         )}
         {viewMode === 'board' && <BoardView />}
         {viewMode === 'list' && <ListView />}
+        {viewMode === 'forYou' && <ForYouPage />}
       </main>
     </div>
   );
