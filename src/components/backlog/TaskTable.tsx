@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -13,21 +13,31 @@ import { getPriorityBorder } from '../../utils/utils';
 import type { TaskTableProps } from './type';
 import { useNavigate, useParams } from 'react-router-dom';
 import { updateTask } from '../../services/taskService';
-// import { useNavigate, useLocation } from 'react-router-dom';
 import type { Task } from '../../types/tasks.types';
+import { message } from 'antd';
+
+const formatDateForInput = (date?: string) => {
+  if (!date) return '';
+  const d = new Date(date);
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+    .toISOString()
+    .split('T')[0];
+};
 
 function TaskRow({
   task,
   containerId,
   columns,
+  onPatch,
 }: {
   task: Task;
   containerId: string;
   columns: string[];
+  onPatch: (id: string, patch: Partial<Task>) => void;
 }) {
   const navigate = useNavigate();
   const { projectId, type } = useParams();
-  // const location = useLocation();
+
   const {
     attributes,
     listeners,
@@ -78,9 +88,12 @@ function TaskRow({
           value={task.status}
           columns={columns}
           onChange={async (newStatus) => {
-            await updateTask(task._id, {
-              status: newStatus,
-            });
+            onPatch(task._id, { status: newStatus });
+            try {
+              await updateTask(task._id, { status: newStatus });
+            } catch {
+              message.error('Failed to update status');
+            }
           }}
         />
       </td>
@@ -98,14 +111,17 @@ function TaskRow({
       <td className="p-2 px-6 whitespace-nowrap">
         <input
           type="date"
-          value={task.dueDate?.split('T')[0] ?? ''}
+          value={formatDateForInput(task.dueDate)}
           onChange={async (e) => {
             const newDate = e.target.value;
             if (!newDate) return;
 
-            await updateTask(task._id, {
-              dueDate: newDate,
-            });
+            onPatch(task._id, { dueDate: newDate });
+            try {
+              await updateTask(task._id, { dueDate: newDate });
+            } catch {
+              message.error('Failed to update due date');
+            }
           }}
           className={`w-28 rounded-md border bg-gray-50 p-1 text-sm outline-none ${
             task.dueDate && new Date(task.dueDate) < new Date()
@@ -165,6 +181,18 @@ export function TaskTable({
   containerId,
 }: TaskTableProps) {
   const [open, setOpen] = useState(true);
+  const [localTasks, setLocalTasks] = useState<Task[]>(tasks);
+
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
+
+  const updateTaskInState = (id: string, patch: Partial<Task>) => {
+    setLocalTasks((prev) =>
+      prev.map((t) => (t._id === id ? { ...t, ...patch } : t))
+    );
+  };
+
   const { setNodeRef, isOver } = useDroppable({
     id: `container:${containerId}`,
     data: { type: 'container', containerId },
@@ -182,12 +210,6 @@ export function TaskTable({
             className={`h-4 w-4 transition ${open ? '' : '-rotate-90'}`}
           />
           <span className="font-semibold">{title || sprint?.key}</span>
-
-          {sprint?.dueDate && (
-            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
-              Due {new Date(sprint.dueDate).toLocaleDateString()}
-            </span>
-          )}
         </div>
 
         <div className="space-x-4">
@@ -251,7 +273,7 @@ export function TaskTable({
 
             <tbody className="divide-y">
               <SortableContext
-                items={tasks.map((task) => task._id)}
+                items={localTasks.map((t) => t._id)}
                 strategy={verticalListSortingStrategy}
               >
                 {tasks.length === 0 ? (
@@ -264,12 +286,13 @@ export function TaskTable({
                     </td>
                   </tr>
                 ) : (
-                  tasks.map((task) => (
+                  localTasks.map((task) => (
                     <TaskRow
                       key={task._id}
                       task={task}
                       containerId={containerId}
                       columns={columns}
+                      onPatch={updateTaskInState}
                     />
                   ))
                 )}

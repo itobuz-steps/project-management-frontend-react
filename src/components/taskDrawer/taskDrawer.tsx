@@ -53,7 +53,7 @@ export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
       style={isMobile ? { top: 0, paddingBottom: 0 } : undefined}
       styles={{
         body: {
-          padding: isMobile ? 6 : 24,
+          padding: isMobile ? 6 : 12,
           height: 'auto',
         },
         // overflowY: 'auto',

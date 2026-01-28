@@ -57,7 +57,7 @@ export function CommentItem({ comment, onDelete, onUpdate }: Props) {
   return (
     <>
       {contextHolder}
-      <div className="flex gap-3 border-b border-gray-200 px-3 py-4">
+      <div className="flex gap-3 border-b border-gray-200 px-2 py-2">
         <Avatar
           src={
             comment.author.profileImage

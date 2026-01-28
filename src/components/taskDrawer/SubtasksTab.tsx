@@ -18,10 +18,6 @@ export function SubtasksTab({ task }: { task: Task }) {
     (task.subTask ?? []) as string[]
   );
 
-  useEffect(() => {
-    setSelectedIds((task.subTask ?? []) as string[]);
-  }, [task.subTask]);
-
   const [subtasks, setSubtasks] = useState<Task[]>([]);
   const [projectTasks, setProjectTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
@@ -69,12 +65,13 @@ export function SubtasksTab({ task }: { task: Task }) {
   };
 
   const removeSubtask = async (subtaskId: string) => {
-    setSelectedIds((prev) => prev.filter((id) => id !== subtaskId));
+    const updatedIds = selectedIds.filter((id) => id !== subtaskId);
+    setSelectedIds(updatedIds);
     setSubtasks((prev) => prev.filter((t) => t._id !== subtaskId));
 
     try {
       await updateTask(task._id, {
-        subTask: selectedIds.filter((id) => id !== subtaskId),
+        subTask: updatedIds,
       });
 
       message.success('Subtask removed');

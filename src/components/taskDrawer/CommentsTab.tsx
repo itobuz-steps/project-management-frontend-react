@@ -67,7 +67,7 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
       {contextHolder}
 
       {/* Comment input */}
-      <div className="mb-4 border-b border-gray-200 pb-3">
+      <div className="mb-0 border-b border-gray-200 pb-3">
         <Space orientation="vertical" className="w-full">
           <TextArea
             value={messageText}
