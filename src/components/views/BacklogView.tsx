@@ -176,10 +176,12 @@ function BacklogView({ columns }: BacklogViewProps) {
           const calls: Promise<unknown>[] = [];
 
           if (sourceSprint) {
+            console.log('Calling sprint update API');
             calls.push(removeTaskFromSprint(sourceSprint._id, taskId));
           }
 
           if (targetSprint) {
+            console.log('Calling sprint update API');
             calls.push(addTasksToSprint(targetSprint._id, [taskId]));
           }
 
