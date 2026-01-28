@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Empty, Spin, Modal, Checkbox, Button, Tag } from 'antd';
+import { Empty, Spin, Modal, Checkbox, Button, Tag, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useSearchParams } from 'react-router-dom';
 
@@ -8,6 +8,7 @@ import getTaskById, {
   getTaskByProjectId,
   updateTask,
 } from '../../services/taskService';
+import { Trash2 } from 'lucide-react';
 
 export function SubtasksTab({ task }: { task: Task }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,12 +16,12 @@ export function SubtasksTab({ task }: { task: Task }) {
   const projectId = searchParams.get('projectId')!;
   const currentTaskId = searchParams.get('taskId');
 
+  const selectedIds = (task.subTask ?? []) as string[];
+
   const [subtasks, setSubtasks] = useState<Task[]>([]);
   const [projectTasks, setProjectTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-
-  const selectedIds = (task.subTask ?? []) as unknown as string[];
 
   useEffect(() => {
     if (!selectedIds.length) return;
@@ -49,18 +50,47 @@ export function SubtasksTab({ task }: { task: Task }) {
 
   const openModal = async () => {
     setModalOpen(true);
+
     const tasks = await getTaskByProjectId(projectId);
+
     setProjectTasks(tasks.filter((t: Task) => t._id !== task._id));
   };
 
   const toggleSubtask = async (subtaskId: string, checked: boolean) => {
-    const updatedSubtasks = checked
+    const updated = checked
       ? [...new Set([...selectedIds, subtaskId])]
       : selectedIds.filter((id) => id !== subtaskId);
 
-    await updateTask(task._id, {
-      subTask: updatedSubtasks,
-    });
+    try {
+      await updateTask(task._id, {
+        subTask: updated,
+      });
+
+      message.success(
+        checked ? 'Subtask added successfully' : 'Subtask removed successfully'
+      );
+    } catch (error) {
+      console.error(error);
+      message.error('Failed to update subtask');
+    }
+  };
+
+  const removeSubtask = async (subtaskId: string) => {
+    const updated = selectedIds.filter((id) => id !== subtaskId);
+
+    // optimistic UI
+    setSubtasks((prev) => prev.filter((t) => t._id !== subtaskId));
+
+    try {
+      await updateTask(task._id, {
+        subTask: updated,
+      });
+
+      message.success('Subtask removed');
+    } catch (error) {
+      console.error(error);
+      message.error('Failed to remove subtask');
+    }
   };
 
   const openSubtask = (subtaskId: string) => {
@@ -74,7 +104,7 @@ export function SubtasksTab({ task }: { task: Task }) {
       {/* HEADER */}
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-600">
-          Subtasks ({subtasks.length})
+          Subtasks ({selectedIds.length})
         </h3>
 
         <Button size="small" icon={<PlusOutlined />} onClick={openModal}>
@@ -87,21 +117,23 @@ export function SubtasksTab({ task }: { task: Task }) {
         <div className="flex justify-center py-6">
           <Spin />
         </div>
-      ) : !subtasks.length ? (
+      ) : !selectedIds.length ? (
         <Empty />
       ) : (
         <div className="space-y-2">
           {subtasks.map((subtask) => (
             <div
               key={subtask._id}
-              onClick={() => openSubtask(subtask._id)}
-              className={`group flex cursor-pointer items-center justify-between rounded-lg border p-3 transition ${
+              className={`group flex items-center justify-between rounded-lg border p-3 transition ${
                 currentTaskId === subtask._id
                   ? 'border-primary-400 bg-primary-50'
                   : 'bg-white hover:shadow-md'
               }`}
             >
-              <div>
+              <div
+                className="flex-1 cursor-pointer"
+                onClick={() => openSubtask(subtask._id)}
+              >
                 <div className="font-medium">
                   {subtask.key} — {subtask.title}
                 </div>
@@ -111,15 +143,23 @@ export function SubtasksTab({ task }: { task: Task }) {
                 </div>
               </div>
 
-              <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100">
-                Open →
-              </span>
+              <Button
+                size="small"
+                danger
+                type="text"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeSubtask(subtask._id);
+                }}
+              >
+                <Trash2 size={16} />
+              </Button>
             </div>
           ))}
         </div>
       )}
 
-      {/* MANAGE SUBTASK MODAL */}
+      {/* MODAL */}
       <Modal
         title="Manage Subtasks"
         open={modalOpen}
@@ -128,24 +168,33 @@ export function SubtasksTab({ task }: { task: Task }) {
       >
         <div className="max-h-[420px] space-y-2 overflow-y-auto">
           {projectTasks.map((t) => {
-            const checked = selectedIds.includes(t._id);
+            const isSubtask = selectedIds.includes(t._id);
 
             return (
               <div
                 key={t._id}
-                className="flex items-center justify-between rounded border p-2 hover:bg-gray-50"
+                className={`flex items-center justify-between rounded border p-2 transition ${isSubtask ? 'border-primary-400 bg-primary-50' : 'hover:bg-gray-50'} `}
               >
                 <div>
                   <div className="text-sm font-medium">
                     {t.key} — {t.title}
                   </div>
-                  <div className="text-xs text-gray-500">
-                    {t.type} · {t.status}
+
+                  <div className="flex gap-2 text-xs text-gray-500">
+                    <span>{t.type}</span>
+                    <span>·</span>
+                    <span>{t.status}</span>
+
+                    {isSubtask && (
+                      <Tag color="green" className="ml-2">
+                        Subtask
+                      </Tag>
+                    )}
                   </div>
                 </div>
 
                 <Checkbox
-                  checked={checked}
+                  checked={selectedIds.includes(t._id)}
                   onChange={(e) => toggleSubtask(t._id, e.target.checked)}
                 />
               </div>

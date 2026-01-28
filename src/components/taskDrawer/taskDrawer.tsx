@@ -98,7 +98,7 @@ export default function TaskDrawer({ taskId, onClose }: TaskDrawerProps) {
             },
             {
               key: 'subtasks',
-              label: `Subtasks (${task.subTask?.length ?? 0})`,
+              label: `Subtasks`,
               children: <SubtasksTab task={task} />,
             },
             {
