@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchWithAuth } from '../api/interceptor';
-import { useSearchParams } from 'react-router-dom';
-import type { Sprint } from '../../types/sprint.types';
+import { useParams } from 'react-router-dom';
+import type { Sprint } from '../../services/types/sprints.types';
 import type { Task } from '../../types/tasks.types';
 import { TaskTable } from '../backlog/TaskTable';
 
@@ -10,9 +10,7 @@ interface BacklogViewProps {
 }
 
 function BacklogView({ columns }: BacklogViewProps) {
-  const [searchParams] = useSearchParams();
-  const projectId = searchParams.get('projectId');
-  const type = searchParams.get('type');
+  const { projectId, type } = useParams();
   const isScrum = type === 'scrum';
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -20,6 +18,8 @@ function BacklogView({ columns }: BacklogViewProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!projectId) return;
+
     async function loadData(projectId: string) {
       try {
         setLoading(true);
@@ -47,10 +47,6 @@ function BacklogView({ columns }: BacklogViewProps) {
       } finally {
         setLoading(false);
       }
-    }
-
-    if (!projectId) {
-      return;
     }
 
     loadData(projectId);

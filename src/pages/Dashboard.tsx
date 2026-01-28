@@ -5,14 +5,13 @@ import BacklogView from '../components/views/BacklogView';
 import BoardView from '../components/views/BoardView';
 import ListView from '../components/views/ListView';
 import type { Project } from '../types/project.types';
-import { useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../components/api/interceptor';
 import { useProject } from '../context/ProjectContext';
 
 function Dashboard() {
   const { setProject } = useProject();
-  const [searchParams] = useSearchParams();
-  const projectId = searchParams.get('projectId');
+  const { projectId } = useParams();
 
   const [projects, setProjects] = useState<Project[]>([]);
   const activeProject = projects.find((p) => p._id === projectId);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Empty, Spin, Modal, Checkbox, Button, Tag, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import type { Task } from '../../types/tasks.types';
 import getTaskById, {
@@ -11,10 +11,8 @@ import getTaskById, {
 import { Trash2 } from 'lucide-react';
 
 export function SubtasksTab({ task }: { task: Task }) {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const projectId = searchParams.get('projectId')!;
-  const currentTaskId = searchParams.get('taskId');
+  const navigate = useNavigate();
+  const { projectId, type, taskId: currentTaskId } = useParams();
 
   const selectedIds = (task.subTask ?? []) as string[];
 
@@ -51,7 +49,7 @@ export function SubtasksTab({ task }: { task: Task }) {
   const openModal = async () => {
     setModalOpen(true);
 
-    const tasks = await getTaskByProjectId(projectId);
+    const tasks = await getTaskByProjectId(projectId as string);
 
     setProjectTasks(tasks.filter((t: Task) => t._id !== task._id));
   };
@@ -94,9 +92,7 @@ export function SubtasksTab({ task }: { task: Task }) {
   };
 
   const openSubtask = (subtaskId: string) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('taskId', subtaskId);
-    setSearchParams(params);
+    navigate(`/dashboard/${projectId}/${type}/${subtaskId}`);
   };
 
   return (

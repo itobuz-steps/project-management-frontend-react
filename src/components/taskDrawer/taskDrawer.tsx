@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { Modal, Tabs, Tag, Spin } from 'antd';
 import type { Task } from '../../types/tasks.types';
 import getTaskById from '../../services/taskService';
@@ -18,7 +17,6 @@ interface TaskDrawerProps {
 export default function TaskDrawer({ taskId, onClose }: TaskDrawerProps) {
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
   const screens = useBreakpoint();
 
   const isMobile = !screens.md;
@@ -31,7 +29,6 @@ export default function TaskDrawer({ taskId, onClose }: TaskDrawerProps) {
       try {
         setLoading(true);
         const data = await getTaskById(taskId);
-        console.log(data);
         if (!cancelled) setTask(data);
       } finally {
         if (!cancelled) setLoading(false);
@@ -44,16 +41,10 @@ export default function TaskDrawer({ taskId, onClose }: TaskDrawerProps) {
     };
   }, [taskId]);
 
-  const closeModal = () => {
-    searchParams.delete('taskId');
-    setSearchParams(searchParams);
-    onClose();
-  };
-
   return (
     <Modal
       open={!!taskId}
-      onCancel={closeModal}
+      onCancel={onClose}
       footer={null}
       centered={!isMobile}
       width={isMobile ? '100%' : 900}

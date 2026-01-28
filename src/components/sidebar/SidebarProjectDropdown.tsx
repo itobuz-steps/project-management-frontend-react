@@ -1,20 +1,19 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../api/interceptor';
 import type { Project } from '../../types/project.types';
 
 function SidebarProjectsDropdown() {
   const [projects, setProjects] = useState<Project[]>([]);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
-  const activeProjectId = searchParams.get('projectId');
+  const { projectId: activeProjectId } = useParams();
 
   useEffect(() => {
     async function loadProjects() {
       try {
         const res = await fetchWithAuth<Project[]>('/project');
-        console.log(res)
+        console.log(res);
         setProjects(res);
       } catch (err) {
         console.error(err);
@@ -26,7 +25,7 @@ function SidebarProjectsDropdown() {
   }, []);
 
   function handleProjectClick(projectId: string, type: string) {
-    navigate(`?projectId=${projectId}&type=${type}`);
+    navigate(`/dashboard/${projectId}/${type}`);
   }
 
   return (

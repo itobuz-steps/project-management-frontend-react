@@ -39,7 +39,7 @@ function App() {
             <>
               <Route path="/edit-profile" element={<EditProfilePage />} />
               <Route
-                path="/dashboard"
+                path="/dashboard/:projectId?/:type/:taskId?"
                 element={
                   <ProjectProvider>
                     <MainLayout>
