@@ -4,18 +4,16 @@ import { toast } from 'react-toastify';
 
 export function ProtectedRoute({
   redirectPath = '/login',
-  isAuthenticated,
 }: {
   redirectPath?: string;
-  isAuthenticated: boolean;
 }) {
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (localStorage.getItem('access_token') === null) {
       toast.error('Please log in to access this page.');
     }
-  }, [isAuthenticated]);
+  }, []);
 
-  if (!isAuthenticated) {
+  if (localStorage.getItem('access_token') === null) {
     return <Navigate to={redirectPath} replace />;
   }
 

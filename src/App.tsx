@@ -14,20 +14,8 @@ import BoardView from './components/views/BoardView';
 import ListView from './components/views/ListView';
 import { ForYouPage } from './pages/ForYouPage';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
-import { useEffect, useState } from 'react';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    function checkAccessToken() {
-      const token = localStorage.getItem('access_token');
-      setIsAuthenticated(token ? true : false);
-    }
-
-    checkAccessToken();
-  }, []);
-
   return (
     <>
       <ToastContainer
@@ -52,7 +40,7 @@ function App() {
           <Route path="/verify-otp" element={<VerifyOtpPage />} />
           <Route path="/invite/join" element={<AcceptInvitePage />} />
 
-          <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+          <Route element={<ProtectedRoute />}>
             <Route path="/edit-profile" element={<EditProfilePage />} />
             <Route
               path="/dashboard"
