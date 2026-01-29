@@ -9,9 +9,24 @@ import { Flip, ToastContainer } from 'react-toastify';
 import { EditProfilePage } from './pages/EditProfilePage';
 import { ProjectProvider } from './context/ProjectProvider';
 import { AcceptInvitePage } from './pages/AcceptInvitePage';
+import BacklogView from './components/views/BacklogView';
+import BoardView from './components/views/BoardView';
+import ListView from './components/views/ListView';
+import { ForYouPage } from './pages/ForYouPage';
+import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { useEffect, useState } from 'react';
 
 function App() {
-  const isAuthenticated = true;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    function checkAccessToken() {
+      const token = localStorage.getItem('access_token');
+      setIsAuthenticated(token ? true : false);
+    }
+
+    checkAccessToken();
+  }, []);
 
   return (
     <>
@@ -37,26 +52,30 @@ function App() {
           <Route path="/verify-otp" element={<VerifyOtpPage />} />
           <Route path="/invite/join" element={<AcceptInvitePage />} />
 
-          {isAuthenticated && (
-            <>
-              <Route path="/edit-profile" element={<EditProfilePage />} />
-              <Route
-                path="/dashboard"
-                element={<Navigate to="/dashboard/default" replace />}
-              />
-              <Route
-                path="/dashboard/:projectId?/:taskId?"
-                element={
-                  <ProjectProvider>
-                    <MainLayout>
-                      <Dashboard />
-                      {/* <h1 className="text-2xl font-semibold">Hello world</h1> */}
-                    </MainLayout>
-                  </ProjectProvider>
-                }
-              />
-            </>
-          )}
+          <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+            <Route path="/edit-profile" element={<EditProfilePage />} />
+            <Route
+              path="/dashboard"
+              element={<Navigate to="/dashboard/default" replace />}
+            />
+            <Route
+              path="/dashboard/:projectId?/:taskId?"
+              element={
+                <ProjectProvider>
+                  <MainLayout>
+                    <Dashboard />
+                    {/* <h1 className="text-2xl font-semibold">Hello world</h1> */}
+                  </MainLayout>
+                </ProjectProvider>
+              }
+            >
+              <Route index element={<Navigate to="backlog" replace />} />
+              <Route path="backlog" element={<BacklogView />} />
+              <Route path="board" element={<BoardView />} />
+              <Route path="list" element={<ListView />} />
+              <Route path="for-you" element={<ForYouPage />} />
+            </Route>
+          </Route>
         </Routes>
       </BrowserRouter>
     </>
