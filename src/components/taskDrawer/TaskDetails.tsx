@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Task } from '../../types/tasks.types';
+import type { TaskPopulated } from '../../services/types/tasks.types';
 import { Button, Descriptions, Tag } from 'antd';
 import { EditTaskModal } from '../../utils/EditTaskModal';
 import { UserCell } from '../../utils/UserCell';
@@ -10,8 +10,8 @@ export function TaskDetails({
   onUpdated,
   isMobile,
 }: {
-  task: Task;
-  onUpdated: (t: Task) => void;
+  task: TaskPopulated;
+  onUpdated: (t: TaskPopulated) => void;
   isMobile: boolean;
 }) {
   const [editOpen, setEditOpen] = useState(false);

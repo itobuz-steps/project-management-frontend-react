@@ -13,7 +13,7 @@ import { getPriorityBorder } from '../../utils/utils';
 import type { TaskTableProps } from './type';
 import { useNavigate, useParams } from 'react-router-dom';
 import { updateTask } from '../../services/taskService';
-import type { Task } from '../../types/tasks.types';
+import type { TaskPopulated } from '../../services/types/tasks.types';
 import { message } from 'antd';
 
 const formatDateForInput = (date?: string) => {
@@ -30,10 +30,10 @@ function TaskRow({
   columns,
   onPatch,
 }: {
-  task: Task;
+  task: TaskPopulated;
   containerId: string;
   columns: string[];
-  onPatch: (id: string, patch: Partial<Task>) => void;
+  onPatch: (id: string, patch: Partial<TaskPopulated>) => void;
 }) {
   const navigate = useNavigate();
   const { projectId } = useParams();
@@ -181,13 +181,13 @@ export function TaskTable({
   containerId,
 }: TaskTableProps) {
   const [open, setOpen] = useState(true);
-  const [localTasks, setLocalTasks] = useState<Task[]>(tasks);
+  const [localTasks, setLocalTasks] = useState<TaskPopulated[]>(tasks);
 
   useEffect(() => {
     setLocalTasks(tasks);
   }, [tasks]);
 
-  const updateTaskInState = (id: string, patch: Partial<Task>) => {
+  const updateTaskInState = (id: string, patch: Partial<TaskPopulated>) => {
     setLocalTasks((prev) =>
       prev.map((t) => (t._id === id ? { ...t, ...patch } : t))
     );

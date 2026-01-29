@@ -5,12 +5,12 @@ import {
   FileOutlined,
 } from '@ant-design/icons';
 import { config } from '../../config/config';
-import type { Task } from '../../types/tasks.types';
+import type { TaskPopulated } from '../../services/types/tasks.types';
 
 const { Text, Link } = Typography;
 
 interface AttachmentsTabProps {
-  task: Task;
+  task: TaskPopulated;
 }
 
 export function AttachmentsTab({ task }: AttachmentsTabProps) {

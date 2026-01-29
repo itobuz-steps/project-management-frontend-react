@@ -3,14 +3,14 @@ import { Empty, Spin, Modal, Checkbox, Button, Tag, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import type { Task } from '../../types/tasks.types';
+import type { TaskPopulated } from '../../services/types/tasks.types';
 import getTaskById, {
   getTaskByProjectId,
   updateTask,
 } from '../../services/taskService';
 import { Trash2 } from 'lucide-react';
 
-export function SubtasksTab({ task }: { task: Task }) {
+export function SubtasksTab({ task }: { task: TaskPopulated }) {
   const navigate = useNavigate();
   const { projectId, type, taskId: currentTaskId } = useParams();
 
@@ -18,8 +18,8 @@ export function SubtasksTab({ task }: { task: Task }) {
     (task.subTask ?? []) as string[]
   );
 
-  const [subtasks, setSubtasks] = useState<Task[]>([]);
-  const [projectTasks, setProjectTasks] = useState<Task[]>([]);
+  const [subtasks, setSubtasks] = useState<TaskPopulated[]>([]);
+  const [projectTasks, setProjectTasks] = useState<TaskPopulated[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -53,7 +53,7 @@ export function SubtasksTab({ task }: { task: Task }) {
 
     const tasks = await getTaskByProjectId(projectId as string);
 
-    setProjectTasks(tasks.filter((t: Task) => t._id !== task._id));
+    setProjectTasks(tasks.filter((t: TaskPopulated) => t._id !== task._id));
   };
 
   const toggleSubtask = (subtaskId: string, checked: boolean) => {

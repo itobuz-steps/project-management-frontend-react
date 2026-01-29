@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Modal, Tabs, Tag, Spin } from 'antd';
-import type { Task } from '../../types/tasks.types';
+import type { TaskPopulated } from '../../services/types/tasks.types';
 import getTaskById from '../../services/taskService';
 import { Grid } from 'antd';
 const { useBreakpoint } = Grid;
@@ -17,7 +17,7 @@ import { CommentsTab } from './CommentsTab';
 
 
 export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
-  const [task, setTask] = useState<Task | null>(null);
+  const [task, setTask] = useState<TaskPopulated | null>(null);
   const [loading, setLoading] = useState(false);
   const screens = useBreakpoint();
 

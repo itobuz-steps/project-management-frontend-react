@@ -1,4 +1,4 @@
-import type { User } from '../../types/tasks.types';
+import type { User } from '../../services/types/tasks.types';
 import type { IResponse } from './common';
 
 interface IUserResponse extends IResponse {
