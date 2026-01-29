@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import TopBar from '../components/common/TopBar';
 import type { ViewMode } from '../types/TopBar.types';
-import BacklogView from '../components/views/BacklogView';
-import BoardView from '../components/views/BoardView';
-import ListView from '../components/views/ListView';
+import BacklogView from '../components/views/BacklogView/BacklogView';
+import BoardView from '../components/views/BoardView/BoardView';
+import ListView from '../components/views/ListView/ListView';
 import type { Project } from '../types/project.types';
 import { useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../components/api/interceptor';

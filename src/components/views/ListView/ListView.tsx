@@ -1,0 +1,232 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import { getTasks, updateTask } from '../../../services/tasks.service';
+import type { Task, TaskStatus } from '../../../services/types/tasks.types';
+import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
+import { TaskTypeColor } from '../../../utils/TaskTypeColor';
+import { StatusSelect } from '../../../utils/StatusSelect';
+import { getPriorityBorder } from '../../../utils/utils';
+import { useProject } from '../../../context/ProjectContext';
+
+const priorityStyles: Record<string, string> = {
+  critical: 'bg-red-100 text-red-700',
+  high: 'bg-yellow-100 text-yellow-700',
+  medium: 'bg-blue-100 text-blue-700',
+  low: 'bg-green-100 text-green-700',
+};
+
+const formatDate = (value?: string) => {
+  if (!value) return '—';
+  return new Date(value).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+function ListView() {
+  const navigate = useNavigate();
+  const { projectId } = useParams();
+  const [searchParams] = useSearchParams();
+  const { columns } = useProject();
+
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const visibleTasks = useMemo(() => tasks, [tasks]);
+
+  useEffect(() => {
+    if (!projectId) {
+      setTasks([]);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const taskPayload = await getTasks({
+          projectId,
+          searchInput: searchParams.get('searchInput') || '',
+        });
+
+        const normalized = Array.isArray(taskPayload)
+          ? taskPayload
+          : ((taskPayload as { result?: Task[] }).result ?? []);
+
+        if (isMounted) setTasks(normalized);
+      } catch {
+        if (isMounted) setError('Failed to load tasks.');
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    load();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [projectId, searchParams]);
+
+  if (!projectId) {
+    return (
+      <div className="rounded-lg border bg-blue-50 p-6 text-center text-gray-500">
+        <h2 className="mb-2 text-lg font-semibold text-gray-700">
+          No project selected
+        </h2>
+        <p className="text-sm">
+          Select a project from the sidebar to view its list.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <table className="min-w-full table-auto overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
+      <thead className="sticky top-0 z-10 bg-[#f8f8f8] text-xs font-semibold text-gray-500 uppercase">
+        <tr>
+          <th className="p-3">Type</th>
+          <th className="p-3">Key</th>
+          <th className="p-3">Summary</th>
+          <th className="p-3">Status</th>
+          <th className="p-3">Assignee</th>
+          <th className="p-3">Priority</th>
+          <th className="p-3">Reporter</th>
+          <th className="p-3">Labels</th>
+          <th className="p-3">Created</th>
+          <th className="p-3">Due</th>
+          <th className="p-3">Updated</th>
+        </tr>
+      </thead>
+
+      <tbody className="divide-y whitespace-nowrap">
+        {loading && (
+          <tr>
+            <td colSpan={11} className="p-4 text-center text-gray-500">
+              Loading tasks...
+            </td>
+          </tr>
+        )}
+
+        {error && !loading && (
+          <tr>
+            <td colSpan={11} className="p-4 text-center text-red-600">
+              {error}
+            </td>
+          </tr>
+        )}
+
+        {!loading && !error && visibleTasks.length === 0 && (
+          <tr>
+            <td colSpan={11} className="p-4 text-center text-gray-500">
+              No tasks available
+            </td>
+          </tr>
+        )}
+
+        {!loading &&
+          !error &&
+          visibleTasks.map((task) => (
+            <tr
+              key={task._id}
+              className={`cursor-pointer hover:bg-gray-50 ${getPriorityBorder(
+                task.priority
+              )}`}
+              onClick={() => {
+                navigate(`/dashboard/${projectId}/${task._id}`);
+              }}
+            >
+              <td className="p-3">
+                <TaskTypeIcon type={task.type} />
+              </td>
+              <td className="p-3 whitespace-nowrap">
+                <TaskTypeColor type={task.type}>
+                  {task.key ?? task._id}
+                </TaskTypeColor>
+              </td>
+              <td className="p-3 font-medium whitespace-nowrap text-gray-900">
+                {task.title}
+              </td>
+              <td className="p-3">
+                <StatusSelect
+                  taskId={task._id}
+                  value={task.status}
+                  columns={columns}
+                  onChange={(value) => {
+                    const next = value as TaskStatus;
+                    const previous = task.status;
+                    setTasks((prev) =>
+                      prev.map((t) =>
+                        t._id === task._id ? { ...t, status: next } : t
+                      )
+                    );
+
+                    void updateTask(task._id, { status: next }).catch(() => {
+                      setTasks((prev) =>
+                        prev.map((t) =>
+                          t._id === task._id ? { ...t, status: previous } : t
+                        )
+                      );
+                    });
+                  }}
+                />
+              </td>
+              <td className="p-3 whitespace-nowrap text-gray-700">
+                {task.assignee ? String(task.assignee) : 'Unassigned'}
+              </td>
+              <td className="p-3">
+                <span
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${
+                    priorityStyles[task.priority] || 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  {task.priority}
+                </span>
+              </td>
+              <td className="p-3 whitespace-nowrap text-gray-700">
+                {task.reporter ? String(task.reporter) : 'Unknown'}
+              </td>
+              <td className="w-full p-3">
+                <div className="flex flex-wrap gap-1 whitespace-nowrap">
+                  {task.tags?.slice(0, 1).map((label) => (
+                    <span
+                      key={label}
+                      className="rounded bg-blue-100 px-2 py-0.5 text-xs whitespace-nowrap text-blue-700"
+                    >
+                      {label}
+                    </span>
+                  ))}
+                  {task.tags && task.tags.length > 1 && (
+                    <span className="rounded bg-gray-200 px-2 py-0.5 text-xs whitespace-nowrap">
+                      +{task.tags.length - 1}
+                    </span>
+                  )}
+                  {!task.tags?.length && (
+                    <span className="text-xs text-gray-400">—</span>
+                  )}
+                </div>
+              </td>
+              <td className="p-3 whitespace-nowrap text-gray-600">
+                {formatDate(task.createdAt)}
+              </td>
+              <td className="p-3 whitespace-nowrap text-gray-600">
+                {formatDate(task.dueDate)}
+              </td>
+              <td className="p-3 whitespace-nowrap text-gray-600">
+                {formatDate(task.updatedAt)}
+              </td>
+            </tr>
+          ))}
+      </tbody>
+    </table>
+  );
+}
+
+export default ListView;
