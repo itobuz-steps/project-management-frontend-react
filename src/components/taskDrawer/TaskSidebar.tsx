@@ -10,9 +10,11 @@ import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { StatusSelect } from '../../utils/StatusSelect';
 import { formatDateForInput } from '../../utils/utils';
 import { useProject } from '../../context/ProjectContext';
+import { InputNumber, Dropdown, Space } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+import { PRIORITIES, PRIORITY_COLORS, TASK_TYPES } from './constants';
 
-const TASK_TYPES = ['task', 'story', 'bug'] as const;
-const PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
+const STORY_POINTS = [1, 2, 3, 5, 8, 13];
 
 export function TaskSidebar({
   task,
@@ -63,12 +65,10 @@ export function TaskSidebar({
               }}
             />
           </SidebarRow>
-
           {/* ASSIGNEE */}
           <SidebarRow label="Assignee">
             <UserCell user={task.assignee} emptyText="Unassigned" />
           </SidebarRow>
-
           {/* PRIORITY */}
           <SidebarRow label="Priority">
             {editing !== 'priority' ? (
@@ -78,13 +78,9 @@ export function TaskSidebar({
               >
                 <Tag
                   color={
-                    task.priority === 'critical'
-                      ? 'red'
-                      : task.priority === 'high'
-                        ? 'orange'
-                        : task.priority === 'medium'
-                          ? 'blue'
-                          : 'green'
+                    PRIORITY_COLORS[
+                      task.priority as keyof typeof PRIORITY_COLORS
+                    ] ?? 'green'
                   }
                 >
                   {task.priority}
@@ -111,15 +107,14 @@ export function TaskSidebar({
                 }}
                 className="w-full rounded-md border bg-gray-50 p-1 text-sm capitalize"
               >
-                {PRIORITIES.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
+                {PRIORITIES.map((priority) => (
+                  <option key={priority} value={priority}>
+                    {priority}
                   </option>
                 ))}
               </select>
             )}
           </SidebarRow>
-
           {/* TYPE with ICON */}
           <SidebarRow label="Type">
             {editing !== 'type' ? (
@@ -151,45 +146,63 @@ export function TaskSidebar({
                 }}
                 className="w-full rounded-md border bg-gray-50 p-1 text-sm capitalize"
               >
-                {TASK_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
+                {TASK_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
                   </option>
                 ))}
               </select>
             )}
           </SidebarRow>
-
           {/* STORY POINTS */}
           <SidebarRow label="Story Points">
-            <select
-              value={task.storyPoint ?? ''}
-              onChange={async (e) => {
-                const value = e.target.value
-                  ? Number(e.target.value)
-                  : undefined;
+            <Space.Compact className="w-full">
+              <InputNumber
+                className="w-full"
+                min={0}
+                value={task.storyPoint}
+                placeholder="—"
+                onChange={async (value) => {
+                  const optimistic = {
+                    ...task,
+                    storyPoint: value ?? undefined,
+                  };
+                  onUpdated(optimistic);
 
-                const optimistic = { ...task, storyPoint: value };
-                onUpdated(optimistic);
+                  try {
+                    await updateTask(task._id, {
+                      storyPoint: value ?? undefined,
+                    });
+                  } catch {
+                    message.error('Failed to update story points');
+                    onUpdated(task);
+                  }
+                }}
+              />
 
-                try {
-                  await updateTask(task._id, { storyPoint: value });
-                } catch {
-                  message.error('Failed to update story points');
-                  onUpdated(task);
-                }
-              }}
-              className="w-full rounded-md border bg-gray-50 p-1 text-sm"
-            >
-              <option value="">—</option>
-              {[1, 2, 3, 5, 8, 13].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
+              <Dropdown
+                menu={{
+                  items: STORY_POINTS.map((n) => ({
+                    key: n,
+                    label: n,
+                    onClick: async () => {
+                      const optimistic = { ...task, storyPoint: n };
+                      onUpdated(optimistic);
+
+                      try {
+                        await updateTask(task._id, { storyPoint: n });
+                      } catch {
+                        message.error('Failed to update story points');
+                        onUpdated(task);
+                      }
+                    },
+                  })),
+                }}
+              >
+                <Button icon={<DownOutlined />} />
+              </Dropdown>
+            </Space.Compact>
           </SidebarRow>
-
           {/* DUE DATE — inline editable */}
           <SidebarRow label="Due Date">
             <input
@@ -216,7 +229,6 @@ export function TaskSidebar({
               }`}
             />
           </SidebarRow>
-
           {/* REPORTER */}
           <SidebarRow label="Reporter">
             <UserCell user={task.reporter} emptyText="—" />

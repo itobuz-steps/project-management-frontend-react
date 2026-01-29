@@ -22,8 +22,8 @@ export interface Task {
   labels?: string[];
   tags?: string[];
   attachments?: FileList | File[];
-  createdAt?: string | number | Date;
-  updatedAt?: string | number | Date;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type SubTask = {
@@ -57,8 +57,8 @@ export interface TaskPopulated {
   labels?: string[];
   attachments?: FileList | File[];
   tags?: string[];
-  createdAt?: string | number | Date;
-  updatedAt?: string | number | Date;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreateTaskPayload {

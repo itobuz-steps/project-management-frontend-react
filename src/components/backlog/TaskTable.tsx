@@ -29,8 +29,8 @@ export function TaskTable({
   }, [tasks]);
 
   const updateTaskInState = (id: string, patch: Partial<TaskPopulated>) => {
-    setLocalTasks((prev) =>
-      prev.map((t) => (t._id === id ? { ...t, ...patch } : t))
+    setLocalTasks((previous) =>
+      previous.map((task) => (task._id === id ? { ...task, ...patch } : task))
     );
   };
 
@@ -158,7 +158,7 @@ export function TaskTable({
 
             <tbody className="divide-y">
               <SortableContext
-                items={localTasks.map((t) => t._id)}
+                items={localTasks.map((task) => task._id)}
                 strategy={verticalListSortingStrategy}
               >
                 {tasks.length === 0 ? (

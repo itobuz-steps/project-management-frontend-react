@@ -98,11 +98,11 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
       </div>
 
       {/* Comments */}
-      {loading ? (
-        <Spin />
-      ) : !comments.length ? (
-        <Empty description="No comments yet" />
-      ) : (
+      {loading && <Spin />}
+
+      {!loading && !comments.length && <Empty description="No comments yet" />}
+
+      {!loading && comments.length > 0 && (
         <div>
           {comments.map((comment) => (
             <CommentItem

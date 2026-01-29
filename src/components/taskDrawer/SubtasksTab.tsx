@@ -54,7 +54,9 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
 
     const tasks = await getTaskByProjectId(projectId as string);
 
-    setProjectTasks(tasks.filter((t: TaskPopulated) => t._id !== task._id));
+    setProjectTasks(
+      tasks.filter((task: TaskPopulated) => task._id !== task._id)
+    );
   };
 
   const toggleSubtask = (subtaskId: string, checked: boolean) => {
@@ -68,7 +70,7 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
   const removeSubtask = async (subtaskId: string) => {
     const updatedIds = selectedIds.filter((id) => id !== subtaskId);
     setSelectedIds(updatedIds);
-    setSubtasks((prev) => prev.filter((t) => t._id !== subtaskId));
+    setSubtasks((prev) => prev.filter((task) => task._id !== subtaskId));
 
     try {
       await updateTask(task._id, {
@@ -147,10 +149,7 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
 
                   <Tag color="gold">{subtask.status}</Tag>
 
-                  <UserCell
-                    user={subtask.assignee}
-                    emptyText="Unassigned"
-                  />
+                  <UserCell user={subtask.assignee} emptyText="Unassigned" />
                 </div>
               </div>
 
@@ -179,23 +178,23 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
         footer={null}
       >
         <div className="max-h-[420px] space-y-2 overflow-y-auto">
-          {projectTasks.map((t) => {
-            const isSubtask = selectedIds.includes(t._id);
+          {projectTasks.map((task) => {
+            const isSubtask = selectedIds.includes(task._id);
 
             return (
               <div
-                key={t._id}
+                key={task._id}
                 className={`flex items-center justify-between rounded border p-2 transition ${isSubtask ? 'border-primary-400 bg-primary-50' : 'hover:bg-gray-50'} `}
               >
                 <div>
                   <div className="text-sm font-medium">
-                    {t.key} — {t.title}
+                    {task.key} — {task.title}
                   </div>
 
                   <div className="flex gap-2 text-xs text-gray-500">
-                    <span>{t.type}</span>
+                    <span>{task.type}</span>
                     <span>·</span>
-                    <span>{t.status}</span>
+                    <span>{task.status}</span>
 
                     {isSubtask && (
                       <Tag color="green" className="ml-2">
@@ -206,8 +205,8 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
                 </div>
 
                 <Checkbox
-                  checked={selectedIds.includes(t._id)}
-                  onChange={(e) => toggleSubtask(t._id, e.target.checked)}
+                  checked={selectedIds.includes(task._id)}
+                  onChange={(e) => toggleSubtask(task._id, e.target.checked)}
                 />
               </div>
             );

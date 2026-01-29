@@ -6,11 +6,11 @@ import {
   PaperClipOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
-import { DateTime } from 'luxon';
 import { marked } from 'marked';
 import { commentsApi } from '../../services/commentService';
 import { config } from '../../config/config';
 import type { CommentItemProps } from './taskDrawer.type';
+import { formatDistanceToNow } from 'date-fns';
 
 const { Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -66,7 +66,9 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
               <div>
                 <Text strong>{comment.author.name}</Text>
                 <div className="text-xs text-gray-500">
-                  {DateTime.fromISO(comment.createdAt).toRelative()}
+                  {formatDistanceToNow(new Date(comment.createdAt), {
+                    addSuffix: true,
+                  })}
                 </div>
               </div>
 
