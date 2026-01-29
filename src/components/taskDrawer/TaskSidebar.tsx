@@ -1,10 +1,18 @@
-import {EditOutlined} from "@ant-design/icons";
-import { useState } from "react";
-import type { TaskPopulated } from "../../services/types/tasks.types";
-import { Button, Tag } from "antd";
-import { SidebarRow } from "./SidebarRow";
-import { UserCell } from "../../utils/UserCell";
-import { EditTaskModal } from "../../utils/EditTaskModal";
+import { EditOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import { Button, Tag, message } from 'antd';
+import type { TaskPopulated } from '../../services/types/tasks.types';
+import { updateTask } from '../../services/taskService';
+import { SidebarRow } from './SidebarRow';
+import { UserCell } from '../../utils/UserCell';
+import { EditTaskModal } from '../../utils/EditTaskModal';
+import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
+import { StatusSelect } from '../../utils/StatusSelect';
+import { formatDateForInput } from '../../utils/utils';
+import { useProject } from '../../context/ProjectContext';
+
+const TASK_TYPES = ['task', 'story', 'bug'] as const;
+const PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
 
 export function TaskSidebar({
   task,
@@ -13,56 +21,210 @@ export function TaskSidebar({
   task: TaskPopulated;
   onUpdated: (t: TaskPopulated) => void;
 }) {
+  const [editing, setEditing] = useState<'priority' | 'type' | null>(null);
+
+  const { columns } = useProject();
   const [editOpen, setEditOpen] = useState(false);
+
   return (
     <>
-      <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
-        {/* EDIT BUTTON */}
-        <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="text-lg font-semibold">Task Details</h3>
+      <div
+        className={`rounded-lg border border-gray-200 bg-white p-3 shadow-sm`}
+      >
+        {/* HEADER */}
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-gray-700">Task Details</h3>
+
           <Button
+            size="small"
+            type="text"
             icon={<EditOutlined />}
-            // block={isMobile}
             onClick={() => setEditOpen(true)}
-          ></Button>
+          />
         </div>
-        {/* <Button
-          size="small"
-          type="text"
-          icon={<EditOutlined />}
-          className="absolute top-2 right-2 opacity-0 transition group-hover:opacity-100 bg-red-900"
-          onClick={() => setEditOpen(true)}
-        /> */}
+
         <div className="space-y-3">
+          {/* STATUS — inline editable */}
           <SidebarRow label="Status">
-            <Tag>{task.status}</Tag>
+            <StatusSelect
+              taskId={task._id}
+              value={task.status}
+              columns={columns}
+              onChange={async (newStatus) => {
+                const optimistic = { ...task, status: newStatus };
+                onUpdated(optimistic);
+
+                try {
+                  await updateTask(task._id, { status: newStatus });
+                } catch {
+                  message.error('Failed to update status');
+                  onUpdated(task);
+                }
+              }}
+            />
           </SidebarRow>
 
+          {/* ASSIGNEE */}
           <SidebarRow label="Assignee">
             <UserCell user={task.assignee} emptyText="Unassigned" />
           </SidebarRow>
 
+          {/* PRIORITY */}
           <SidebarRow label="Priority">
-            <Tag color={task.priority === 'high' ? 'red' : 'gold'}>
-              {task.priority}
-            </Tag>
+            {editing !== 'priority' ? (
+              <div
+                onClick={() => setEditing('priority')}
+                className="cursor-pointer rounded-md bg-gray-100 px-2 py-1 text-sm capitalize hover:bg-gray-200"
+              >
+                <Tag
+                  color={
+                    task.priority === 'critical'
+                      ? 'red'
+                      : task.priority === 'high'
+                        ? 'orange'
+                        : task.priority === 'medium'
+                          ? 'blue'
+                          : 'green'
+                  }
+                >
+                  {task.priority}
+                </Tag>
+              </div>
+            ) : (
+              <select
+                autoFocus
+                value={task.priority}
+                onBlur={() => setEditing(null)}
+                onChange={async (e) => {
+                  const newPriority = e.target.value as typeof task.priority;
+
+                  const optimistic = { ...task, priority: newPriority };
+                  onUpdated(optimistic);
+                  setEditing(null);
+
+                  try {
+                    await updateTask(task._id, { priority: newPriority });
+                  } catch {
+                    message.error('Failed to update priority');
+                    onUpdated(task);
+                  }
+                }}
+                className="w-full rounded-md border bg-gray-50 p-1 text-sm capitalize"
+              >
+                {PRIORITIES.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+            )}
           </SidebarRow>
 
+          {/* TYPE with ICON */}
           <SidebarRow label="Type">
-            <Tag color="geekblue">{task.type}</Tag>
+            {editing !== 'type' ? (
+              <div
+                onClick={() => setEditing('type')}
+                className="flex cursor-pointer items-center gap-2 rounded-md bg-gray-100 px-2 py-1 text-sm hover:bg-gray-200"
+              >
+                <TaskTypeIcon type={task.type} />
+                <span className="capitalize">{task.type}</span>
+              </div>
+            ) : (
+              <select
+                autoFocus
+                value={task.type}
+                onBlur={() => setEditing(null)}
+                onChange={async (e) => {
+                  const newType = e.target.value as typeof task.type;
+
+                  const optimistic = { ...task, type: newType };
+                  onUpdated(optimistic);
+                  setEditing(null);
+
+                  try {
+                    await updateTask(task._id, { type: newType });
+                  } catch {
+                    message.error('Failed to update type');
+                    onUpdated(task);
+                  }
+                }}
+                className="w-full rounded-md border bg-gray-50 p-1 text-sm capitalize"
+              >
+                {TASK_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            )}
           </SidebarRow>
 
-          <SidebarRow label="Story Points">{task.storyPoint ?? '—'}</SidebarRow>
+          {/* STORY POINTS */}
+          <SidebarRow label="Story Points">
+            <select
+              value={task.storyPoint ?? ''}
+              onChange={async (e) => {
+                const value = e.target.value
+                  ? Number(e.target.value)
+                  : undefined;
 
+                const optimistic = { ...task, storyPoint: value };
+                onUpdated(optimistic);
+
+                try {
+                  await updateTask(task._id, { storyPoint: value });
+                } catch {
+                  message.error('Failed to update story points');
+                  onUpdated(task);
+                }
+              }}
+              className="w-full rounded-md border bg-gray-50 p-1 text-sm"
+            >
+              <option value="">—</option>
+              {[1, 2, 3, 5, 8, 13].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </SidebarRow>
+
+          {/* DUE DATE — inline editable */}
           <SidebarRow label="Due Date">
-            {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '—'}
+            <input
+              type="date"
+              value={formatDateForInput(task.dueDate)}
+              onChange={async (e) => {
+                const newDate = e.target.value;
+                if (!newDate) return;
+
+                const optimistic = { ...task, dueDate: newDate };
+                onUpdated(optimistic);
+
+                try {
+                  await updateTask(task._id, { dueDate: newDate });
+                } catch {
+                  message.error('Failed to update due date');
+                  onUpdated(task);
+                }
+              }}
+              className={`w-full rounded-md border bg-gray-50 p-1 text-sm outline-none ${
+                task.dueDate && new Date(task.dueDate) < new Date()
+                  ? 'text-red-600'
+                  : ''
+              }`}
+            />
           </SidebarRow>
 
+          {/* REPORTER */}
           <SidebarRow label="Reporter">
             <UserCell user={task.reporter} emptyText="—" />
           </SidebarRow>
         </div>
       </div>
+
+      {/* FULL EDIT MODAL */}
       <EditTaskModal
         open={editOpen}
         task={task}
