@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/sidebar/Sidebar';
-import SidebarToggle from '../components/sidebar/SidebarToggle';
 import Navbar from '../components/navbar/Navbar';
 import TaskModal from '../components/taskDrawer/TaskModal';
 import { CommandPalette } from '../components/common/CommandPalette';
@@ -9,7 +8,7 @@ import { useSearchParams } from 'react-router-dom';
 
 export default function MainLayout(
 ) {
-  const [collapsed, setCollapsed] = useState(false);
+  // const [collapsed, setCollapsed] = useState(false);
   // const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
   // const [openTaskId, setOpenTaskId] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -46,11 +45,9 @@ export default function MainLayout(
     
   return (
     <div className="relative flex h-screen w-full overflow-hidden">
-      <SidebarToggle onToggle={() => setCollapsed((prev) => !prev)} />
+      <Sidebar />
 
-      <Sidebar collapsed={collapsed} />
-
-      <div className="flex w-full flex-1 flex-col overflow-x-auto">
+      <div className="flex w-full flex-1 flex-col overflow-x-auto pl-0 md:pl-0">
         <Navbar />
         <main className="flex-1 overflow-y-auto p-6">
           <Outlet />
