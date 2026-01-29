@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SprintButton } from './SprintButton';
 
 interface SprintMenuProps {
   dueDateRef: React.RefObject<HTMLInputElement | null>;
@@ -17,13 +18,13 @@ export function SprintMenu({
   return (
     <>
       {!sprintStarted && dueDateInputHidden && (
-        <button
+        <SprintButton
           type="button"
           onClick={() => setDueDateInputHidden(!dueDateInputHidden)}
           className="bg-primary-400 hover:bg-primary-500 cursor-pointer rounded-sm px-2 py-1 font-medium text-white shadow-xs focus:outline-none"
         >
           Start Sprint
-        </button>
+        </SprintButton>
       )}
 
       {!sprintStarted && !dueDateInputHidden && (
@@ -33,24 +34,24 @@ export function SprintMenu({
             className="rounded-sm border border-gray-300 px-2 py-1 text-xs"
             ref={dueDateRef}
           />
-          <button
+          <SprintButton
             type="button"
             onClick={startSprint}
             className="bg-primary-400 hover:bg-primary-500 cursor-pointer rounded-sm px-2 py-1 font-medium text-white shadow-xs focus:outline-none"
           >
             Start
-          </button>
+          </SprintButton>
         </>
       )}
 
       {sprintStarted && (
-        <button
+        <SprintButton
           type="button"
           onClick={completeSprint}
           className="bg-primary-400 hover:bg-primary-500 cursor-pointer rounded-sm px-2 py-1 font-medium text-white shadow-xs focus:outline-none"
         >
           Complete Sprint
-        </button>
+        </SprintButton>
       )}
     </>
   );
