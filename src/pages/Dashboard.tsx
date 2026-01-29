@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react';
 import TopBar from '../components/common/TopBar';
 import type { ViewMode } from '../types/TopBar.types';
-import BacklogView from '../components/views/BacklogView';
-import BoardView from '../components/views/BoardView';
-import ListView from '../components/views/ListView';
 import type { Project } from '../types/project.types';
-import { useParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../components/api/interceptor';
 import { useProject } from '../context/ProjectContext';
 import { setupPushNotifications } from '../utils/setupNotification';
-import { ForYouPage } from './ForYouPage';
 
 function Dashboard() {
   const { setProject } = useProject();
@@ -52,12 +48,7 @@ function Dashboard() {
         activeUsers={[]}
       />
       <main>
-        {viewMode === 'backlog' && (
-          <BacklogView columns={activeProject?.columns || []} />
-        )}
-        {viewMode === 'board' && <BoardView />}
-        {viewMode === 'list' && <ListView />}
-        {viewMode === 'forYou' && <ForYouPage />}
+        <Outlet />
       </main>
     </div>
   );
