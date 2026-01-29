@@ -16,6 +16,7 @@ import { ForYouPage } from './pages/ForYouPage';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 
 function App() {
+  const isAuthenticated = localStorage.getItem('access_token') !== null;
   return (
     <>
       <ToastContainer
@@ -34,6 +35,15 @@ function App() {
       />
       <BrowserRouter>
         <Routes>
+          <Route
+            path="/"
+            element={
+              <Navigate
+                to={isAuthenticated ? '/dashboard' : '/login'}
+                replace
+              />
+            }
+          />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
