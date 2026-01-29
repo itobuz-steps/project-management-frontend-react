@@ -50,7 +50,7 @@ function App() {
           <Route path="/verify-otp" element={<VerifyOtpPage />} />
           <Route path="/invite/join" element={<AcceptInvitePage />} />
 
-          <Route element={<ProtectedRoute />}>
+          <Route element={<ProtectedRoute redirectPath="/login" />}>
             <Route path="/edit-profile" element={<EditProfilePage />} />
             <Route
               path="/dashboard"

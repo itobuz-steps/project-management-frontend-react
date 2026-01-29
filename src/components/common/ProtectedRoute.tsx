@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation } from 'react-router';
 import { toast } from 'react-toastify';
 
 export function ProtectedRoute({
-  redirectPath = '/login',
+  redirectPath = '/',
 }: {
   redirectPath?: string;
 }) {
