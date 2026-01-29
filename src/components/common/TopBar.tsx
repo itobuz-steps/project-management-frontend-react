@@ -1,23 +1,23 @@
 import { Plus, FunnelX } from 'lucide-react';
 import type { ViewMode, TopBarProps } from '../../types/TopBar.types';
+import { NavLink, useNavigate } from 'react-router-dom';
 // import AvatarGroup from '../AvatarGroup/AvatarGroup';
 
 const views: { label: string; value: ViewMode }[] = [
   { label: 'Backlog', value: 'backlog' },
   { label: 'Board', value: 'board' },
   { label: 'List', value: 'list' },
-  { label: 'For You', value: 'forYou' },
+  { label: 'For You', value: 'for-you' },
 ];
 
 function TopBar({
-  viewMode,
-  onViewChange,
   onAddTask,
   onOpenFilters,
   onClearFilters,
   hasActiveFilters,
   projectName,
 }: TopBarProps) {
+  const navigate = useNavigate();
   return (
     <>
       <header className="mb-3 border-b border-gray-200 bg-white px-4 py-3 shadow-sm sm:px-6">
@@ -28,21 +28,22 @@ function TopBar({
           {/* LEFT: View Switcher */}
           <div className="flex w-full flex-wrap items-center gap-1 rounded-md bg-gray-100 p-1 sm:w-auto">
             {views.map((view) => {
-              const isActive = viewMode === view.value;
-
               return (
-                <button
+                <NavLink
+                  to={view.value}
                   key={view.value}
-                  onClick={() => onViewChange(view.value)}
-                  className={[
-                    'flex-1 rounded-md px-3 py-2 text-sm font-medium transition sm:flex-none sm:px-3.5',
-                    isActive
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-800',
-                  ].join(' ')}
+                  onClick={() => navigate(view.value)}
+                  className={({ isActive }) => {
+                    return [
+                      'flex-1 rounded-md px-3 py-2 text-sm font-medium transition sm:flex-none sm:px-3.5',
+                      isActive
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-800',
+                    ].join(' ');
+                  }}
                 >
                   {view.label}
-                </button>
+                </NavLink>
               );
             })}
           </div>

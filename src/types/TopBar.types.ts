@@ -1,4 +1,4 @@
-export type ViewMode = 'backlog' | 'board' | 'list' | 'forYou';
+export type ViewMode = 'backlog' | 'board' | 'list' | 'for-you';
 
 export interface ActiveUser {
   id: string;
