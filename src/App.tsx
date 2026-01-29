@@ -13,10 +13,10 @@ import BacklogView from './components/views/BacklogView';
 import BoardView from './components/views/BoardView';
 import ListView from './components/views/ListView';
 import { ForYouPage } from './pages/ForYouPage';
+import { ProtectedRoute } from './components/common/ProtectedRoute';
 
 function App() {
-  const isAuthenticated = true;
-
+  const isAuthenticated = localStorage.getItem('access_token') !== null;
   return (
     <>
       <ToastContainer
@@ -35,38 +35,45 @@ function App() {
       />
       <BrowserRouter>
         <Routes>
+          <Route
+            path="/"
+            element={
+              <Navigate
+                to={isAuthenticated ? '/dashboard' : '/login'}
+                replace
+              />
+            }
+          />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/verify-otp" element={<VerifyOtpPage />} />
           <Route path="/invite/join" element={<AcceptInvitePage />} />
 
-          {isAuthenticated && (
-            <>
-              <Route path="/edit-profile" element={<EditProfilePage />} />
-              <Route
-                path="/dashboard"
-                element={<Navigate to="/dashboard/default" replace />}
-              />
-              <Route
-                path="/dashboard/:projectId?/:taskId?"
-                element={
-                  <ProjectProvider>
-                    <MainLayout>
-                      <Dashboard />
-                      {/* <h1 className="text-2xl font-semibold">Hello world</h1> */}
-                    </MainLayout>
-                  </ProjectProvider>
-                }
-              >
-                <Route index element={<Navigate to="backlog" replace />} />
-                <Route path="backlog" element={<BacklogView />} />
-                <Route path="board" element={<BoardView />} />
-                <Route path="list" element={<ListView />} />
-                <Route path="for-you" element={<ForYouPage />} />
-              </Route>
-            </>
-          )}
+          <Route element={<ProtectedRoute redirectPath="/login" />}>
+            <Route path="/edit-profile" element={<EditProfilePage />} />
+            <Route
+              path="/dashboard"
+              element={<Navigate to="/dashboard/default" replace />}
+            />
+            <Route
+              path="/dashboard/:projectId?/:taskId?"
+              element={
+                <ProjectProvider>
+                  <MainLayout>
+                    <Dashboard />
+                    {/* <h1 className="text-2xl font-semibold">Hello world</h1> */}
+                  </MainLayout>
+                </ProjectProvider>
+              }
+            >
+              <Route index element={<Navigate to="backlog" replace />} />
+              <Route path="backlog" element={<BacklogView />} />
+              <Route path="board" element={<BoardView />} />
+              <Route path="list" element={<ListView />} />
+              <Route path="for-you" element={<ForYouPage />} />
+            </Route>
+          </Route>
         </Routes>
       </BrowserRouter>
     </>
