@@ -14,10 +14,10 @@ import BacklogView from './components/views/BacklogView';
 import BoardView from './components/views/BoardView';
 import ListView from './components/views/ListView';
 import { ForYouPage } from './pages/ForYouPage';
+import { ProtectedRoute } from './components/common/ProtectedRoute';
 
 function App() {
-  const isAuthenticated = true;
-
+  const isAuthenticated = localStorage.getItem('access_token') !== null;
   return (
     <>
       <ToastContainer
@@ -34,17 +34,29 @@ function App() {
         transition={Flip}
         limit={3}
       />
+      
       <BrowserRouter>
         <Routes>
-          {/* PUBLIC */}
+          {/* Redirect root */}
+          <Route
+            path="/"
+            element={
+              <Navigate
+                to={isAuthenticated ? '/dashboard' : '/login'}
+                replace
+              />
+            }
+          />
+
+          {/* PUBLIC ROUTES */}
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/verify-otp" element={<VerifyOtpPage />} />
           <Route path="/invite/join" element={<AcceptInvitePage />} />
 
-          {/* APP */}
-          {isAuthenticated && (
+          {/* PROTECTED ROUTES */}
+          <Route element={<ProtectedRoute redirectPath="/login" />}>
             <Route
               element={
                 <ProjectProvider>
@@ -52,7 +64,7 @@ function App() {
                 </ProjectProvider>
               }
             >
-              {/* Dashboard */}
+              {/* Dashboard redirects */}
               <Route
                 path="/dashboard"
                 element={<Navigate to="/dashboard/default" replace />}
@@ -69,18 +81,20 @@ function App() {
                 <Route path="for-you" element={<ForYouPage />} />
               </Route>
 
-              {/* ✅ FULL PAGE TASK */}
+              {/* Full page task */}
               <Route
                 path="/projects/:projectId/tasks/:taskId"
                 element={<TaskPage />}
               />
 
+              {/* Edit profile */}
               <Route path="/edit-profile" element={<EditProfilePage />} />
             </Route>
-          )}
+          </Route>
         </Routes>
       </BrowserRouter>
     </>
   );
 }
+
 export default App;
