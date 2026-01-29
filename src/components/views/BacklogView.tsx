@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { fetchWithAuth } from '../api/interceptor';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import type { Sprint } from '../../services/types/sprints.types';
 import type { Task } from '../../types/tasks.types';
 import { TaskTable } from '../backlog/TaskTable';
@@ -13,11 +13,14 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
   addTasksToSprint,
   removeTaskFromSprint,
 } from '../../services/sprints.service';
 import { useProject } from '../../context/ProjectContext';
-import { useSearchParams } from 'react-router-dom';
 
 interface BacklogViewProps {
   columns?: string[];
@@ -27,6 +30,7 @@ function BacklogView({ columns }: BacklogViewProps) {
   const { projectId } = useParams();
   const { project } = useProject();
   const [searchParams] = useSearchParams();
+
   const type = project?.projectType;
   const isScrum = type === 'scrum';
 
@@ -35,19 +39,26 @@ function BacklogView({ columns }: BacklogViewProps) {
   const [loading, setLoading] = useState(true);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
 
+  /* ---------------- sensors ---------------- */
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 6,
-      },
+      activationConstraint: { distance: 6 },
     })
   );
 
+  /* ---------- map for drag overlay ---------- */
   const taskById = useMemo(
     () => new Map(tasks.map((t) => [t._id, t])),
     [tasks]
   );
 
+  /* ---------- container registration ---------- */
+  const containerIds = useMemo(
+    () => ['backlog', ...sprints.map((s) => s._id)],
+    [sprints]
+  );
+
+  /* ---------------- data load ---------------- */
   useEffect(() => {
     if (!projectId) return;
 
@@ -86,11 +97,10 @@ function BacklogView({ columns }: BacklogViewProps) {
       }
     }
 
-    if (projectId) {
-      loadData(projectId);
-    }
+    loadData(projectId);
   }, [projectId, type, searchParams]);
 
+  /* ---------------- guards ---------------- */
   if (!projectId) {
     return (
       <div className="rounded-lg border bg-white p-6 text-center text-gray-500">
@@ -108,12 +118,14 @@ function BacklogView({ columns }: BacklogViewProps) {
     return <div className="p-4">Loading backlog...</div>;
   }
 
+  /* ---------------- backlog calc ---------------- */
   const sprintTaskIds = new Set(sprints.flatMap((s) => s.tasks));
 
   const backlogTasks = tasks.filter(
     (task) => !sprintTaskIds.has(task._id) && task.status !== 'done'
   );
 
+  /* ---------------- render ---------------- */
   return (
     <div className="rounded-lg border bg-white p-4">
       <DndContext
@@ -122,7 +134,7 @@ function BacklogView({ columns }: BacklogViewProps) {
         onDragStart={(event) => setActiveTaskId(String(event.active.id))}
         onDragEnd={({ active, over }) => {
           setActiveTaskId(null);
-          if (!over || active.id === over.id) return;
+          if (!over) return;
 
           const activeContainer = active.data.current?.containerId as
             | string
@@ -138,7 +150,6 @@ function BacklogView({ columns }: BacklogViewProps) {
           if (activeContainer === overContainer) return;
 
           const taskId = String(active.id);
-
           const previousSprints = sprints;
 
           const nextSprints = sprints.map((sprint) => {
@@ -176,79 +187,75 @@ function BacklogView({ columns }: BacklogViewProps) {
           const calls: Promise<unknown>[] = [];
 
           if (sourceSprint) {
-            console.log('Calling sprint update API');
             calls.push(removeTaskFromSprint(sourceSprint._id, taskId));
           }
 
           if (targetSprint) {
-            console.log('Calling sprint update API');
             calls.push(addTasksToSprint(targetSprint._id, [taskId]));
           }
 
-          if (calls.length > 0) {
+          if (calls.length) {
             void Promise.all(calls).catch(() => {
               setSprints(previousSprints);
             });
           }
         }}
       >
-        {/* SPRINTS */}
-        {isScrum && (
-          <section className="mb-4 w-full">
-            {sprints.length === 0 ? (
-              <div className="rounded border bg-gray-50 p-6 text-center text-gray-400">
-                <h2 className="mb-2 font-semibold text-gray-500">
-                  No sprints found
-                </h2>
-                <p className="text-sm">
-                  Create a sprint to organize your tasks.
-                </p>
-              </div>
-            ) : (
-              <div className="w-full space-y-4 overflow-x-auto">
-                {sprints.map((sprint) => {
-                  const sprintTasks = tasks.filter((t) =>
-                    sprint.tasks.includes(t._id)
-                  );
+        {/* CONTAINER LAYER */}
+        <SortableContext
+          items={containerIds}
+          strategy={verticalListSortingStrategy}
+        >
+          {/* SPRINTS */}
+          {isScrum && (
+            <section className="mb-4 w-full">
+              {sprints.length === 0 ? (
+                <div className="rounded border bg-gray-50 p-6 text-center text-gray-400">
+                  <h2 className="mb-2 font-semibold text-gray-500">
+                    No sprints found
+                  </h2>
+                  <p className="text-sm">
+                    Create a sprint to organize your tasks.
+                  </p>
+                </div>
+              ) : (
+                <div className="w-full space-y-4 overflow-x-auto">
+                  {sprints.map((sprint) => {
+                    const sprintTasks = tasks.filter((t) =>
+                      sprint.tasks.includes(t._id)
+                    );
 
-                  return (
-                    <TaskTable
-                      key={sprint._id}
-                      sprint={sprint}
-                      tasks={sprintTasks}
-                      columns={columns || []}
-                      containerId={sprint._id}
-                    />
-                  );
-                })}
-              </div>
-            )}
-          </section>
-        )}
+                    return (
+                      <TaskTable
+                        key={sprint._id}
+                        sprint={sprint}
+                        tasks={sprintTasks}
+                        columns={columns || []}
+                        containerId={sprint._id}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          )}
 
-        {/* BACKLOG */}
-        {backlogTasks.length === 0 ? (
-          <section className="rounded border bg-gray-50 p-6 text-center text-gray-400">
-            <h2 className="mb-2 font-semibold text-gray-500">
-              No backlog tasks
-            </h2>
-            <p className="text-sm">Create a sprint to organize your tasks.</p>
-          </section>
-        ) : (
+          {/* BACKLOG */}
           <TaskTable
-            key="Backlog"
+            key="backlog"
             sprint={undefined}
             tasks={backlogTasks}
             columns={columns || []}
             title="Backlog"
             containerId="backlog"
           />
-        )}
+        </SortableContext>
 
+        {/* DRAG PREVIEW */}
         <DragOverlay>
           {activeTaskId ? (
             <div className="w-64 cursor-move rounded-md border bg-white p-3 shadow-lg">
-              {taskById.get(activeTaskId)?.title || 'Dragging...'}
+              {taskById.get(activeTaskId)?.title ?? 'Dragging...'}
             </div>
           ) : null}
         </DragOverlay>
