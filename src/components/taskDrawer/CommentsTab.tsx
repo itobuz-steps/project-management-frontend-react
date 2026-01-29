@@ -4,12 +4,9 @@ import { useEffect, useState } from 'react';
 import { commentsApi } from '../../services/commentService';
 import type { Comment } from '../../services/types/comments.types';
 import { CommentItem } from './CommentItem';
+import type { CommentsTabProps } from './taskDrawer.type';
 
 const { TextArea } = Input;
-
-interface CommentsTabProps {
-  taskId: string;
-}
 
 export function CommentsTab({ taskId }: CommentsTabProps) {
   const [comments, setComments] = useState<Comment[]>([]);

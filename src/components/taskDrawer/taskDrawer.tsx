@@ -4,16 +4,11 @@ import type { TaskPopulated } from '../../services/types/tasks.types';
 import getTaskById from '../../services/taskService';
 import { Grid } from 'antd';
 const { useBreakpoint } = Grid;
-
-interface TaskModalProps {
-  taskId: string;
-  onClose: () => void;
-}
-
 import { TaskDetails } from './TaskDetails';
 import { SubtasksTab } from './SubtasksTab';
 import { AttachmentsTab } from './AttachmentsTab';
 import { CommentsTab } from './CommentsTab';
+import type { TaskModalProps } from './taskDrawer.type';
 
 
 export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {

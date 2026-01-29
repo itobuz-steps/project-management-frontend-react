@@ -9,19 +9,13 @@ import { useState } from 'react';
 import { DateTime } from 'luxon';
 import { marked } from 'marked';
 import { commentsApi } from '../../services/commentService';
-import type { Comment } from '../../services/types/comments.types';
 import { config } from '../../config/config';
+import type { CommentItemProps } from './taskDrawer.type';
 
 const { Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
-interface Props {
-  comment: Comment;
-  onDelete: (id: string) => void;
-  onUpdate: (comment: Comment) => void;
-}
-
-export function CommentItem({ comment, onDelete, onUpdate }: Props) {
+export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
   const [messageApi, contextHolder] = message.useMessage();
 
   const [isEditing, setIsEditing] = useState(false);

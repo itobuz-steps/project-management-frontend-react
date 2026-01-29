@@ -5,13 +5,9 @@ import {
   FileOutlined,
 } from '@ant-design/icons';
 import { config } from '../../config/config';
-import type { TaskPopulated } from '../../services/types/tasks.types';
+import type { AttachmentsTabProps } from './taskDrawer.type';
 
 const { Text, Link } = Typography;
-
-interface AttachmentsTabProps {
-  task: TaskPopulated;
-}
 
 export function AttachmentsTab({ task }: AttachmentsTabProps) {
   const attachments = Array.isArray(task.attachments)
