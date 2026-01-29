@@ -2,22 +2,25 @@ import { useEffect, useState } from 'react';
 import { Empty, Spin, Modal, Checkbox, Button, Tag, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
-
-import type { Task } from '../../types/tasks.types';
+import { UserCell } from '../../utils/UserCell';
+import type { TaskPopulated } from '../../services/types/tasks.types';
 import getTaskById, {
   getTaskByProjectId,
   updateTask,
 } from '../../services/taskService';
 import { Trash2 } from 'lucide-react';
+import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 
-export function SubtasksTab({ task }: { task: Task }) {
+export function SubtasksTab({ task }: { task: TaskPopulated }) {
   const navigate = useNavigate();
   const { projectId, taskId: currentTaskId } = useParams();
 
-  const selectedIds = (task.subTask ?? []) as string[];
+  const [selectedIds, setSelectedIds] = useState<string[]>(
+    (task.subTask ?? []) as string[]
+  );
 
-  const [subtasks, setSubtasks] = useState<Task[]>([]);
-  const [projectTasks, setProjectTasks] = useState<Task[]>([]);
+  const [subtasks, setSubtasks] = useState<TaskPopulated[]>([]);
+  const [projectTasks, setProjectTasks] = useState<TaskPopulated[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -51,43 +54,46 @@ export function SubtasksTab({ task }: { task: Task }) {
 
     const tasks = await getTaskByProjectId(projectId as string);
 
-    setProjectTasks(tasks.filter((t: Task) => t._id !== task._id));
+    setProjectTasks(
+      tasks.filter((task: TaskPopulated) => task._id !== task._id)
+    );
   };
 
-  const toggleSubtask = async (subtaskId: string, checked: boolean) => {
-    const updated = checked
-      ? [...new Set([...selectedIds, subtaskId])]
-      : selectedIds.filter((id) => id !== subtaskId);
-
-    try {
-      await updateTask(task._id, {
-        subTask: updated,
-      });
-
-      message.success(
-        checked ? 'Subtask added successfully' : 'Subtask removed successfully'
-      );
-    } catch (error) {
-      console.error(error);
-      message.error('Failed to update subtask');
-    }
+  const toggleSubtask = (subtaskId: string, checked: boolean) => {
+    setSelectedIds((prev) =>
+      checked
+        ? [...new Set([...prev, subtaskId])]
+        : prev.filter((id) => id !== subtaskId)
+    );
   };
 
   const removeSubtask = async (subtaskId: string) => {
-    const updated = selectedIds.filter((id) => id !== subtaskId);
-
-    // optimistic UI
-    setSubtasks((prev) => prev.filter((t) => t._id !== subtaskId));
+    const updatedIds = selectedIds.filter((id) => id !== subtaskId);
+    setSelectedIds(updatedIds);
+    setSubtasks((prev) => prev.filter((task) => task._id !== subtaskId));
 
     try {
       await updateTask(task._id, {
-        subTask: updated,
+        subTask: updatedIds,
       });
 
       message.success('Subtask removed');
+    } catch {
+      message.error('Failed to remove subtask');
+    }
+  };
+
+  const handleSaveSubtasks = async () => {
+    try {
+      await updateTask(task._id, {
+        subTask: selectedIds,
+      });
+
+      message.success('Subtasks updated');
+      setModalOpen(false);
     } catch (error) {
       console.error(error);
-      message.error('Failed to remove subtask');
+      message.error('Failed to update subtasks');
     }
   };
 
@@ -133,9 +139,17 @@ export function SubtasksTab({ task }: { task: Task }) {
                 <div className="font-medium">
                   {subtask.key} — {subtask.title}
                 </div>
-                <div className="mt-1 flex gap-2">
-                  <Tag color="blue">{subtask.type}</Tag>
+                <div className="mt-1 flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-1">
+                    <TaskTypeIcon type={subtask.type} />
+                    <span className="text-xs text-gray-600 capitalize">
+                      {subtask.type}
+                    </span>
+                  </div>
+
                   <Tag color="gold">{subtask.status}</Tag>
+
+                  <UserCell user={subtask.assignee} emptyText="Unassigned" />
                 </div>
               </div>
 
@@ -160,26 +174,27 @@ export function SubtasksTab({ task }: { task: Task }) {
         title="Manage Subtasks"
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
+        onOk={handleSaveSubtasks}
         footer={null}
       >
         <div className="max-h-[420px] space-y-2 overflow-y-auto">
-          {projectTasks.map((t) => {
-            const isSubtask = selectedIds.includes(t._id);
+          {projectTasks.map((task) => {
+            const isSubtask = selectedIds.includes(task._id);
 
             return (
               <div
-                key={t._id}
+                key={task._id}
                 className={`flex items-center justify-between rounded border p-2 transition ${isSubtask ? 'border-primary-400 bg-primary-50' : 'hover:bg-gray-50'} `}
               >
                 <div>
                   <div className="text-sm font-medium">
-                    {t.key} — {t.title}
+                    {task.key} — {task.title}
                   </div>
 
                   <div className="flex gap-2 text-xs text-gray-500">
-                    <span>{t.type}</span>
+                    <span>{task.type}</span>
                     <span>·</span>
-                    <span>{t.status}</span>
+                    <span>{task.status}</span>
 
                     {isSubtask && (
                       <Tag color="green" className="ml-2">
@@ -190,8 +205,8 @@ export function SubtasksTab({ task }: { task: Task }) {
                 </div>
 
                 <Checkbox
-                  checked={selectedIds.includes(t._id)}
-                  onChange={(e) => toggleSubtask(t._id, e.target.checked)}
+                  checked={selectedIds.includes(task._id)}
+                  onChange={(e) => toggleSubtask(task._id, e.target.checked)}
                 />
               </div>
             );
