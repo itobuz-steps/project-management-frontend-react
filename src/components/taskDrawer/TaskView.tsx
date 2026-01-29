@@ -10,12 +10,14 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
     <div className="no-scrollbar flex h-full overflow-hidden">
       {/* LEFT CONTENT */}
       <div className="flex-1 overflow-y-auto pr-2">
-        <TaskDescription task={task} />
-
+        <TaskDescription
+          task={task}
+          onPatch={(_, patch) => {
+            onUpdated({ ...task, ...patch });
+          }}
+        />
         <SubtasksTab task={task} />
-
         <AttachmentsTab task={task} />
-
         <CommentsTab taskId={task._id} />
       </div>
 
@@ -25,7 +27,6 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
           <div className="sticky top-10 max-h-[calc(100vh-160px)] overflow-auto">
             <TaskSidebar task={task} onUpdated={onUpdated} />
           </div>
-          {/* <TaskSidebar task={task} onUpdated={onUpdated} /> */}
         </div>
       )}
     </div>

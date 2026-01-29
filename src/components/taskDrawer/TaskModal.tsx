@@ -63,7 +63,15 @@ export default function TaskModal({ taskId, onClose }: TaskModalProps) {
         },
       }}
       destroyOnHidden
-      title={task && <TaskDrawerHeader task={task} projectId={projectId!} />}
+      title={
+        task && (
+          <TaskDrawerHeader
+            task={task}
+            projectId={projectId!}
+            onUpdated={setTask}
+          />
+        )
+      }
     >
       {loading && (
         <div className="flex justify-center py-20">
