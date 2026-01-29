@@ -18,7 +18,7 @@ export function AttachmentsTab({ task }: AttachmentsTabProps) {
 
   if (!attachments.length) {
     return (
-      <div className="flex justify-center py-10">
+      <div className="flex justify-center py-2">
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description="No attachments yet"
@@ -28,56 +28,57 @@ export function AttachmentsTab({ task }: AttachmentsTabProps) {
   }
 
   return (
-    <Card
-      size="small"
-      title={
-        <Space>
-          <PaperClipOutlined />
-          <span>Attachments</span>
-        </Space>
-      }
-      bordered={false}
-      className="shadow-sm"
-    >
-      <List
-        itemLayout="horizontal"
-        dataSource={attachments}
-        renderItem={(file) => {
-          const fileName = typeof file === 'string' ? file : file.name;
-          const fileUrl = `${config.api_base_url}/uploads/attachments/${fileName}`;
+    <div className="py-3">
+      <Card
+        size="small"
+        title={
+          <Space>
+            <PaperClipOutlined />
+            <span>Attachments</span>
+          </Space>
+        }
+        className="shadow-sm"
+      >
+        <List
+          itemLayout="horizontal"
+          dataSource={attachments}
+          renderItem={(file) => {
+            const fileName = typeof file === 'string' ? file : file.name;
+            const fileUrl = `${config.api_base_url}/uploads/attachments/${fileName}`;
 
-          return (
-            <List.Item
-              className="rounded-md px-2 hover:bg-gray-50"
-              actions={[
-                <Tooltip title="Open">
-                  <Button
-                    type="text"
-                    icon={<DownloadOutlined />}
-                    href={fileUrl}
-                    target="_blank"
-                  />
-                </Tooltip>,
-              ]}
-            >
-              <List.Item.Meta
-                avatar={<FileOutlined className="text-lg text-blue-500" />}
-                title={
-                  <Link
-                    href={fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Text ellipsis style={{ maxWidth: 360 }}>
-                      {fileName}
-                    </Text>
-                  </Link>
-                }
-              />
-            </List.Item>
-          );
-        }}
-      />
-    </Card>
+            return (
+              <List.Item
+                className="rounded-md px-6 hover:bg-gray-50"
+                actions={[
+                  <Tooltip title="Open">
+                    <Button
+                      type="text"
+                      icon={<DownloadOutlined />}
+                      href={fileUrl}
+                      target="_blank"
+                    />
+                  </Tooltip>,
+                ]}
+              >
+                <List.Item.Meta
+                  avatar={<FileOutlined className="text-lg text-blue-500" />}
+                  title={
+                    <Link
+                      href={fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Text ellipsis style={{ maxWidth: 360 }}>
+                        {fileName}
+                      </Text>
+                    </Link>
+                  }
+                />
+              </List.Item>
+            );
+          }}
+        />
+      </Card>
+    </div>
   );
 }

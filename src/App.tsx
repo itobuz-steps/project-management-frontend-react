@@ -9,6 +9,7 @@ import { Flip, ToastContainer } from 'react-toastify';
 import { EditProfilePage } from './pages/EditProfilePage';
 import { ProjectProvider } from './context/ProjectProvider';
 import { AcceptInvitePage } from './pages/AcceptInvitePage';
+import TaskPage from './pages/TaskPage';
 
 function App() {
   const isAuthenticated = true;
@@ -31,31 +32,41 @@ function App() {
       />
       <BrowserRouter>
         <Routes>
+          {/* PUBLIC */}
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/verify-otp" element={<VerifyOtpPage />} />
           <Route path="/invite/join" element={<AcceptInvitePage />} />
 
+          {/* APP */}
           {isAuthenticated && (
-            <>
-              <Route path="/edit-profile" element={<EditProfilePage />} />
+            <Route
+              element={
+                <ProjectProvider>
+                  <MainLayout />
+                </ProjectProvider>
+              }
+            >
+              {/* Dashboard */}
               <Route
                 path="/dashboard"
                 element={<Navigate to="/dashboard/default" replace />}
               />
+              <Route path="/dashboard/:projectId" element={<Dashboard />} />
               <Route
-                path="/dashboard/:projectId?/:taskId?"
-                element={
-                  <ProjectProvider>
-                    <MainLayout>
-                      <Dashboard />
-                      {/* <h1 className="text-2xl font-semibold">Hello world</h1> */}
-                    </MainLayout>
-                  </ProjectProvider>
-                }
+                path="/dashboard/:projectId/:taskId"
+                element={<Dashboard />}
               />
-            </>
+
+              {/* ✅ FULL PAGE TASK */}
+              <Route
+                path="/projects/:projectId/tasks/:taskId"
+                element={<TaskPage />}
+              />
+
+              <Route path="/edit-profile" element={<EditProfilePage />} />
+            </Route>
           )}
         </Routes>
       </BrowserRouter>

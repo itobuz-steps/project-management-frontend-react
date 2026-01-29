@@ -19,3 +19,10 @@ export interface CommentItemProps {
   onDelete: (id: string) => void;
   onUpdate: (comment: Comment) => void;
 }
+
+export type ViewProps = {
+  task: TaskPopulated;
+  isMobile: boolean;
+  onUpdated: (t: TaskPopulated) => void;
+  loading?: boolean;
+};

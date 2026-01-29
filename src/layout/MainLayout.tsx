@@ -1,17 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/sidebar/Sidebar';
 import SidebarToggle from '../components/sidebar/SidebarToggle';
 import Navbar from '../components/navbar/Navbar';
-import TaskDrawer from '../components/taskDrawer/taskDrawer';
+import TaskModal from '../components/taskDrawer/TaskModal';
 import { CommandPalette } from '../components/common/CommandPalette';
 import { useSearchParams } from 'react-router-dom';
 
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function MainLayout(
+) {
   const [collapsed, setCollapsed] = useState(false);
   // const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
   // const [openTaskId, setOpenTaskId] = useState<string | null>(null);
@@ -44,9 +41,9 @@ export default function MainLayout({
   const navigate = useNavigate();
   const { projectId, taskId } = useParams();
 
-  const taskDrawerOpen = Boolean(taskId);
-  const openTaskId = taskId ?? null;
-
+  const isDashboardTask =
+    window.location.pathname.startsWith('/dashboard') && taskId;
+    
   return (
     <div className="relative flex h-screen w-full overflow-hidden">
       <SidebarToggle onToggle={() => setCollapsed((prev) => !prev)} />
@@ -55,15 +52,15 @@ export default function MainLayout({
 
       <div className="flex w-full flex-1 flex-col overflow-x-auto">
         <Navbar />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6">
+          <Outlet />
+        </main>
       </div>
 
-      {taskDrawerOpen && openTaskId && (
-        <TaskDrawer
-          taskId={openTaskId}
-          onClose={() => {
-            navigate(`/dashboard/${projectId}`, { replace: true });
-          }}
+      {isDashboardTask && projectId && taskId && (
+        <TaskModal
+          taskId={taskId}
+          onClose={() => navigate(`/dashboard/${projectId}`, { replace: true })}
         />
       )}
       <CommandPalette
