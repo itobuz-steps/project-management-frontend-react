@@ -8,6 +8,7 @@ import { TaskTypeColor } from '../../../utils/TaskTypeColor';
 import { StatusSelect } from '../../../utils/StatusSelect';
 import { getPriorityBorder } from '../../../utils/utils';
 import { useProject } from '../../../context/ProjectContext';
+import { listViewHeaders } from './listView.constants';
 
 const priorityStyles: Record<string, string> = {
   critical: 'bg-red-100 text-red-700',
@@ -45,8 +46,6 @@ function ListView() {
       return;
     }
 
-    let isMounted = true;
-
     const load = async () => {
       try {
         setLoading(true);
@@ -60,20 +59,36 @@ function ListView() {
           ? taskPayload
           : ((taskPayload as { result?: Task[] }).result ?? []);
 
-        if (isMounted) setTasks(normalized);
+        setTasks(normalized);
       } catch {
-        if (isMounted) setError('Failed to load tasks.');
+        setError('Failed to load tasks.');
       } finally {
-        if (isMounted) setLoading(false);
+        setLoading(false);
       }
     };
 
     load();
-
-    return () => {
-      isMounted = false;
-    };
   }, [projectId, searchParams]);
+
+  const handleStatusChange = (
+    taskId: string,
+    nextStatus: TaskStatus,
+    previousStatus: TaskStatus
+  ) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task._id === taskId ? { ...task, status: nextStatus } : task
+      )
+    );
+
+    void updateTask(taskId, { status: nextStatus }).catch(() => {
+      setTasks((prev) =>
+        prev.map((task) =>
+          task._id === taskId ? { ...task, status: previousStatus } : task
+        )
+      );
+    });
+  };
 
   if (!projectId) {
     return (
@@ -92,17 +107,11 @@ function ListView() {
     <table className="min-w-full table-auto overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
       <thead className="sticky top-0 z-10 bg-[#f8f8f8] text-xs font-semibold text-gray-500 uppercase">
         <tr>
-          <th className="p-3">Type</th>
-          <th className="p-3">Key</th>
-          <th className="p-3">Summary</th>
-          <th className="p-3">Status</th>
-          <th className="p-3">Assignee</th>
-          <th className="p-3">Priority</th>
-          <th className="p-3">Reporter</th>
-          <th className="p-3">Labels</th>
-          <th className="p-3">Created</th>
-          <th className="p-3">Due</th>
-          <th className="p-3">Updated</th>
+          {listViewHeaders.map((header) => (
+            <th key={header.key} className="p-3">
+              {header.label}
+            </th>
+          ))}
         </tr>
       </thead>
 
@@ -159,23 +168,13 @@ function ListView() {
                   taskId={task._id}
                   value={task.status}
                   columns={columns}
-                  onChange={(value) => {
-                    const next = value as TaskStatus;
-                    const previous = task.status;
-                    setTasks((prev) =>
-                      prev.map((t) =>
-                        t._id === task._id ? { ...t, status: next } : t
-                      )
-                    );
-
-                    void updateTask(task._id, { status: next }).catch(() => {
-                      setTasks((prev) =>
-                        prev.map((t) =>
-                          t._id === task._id ? { ...t, status: previous } : t
-                        )
-                      );
-                    });
-                  }}
+                  onChange={(value) =>
+                    handleStatusChange(
+                      task._id,
+                      value as TaskStatus,
+                      task.status
+                    )
+                  }
                 />
               </td>
               <td className="p-3 whitespace-nowrap text-gray-700">

@@ -9,9 +9,9 @@ import { Flip, ToastContainer } from 'react-toastify';
 import { EditProfilePage } from './pages/EditProfilePage';
 import { ProjectProvider } from './context/ProjectProvider';
 import { AcceptInvitePage } from './pages/AcceptInvitePage';
-import BacklogView from './components/views/BacklogView';
-import BoardView from './components/views/BoardView';
-import ListView from './components/views/ListView';
+import BacklogView from './components/views/BacklogView/BacklogView';
+import BoardView from './components/views/BoardView/BoardView';
+import ListView from './components/views/ListView/ListView';
 import { ForYouPage } from './pages/ForYouPage';
 
 function App() {
