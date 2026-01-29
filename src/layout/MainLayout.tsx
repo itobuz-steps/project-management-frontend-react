@@ -6,8 +6,7 @@ import TaskModal from '../components/taskDrawer/TaskModal';
 import { CommandPalette } from '../components/common/CommandPalette';
 import { useSearchParams } from 'react-router-dom';
 
-export default function MainLayout(
-) {
+export default function MainLayout() {
   // const [collapsed, setCollapsed] = useState(false);
   // const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
   // const [openTaskId, setOpenTaskId] = useState<string | null>(null);
@@ -42,7 +41,7 @@ export default function MainLayout(
 
   const isDashboardTask =
     window.location.pathname.startsWith('/dashboard') && taskId;
-    
+
   return (
     <div className="relative flex h-screen w-full overflow-hidden">
       <Sidebar />
