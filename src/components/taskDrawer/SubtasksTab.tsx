@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { Empty, Spin, Modal, Checkbox, Button, Tag, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import { UserCell } from '../../utils/UserCell';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import getTaskById, {
   getTaskByProjectId,
   updateTask,
 } from '../../services/taskService';
 import { Trash2 } from 'lucide-react';
+import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 
 export function SubtasksTab({ task }: { task: TaskPopulated }) {
   const navigate = useNavigate();
@@ -136,9 +137,20 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
                 <div className="font-medium">
                   {subtask.key} — {subtask.title}
                 </div>
-                <div className="mt-1 flex gap-2">
-                  <Tag color="blue">{subtask.type}</Tag>
+                <div className="mt-1 flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-1">
+                    <TaskTypeIcon type={subtask.type} />
+                    <span className="text-xs text-gray-600 capitalize">
+                      {subtask.type}
+                    </span>
+                  </div>
+
                   <Tag color="gold">{subtask.status}</Tag>
+
+                  <UserCell
+                    user={subtask.assignee}
+                    emptyText="Unassigned"
+                  />
                 </div>
               </div>
 

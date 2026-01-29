@@ -3,6 +3,7 @@ import { ExportOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from 'react';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { updateTask } from '../../services/taskService';
+import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 
 export function TaskDrawerHeader({
   task,
@@ -17,7 +18,6 @@ export function TaskDrawerHeader({
   const [value, setValue] = useState(task.title);
   const [saving, setSaving] = useState(false);
   const inputRef = useRef<InputRef>(null);
-
 
   useEffect(() => {
     setValue(task.title);
@@ -63,8 +63,15 @@ export function TaskDrawerHeader({
     <div className="flex items-start justify-between gap-4">
       {/* LEFT */}
       <div className="flex items-center gap-2">
+        {/* TYPE ICON */}
+        <div className="flex h-7 w-7 items-center justify-center rounded bg-gray-100">
+          <TaskTypeIcon type={task.type} />
+        </div>
+
+        {/* TASK KEY */}
         <Tag color="blue">{task.key}</Tag>
 
+        {/* TITLE */}
         {!editing ? (
           <h1
             className="cursor-pointer rounded px-1 text-xl font-semibold hover:bg-gray-100"
