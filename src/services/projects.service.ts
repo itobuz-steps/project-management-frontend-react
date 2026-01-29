@@ -1,7 +1,8 @@
 // src/services/project.service.ts
 import { config } from '../config/config';
+import type { Project } from '../types/project.types';
+import type { User } from '../types/tasks.types';
 import type {
-  Project,
   CreateProjectPayload,
   UpdateProjectPayload,
 } from './types/projects.types';
@@ -78,7 +79,7 @@ export const deleteProject = async (projectId: string): Promise<void> => {
 /* ---------------- USERS BY PROJECT ---------------- */
 export const getUsersByProjectId = async (
   projectId: string
-): Promise<any[]> => {
+): Promise<User[]> => {
   const res = await fetch(`${BASE_URL}/get-user/${projectId}`, {
     headers: getAuthHeaders(),
   });

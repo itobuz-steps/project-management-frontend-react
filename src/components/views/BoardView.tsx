@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   DndContext,
@@ -23,8 +29,22 @@ import type { Task, TaskStatus } from '../../services/types/tasks.types';
 import type { Sprint } from '../../services/types/sprints.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../utils/TaskTypeColor';
+import { useProject } from '../../context/ProjectContext';
+import { useSearchParams } from 'react-router-dom';
+import { DeleteTaskModal } from '../../utils/DeleteTaskModal';
+import { Trash } from 'lucide-react';
 
-function TaskCard({ task, column }: { task: Task; column: string }) {
+function TaskCard({
+  task,
+  column,
+  onOpen,
+}: {
+  task: Task;
+  column: string;
+  onOpen: () => void;
+}) {
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
   const {
     attributes,
     listeners,
@@ -46,26 +66,52 @@ function TaskCard({ task, column }: { task: Task; column: string }) {
       className={`rounded-md border border-gray-100 bg-white p-3 shadow-sm ${
         isDragging ? 'opacity-50' : ''
       }`}
+      onClick={() => onOpen()}
       {...attributes}
       {...listeners}
     >
-      <p className="text-sm font-semibold text-gray-900">{task.title}</p>
-      <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
-        <TaskTypeIcon type={task.type} />
-        <TaskTypeColor type={task.type}>{task.key ?? task._id}</TaskTypeColor>
-      </p>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="text-sm font-semibold text-gray-900">{task.title}</p>
+          <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+            <TaskTypeIcon type={task.type} />
+            <TaskTypeColor type={task.type}>
+              {task.key ?? task._id}
+            </TaskTypeColor>
+          </p>
+        </div>
+
+        <button
+          type="button"
+          aria-label="Delete task"
+          className="rounded p-1 text-red-500 hover:bg-red-50 hover:text-red-600"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsDeleteOpen(true);
+          }}
+        >
+          <Trash size={16} />
+        </button>
+      </div>
+
+      <DeleteTaskModal
+        task={task}
+        open={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onDeleted={() => setIsDeleteOpen(false)}
+      />
     </div>
   );
 }
 
 function ColumnDropZone({ id, children }: { id: string; children: ReactNode }) {
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef } = useDroppable({
     id: `column:${id}`,
     data: { type: 'column', column: id },
   });
 
   return (
-    <div ref={setNodeRef} className={`min-h-[120px] rounded-md`}>
+    <div ref={setNodeRef} className={`min-h-30 rounded-md`}>
       {children}
     </div>
   );
@@ -73,9 +119,11 @@ function ColumnDropZone({ id, children }: { id: string; children: ReactNode }) {
 
 function BoardView() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const { projectId, type } = useParams();
-
+  const { projectId } = useParams();
+  const { project } = useProject();
+  const type = project?.projectType;
   const isScrum = type === 'scrum';
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -85,7 +133,10 @@ function BoardView() {
   const [error, setError] = useState<string | null>(null);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
 
-  const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
+  const normalize = useCallback(
+    (value?: string) => (value ?? '').toLowerCase().trim(),
+    []
+  );
 
   const sprintTaskIds = useMemo(() => {
     if (!isScrum) return null;
@@ -149,10 +200,16 @@ function BoardView() {
         setError(null);
         const [projectResp, tasksResp, sprintsResp] = await Promise.all([
           getProjectById(projectId),
-          getTasks({ projectId }),
+          getTasks({
+            projectId,
+            searchInput: searchParams.get('searchInput') || '',
+          }),
           isScrum
             ? fetchWithAuth<{ result?: Sprint[] } | Sprint[]>('/sprint', {
-                params: { projectId },
+                params: {
+                  projectId,
+                  searchInput: searchParams.get('searchInput') || '',
+                },
               })
             : Promise.resolve([] as Sprint[]),
         ]);
@@ -191,7 +248,7 @@ function BoardView() {
     return () => {
       isMounted = false;
     };
-  }, [isScrum, projectId]);
+  }, [isScrum, projectId, searchParams]);
 
   if (!projectId) {
     return (
@@ -299,18 +356,16 @@ function BoardView() {
                     {!loading &&
                       !error &&
                       tasksByColumn[col]?.map((task) => (
-                        <div
+                        <TaskCard
                           key={task._id}
-                          onClick={() => {
+                          task={task}
+                          column={col}
+                          onOpen={() => {
                             const params = new URLSearchParams(location.search);
                             params.set('taskId', task._id);
-                            navigate(
-                              `/dashboard/${projectId}/${type}/${task._id}`
-                            );
+                            navigate(`/dashboard/${projectId}/${task._id}`);
                           }}
-                        >
-                          <TaskCard task={task} column={col} />
-                        </div>
+                        />
                       ))}
                   </div>
                 </SortableContext>
@@ -328,10 +383,17 @@ function BoardView() {
               {tasks.find((task) => task._id === activeTaskId) ? (
                 <span className="mt-1 flex items-center gap-1 text-xs text-gray-500">
                   <TaskTypeIcon
-                    type={tasks.find((task) => task._id === activeTaskId)?.type}
+                    type={
+                      tasks.find((task) => task._id === activeTaskId)?.type ||
+                      'task'
+                    }
                   />
+
                   <TaskTypeColor
-                    type={tasks.find((task) => task._id === activeTaskId)?.type}
+                    type={
+                      tasks.find((task) => task._id === activeTaskId)?.type ||
+                      'task'
+                    }
                   >
                     {tasks.find((task) => task._id === activeTaskId)?.key ??
                       activeTaskId}

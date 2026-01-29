@@ -16,13 +16,18 @@ import {
   addTasksToSprint,
   removeTaskFromSprint,
 } from '../../services/sprints.service';
+import { useProject } from '../../context/ProjectContext';
+import { useSearchParams } from 'react-router-dom';
 
 interface BacklogViewProps {
   columns?: string[];
 }
 
 function BacklogView({ columns }: BacklogViewProps) {
-  const { projectId, type } = useParams();
+  const { projectId } = useParams();
+  const { project } = useProject();
+  const [searchParams] = useSearchParams();
+  const type = project?.projectType;
   const isScrum = type === 'scrum';
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -51,13 +56,19 @@ function BacklogView({ columns }: BacklogViewProps) {
         setLoading(true);
 
         const tasksPromise = fetchWithAuth<{ result: Task[] }>('/tasks', {
-          params: { projectId },
+          params: {
+            projectId,
+            searchInput: searchParams.get('searchInput') || '',
+          },
         });
 
         const sprintsPromise =
           type === 'scrum'
             ? fetchWithAuth<{ result: Sprint[] }>('/sprint', {
-                params: { projectId },
+                params: {
+                  projectId,
+                  searchInput: searchParams.get('searchInput') || '',
+                },
               })
             : Promise.resolve({ result: [] as Sprint[] });
 
@@ -78,7 +89,7 @@ function BacklogView({ columns }: BacklogViewProps) {
     if (projectId) {
       loadData(projectId);
     }
-  }, [projectId, type]);
+  }, [projectId, type, searchParams]);
 
   if (!projectId) {
     return (
@@ -165,10 +176,12 @@ function BacklogView({ columns }: BacklogViewProps) {
           const calls: Promise<unknown>[] = [];
 
           if (sourceSprint) {
+            console.log('Calling sprint update API');
             calls.push(removeTaskFromSprint(sourceSprint._id, taskId));
           }
 
           if (targetSprint) {
+            console.log('Calling sprint update API');
             calls.push(addTasksToSprint(targetSprint._id, [taskId]));
           }
 
