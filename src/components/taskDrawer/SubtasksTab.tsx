@@ -12,7 +12,7 @@ import { Trash2 } from 'lucide-react';
 
 export function SubtasksTab({ task }: { task: TaskPopulated }) {
   const navigate = useNavigate();
-  const { projectId, type, taskId: currentTaskId } = useParams();
+  const { projectId, taskId: currentTaskId } = useParams();
 
   const [selectedIds, setSelectedIds] = useState<string[]>(
     (task.subTask ?? []) as string[]
@@ -95,7 +95,7 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
   };
 
   const openSubtask = (subtaskId: string) => {
-    navigate(`/dashboard/${projectId}/${type}/${subtaskId}`);
+    navigate(`/dashboard/${projectId}/${subtaskId}`);
   };
 
   return (

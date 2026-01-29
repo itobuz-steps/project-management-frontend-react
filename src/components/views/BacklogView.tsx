@@ -19,13 +19,9 @@ import {
 import { useProject } from '../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
 
-interface BacklogViewProps {
-  columns?: string[];
-}
-
-function BacklogView({ columns }: BacklogViewProps) {
+function BacklogView() {
   const { projectId } = useParams();
-  const { project } = useProject();
+  const { project, columns } = useProject();
   const [searchParams] = useSearchParams();
   const type = project?.projectType;
   const isScrum = type === 'scrum';
@@ -92,7 +88,7 @@ function BacklogView({ columns }: BacklogViewProps) {
     if (projectId) {
       loadData(projectId);
     }
-  }, [projectId, type, searchParams]);
+  }, [projectId, type]);
 
   if (!projectId) {
     return (
@@ -214,10 +210,11 @@ function BacklogView({ columns }: BacklogViewProps) {
                     sprint.tasks.includes(t._id)
                   );
 
-                  return (
+                  return sprint.isCompleted ? null : (
                     <TaskTable
                       key={sprint._id}
                       sprint={sprint}
+                      setSprints={setSprints}
                       tasks={sprintTasks}
                       columns={columns || []}
                       containerId={sprint._id}

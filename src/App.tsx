@@ -10,6 +10,10 @@ import { EditProfilePage } from './pages/EditProfilePage';
 import { ProjectProvider } from './context/ProjectProvider';
 import { AcceptInvitePage } from './pages/AcceptInvitePage';
 import TaskPage from './pages/TaskPage';
+import BacklogView from './components/views/BacklogView';
+import BoardView from './components/views/BoardView';
+import ListView from './components/views/ListView';
+import { ForYouPage } from './pages/ForYouPage';
 
 function App() {
   const isAuthenticated = true;
@@ -55,9 +59,15 @@ function App() {
               />
               <Route path="/dashboard/:projectId" element={<Dashboard />} />
               <Route
-                path="/dashboard/:projectId/:taskId"
+                path="/dashboard/:projectId?/:taskId?"
                 element={<Dashboard />}
-              />
+              >
+                <Route index element={<Navigate to="backlog" replace />} />
+                <Route path="backlog" element={<BacklogView />} />
+                <Route path="board" element={<BoardView />} />
+                <Route path="list" element={<ListView />} />
+                <Route path="for-you" element={<ForYouPage />} />
+              </Route>
 
               {/* ✅ FULL PAGE TASK */}
               <Route

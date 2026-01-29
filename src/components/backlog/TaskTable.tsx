@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -23,6 +23,11 @@ const formatDateForInput = (date?: string) => {
     .toISOString()
     .split('T')[0];
 };
+// import { useNavigate, useLocation } from 'react-router-dom';
+import { updateSprint } from '../../services/sprints.service';
+import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
+import { SprintMenu } from './SprintMenu';
 
 function TaskRow({
   task,
@@ -175,6 +180,7 @@ function TaskRow({
 
 export function TaskTable({
   sprint,
+  setSprints,
   tasks,
   columns,
   title,
@@ -193,39 +199,83 @@ export function TaskTable({
     );
   };
 
+  const dueDateRef = useRef<HTMLInputElement>(null);
   const { setNodeRef, isOver } = useDroppable({
     id: `container:${containerId}`,
     data: { type: 'container', containerId },
   });
+  const sprintStarted = sprint?.dueDate;
+
+  async function startSprint() {
+    if (!sprint) return;
+    if (!dueDateRef.current || !dueDateRef.current.value) return;
+
+    const dueDateValue = dueDateRef.current.value;
+
+    try {
+      await updateSprint(sprint._id, {
+        dueDate: new Date(dueDateValue),
+      });
+      setSprints?.((prevSprints) =>
+        prevSprints.map((s) =>
+          s._id === sprint._id ? { ...s, dueDate: new Date(dueDateValue) } : s
+        )
+      );
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data.message || 'Failed to start sprint');
+      }
+    }
+  }
+
+  async function completeSprint() {
+    if (!sprint) return;
+
+    try {
+      await updateSprint(sprint._id, {
+        isCompleted: true,
+      });
+      setSprints?.((prevSprints) =>
+        prevSprints.map((s) =>
+          s._id === sprint._id ? { ...s, isCompleted: true } : s
+        )
+      );
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(
+          error.response?.data.message || 'Failed to complete sprint'
+        );
+      }
+    }
+  }
 
   return (
     <div className="rounded-lg border bg-white shadow-sm">
       {/* Sprint Header */}
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between rounded-t-lg bg-gray-50 px-4 py-2 text-left hover:bg-gray-100"
-      >
-        <div className="flex items-center gap-2">
+      <div className="flex w-full items-center justify-between rounded-t-lg bg-gray-50 px-4 py-2 text-left hover:bg-gray-100">
+        <div
+          onClick={() => setOpen(!open)}
+          className="flex cursor-pointer items-center gap-2"
+        >
           <ChevronDown
             className={`h-4 w-4 transition ${open ? '' : '-rotate-90'}`}
           />
           <span className="font-semibold">{title || sprint?.key}</span>
         </div>
-
         <div className="space-x-4">
           <span className="text-xs text-gray-400">
             {tasks.length} issue{tasks.length !== 1 && 's'}
           </span>
-          {/* 
-          <button
-            type="button"
-            id={`${sprint.key}-sprint-start-button`}
-            className="bg-primary-400 hover:bg-primary-500 cursor-pointer rounded-sm px-2 py-1 font-medium text-white shadow-xs focus:outline-none"
-          >
-            Start Sprint
-          </button> */}
+          {sprint && (
+            <SprintMenu
+              dueDateRef={dueDateRef}
+              sprintStarted={!!sprintStarted}
+              startSprint={startSprint}
+              completeSprint={completeSprint}
+            />
+          )}
         </div>
-      </button>
+      </div>
 
       {/* Sprint Table */}
       {open && (

@@ -4,7 +4,7 @@ export interface Sprint {
   name: string;
   key: string;
   tasks: string[];
-  dueDate: string;
+  dueDate: Date;
   isCompleted: boolean;
   projectId: string;
   createdAt?: string;
@@ -25,7 +25,7 @@ export interface UpdateSprintPayload {
   name?: string;
   key?: string;
   tasks?: string[];
-  dueDate?: string;
+  dueDate?: Date;
   isCompleted?: boolean;
 }
 
