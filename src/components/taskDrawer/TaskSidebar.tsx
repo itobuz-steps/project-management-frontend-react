@@ -1,5 +1,5 @@
 import { EditOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Tag, message } from 'antd';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { updateTask } from '../../services/taskService';
@@ -9,10 +9,10 @@ import { EditTaskModal } from '../../utils/EditTaskModal';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { StatusSelect } from '../../utils/StatusSelect';
 import { formatDateForInput } from '../../utils/utils';
-import { useProject } from '../../context/ProjectContext';
 import { InputNumber, Dropdown, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { PRIORITIES, PRIORITY_COLORS, TASK_TYPES } from './constants';
+import { getProjectById } from '../../services/projectService';
 
 const STORY_POINTS = [1, 2, 3, 5, 8, 13];
 
@@ -24,9 +24,19 @@ export function TaskSidebar({
   onUpdated: (t: TaskPopulated) => void;
 }) {
   const [editing, setEditing] = useState<'priority' | 'type' | null>(null);
-
-  const { columns } = useProject();
   const [editOpen, setEditOpen] = useState(false);
+
+  const [columns, setColumns] = useState<string[]>([]);
+
+  useEffect(() => {
+    async function fetchColumns() {
+      // TODO: Change task type from TaskPopulated to Task or populate projectid from backend
+      const project = await getProjectById(task.projectId as unknown as string);
+      setColumns(project.columns);
+    }
+
+    fetchColumns();
+  });
 
   return (
     <>
