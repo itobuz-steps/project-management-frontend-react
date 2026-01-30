@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/sidebar/Sidebar';
 import Navbar from '../components/navbar/Navbar';
 import TaskModal from '../components/taskDrawer/TaskModal';
@@ -36,11 +36,8 @@ export default function MainLayout() {
 
     setSearchParams(next, { replace: true });
   };
-  const navigate = useNavigate();
-  const { projectId, taskId } = useParams();
 
-  const isDashboardTask =
-    window.location.pathname.startsWith('/dashboard') && taskId;
+  const taskId = searchParams.get('taskId');
 
   return (
     <div className="relative flex h-screen w-full overflow-hidden">
@@ -53,10 +50,16 @@ export default function MainLayout() {
         </main>
       </div>
 
-      {isDashboardTask && projectId && taskId && (
+      {taskId && (
         <TaskModal
           taskId={taskId}
-          onClose={() => navigate(`/dashboard/${projectId}`, { replace: true })}
+          onClose={() =>
+            setSearchParams((prev) => {
+              const next = new URLSearchParams(prev);
+              next.delete('taskId');
+              return next;
+            })
+          }
         />
       )}
       <CommandPalette

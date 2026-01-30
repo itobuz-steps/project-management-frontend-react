@@ -1,8 +1,9 @@
 import SidebarGroup from './SidebarGroup';
 import LogoutButton from './LogoutButton';
-import { FolderKanban, Plus, Menu, X } from 'lucide-react';
+import { FolderKanban, Plus, Menu, X, Home } from 'lucide-react';
 import SidebarProjectsDropdown from './SidebarProjectDropdown';
 import { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(true);
@@ -68,6 +69,29 @@ export default function Sidebar() {
 
         <div className="flex h-full flex-col gap-5 overflow-x-hidden overflow-y-auto px-3 py-4">
           <ul className="mt-10 flex flex-col gap-2 font-semibold md:mt-4">
+            {/* FOR YOU */}
+            <li>
+              <NavLink
+                to="/for-you"
+                className={({ isActive }) =>
+                  `hover:bg-primary-100 flex items-center gap-3 rounded px-2 py-2 transition-colors ${
+                    isActive ? 'bg-primary-200 font-medium' : ''
+                  }`
+                }
+              >
+                <Home size={20} className="shrink-0" />
+                <span
+                  className={`truncate whitespace-nowrap transition-all duration-300 ${
+                    collapsed && !mobileOpen
+                      ? '-translate-x-2 opacity-0'
+                      : 'translate-x-0 opacity-100'
+                  }`}
+                >
+                  For You
+                </span>
+              </NavLink>
+            </li>
+
             {/* PROJECTS */}
             <SidebarGroup
               id="projectsMenu"

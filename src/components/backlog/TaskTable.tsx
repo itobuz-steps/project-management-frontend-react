@@ -96,6 +96,11 @@ export function TaskTable({
             className={`h-4 w-4 transition ${open ? '' : '-rotate-90'}`}
           />
           <span className="font-semibold">{title || sprint?.key}</span>
+          {sprint?.dueDate && (
+            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
+              Due {new Date(sprint.dueDate).toLocaleDateString()}
+            </span>
+          )}
         </div>
         <div className="space-x-4">
           <span className="text-xs text-gray-400">

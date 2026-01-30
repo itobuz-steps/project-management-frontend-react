@@ -5,7 +5,7 @@ export function ProjectCard({ project }: { project: Project }) {
   const navigate = useNavigate();
 
   function handleClick() {
-    navigate(`/dashboard/${project._id}`);
+    navigate(`/project/${project._id}`);
   }
 
   return (

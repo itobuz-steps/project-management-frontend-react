@@ -98,7 +98,7 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
   };
 
   const openSubtask = (subtaskId: string) => {
-    navigate(`/dashboard/${projectId}/${subtaskId}`);
+    navigate(`/task/${subtaskId}`);
   };
 
   return (

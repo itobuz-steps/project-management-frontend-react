@@ -2,7 +2,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { StatusSelect } from '../../utils/StatusSelect';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { formatDateForInput, getPriorityBorder } from '../../utils/utils';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { updateTask } from '../../services/taskService';
 import { useSortable } from '@dnd-kit/sortable';
 import { message } from 'antd';
@@ -19,7 +19,7 @@ export function TaskRow({
   columns: string[];
   onPatch: (id: string, patch: Partial<TaskPopulated>) => void;
 }) {
-  const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
   const { projectId } = useParams();
   // const location = useLocation();
   const {
@@ -65,7 +65,7 @@ export function TaskRow({
       <td
         className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline"
         onClick={() => {
-          navigate(`/dashboard/${projectId}/${task._id}`);
+          setSearchParams({ taskId: task._id }, { replace: true });
         }}
       >
         {task.title}

@@ -25,7 +25,7 @@ function SidebarProjectsDropdown({ collapsed }: { collapsed: boolean }) {
   }, []);
 
   function handleProjectClick(projectId: string) {
-    navigate(`/dashboard/${projectId}`);
+    navigate(`/project/${projectId}`);
   }
 
   return (
