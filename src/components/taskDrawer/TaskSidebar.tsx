@@ -36,7 +36,7 @@ export function TaskSidebar({
     }
 
     fetchColumns();
-  });
+  }, [task.projectId]);
 
   return (
     <>
