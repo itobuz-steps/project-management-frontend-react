@@ -25,6 +25,14 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
+    function setupSelectedIds() {
+      setSelectedIds((task.subTask ?? []) as string[]);
+    }
+
+    setupSelectedIds();
+  }, [task._id, task.subTask]);
+
+  useEffect(() => {
     if (!selectedIds.length) return;
 
     let cancelled = false;
