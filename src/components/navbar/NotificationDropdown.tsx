@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useElementInView } from '../../hooks/useElementInView';
 import type { INotification } from '../../types/notification.types';
 import { NotificationItem } from './NotificationItem';
@@ -8,10 +8,12 @@ export function NotificationDropdown({
   notifications,
   loadMore,
   hasMore,
+  setOpen,
 }: {
   notifications: INotification[];
   loadMore: () => void;
   hasMore: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [targetRef, isInView] = useElementInView({ threshold: 1 });
 
@@ -38,7 +40,11 @@ export function NotificationDropdown({
           </li>
         ) : (
           notifications.map((notification) => (
-            <NotificationItem key={notification._id} data={notification} />
+            <NotificationItem
+              setOpen={setOpen}
+              key={notification._id}
+              data={notification}
+            />
           ))
         )}
       </ul>

@@ -3,11 +3,18 @@ import type { INotification } from '../../types/notification.types';
 import { config } from '../../config/config';
 import { useNavigate } from 'react-router-dom';
 
-export function NotificationItem({ data }: { data: INotification }) {
+export function NotificationItem({
+  data,
+  setOpen,
+}: {
+  data: INotification;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const navigate = useNavigate();
 
   function handleClick() {
-    navigate(`/dashboard/${data.projectId}/${data.taskId}`);
+    navigate(`/task/${data.taskId}`);
+    setOpen(false);
   }
 
   const profileImage = data.profileImage
