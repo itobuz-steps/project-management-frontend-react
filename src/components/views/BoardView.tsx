@@ -240,7 +240,8 @@ function BoardView() {
     return () => {
       isMounted = false;
     };
-  }, [isScrum, projectId, searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isScrum, projectId, searchParams.get('searchInput')]);
 
   if (!projectId) {
     return (
@@ -353,10 +354,7 @@ function BoardView() {
                           task={task}
                           column={col}
                           onOpen={() => {
-                            setSearchParams(
-                              { taskId: task._id },
-                              { replace: true }
-                            );
+                            setSearchParams({ taskId: task._id });
                           }}
                         />
                       ))}
