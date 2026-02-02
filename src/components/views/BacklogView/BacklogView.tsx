@@ -1,9 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
+<<<<<<< HEAD:src/components/views/BacklogView.tsx
 import { fetchWithAuth } from '../api/interceptor';
 import { useParams, useSearchParams } from 'react-router-dom';
 import type { Sprint } from '../../services/types/sprints.types';
 import type { Task } from '../../types/tasks.types';
 import { TaskTable } from '../backlog/TaskTable';
+=======
+import { fetchWithAuth } from '../../api/interceptor';
+import { useParams } from 'react-router-dom';
+import type { Sprint } from '../../../services/types/sprints.types';
+import { TaskTable } from '../../backlog/TaskTable';
+import type { TaskPopulated } from '../../../services/types/tasks.types';
+>>>>>>> dev:src/components/views/BacklogView/BacklogView.tsx
 import {
   DndContext,
   DragOverlay,
@@ -19,22 +27,24 @@ import {
 import {
   addTasksToSprint,
   removeTaskFromSprint,
+<<<<<<< HEAD:src/components/views/BacklogView.tsx
 } from '../../services/sprints.service';
 import { useProject } from '../../context/ProjectContext';
+=======
+} from '../../../services/sprints.service';
+import { useProject } from '../../../context/ProjectContext';
+import { useSearchParams } from 'react-router-dom';
+>>>>>>> dev:src/components/views/BacklogView/BacklogView.tsx
 
-interface BacklogViewProps {
-  columns?: string[];
-}
-
-function BacklogView({ columns }: BacklogViewProps) {
+function BacklogView() {
   const { projectId } = useParams();
-  const { project } = useProject();
+  const { project, columns } = useProject();
   const [searchParams] = useSearchParams();
 
   const type = project?.projectType;
   const isScrum = type === 'scrum';
 
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskPopulated[]>([]);
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
@@ -66,12 +76,15 @@ function BacklogView({ columns }: BacklogViewProps) {
       try {
         setLoading(true);
 
-        const tasksPromise = fetchWithAuth<{ result: Task[] }>('/tasks', {
-          params: {
-            projectId,
-            searchInput: searchParams.get('searchInput') || '',
-          },
-        });
+        const tasksPromise = fetchWithAuth<{ result: TaskPopulated[] }>(
+          '/tasks',
+          {
+            params: {
+              projectId,
+              searchInput: searchParams.get('searchInput') || '',
+            },
+          }
+        );
 
         const sprintsPromise =
           type === 'scrum'
@@ -97,8 +110,15 @@ function BacklogView({ columns }: BacklogViewProps) {
       }
     }
 
+<<<<<<< HEAD:src/components/views/BacklogView.tsx
     loadData(projectId);
   }, [projectId, type, searchParams]);
+=======
+    if (projectId) {
+      loadData(projectId);
+    }
+  }, [projectId, type]);
+>>>>>>> dev:src/components/views/BacklogView/BacklogView.tsx
 
   /* ---------------- guards ---------------- */
   if (!projectId) {
@@ -127,7 +147,7 @@ function BacklogView({ columns }: BacklogViewProps) {
 
   /* ---------------- render ---------------- */
   return (
-    <div className="rounded-lg border bg-white p-4">
+    <div className="rounded-lg bg-white p-1">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
@@ -225,6 +245,7 @@ function BacklogView({ columns }: BacklogViewProps) {
                       sprint.tasks.includes(t._id)
                     );
 
+<<<<<<< HEAD:src/components/views/BacklogView.tsx
                     return (
                       <TaskTable
                         key={sprint._id}
@@ -239,6 +260,23 @@ function BacklogView({ columns }: BacklogViewProps) {
               )}
             </section>
           )}
+=======
+                  return sprint.isCompleted ? null : (
+                    <TaskTable
+                      key={sprint._id}
+                      sprint={sprint}
+                      setSprints={setSprints}
+                      tasks={sprintTasks}
+                      columns={columns || []}
+                      containerId={sprint._id}
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        )}
+>>>>>>> dev:src/components/views/BacklogView/BacklogView.tsx
 
           {/* BACKLOG */}
           <TaskTable

@@ -22,16 +22,16 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { fetchWithAuth } from '../api/interceptor';
-import { getProjectById } from '../../services/projects.service';
-import { getTasks, updateTask } from '../../services/tasks.service';
-import type { Task, TaskStatus } from '../../services/types/tasks.types';
-import type { Sprint } from '../../services/types/sprints.types';
-import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
-import { TaskTypeColor } from '../../utils/TaskTypeColor';
-import { useProject } from '../../context/ProjectContext';
+import { fetchWithAuth } from '../../api/interceptor';
+import { getProjectById } from '../../../services/projects.service';
+import { getTasks, updateTask } from '../../../services/tasks.service';
+import type { Task, TaskStatus } from '../../../services/types/tasks.types';
+import type { Sprint } from '../../../services/types/sprints.types';
+import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
+import { TaskTypeColor } from '../../../utils/TaskTypeColor';
+import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
-import { DeleteTaskModal } from '../../utils/DeleteTaskModal';
+import { DeleteTaskModal } from '../../../utils/DeleteTaskModal';
 import { Trash } from 'lucide-react';
 
 function TaskCard({

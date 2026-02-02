@@ -23,3 +23,17 @@ export interface Project {
   updatedAt: string; // ISO date string
   __v: number;
 }
+
+export interface CreateProjectPayload {
+  name: string;
+  projectType: ProjectType;
+  columns: string[];
+  memberLead: string;
+  tasks: string | string[];
+}
+
+export interface UpdateProjectPayload {
+  name?: string;
+  projectType?: ProjectType;
+  columns?: string[];
+}

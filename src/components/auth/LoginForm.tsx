@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
@@ -13,7 +13,10 @@ interface ILoginInput {
 export function LoginForm() {
   const { register, handleSubmit } = useForm<ILoginInput>();
 
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const from = location.state?.from || '/dashboard';
 
   const submitHandler = async (data: ILoginInput) => {
     try {
@@ -22,7 +25,7 @@ export function LoginForm() {
       toast.success('Login successful');
       localStorage.setItem('access_token', response.accessToken);
       localStorage.setItem('refresh_token', response.refreshToken);
-      navigate('/dashboard');
+      navigate(from, { replace: true });
     } catch (error) {
       if (error instanceof AxiosError) {
         toast.error(

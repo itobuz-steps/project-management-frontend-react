@@ -1,209 +1,116 @@
 import { ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
   SortableContext,
-  useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { StatusSelect } from '../../utils/StatusSelect';
-import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
-import { getPriorityBorder } from '../../utils/utils';
 import type { TaskTableProps } from './type';
-import { useNavigate, useParams } from 'react-router-dom';
-import { updateTask } from '../../services/taskService';
-// import { useNavigate, useLocation } from 'react-router-dom';
-import type { Task } from '../../types/tasks.types';
-
-function TaskRow({
-  task,
-  containerId,
-  columns,
-}: {
-  task: Task;
-  containerId: string;
-  columns: string[];
-}) {
-  const navigate = useNavigate();
-  const { projectId } = useParams();
-  // const location = useLocation();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: task._id, data: { type: 'task', containerId } });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <tr
-      key={task._id}
-      ref={setNodeRef}
-      className={`whitespace-nowrap hover:bg-gray-50 ${getPriorityBorder(
-        task.priority
-      )} ${isDragging ? 'opacity-50' : ''}`}
-      style={{ ...style, touchAction: 'none' }}
-      {...attributes}
-      {...listeners}
-    >
-      <td className="p-2 text-center whitespace-nowrap">
-        <div className="flex justify-center">
-          <TaskTypeIcon type={task.type} />
-        </div>
-      </td>
-
-      <td className="p-2 font-medium whitespace-nowrap text-blue-600">
-        {task.key}
-      </td>
-
-      <td
-        className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline"
-        onClick={() => {
-          navigate(`/dashboard/${projectId}/${task._id}`);
-        }}
-      >
-        {task.title}
-      </td>
-
-      <td className="p-2 px-6 whitespace-nowrap">
-        <StatusSelect
-          taskId={task._id}
-          value={task.status}
-          columns={columns}
-          onChange={async (newStatus) => {
-            await updateTask(task._id, {
-              status: newStatus,
-            });
-          }}
-        />
-      </td>
-
-      <td className="p-2 px-6 whitespace-nowrap">
-        <div className="flex items-center">
-          <img
-            className="mr-3 aspect-square h-6 w-6 rounded-full object-cover"
-            src={`${task.assignee?.profileImage}`}
-          />
-          {task.assignee?.name ?? 'Unassigned'}
-        </div>
-      </td>
-
-      <td className="p-2 px-6 whitespace-nowrap">
-        <input
-          type="date"
-          value={task.dueDate?.split('T')[0] ?? ''}
-          onChange={async (e) => {
-            const newDate = e.target.value;
-            if (!newDate) return;
-
-            await updateTask(task._id, {
-              dueDate: newDate,
-            });
-          }}
-          className={`w-28 rounded-md border bg-gray-50 p-1 text-sm outline-none ${
-            task.dueDate && new Date(task.dueDate) < new Date()
-              ? 'text-red-600'
-              : ''
-          }`}
-        />
-      </td>
-
-      <td className="p-2 px-6 whitespace-nowrap">
-        <div className="flex gap-1">
-          {task.tags?.slice(0, 3).map((label) => (
-            <span
-              key={label}
-              className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700"
-            >
-              {label}
-            </span>
-          ))}
-
-          {task.tags && task.tags.length > 3 && (
-            <span className="rounded bg-gray-200 px-2 py-0.5 text-xs">
-              +{task.tags.length - 3}
-            </span>
-          )}
-        </div>
-      </td>
-
-      <td className="p-2 px-6 text-xs whitespace-nowrap text-gray-500">
-        {task.createdAt ? new Date(task.createdAt).toLocaleDateString() : ''}
-      </td>
-
-      <td className="p-2 px-6 text-xs whitespace-nowrap text-gray-500">
-        {task.updatedAt ? new Date(task.updatedAt).toLocaleDateString() : ''}
-      </td>
-
-      <td className="p-2 px-6 whitespace-nowrap">
-        <div className="flex items-center">
-          <img
-            className="mr-3 aspect-square h-6 w-6 rounded-full object-cover"
-            src={`${task.reporter?.profileImage}
-                            ? config.API_BASE_URL + '/uploads/profile/' + task.reporter.avatarUrl
-                            : '../../../assets/img/profile.png'}`}
-          />
-          {task.reporter?.name ?? 'Unknown'}
-        </div>
-      </td>
-    </tr>
-  );
-}
+import type { TaskPopulated } from '../../services/types/tasks.types';
+import { updateSprint } from '../../services/sprints.service';
+import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
+import { SprintMenu } from './SprintMenu';
+import { TaskRow } from './TaskRow';
 
 export function TaskTable({
   sprint,
+  setSprints,
   tasks,
   columns,
   title,
   containerId,
 }: TaskTableProps) {
   const [open, setOpen] = useState(true);
+  const [localTasks, setLocalTasks] = useState<TaskPopulated[]>(tasks);
+
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
+
+  const updateTaskInState = (id: string, patch: Partial<TaskPopulated>) => {
+    setLocalTasks((previous) =>
+      previous.map((task) => (task._id === id ? { ...task, ...patch } : task))
+    );
+  };
+
+  const dueDateRef = useRef<HTMLInputElement>(null);
   const { setNodeRef, isOver } = useDroppable({
     id: containerId,
     data: { containerId },
   });
+  const sprintStarted = sprint?.dueDate;
+
+  async function startSprint() {
+    if (!sprint) return;
+    if (!dueDateRef.current || !dueDateRef.current.value) return;
+
+    const dueDateValue = dueDateRef.current.value;
+
+    try {
+      await updateSprint(sprint._id, {
+        dueDate: new Date(dueDateValue),
+      });
+      setSprints?.((prevSprints) =>
+        prevSprints.map((s) =>
+          s._id === sprint._id ? { ...s, dueDate: new Date(dueDateValue) } : s
+        )
+      );
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data.message || 'Failed to start sprint');
+      }
+    }
+  }
+
+  async function completeSprint() {
+    if (!sprint) return;
+
+    try {
+      await updateSprint(sprint._id, {
+        isCompleted: true,
+      });
+      setSprints?.((prevSprints) =>
+        prevSprints.map((s) =>
+          s._id === sprint._id ? { ...s, isCompleted: true } : s
+        )
+      );
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(
+          error.response?.data.message || 'Failed to complete sprint'
+        );
+      }
+    }
+  }
 
   return (
-    <div className="rounded-lg border bg-white shadow-sm">
+    <div className="rounded-lg bg-white shadow-sm">
       {/* Sprint Header */}
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between rounded-t-lg bg-gray-50 px-4 py-2 text-left hover:bg-gray-100"
-      >
-        <div className="flex items-center gap-2">
+      <div className="flex w-full items-center justify-between rounded-t-lg bg-gray-100 px-4 py-2 text-left hover:bg-gray-100">
+        <div
+          onClick={() => setOpen(!open)}
+          className="flex cursor-pointer items-center gap-2"
+        >
           <ChevronDown
             className={`h-4 w-4 transition ${open ? '' : '-rotate-90'}`}
           />
           <span className="font-semibold">{title || sprint?.key}</span>
-
-          {sprint?.dueDate && (
-            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
-              Due {new Date(sprint.dueDate).toLocaleDateString()}
-            </span>
-          )}
         </div>
-
         <div className="space-x-4">
           <span className="text-xs text-gray-400">
             {tasks.length} issue{tasks.length !== 1 && 's'}
           </span>
-          {/* 
-          <button
-            type="button"
-            id={`${sprint.key}-sprint-start-button`}
-            className="bg-primary-400 hover:bg-primary-500 cursor-pointer rounded-sm px-2 py-1 font-medium text-white shadow-xs focus:outline-none"
-          >
-            Start Sprint
-          </button> */}
+          {sprint && (
+            <SprintMenu
+              dueDateRef={dueDateRef}
+              sprintStarted={!!sprintStarted}
+              startSprint={startSprint}
+              completeSprint={completeSprint}
+            />
+          )}
         </div>
-      </button>
+      </div>
 
       {/* Sprint Table */}
       {open && (
@@ -251,7 +158,7 @@ export function TaskTable({
               className={`${isOver ? 'bg-blue-50' : ''} divide-y`}
             >
               <SortableContext
-                items={tasks.map((task) => task._id)}
+                items={localTasks.map((task) => task._id)}
                 strategy={verticalListSortingStrategy}
               >
                 {tasks.length === 0 ? (
@@ -264,12 +171,13 @@ export function TaskTable({
                     </td>
                   </tr>
                 ) : (
-                  tasks.map((task) => (
+                  localTasks.map((task) => (
                     <TaskRow
                       key={task._id}
                       task={task}
                       containerId={containerId}
                       columns={columns}
+                      onPatch={updateTaskInState}
                     />
                   ))
                 )}

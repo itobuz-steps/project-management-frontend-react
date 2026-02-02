@@ -7,7 +7,7 @@ import {
   Select,
   InputNumber,
 } from 'antd';
-import type { Task } from '../types/tasks.types';
+import type { TaskPopulated } from '../services/types/tasks.types';
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import { updateTask } from '../services/taskService';
@@ -15,9 +15,9 @@ import { useProject } from '../context/ProjectContext';
 
 interface Props {
   open: boolean;
-  task: Task;
+  task: TaskPopulated;
   onClose: () => void;
-  onUpdated: (task: Task) => void;
+  onUpdated: (task: TaskPopulated) => void;
 }
 
 export function EditTaskModal({ open, task, onClose, onUpdated }: Props) {

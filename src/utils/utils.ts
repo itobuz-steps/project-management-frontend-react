@@ -12,3 +12,8 @@ export function getPriorityBorder(priority?: string) {
       return 'border-l-2 border-l-transparent';
   }
 }
+
+export function formatDateForInput(date?: string) {
+  if (!date) return '';
+  return new Date(date).toISOString().split('T')[0];
+}
