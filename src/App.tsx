@@ -9,10 +9,10 @@ import { Flip, ToastContainer } from 'react-toastify';
 import { EditProfilePage } from './pages/EditProfilePage';
 import { ProjectProvider } from './context/ProjectProvider';
 import { AcceptInvitePage } from './pages/AcceptInvitePage';
+import BacklogView from './components/views/BacklogView/BacklogView';
+import BoardView from './components/views/BoardView/BoardView';
+import ListView from './components/views/ListView/ListView';
 import TaskPage from './pages/TaskPage';
-import BacklogView from './components/views/BacklogView';
-import BoardView from './components/views/BoardView';
-import ListView from './components/views/ListView';
 import { ForYouPage } from './pages/ForYouPage';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 
@@ -34,7 +34,7 @@ function App() {
         transition={Flip}
         limit={3}
       />
-      
+
       <BrowserRouter>
         <Routes>
           {/* Redirect root */}
