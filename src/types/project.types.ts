@@ -28,7 +28,6 @@ export interface CreateProjectPayload {
   name: string;
   projectType: ProjectType;
   columns: string[];
-  memberLead: string;
   tasks: string | string[];
 }
 
