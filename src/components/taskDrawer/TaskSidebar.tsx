@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Button, Select, Tag, message } from 'antd';
-import type { TaskPopulated } from '../../services/types/tasks.types';
+import { Button, Select, Tag, message, Avatar } from 'antd';
+import type { TaskPopulated, User } from '../../services/types/tasks.types';
 import { updateTask } from '../../services/taskService';
 import { SidebarRow } from './SidebarRow';
 import { UserCell } from '../../utils/UserCell';
@@ -11,7 +11,10 @@ import { formatDateForInput } from '../../utils/utils';
 import { InputNumber, Dropdown, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { PRIORITIES, PRIORITY_COLORS, TASK_TYPES } from './constants';
-import { getProjectById } from '../../services/projectService';
+import {
+  getProjectById,
+  getProjectMembers,
+} from '../../services/projectService';
 
 const STORY_POINTS = [1, 2, 3, 5, 8, 13];
 
@@ -24,8 +27,25 @@ export function TaskSidebar({
 }) {
   const [editing, setEditing] = useState<'priority' | 'type' | null>(null);
   const [editingLabels, setEditingLabels] = useState(false);
+  const [editingAssignee, setEditingAssignee] = useState(false);
+  const [members, setMembers] = useState<User[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
 
   const [columns, setColumns] = useState<string[]>([]);
+
+  const loadMembers = async () => {
+    if (members.length) return;
+
+    setLoadingMembers(true);
+    try {
+      const result = await getProjectMembers(
+        task.projectId as unknown as string
+      );
+      setMembers(result);
+    } finally {
+      setLoadingMembers(false);
+    }
+  };
 
   useEffect(() => {
     async function fetchColumns() {
@@ -76,8 +96,57 @@ export function TaskSidebar({
           </SidebarRow>
           {/* ASSIGNEE */}
           <SidebarRow label="Assignee">
-            <UserCell user={task.assignee} emptyText="Unassigned" />
+            {!editingAssignee ? (
+              <div
+                className="cursor-pointer rounded-md px-2 py-1 hover:bg-gray-100"
+                onClick={() => {
+                  setEditingAssignee(true);
+                  loadMembers();
+                }}
+              >
+                <UserCell user={task.assignee} emptyText="Unassigned" />
+              </div>
+            ) : (
+              <Select
+                autoFocus
+                className="w-full"
+                loading={loadingMembers}
+                value={task.assignee?._id ?? null}
+                placeholder="Unassigned"
+                allowClear
+                onBlur={() => setEditingAssignee(false)}
+                onChange={async (userId) => {
+                  const selectedUser = members.find((m) => m._id === userId);
+
+                  const optimistic: TaskPopulated = {
+                    ...task,
+                    assignee: selectedUser as unknown as User,
+                  };
+                  onUpdated(optimistic);
+                  setEditingAssignee(false);
+
+                  try {
+                    await updateTask(task._id, {
+                      assignee: userId ?? undefined,
+                    });
+                  } catch {
+                    message.error('Failed to update assignee');
+                    onUpdated(task);
+                  }
+                }}
+                options={members.map((member) => ({
+                  value: member._id,
+                  label: (
+                    <div className="flex items-center gap-2">
+                      <Avatar size="small" src={member.profileImage} />
+                      <span>{member.name}</span>
+                    </div>
+                  ),
+                }))}
+              />
+            )}
           </SidebarRow>
+
           <SidebarRow label="Labels">
             {!editingLabels ? (
               <div
