@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   DndContext,
   DragOverlay,
@@ -118,8 +118,7 @@ function ColumnDropZone({ id, children }: { id: string; children: ReactNode }) {
 }
 
 function BoardView() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const { projectId } = useParams();
   const { project } = useProject();
@@ -198,7 +197,7 @@ function BoardView() {
       try {
         setLoading(true);
         setError(null);
-        const [projectResp, tasksResp, sprintsResp] = await Promise.all([
+        const [project, tasksResp, sprintsResp] = await Promise.all([
           getProjectById(projectId),
           getTasks({
             projectId,
@@ -214,14 +213,7 @@ function BoardView() {
             : Promise.resolve([] as Sprint[]),
         ]);
 
-        const project =
-          typeof projectResp === 'object' && projectResp
-            ? ((projectResp as { result?: { columns?: string[] } }).result ??
-              projectResp)
-            : projectResp;
-
-        const projectColumns =
-          (project as { columns?: string[] })?.columns ?? [];
+        const projectColumns = project.columns;
 
         const taskPayload = Array.isArray(tasksResp)
           ? tasksResp
@@ -248,7 +240,8 @@ function BoardView() {
     return () => {
       isMounted = false;
     };
-  }, [isScrum, projectId, searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isScrum, projectId, searchParams.get('searchInput')]);
 
   if (!projectId) {
     return (
@@ -361,9 +354,7 @@ function BoardView() {
                           task={task}
                           column={col}
                           onOpen={() => {
-                            const params = new URLSearchParams(location.search);
-                            params.set('taskId', task._id);
-                            navigate(`/dashboard/${projectId}/${task._id}`);
+                            setSearchParams({ taskId: task._id });
                           }}
                         />
                       ))}

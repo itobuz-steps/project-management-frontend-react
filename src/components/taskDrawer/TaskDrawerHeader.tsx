@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { updateTask } from '../../services/taskService';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
+import { useNavigate } from 'react-router';
 
 export function TaskDrawerHeader({
   task,
-  projectId,
   onUpdated,
 }: {
   task: TaskPopulated;
@@ -18,6 +18,7 @@ export function TaskDrawerHeader({
   const [value, setValue] = useState(task.title);
   const [saving, setSaving] = useState(false);
   const inputRef = useRef<InputRef>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setValue(task.title);
@@ -90,7 +91,7 @@ export function TaskDrawerHeader({
               if (e.key === 'Escape') cancel();
             }}
             disabled={saving}
-            className="w-[420px]"
+            className="w-105"
           />
         )}
       </div>
@@ -102,7 +103,7 @@ export function TaskDrawerHeader({
         <Button
           type="text"
           icon={<ExportOutlined />}
-          href={`/projects/${projectId}/tasks/${task._id}`}
+          onClick={() => navigate(`/task/${task._id}`)}
           target="_blank"
         />
       </div>

@@ -12,7 +12,7 @@ export function AcceptInvitePage() {
   const { countdownStarted, startCountdown, countdown } = useCountdown(
     5,
     () => {
-      navigate('/dashboard');
+      navigate('/for-you');
     }
   );
 

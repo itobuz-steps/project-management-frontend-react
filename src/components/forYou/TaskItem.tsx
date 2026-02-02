@@ -1,13 +1,13 @@
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 
 export function TaskItem({ task }: { task: TaskPopulated }) {
-  const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
 
   return (
     <li
-      onClick={() => navigate(`/dashboard/${task.projectId._id}/${task._id}`)}
+      onClick={() => setSearchParams({ taskId: task._id }, { replace: true })}
       className="hover:bg-primary-50 flex items-center justify-between rounded-sm border border-gray-100 bg-white p-2 shadow-sm hover:cursor-pointer"
     >
       <div className="flex items-center justify-start gap-2">

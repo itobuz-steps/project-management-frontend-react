@@ -52,7 +52,7 @@ export default function EditProfileContainer() {
         initialUsername={username}
       />
       <Link
-        to={'/dashboard'}
+        to={'/for-you'}
         id="profile-go-back-btn"
         className="text-primary-400 hover:text-primary-500 text-center font-semibold transition-colors duration-300"
       >

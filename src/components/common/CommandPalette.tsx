@@ -125,7 +125,7 @@ export function CommandPalette({
                       }
 
                       navigate({
-                        pathname: `/dashboard/${projectId}/${task._id}`,
+                        pathname: `/task/${task._id}`,
                         search: next.toString(),
                       });
                       onClose();

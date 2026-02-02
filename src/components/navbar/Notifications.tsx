@@ -75,6 +75,7 @@ export default function Notifications() {
           notifications={notifications}
           loadMore={loadMore}
           hasMore={hasMore}
+          setOpen={setOpen}
         />
       )}
     </div>

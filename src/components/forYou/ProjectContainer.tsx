@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getAllProjects } from '../../services/projects.service';
+import { getAllProjects } from '../../services/projectService';
 import type { Project } from '../../types/project.types';
 import { ProjectCard } from './ProjectCard';
 

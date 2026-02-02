@@ -16,7 +16,7 @@ export function LoginForm() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const from = location.state?.from || '/dashboard';
+  const from = location.state?.from || '/for-you';
 
   const submitHandler = async (data: ILoginInput) => {
     try {
