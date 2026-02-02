@@ -7,9 +7,10 @@ import {
   Select,
   InputNumber,
 } from 'antd';
-import type { Task } from '../services/types/tasks.types';
-import { useState } from 'react';
+import type { Task, User } from '../services/types/tasks.types';
+import { useEffect, useState } from 'react';
 import { createTask } from '../services/tasks.service';
+import { getUsersByProjectId } from '../services/projectService';
 import { useProject } from '../context/ProjectContext';
 
 interface Props {
@@ -23,6 +24,25 @@ export function AddTaskModal({ open, task, onClose, onCreate }: Props) {
   const { columns, project } = useProject();
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
+  const [members, setMembers] = useState<User[]>([]);
+  useEffect(() => {
+    if (!open || !project?._id) {
+      setMembers([]);
+      return;
+    }
+
+    getUsersByProjectId(project._id)
+      .then((data) => {
+        const list = Array.isArray(data)
+          ? data
+          : (data as { result?: User[] })?.result || [];
+        setMembers(list);
+      })
+      .catch(() => {
+        message.error('Failed to load project members.');
+        setMembers([]);
+      });
+  }, [open, project?._id]);
 
   const onSave = async () => {
     try {
@@ -39,6 +59,7 @@ export function AddTaskModal({ open, task, onClose, onCreate }: Props) {
         priority: String(values.priority).toLowerCase(),
         type: String(values.type).toLowerCase(),
         dueDate: values.dueDate?.toISOString(),
+        assignee: values.assignee || undefined,
       });
 
       message.success('Task created');
@@ -127,7 +148,14 @@ export function AddTaskModal({ open, task, onClose, onCreate }: Props) {
           </Form.Item>
 
           <Form.Item name="assignee" label="Assignee">
-            <Select placeholder="Select assignee" />
+            <Select
+              placeholder="Select assignee"
+              allowClear
+              options={members.map((member) => ({
+                value: member._id,
+                label: member.name || member.email,
+              }))}
+            />
           </Form.Item>
         </div>
 

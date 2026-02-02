@@ -58,22 +58,25 @@ export function TaskDrawerHeader({
   };
 
   return (
-    <div className="flex items-start justify-between gap-4">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       {/* LEFT */}
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         {/* TYPE ICON */}
-        <div className="flex h-7 w-7 items-center justify-center rounded bg-gray-100">
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-gray-100">
           <TaskTypeIcon type={task.type} />
         </div>
 
         {/* TASK KEY */}
-        <Tag color="blue">{task.key}</Tag>
+        <Tag color="blue" className="shrink-0">
+          {task.key}
+        </Tag>
 
         {/* TITLE */}
         {!editing ? (
           <h1
-            className="cursor-pointer rounded px-1 text-xl font-semibold hover:bg-gray-100"
+            className="min-w-0 cursor-pointer truncate rounded px-1 text-lg font-semibold hover:bg-gray-100 sm:text-xl sm:whitespace-normal"
             onClick={() => setEditing(true)}
+            title={task.title}
           >
             {task.title}
           </h1>
@@ -88,13 +91,13 @@ export function TaskDrawerHeader({
               if (e.key === 'Escape') cancel();
             }}
             disabled={saving}
-            className="w-105"
+            className="w-full sm:w-105"
           />
         )}
       </div>
 
       {/* RIGHT */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 sm:self-start">
         <Tag color="blue">{task.status}</Tag>
 
         <Button

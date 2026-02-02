@@ -4,13 +4,14 @@ import type { TaskPopulated } from '../services/types/tasks.types';
 import getTaskById from '../services/taskService';
 import { TaskView } from '../components/taskDrawer/TaskView';
 import { TaskDrawerHeader } from '../components/taskDrawer/TaskDrawerHeader';
+import { useIsMobile } from '../utils/isMobile';
 
 export default function TaskPage() {
   const { taskId } = useParams();
   const [task, setTask] = useState<TaskPopulated | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const isMobile = window.innerWidth < 768;
+  const isMobile = useIsMobile(768);
 
   useEffect(() => {
     if (!taskId) return;

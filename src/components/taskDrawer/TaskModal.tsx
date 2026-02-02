@@ -1,5 +1,3 @@
-import { Grid } from 'antd';
-const { useBreakpoint } = Grid;
 import type { TaskModalProps } from './taskDrawer.type';
 import { useEffect, useState } from 'react';
 import { Modal, Spin } from 'antd';
@@ -8,13 +6,14 @@ import type { TaskPopulated } from '../../services/types/tasks.types';
 import getTaskById from '../../services/taskService';
 import { TaskView } from './TaskView';
 import { TaskDrawerHeader } from './TaskDrawerHeader';
+import { useIsMobile } from '../../utils/isMobile';
 
 export default function TaskModal({ taskId, onClose }: TaskModalProps) {
   const [task, setTask] = useState<TaskPopulated | null>(null);
   const [loading, setLoading] = useState(false);
   // const navigate = useNavigate();
-  const screens = useBreakpoint();
-  const isMobile = !screens.md;
+  // const screens = useBreakpoint();
+  const isMobile = useIsMobile(768);
 
   useEffect(() => {
     if (!taskId) return;
@@ -44,10 +43,6 @@ export default function TaskModal({ taskId, onClose }: TaskModalProps) {
       footer={null}
       centered={!isMobile}
       width={isMobile ? '100%' : 1000}
-      style={{
-        top: isMobile ? 0 : 32,
-        paddingBottom: 0,
-      }}
       styles={{
         header: {
           padding: '12px 16px',
