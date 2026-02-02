@@ -54,6 +54,12 @@ export function EditTaskModal({ open, task, onClose, onUpdated }: Props) {
       confirmLoading={saving}
       destroyOnHidden
       width={700}
+      styles={{
+        mask: {
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'none',
+        },
+      }}
     >
       <Form
         form={form}

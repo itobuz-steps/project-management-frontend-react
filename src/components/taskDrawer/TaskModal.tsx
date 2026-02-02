@@ -61,6 +61,11 @@ export default function TaskModal({ taskId, onClose }: TaskModalProps) {
           height: isMobile ? 'calc(100vh - 56px)' : '70vh',
           overflow: 'hidden',
         },
+
+        mask: {
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'none',
+        },
       }}
       destroyOnHidden
       title={

@@ -42,7 +42,6 @@ export default function MainLayout() {
   return (
     <div className="relative flex h-screen w-full overflow-hidden">
       <Sidebar />
-
       <div className="flex w-full flex-1 flex-col overflow-x-auto pl-0 md:pl-0">
         <Navbar />
         <main className="flex-1 overflow-y-auto p-6">
