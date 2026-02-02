@@ -1,10 +1,6 @@
 import { Avatar, Button, Popconfirm, Space, Typography, Input } from 'antd';
 import { message } from 'antd';
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PaperClipOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, PaperClipOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { marked } from 'marked';
 import { commentsApi } from '../../services/commentService';
@@ -12,7 +8,7 @@ import { config } from '../../config/config';
 import type { CommentItemProps } from './taskDrawer.type';
 import { formatDistanceToNow } from 'date-fns';
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 const { TextArea } = Input;
 
 export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
@@ -20,7 +16,7 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
 
   const [isEditing, setIsEditing] = useState(false);
   const [messageText, setMessageText] = useState(comment.message);
-  const [saving, setSaving] = useState(false);
+  const [, setSaving] = useState(false);
 
   const handleSave = async () => {
     if (!messageText.trim()) {
@@ -34,8 +30,13 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
         message: messageText,
       });
 
+      onUpdate({
+        ...comment,
+        ...updated,
+        author: comment.author,
+      });
+
       messageApi.success('Comment updated successfully');
-      onUpdate(updated);
       setIsEditing(false);
     } finally {
       setSaving(false);
@@ -51,28 +52,34 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
   return (
     <>
       {contextHolder}
-      <div className="flex gap-3 border-b border-gray-200 px-2 py-2">
-        <Avatar
-          src={
-            comment.author.profileImage
-              ? `${config.api_base_url}/uploads/profile/${comment.author.profileImage}`
-              : '/assets/img/profile.png'
-          }
-        />
+      <div className="group flex gap-2 rounded-md px-2 py-2 hover:bg-gray-50">
+        <div className="flex items-center justify-center">
+          <Avatar
+            src={
+              comment.author.profileImage
+                ? `${config.api_base_url}/uploads/profile/${comment.author.profileImage}`
+                : '/assets/img/profile.png'
+            }
+          >
+            {comment.author.name?.[0]}
+          </Avatar>
+        </div>
 
         <div className="flex-1">
-          <Space orientation="vertical" size={2} className="w-full">
+          <Space orientation="vertical" size={0} className="w-full">
             <Space className="w-full justify-between">
               <div>
-                <Text strong>{comment.author.name}</Text>
-                <div className="text-xs text-gray-500">
+                <Text className="text-sm font-medium text-gray-900">
+                  {comment.author.name || 'You'}
+                </Text>
+                <span className="ml-2 text-xs text-gray-400">
                   {formatDistanceToNow(new Date(comment.createdAt), {
                     addSuffix: true,
                   })}
-                </div>
+                </span>
               </div>
 
-              <Space>
+              <Space className="opacity-0 transition group-hover:opacity-100">
                 {comment.attachment && (
                   <Button
                     icon={<PaperClipOutlined />}
@@ -86,12 +93,6 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
                   />
                 )}
 
-                <Button
-                  icon={<EditOutlined />}
-                  type="text"
-                  onClick={() => setIsEditing(true)}
-                />
-
                 <Popconfirm
                   title="Are you sure you want to delete this comment?"
                   onConfirm={handleDelete}
@@ -101,26 +102,37 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
               </Space>
             </Space>
 
+            {/* {!isEditing && (
+              <div className="text-[11px] text-gray-400 opacity-0 transition group-hover:opacity-100">
+                Click to edit · Enter to save
+              </div>
+            )} */}
+
             {!isEditing ? (
-              <Paragraph>
-                <div
-                  className="prose"
-                  dangerouslySetInnerHTML={{
-                    __html: marked.parse(comment.message),
-                  }}
-                />
-              </Paragraph>
+              <div
+                className="prose prose-sm max-w-none cursor-text rounded px-1 py-0.5 leading-snug hover:bg-gray-100"
+                onClick={() => setIsEditing(true)}
+                dangerouslySetInnerHTML={{
+                  __html: marked.parse(comment.message),
+                }}
+              />
             ) : (
-              <>
-                <TextArea
-                  value={messageText}
-                  onChange={(e) => setMessageText(e.target.value)}
-                  rows={3}
-                />
-                <Button type="primary" loading={saving} onClick={handleSave}>
-                  Save
-                </Button>
-              </>
+              <TextArea
+                autoFocus
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                rows={3}
+                onBlur={handleSave}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setIsEditing(false);
+                    setMessageText(comment.message);
+                  }
+                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                    handleSave();
+                  }
+                }}
+              />
             )}
           </Space>
         </div>
