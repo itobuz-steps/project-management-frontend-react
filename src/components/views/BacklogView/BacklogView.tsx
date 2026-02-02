@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { fetchWithAuth } from '../../api/interceptor';
 import { useParams } from 'react-router-dom';
 import type { Sprint } from '../../../services/types/sprints.types';
-import type { Task } from '../../../types/tasks.types';
 import { TaskTable } from '../../backlog/TaskTable';
+import type { TaskPopulated } from '../../../services/types/tasks.types';
 import {
   DndContext,
   DragOverlay,
@@ -26,7 +26,7 @@ function BacklogView() {
   const type = project?.projectType;
   const isScrum = type === 'scrum';
 
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskPopulated[]>([]);
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
@@ -51,12 +51,15 @@ function BacklogView() {
       try {
         setLoading(true);
 
-        const tasksPromise = fetchWithAuth<{ result: Task[] }>('/tasks', {
-          params: {
-            projectId,
-            searchInput: searchParams.get('searchInput') || '',
-          },
-        });
+        const tasksPromise = fetchWithAuth<{ result: TaskPopulated[] }>(
+          '/tasks',
+          {
+            params: {
+              projectId,
+              searchInput: searchParams.get('searchInput') || '',
+            },
+          }
+        );
 
         const sprintsPromise =
           type === 'scrum'
@@ -111,7 +114,7 @@ function BacklogView() {
   );
 
   return (
-    <div className="rounded-lg border bg-white p-4">
+    <div className="rounded-lg bg-white p-1">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}

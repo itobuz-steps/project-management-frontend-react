@@ -1,11 +1,11 @@
 // src/services/project.service.ts
 import { config } from '../config/config';
 import type { Project } from '../types/project.types';
-import type { User } from '../types/tasks.types';
+import type { User } from './types/tasks.types';
 import type {
   CreateProjectPayload,
   UpdateProjectPayload,
-} from './types/projects.types';
+} from '../types/project.types';
 
 const BASE_URL = `${config.api_base_url}/project`;
 

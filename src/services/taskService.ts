@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { config } from '../config/config';
-import type { Task } from '../types/tasks.types';
+import type { TaskPopulated } from '../services/types/tasks.types';
 import { attachInterceptor } from '../utils/attachInterceptor';
 
 const API_URL = `${config.api_base_url}/tasks`;
@@ -12,10 +12,11 @@ const api = axios.create({
 attachInterceptor(api);
 
 interface TaskResponse {
-  result: Task;
+  result: TaskPopulated;
 }
 
-export default async function getTaskById(taskId: string): Promise<Task> {
+
+export default async function getTaskById(taskId: string): Promise<TaskPopulated> {
   const res = await api.get<TaskResponse>(`/${taskId}`);
 
   return res.data.result;
@@ -23,15 +24,15 @@ export default async function getTaskById(taskId: string): Promise<Task> {
 
 export async function updateTask(
   taskId: string,
-  updates: Partial<Task>
-): Promise<Task> {
+  updates: Partial<TaskPopulated>
+): Promise<TaskPopulated> {
   const res = await api.put<TaskResponse>(`/${taskId}`, updates);
 
   return res.data.result;
 }
 
-export async function getAllTasks(): Promise<Task[]> {
-  const res = await api.get<{ result: Task[] }>(`/`);
+export async function getAllTasks(): Promise<TaskPopulated[]> {
+  const res = await api.get<{ result: TaskPopulated[] }>(`/`);
 
   return res.data.result;
 }

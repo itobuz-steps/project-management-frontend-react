@@ -1,5 +1,5 @@
 import { Avatar } from "antd";
-import type { User } from "../types/tasks.types";
+import type { User } from "../services/types/tasks.types";
 
 export function UserCell({ user, emptyText }: { user?: User; emptyText: string }) {
   if (!user) return <span className="text-gray-400">{emptyText}</span>;
