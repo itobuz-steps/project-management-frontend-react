@@ -144,7 +144,7 @@ function ListView() {
                 task.priority
               )}`}
               onClick={() => {
-                navigate(`/dashboard/${projectId}/${task._id}`);
+                navigate(`/task/${task._id}`);
               }}
             >
               <td className="p-3">
