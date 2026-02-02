@@ -3,7 +3,6 @@ const { useBreakpoint } = Grid;
 import type { TaskModalProps } from './taskDrawer.type';
 import { useEffect, useState } from 'react';
 import { Modal, Spin } from 'antd';
-import { useParams } from 'react-router-dom';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 // import { ExportOutlined } from '@ant-design/icons';
 import getTaskById from '../../services/taskService';
@@ -14,7 +13,6 @@ export default function TaskModal({ taskId, onClose }: TaskModalProps) {
   const [task, setTask] = useState<TaskPopulated | null>(null);
   const [loading, setLoading] = useState(false);
   // const navigate = useNavigate();
-  const { projectId } = useParams();
   const screens = useBreakpoint();
   const isMobile = !screens.md;
 
@@ -72,7 +70,7 @@ export default function TaskModal({ taskId, onClose }: TaskModalProps) {
         task && (
           <TaskDrawerHeader
             task={task}
-            projectId={projectId!}
+            // projectId={projectId!}
             onUpdated={setTask}
           />
         )

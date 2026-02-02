@@ -1,11 +1,10 @@
-import { EditOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { Button, Tag, message } from 'antd';
+import { Button, Select, Tag, message } from 'antd';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { updateTask } from '../../services/taskService';
 import { SidebarRow } from './SidebarRow';
 import { UserCell } from '../../utils/UserCell';
-import { EditTaskModal } from '../../utils/EditTaskModal';
+// import { EditTaskModal } from '../../utils/EditTaskModal';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { StatusSelect } from '../../utils/StatusSelect';
 import { formatDateForInput } from '../../utils/utils';
@@ -24,7 +23,7 @@ export function TaskSidebar({
   onUpdated: (t: TaskPopulated) => void;
 }) {
   const [editing, setEditing] = useState<'priority' | 'type' | null>(null);
-  const [editOpen, setEditOpen] = useState(false);
+  const [editingLabels, setEditingLabels] = useState(false);
 
   const [columns, setColumns] = useState<string[]>([]);
 
@@ -47,15 +46,15 @@ export function TaskSidebar({
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-gray-700">Task Details</h3>
 
-          <Button
+          {/* <Button
             size="small"
             type="text"
             icon={<EditOutlined />}
             onClick={() => setEditOpen(true)}
-          />
+          /> */}
         </div>
 
-        <div className="space-y-3">
+        <div className="max-h-[calc(100vh-350px)] space-y-3 overflow-y-auto pr-1">
           {/* STATUS — inline editable */}
           <SidebarRow label="Status">
             <StatusSelect
@@ -79,6 +78,50 @@ export function TaskSidebar({
           <SidebarRow label="Assignee">
             <UserCell user={task.assignee} emptyText="Unassigned" />
           </SidebarRow>
+          <SidebarRow label="Labels">
+            {!editingLabels ? (
+              <div
+                className="flex cursor-pointer flex-wrap gap-1"
+                onClick={() => setEditingLabels(true)}
+              >
+                {task.tags?.length ? (
+                  <>
+                    {task.tags.slice(0, 3).map((label) => (
+                      <Tag key={label} color="blue">
+                        {label}
+                      </Tag>
+                    ))}
+
+                    {task.tags.length > 3 && <Tag>+{task.tags.length - 3}</Tag>}
+                  </>
+                ) : (
+                  <span className="text-xs text-gray-400">Add labels</span>
+                )}
+              </div>
+            ) : (
+              <Select
+                autoFocus
+                mode="tags"
+                style={{ width: '100%' }}
+                value={task.tags}
+                placeholder="Add labels"
+                onBlur={() => setEditingLabels(false)}
+                onChange={async (values) => {
+                  const optimistic = { ...task, tags: values };
+                  onUpdated(optimistic);
+                  setEditingLabels(false);
+
+                  try {
+                    await updateTask(task._id, { tags: values });
+                  } catch {
+                    message.error('Failed to update labels');
+                    onUpdated(task);
+                  }
+                }}
+              />
+            )}
+          </SidebarRow>
+
           {/* PRIORITY */}
           <SidebarRow label="Priority">
             {editing !== 'priority' ? (
@@ -246,13 +289,12 @@ export function TaskSidebar({
         </div>
       </div>
 
-      {/* FULL EDIT MODAL */}
-      <EditTaskModal
+      {/* <EditTaskModal
         open={editOpen}
         task={task}
         onClose={() => setEditOpen(false)}
         onUpdated={onUpdated}
-      />
+      /> */}
     </>
   );
 }

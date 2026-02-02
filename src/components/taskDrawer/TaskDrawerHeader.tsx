@@ -10,7 +10,6 @@ export function TaskDrawerHeader({
   onUpdated,
 }: {
   task: TaskPopulated;
-  projectId: string;
   onUpdated: (t: TaskPopulated) => void;
 }) {
   const [editing, setEditing] = useState(false);
