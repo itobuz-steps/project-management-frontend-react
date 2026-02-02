@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { fetchWithAuth } from '../api/interceptor';
+import { fetchWithAuth } from '../../api/interceptor';
 import { useParams } from 'react-router-dom';
-import type { Sprint } from '../../services/types/sprints.types';
-import type { TaskPopulated } from '../../services/types/tasks.types';
-import { TaskTable } from '../backlog/TaskTable';
+import type { Sprint } from '../../../services/types/sprints.types';
+import { TaskTable } from '../../backlog/TaskTable';
+import type { TaskPopulated } from '../../../services/types/tasks.types';
 import {
   DndContext,
   DragOverlay,
@@ -15,8 +15,8 @@ import {
 import {
   addTasksToSprint,
   removeTaskFromSprint,
-} from '../../services/sprints.service';
-import { useProject } from '../../context/ProjectContext';
+} from '../../../services/sprints.service';
+import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
 
 function BacklogView() {
