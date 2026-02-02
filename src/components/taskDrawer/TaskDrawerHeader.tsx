@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { updateTask } from '../../services/taskService';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
-import { useNavigate } from 'react-router';
 
 export function TaskDrawerHeader({
   task,
@@ -18,7 +17,6 @@ export function TaskDrawerHeader({
   const [value, setValue] = useState(task.title);
   const [saving, setSaving] = useState(false);
   const inputRef = useRef<InputRef>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     setValue(task.title);
@@ -103,8 +101,7 @@ export function TaskDrawerHeader({
         <Button
           type="text"
           icon={<ExportOutlined />}
-          onClick={() => navigate(`/task/${task._id}`)}
-          target="_blank"
+          onClick={() => window.open(`/task/${task._id}`, '_blank')}
         />
       </div>
     </div>

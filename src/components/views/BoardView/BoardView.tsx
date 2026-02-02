@@ -70,14 +70,22 @@ function TaskCard({
       {...attributes}
       {...listeners}
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-2 cursor-pointer">
         <div>
-          <p className="text-sm font-semibold text-gray-900">{task.title}</p>
+          <p className="text-sm font-semibold text-gray-900 hover:underline">{task.title}</p>
           <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
             <TaskTypeIcon type={task.type} />
-            <TaskTypeColor type={task.type}>
-              {task.key ?? task._id}
-            </TaskTypeColor>
+            <span
+              className="p-1 whitespace-nowrap"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(`/task/${task._id}`, '_blank');
+              }}
+            >
+              <TaskTypeColor type={task.type}>
+                {task.key ?? task._id}
+              </TaskTypeColor>
+            </span>
           </p>
         </div>
 
