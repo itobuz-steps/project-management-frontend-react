@@ -1,3 +1,5 @@
+import { Tag } from 'antd';
+
 export function TaskTypeColor({
   type,
   children,
@@ -8,21 +10,30 @@ export function TaskTypeColor({
   switch (type) {
     case 'bug':
       return (
-        <span className="rounded-xl bg-red-500 px-1.5 py-0.5 text-white">
+        <Tag
+          color="red"
+          className="cursor-pointer rounded-xl bg-red-500 px-1.5 py-0.5 text-white hover:underline"
+        >
           {children}
-        </span>
+        </Tag>
       );
     case 'story':
       return (
-        <span className="rounded-xl bg-green-600 px-1.5 py-0.5 text-white">
+        <Tag
+          color="green"
+          className="cursor-pointer rounded-xl bg-green-600 px-1.5 py-0.5 text-white hover:underline"
+        >
           {children}
-        </span>
+        </Tag>
       );
     default:
       return (
-        <span className="rounded-xl bg-blue-600 px-1.5 py-0.5 text-white">
+        <Tag
+          color="blue"
+          className="cursor cursor-pointer rounded-xl bg-blue-600 px-1.5 py-0.5 text-white hover:underline"
+        >
           {children}
-        </span>
+        </Tag>
       );
   }
 }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { config } from '../config/config';
-import type { TaskPopulated } from '../services/types/tasks.types';
+import type { Task, TaskPopulated } from '../services/types/tasks.types';
 import { attachInterceptor } from '../utils/attachInterceptor';
 
 const API_URL = `${config.api_base_url}/tasks`;
@@ -24,7 +24,7 @@ export default async function getTaskById(taskId: string): Promise<TaskPopulated
 
 export async function updateTask(
   taskId: string,
-  updates: Partial<TaskPopulated>
+  updates: Partial<TaskPopulated> | Partial<Task>
 ): Promise<TaskPopulated> {
   const res = await api.put<TaskResponse>(`/${taskId}`, updates);
 

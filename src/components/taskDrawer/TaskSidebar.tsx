@@ -1,18 +1,20 @@
-import { EditOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { Button, Tag, message } from 'antd';
-import type { TaskPopulated } from '../../services/types/tasks.types';
+import { Button, Select, Tag, message, Avatar } from 'antd';
+import type { TaskPopulated, User } from '../../services/types/tasks.types';
 import { updateTask } from '../../services/taskService';
 import { SidebarRow } from './SidebarRow';
 import { UserCell } from '../../utils/UserCell';
-import { EditTaskModal } from '../../utils/EditTaskModal';
+// import { EditTaskModal } from '../../utils/EditTaskModal';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { StatusSelect } from '../../utils/StatusSelect';
 import { formatDateForInput } from '../../utils/utils';
 import { InputNumber, Dropdown, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { PRIORITIES, PRIORITY_COLORS, TASK_TYPES } from './constants';
-import { getProjectById } from '../../services/projectService';
+import {
+  getProjectById,
+  getProjectMembers,
+} from '../../services/projectService';
 
 const STORY_POINTS = [1, 2, 3, 5, 8, 13];
 
@@ -24,9 +26,26 @@ export function TaskSidebar({
   onUpdated: (t: TaskPopulated) => void;
 }) {
   const [editing, setEditing] = useState<'priority' | 'type' | null>(null);
-  const [editOpen, setEditOpen] = useState(false);
+  const [editingLabels, setEditingLabels] = useState(false);
+  const [editingAssignee, setEditingAssignee] = useState(false);
+  const [members, setMembers] = useState<User[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
 
   const [columns, setColumns] = useState<string[]>([]);
+
+  const loadMembers = async () => {
+    if (members.length) return;
+
+    setLoadingMembers(true);
+    try {
+      const result = await getProjectMembers(
+        task.projectId as unknown as string
+      );
+      setMembers(result);
+    } finally {
+      setLoadingMembers(false);
+    }
+  };
 
   useEffect(() => {
     async function fetchColumns() {
@@ -47,15 +66,15 @@ export function TaskSidebar({
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-gray-700">Task Details</h3>
 
-          <Button
+          {/* <Button
             size="small"
             type="text"
             icon={<EditOutlined />}
             onClick={() => setEditOpen(true)}
-          />
+          /> */}
         </div>
 
-        <div className="space-y-3">
+        <div className="max-h-[calc(100vh-350px)] space-y-3 overflow-y-auto pr-1">
           {/* STATUS — inline editable */}
           <SidebarRow label="Status">
             <StatusSelect
@@ -77,8 +96,101 @@ export function TaskSidebar({
           </SidebarRow>
           {/* ASSIGNEE */}
           <SidebarRow label="Assignee">
-            <UserCell user={task.assignee} emptyText="Unassigned" />
+            {!editingAssignee ? (
+              <div
+                className="cursor-pointer rounded-md px-2 py-1 hover:bg-gray-100"
+                onClick={() => {
+                  setEditingAssignee(true);
+                  loadMembers();
+                }}
+              >
+                <UserCell user={task.assignee} emptyText="Unassigned" />
+              </div>
+            ) : (
+              <Select
+                autoFocus
+                className="w-full"
+                loading={loadingMembers}
+                value={task.assignee?._id ?? null}
+                placeholder="Unassigned"
+                allowClear
+                onBlur={() => setEditingAssignee(false)}
+                onChange={async (userId) => {
+                  const selectedUser = members.find((m) => m._id === userId);
+
+                  const optimistic: TaskPopulated = {
+                    ...task,
+                    assignee: selectedUser as unknown as User,
+                  };
+                  onUpdated(optimistic);
+                  setEditingAssignee(false);
+
+                  try {
+                    await updateTask(task._id, {
+                      assignee: userId ?? undefined,
+                    });
+                  } catch {
+                    message.error('Failed to update assignee');
+                    onUpdated(task);
+                  }
+                }}
+                options={members.map((member) => ({
+                  value: member._id,
+                  label: (
+                    <div className="flex items-center gap-2">
+                      <Avatar size="small" src={member.profileImage} />
+                      <span>{member.name}</span>
+                    </div>
+                  ),
+                }))}
+              />
+            )}
           </SidebarRow>
+
+          <SidebarRow label="Labels">
+            {!editingLabels ? (
+              <div
+                className="flex cursor-pointer flex-wrap gap-1"
+                onClick={() => setEditingLabels(true)}
+              >
+                {task.tags?.length ? (
+                  <>
+                    {task.tags.slice(0, 3).map((label) => (
+                      <Tag key={label} color="blue">
+                        {label}
+                      </Tag>
+                    ))}
+
+                    {task.tags.length > 3 && <Tag>+{task.tags.length - 3}</Tag>}
+                  </>
+                ) : (
+                  <span className="text-xs text-gray-400">Add labels</span>
+                )}
+              </div>
+            ) : (
+              <Select
+                autoFocus
+                mode="tags"
+                style={{ width: '100%' }}
+                value={task.tags}
+                placeholder="Add labels"
+                onBlur={() => setEditingLabels(false)}
+                onChange={async (values) => {
+                  const optimistic = { ...task, tags: values };
+                  onUpdated(optimistic);
+                  setEditingLabels(false);
+
+                  try {
+                    await updateTask(task._id, { tags: values });
+                  } catch {
+                    message.error('Failed to update labels');
+                    onUpdated(task);
+                  }
+                }}
+              />
+            )}
+          </SidebarRow>
+
           {/* PRIORITY */}
           <SidebarRow label="Priority">
             {editing !== 'priority' ? (
@@ -246,13 +358,12 @@ export function TaskSidebar({
         </div>
       </div>
 
-      {/* FULL EDIT MODAL */}
-      <EditTaskModal
+      {/* <EditTaskModal
         open={editOpen}
         task={task}
         onClose={() => setEditOpen(false)}
         onUpdated={onUpdated}
-      />
+      /> */}
     </>
   );
 }

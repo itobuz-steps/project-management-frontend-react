@@ -1,7 +1,6 @@
-import { Empty, List, Typography, Space, Card, Tooltip, Button } from 'antd';
+import { Empty, List, Typography, Space, Card } from 'antd';
 import {
   PaperClipOutlined,
-  DownloadOutlined,
   FileOutlined,
 } from '@ant-design/icons';
 import { config } from '../../config/config';
@@ -47,19 +46,7 @@ export function AttachmentsTab({ task }: AttachmentsTabProps) {
             const fileUrl = `${config.api_base_url}/uploads/attachments/${fileName}`;
 
             return (
-              <List.Item
-                className="rounded-md px-6 hover:bg-gray-50"
-                actions={[
-                  <Tooltip title="Open">
-                    <Button
-                      type="text"
-                      icon={<DownloadOutlined />}
-                      href={fileUrl}
-                      target="_blank"
-                    />
-                  </Tooltip>,
-                ]}
-              >
+              <List.Item className="rounded-md px-6 hover:bg-gray-50">
                 <List.Item.Meta
                   avatar={<FileOutlined className="text-lg text-blue-500" />}
                   title={
@@ -68,9 +55,7 @@ export function AttachmentsTab({ task }: AttachmentsTabProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <Text ellipsis style={{ maxWidth: 360 }}>
-                        {fileName}
-                      </Text>
+                      <Text>{fileName}</Text>
                     </Link>
                   }
                 />

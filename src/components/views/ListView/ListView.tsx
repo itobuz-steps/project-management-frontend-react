@@ -112,8 +112,8 @@ function ListView() {
   }
 
   return (
-    <div className="no-scrollbar w-full overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
-      <table className="min-w-full table-auto">
+    <div className="no-scrollbar relative mt-2 w-full overflow-x-auto rounded-md border border-gray-200">
+      <table className="min-w-full table-auto overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
         <thead className="z-10 bg-[#f8f8f8] text-xs font-semibold text-gray-500 uppercase">
           <tr>
             {listViewHeaders.map((header) => (
@@ -154,29 +154,34 @@ function ListView() {
             visibleTasks.map((task) => (
               <tr
                 key={task._id}
-                className={`hover:bg-gray-50 ${getPriorityBorder(task.priority)}`}
+                className={`cursor-pointer hover:bg-gray-50 ${getPriorityBorder(
+                  task.priority
+                )}`}
+                onClick={() => {
+                  setSearchParams({ taskId: task._id }, { replace: true });
+                }}
               >
                 <td className="p-3">
                   <TaskTypeIcon type={task.type} />
                 </td>
-                <td className="p-3 whitespace-nowrap">
+                <td
+                  className="p-3 whitespace-nowrap"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(`/task/${task._id}`, '_blank');
+                  }}
+                >
                   <TaskTypeColor type={task.type}>
                     {task.key ?? task._id}
                   </TaskTypeColor>
                 </td>
-                <td
-                  className="cursor-pointer p-3 font-medium whitespace-nowrap text-gray-900 hover:underline"
-                  onClick={() => {
-                    setSearchParams((prev) => {
-                      const next = new URLSearchParams(prev);
-                      next.set('taskId', task._id);
-                      return next;
-                    });
-                  }}
-                >
+                <td className="p-3 font-medium whitespace-nowrap text-gray-900 hover:underline">
                   {task.title}
                 </td>
-                <td className="p-3">
+                <td
+                  className="p-3"
+                  onClick={(event) => event.stopPropagation()}
+                >
                   <StatusSelect
                     taskId={task._id}
                     value={task.status}

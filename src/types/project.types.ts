@@ -1,3 +1,5 @@
+import type { User } from "../services/types/tasks.types";
+
 export type ProjectMemberRole = 'admin' | 'member';
 
 export interface ProjectMember {
@@ -13,7 +15,7 @@ export interface Project {
   name: string;
   projectType: ProjectType;
   columns: string[];
-  members: ProjectMember[];
+  members: User[];
   memberLead: string; // user ID
   prefix: string;
   lastKey: number;
