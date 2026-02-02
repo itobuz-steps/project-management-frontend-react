@@ -152,6 +152,9 @@ function BoardView() {
     []
   );
 
+  const statusFilter = normalize(searchParams.get('status') || '');
+  const priorityFilter = normalize(searchParams.get('priority') || '');
+
   const sprintTaskIds = useMemo(() => {
     if (!isScrum) return null;
 
@@ -167,13 +170,27 @@ function BoardView() {
     return tasks.filter((task) => sprintTaskIds.has(task._id));
   }, [isScrum, sprintTaskIds, tasks]);
 
+  const filteredVisibleTasks = useMemo(() => {
+    if (!statusFilter && !priorityFilter) return visibleTasks;
+
+    return visibleTasks.filter((task) => {
+      if (statusFilter && normalize(task.status) !== statusFilter) {
+        return false;
+      }
+      if (priorityFilter && normalize(task.priority) !== priorityFilter) {
+        return false;
+      }
+      return true;
+    });
+  }, [priorityFilter, statusFilter, normalize, visibleTasks]);
+
   const tasksByColumn = useMemo(() => {
     const map = columns.reduce<Record<string, Task[]>>((acc, col) => {
       acc[col] = [];
       return acc;
     }, {});
 
-    visibleTasks.forEach((task) => {
+    filteredVisibleTasks.forEach((task) => {
       const match = columns.find(
         (col) => normalize(col) === normalize(task.status)
       );
@@ -186,7 +203,7 @@ function BoardView() {
     });
 
     return map;
-  }, [columns, normalize, visibleTasks]);
+  }, [columns, normalize, filteredVisibleTasks]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

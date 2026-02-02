@@ -1,6 +1,14 @@
 import { Plus, FunnelX } from 'lucide-react';
 import type { ViewMode, TopBarProps } from '../../types/TopBar.types';
-import { NavLink, useNavigate } from 'react-router-dom';
+import {
+  NavLink,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import { useProject } from '../../context/ProjectContext';
+import { PRIORITIES } from '../taskDrawer/constants';
 // import AvatarGroup from '../AvatarGroup/AvatarGroup';
 
 const views: { label: string; value: ViewMode }[] = [
@@ -17,6 +25,42 @@ function TopBar({
   projectName,
 }: TopBarProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { columns } = useProject();
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<
+    'status' | 'priority' | null
+  >(null);
+
+  const isFilterableView = useMemo(() => {
+    const path = location.pathname;
+    return (
+      path.endsWith('/backlog') ||
+      path.endsWith('/board') ||
+      path.endsWith('/list')
+    );
+  }, [location.pathname]);
+
+  const statusOptions = useMemo(() => {
+    if (columns && columns.length > 0) {
+      return columns;
+    }
+
+    return ['todo', 'in-progress', 'done'];
+  }, [columns]);
+
+  const updateFilterParam = (key: 'status' | 'priority', value: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (value) {
+        next.set(key, value);
+      } else {
+        next.delete(key);
+      }
+      return next;
+    });
+  };
   return (
     <>
       <header className="mb-3 border-b border-gray-200 bg-white px-4 py-3 shadow-sm sm:px-6">
@@ -58,12 +102,71 @@ function TopBar({
               <Plus className="mb-0.5 ml-1 inline-block h-4 w-4" />
             </button>
             {/* Filters */}
-            <button
-              onClick={onOpenFilters}
-              className="w-full rounded-md border border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 sm:w-auto"
-            >
-              Filters
-            </button>
+            {isFilterableView && (
+              <div className="relative w-full sm:w-auto">
+                <button
+                  onClick={() => {
+                    setIsFiltersOpen((prev) => !prev);
+                    onOpenFilters();
+                  }}
+                  className="w-full rounded-md border border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 sm:w-auto"
+                >
+                  Filters
+                </button>
+                {isFiltersOpen && (
+                  <div className="absolute right-0 z-20 mt-2 w-56 rounded-md border border-gray-200 bg-white p-2 shadow-lg">
+                    <button
+                      onClick={() => setActiveFilter('status')}
+                      className="w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Status
+                    </button>
+                    <button
+                      onClick={() => setActiveFilter('priority')}
+                      className="w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Priority
+                    </button>
+                    {activeFilter === 'status' && (
+                      <div className="mt-2">
+                        <select
+                          value={searchParams.get('status') || ''}
+                          onChange={(event) =>
+                            updateFilterParam('status', event.target.value)
+                          }
+                          className="w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none"
+                        >
+                          <option value="">All</option>
+                          {statusOptions.map((status) => (
+                            <option key={status} value={status}>
+                              {status}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                    {activeFilter === 'priority' && (
+                      <div className="mt-2">
+                        <select
+                          value={searchParams.get('priority') || ''}
+                          onChange={(event) =>
+                            updateFilterParam('priority', event.target.value)
+                          }
+                          className="w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none"
+                        >
+                          <option value="">All</option>
+                          {PRIORITIES.map((priority) => (
+                            <option key={priority} value={priority}>
+                              {priority}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
             {/* Clear Filters */}
             {hasActiveFilters && (
               <button
@@ -74,6 +177,7 @@ function TopBar({
                 <FunnelX className="h-5 w-5" />
               </button>
             )}
+
             {/* Active Users */}
             {/* <AvatarGroup users={activeUsers} /> */}
           </div>
