@@ -37,6 +37,7 @@ import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
 import { DeleteTaskModal } from '../../../utils/DeleteTaskModal';
 import { Plus, Trash } from 'lucide-react';
+import { getTypeBorder } from '../../../utils/utils';
 
 function TaskCard({
   task,
@@ -67,7 +68,7 @@ function TaskCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`rounded-md border border-gray-100 bg-white p-3 shadow-sm ${
+      className={`group rounded-md ${getTypeBorder(task.type)} bg-white p-3 shadow-sm ${
         isDragging ? 'opacity-50' : ''
       }`}
       {...attributes}
@@ -76,7 +77,7 @@ function TaskCard({
       <div className="flex items-start justify-between gap-2">
         <div>
           <p
-            className="cursor-pointer text-sm font-semibold text-gray-900 hover:underline"
+            className="mb-4 cursor-pointer text-sm font-medium text-gray-900 hover:underline"
             onClick={() => onOpen()}
           >
             {task.title}
@@ -92,8 +93,9 @@ function TaskCard({
         <button
           type="button"
           aria-label="Delete task"
-          className="rounded p-1 text-red-500 hover:bg-red-50 hover:text-red-600"
-          onClick={() => {
+          className="rounded p-1 text-gray-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-50 hover:text-gray-600"
+          onClick={(event) => {
+            event.stopPropagation();
             setIsDeleteOpen(true);
           }}
         >
