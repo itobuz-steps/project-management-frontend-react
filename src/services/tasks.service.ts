@@ -33,7 +33,7 @@ export const createTask = async (payload: CreateTaskPayload): Promise<Task> => {
 export const getTasks = async (params: {
   projectId: string;
   searchInput?: string;
-}): Promise<Task[]> => {
+}): Promise<{ success: boolean; result: Task[] }> => {
   const query = new URLSearchParams({
     projectId: params.projectId,
     ...(params.searchInput && { searchInput: params.searchInput }),

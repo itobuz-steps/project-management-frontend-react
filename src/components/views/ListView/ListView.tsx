@@ -50,16 +50,11 @@ function ListView() {
       try {
         setLoading(true);
         setError(null);
-        const taskPayload = await getTasks({
+        const { result } = await getTasks({
           projectId,
           searchInput: searchParams.get('searchInput') || '',
         });
-
-        const normalized = Array.isArray(taskPayload)
-          ? taskPayload
-          : ((taskPayload as { result?: Task[] }).result ?? []);
-
-        setTasks(normalized);
+        setTasks(result);
       } catch {
         setError('Failed to load tasks.');
       } finally {
@@ -105,7 +100,7 @@ function ListView() {
 
   return (
     <table className="min-w-full table-auto overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
-      <thead className="sticky top-0 z-10 bg-[#f8f8f8] text-xs font-semibold text-gray-500 uppercase">
+      <thead className="z-10 bg-[#f8f8f8] text-xs font-semibold text-gray-500 uppercase">
         <tr>
           {listViewHeaders.map((header) => (
             <th key={header.key} className="p-3">
