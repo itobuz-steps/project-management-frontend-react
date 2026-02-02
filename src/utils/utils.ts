@@ -13,6 +13,19 @@ export function getPriorityBorder(priority?: string) {
   }
 }
 
+export function getTypeBorder(type?: string) {
+  switch (type) {
+    case 'bug':
+      return 'border-l-2 border-l-red-500';
+    case 'task':
+      return 'border-l-2 border-l-blue-500';
+    case 'story':
+      return 'border-l-2 border-l-green-500';
+    default:
+      return 'border-l-2 border-l-transparent';
+  }
+}
+
 export function formatDateForInput(date?: string) {
   if (!date) return '';
   return new Date(date).toISOString().split('T')[0];

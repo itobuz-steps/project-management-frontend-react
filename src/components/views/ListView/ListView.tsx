@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { getTasks, updateTask } from '../../../services/tasks.service';
 import type { Task, TaskStatus } from '../../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
@@ -27,9 +26,8 @@ const formatDate = (value?: string) => {
 };
 
 function ListView() {
-  const navigate = useNavigate();
   const { projectId } = useParams();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { columns } = useProject();
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -99,127 +97,134 @@ function ListView() {
   }
 
   return (
-    <table className="min-w-full table-auto overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
-      <thead className="z-10 bg-[#f8f8f8] text-xs font-semibold text-gray-500 uppercase">
-        <tr>
-          {listViewHeaders.map((header) => (
-            <th key={header.key} className="p-3">
-              {header.label}
-            </th>
-          ))}
-        </tr>
-      </thead>
-
-      <tbody className="divide-y whitespace-nowrap">
-        {loading && (
+    <div className="no-scrollbar w-full overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
+      <table className="min-w-full table-auto">
+        <thead className="z-10 bg-[#f8f8f8] text-xs font-semibold text-gray-500 uppercase">
           <tr>
-            <td colSpan={11} className="p-4 text-center text-gray-500">
-              Loading tasks...
-            </td>
+            {listViewHeaders.map((header) => (
+              <th key={header.key} className="p-3">
+                {header.label}
+              </th>
+            ))}
           </tr>
-        )}
+        </thead>
 
-        {error && !loading && (
-          <tr>
-            <td colSpan={11} className="p-4 text-center text-red-600">
-              {error}
-            </td>
-          </tr>
-        )}
-
-        {!loading && !error && visibleTasks.length === 0 && (
-          <tr>
-            <td colSpan={11} className="p-4 text-center text-gray-500">
-              No tasks available
-            </td>
-          </tr>
-        )}
-
-        {!loading &&
-          !error &&
-          visibleTasks.map((task) => (
-            <tr
-              key={task._id}
-              className={`cursor-pointer hover:bg-gray-50 ${getPriorityBorder(
-                task.priority
-              )}`}
-              onClick={() => {
-                navigate(`/task/${task._id}`);
-              }}
-            >
-              <td className="p-3">
-                <TaskTypeIcon type={task.type} />
-              </td>
-              <td className="p-3 whitespace-nowrap">
-                <TaskTypeColor type={task.type}>
-                  {task.key ?? task._id}
-                </TaskTypeColor>
-              </td>
-              <td className="p-3 font-medium whitespace-nowrap text-gray-900">
-                {task.title}
-              </td>
-              <td className="p-3" onClick={(event) => event.stopPropagation()}>
-                <StatusSelect
-                  taskId={task._id}
-                  value={task.status}
-                  columns={columns}
-                  onChange={(value) =>
-                    handleStatusChange(
-                      task._id,
-                      value as TaskStatus,
-                      task.status as TaskStatus
-                    )
-                  }
-                />
-              </td>
-              <td className="p-3 whitespace-nowrap text-gray-700">
-                {task.assignee ? String(task.assignee) : 'Unassigned'}
-              </td>
-              <td className="p-3">
-                <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${
-                    priorityStyles[task.priority] || 'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  {task.priority}
-                </span>
-              </td>
-              <td className="p-3 whitespace-nowrap text-gray-700">
-                {task.reporter ? String(task.reporter) : 'Unknown'}
-              </td>
-              <td className="w-full p-3">
-                <div className="flex flex-wrap gap-1 whitespace-nowrap">
-                  {task.tags?.slice(0, 1).map((label) => (
-                    <span
-                      key={label}
-                      className="rounded bg-blue-100 px-2 py-0.5 text-xs whitespace-nowrap text-blue-700"
-                    >
-                      {label}
-                    </span>
-                  ))}
-                  {task.tags && task.tags.length > 1 && (
-                    <span className="rounded bg-gray-200 px-2 py-0.5 text-xs whitespace-nowrap">
-                      +{task.tags.length - 1}
-                    </span>
-                  )}
-                  {!task.tags?.length && (
-                    <span className="text-xs text-gray-400">—</span>
-                  )}
-                </div>
-              </td>
-              <td className="p-3 whitespace-nowrap text-gray-600">
-                {formatDate(task.createdAt)}
-              </td>
-              <td className="p-3 whitespace-nowrap text-gray-600">
-                {formatDate(task.dueDate)}
-              </td>
-              <td className="p-3 whitespace-nowrap text-gray-600">
-                {formatDate(task.updatedAt)}
+        <tbody className="divide-y whitespace-nowrap">
+          {loading && (
+            <tr>
+              <td colSpan={11} className="p-4 text-center text-gray-500">
+                Loading tasks...
               </td>
             </tr>
-          ))}
-      </tbody>
-    </table>
+          )}
+
+          {error && !loading && (
+            <tr>
+              <td colSpan={11} className="p-4 text-center text-red-600">
+                {error}
+              </td>
+            </tr>
+          )}
+
+          {!loading && !error && visibleTasks.length === 0 && (
+            <tr>
+              <td colSpan={11} className="p-4 text-center text-gray-500">
+                No tasks available
+              </td>
+            </tr>
+          )}
+
+          {!loading &&
+            !error &&
+            visibleTasks.map((task) => (
+              <tr
+                key={task._id}
+                className={`hover:bg-gray-50 ${getPriorityBorder(task.priority)}`}
+              >
+                <td className="p-3">
+                  <TaskTypeIcon type={task.type} />
+                </td>
+                <td className="p-3 whitespace-nowrap">
+                  <TaskTypeColor type={task.type}>
+                    {task.key ?? task._id}
+                  </TaskTypeColor>
+                </td>
+                <td
+                  className="cursor-pointer p-3 font-medium whitespace-nowrap text-gray-900 hover:underline"
+                  onClick={() => {
+                    setSearchParams((prev) => {
+                      const next = new URLSearchParams(prev);
+                      next.set('taskId', task._id);
+                      return next;
+                    });
+                  }}
+                >
+                  {task.title}
+                </td>
+                <td className="p-3">
+                  <StatusSelect
+                    taskId={task._id}
+                    value={task.status}
+                    columns={columns}
+                    onChange={(value) =>
+                      handleStatusChange(
+                        task._id,
+                        value as TaskStatus,
+                        task.status as TaskStatus
+                      )
+                    }
+                  />
+                </td>
+                <td className="p-3 whitespace-nowrap text-gray-700">
+                  {task.assignee ? String(task.assignee) : 'Unassigned'}
+                </td>
+                <td className="p-3">
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${
+                      priorityStyles[task.priority] ||
+                      'bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    {task.priority}
+                  </span>
+                </td>
+                <td className="p-3 whitespace-nowrap text-gray-700">
+                  {task.reporter ? String(task.reporter) : 'Unknown'}
+                </td>
+                <td className="w-full p-3">
+                  <div className="flex flex-wrap gap-1 whitespace-nowrap">
+                    {task.tags?.slice(0, 1).map((label) => (
+                      <span
+                        key={label}
+                        className="rounded bg-blue-100 px-2 py-0.5 text-xs whitespace-nowrap text-blue-700"
+                      >
+                        {label}
+                      </span>
+                    ))}
+                    {task.tags && task.tags.length > 1 && (
+                      <span className="rounded bg-gray-200 px-2 py-0.5 text-xs whitespace-nowrap">
+                        +{task.tags.length - 1}
+                      </span>
+                    )}
+                    {!task.tags?.length && (
+                      <span className="text-xs text-gray-400">—</span>
+                    )}
+                  </div>
+                </td>
+                <td className="p-3 whitespace-nowrap text-gray-600">
+                  {formatDate(task.createdAt)}
+                </td>
+                <td className="p-3 whitespace-nowrap text-gray-600">
+                  {formatDate(task.dueDate)}
+                </td>
+                <td className="p-3 whitespace-nowrap text-gray-600">
+                  {formatDate(task.updatedAt)}
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
