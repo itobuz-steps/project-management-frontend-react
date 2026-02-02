@@ -1,17 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-<<<<<<< HEAD:src/components/views/BacklogView.tsx
-import { fetchWithAuth } from '../api/interceptor';
-import { useParams, useSearchParams } from 'react-router-dom';
-import type { Sprint } from '../../services/types/sprints.types';
-import type { Task } from '../../types/tasks.types';
-import { TaskTable } from '../backlog/TaskTable';
-=======
 import { fetchWithAuth } from '../../api/interceptor';
 import { useParams } from 'react-router-dom';
 import type { Sprint } from '../../../services/types/sprints.types';
 import { TaskTable } from '../../backlog/TaskTable';
 import type { TaskPopulated } from '../../../services/types/tasks.types';
->>>>>>> dev:src/components/views/BacklogView/BacklogView.tsx
 import {
   DndContext,
   DragOverlay,
@@ -27,14 +19,9 @@ import {
 import {
   addTasksToSprint,
   removeTaskFromSprint,
-<<<<<<< HEAD:src/components/views/BacklogView.tsx
-} from '../../services/sprints.service';
-import { useProject } from '../../context/ProjectContext';
-=======
 } from '../../../services/sprints.service';
 import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
->>>>>>> dev:src/components/views/BacklogView/BacklogView.tsx
 
 function BacklogView() {
   const { projectId } = useParams();
@@ -110,15 +97,10 @@ function BacklogView() {
       }
     }
 
-<<<<<<< HEAD:src/components/views/BacklogView.tsx
-    loadData(projectId);
-  }, [projectId, type, searchParams]);
-=======
     if (projectId) {
       loadData(projectId);
     }
   }, [projectId, type]);
->>>>>>> dev:src/components/views/BacklogView/BacklogView.tsx
 
   /* ---------------- guards ---------------- */
   if (!projectId) {
@@ -245,11 +227,11 @@ function BacklogView() {
                       sprint.tasks.includes(t._id)
                     );
 
-<<<<<<< HEAD:src/components/views/BacklogView.tsx
-                    return (
+                    return sprint.isCompleted ? null : (
                       <TaskTable
                         key={sprint._id}
                         sprint={sprint}
+                        setSprints={setSprints}
                         tasks={sprintTasks}
                         columns={columns || []}
                         containerId={sprint._id}
@@ -260,23 +242,6 @@ function BacklogView() {
               )}
             </section>
           )}
-=======
-                  return sprint.isCompleted ? null : (
-                    <TaskTable
-                      key={sprint._id}
-                      sprint={sprint}
-                      setSprints={setSprints}
-                      tasks={sprintTasks}
-                      columns={columns || []}
-                      containerId={sprint._id}
-                    />
-                  );
-                })}
-              </div>
-            )}
-          </section>
-        )}
->>>>>>> dev:src/components/views/BacklogView/BacklogView.tsx
 
           {/* BACKLOG */}
           <TaskTable
