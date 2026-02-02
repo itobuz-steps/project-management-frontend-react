@@ -9,9 +9,9 @@ import { EditProfilePage } from '../../pages/EditProfilePage';
 import { ProjectProvider } from '../../context/ProjectProvider';
 import { AcceptInvitePage } from '../../pages/AcceptInvitePage';
 import TaskPage from '../../pages/TaskPage';
-import BacklogView from '../views/BacklogView';
-import BoardView from '../views/BoardView';
-import ListView from '../views/ListView';
+import BacklogView from '../views/BacklogView/BacklogView';
+import BoardView from '../views/BoardView/BoardView';
+import ListView from '../views/ListView/ListView';
 import { ForYouPage } from '../../pages/ForYouPage';
 import { ProtectedRoute } from '../common/ProtectedRoute';
 

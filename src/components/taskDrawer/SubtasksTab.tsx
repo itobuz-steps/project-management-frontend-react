@@ -184,6 +184,12 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
         onCancel={() => setModalOpen(false)}
         onOk={handleSaveSubtasks}
         footer={null}
+        styles={{
+          mask: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'none',
+          },
+        }}
       >
         <div className="max-h-[420px] space-y-2 overflow-y-auto">
           {projectTasks.map((task) => {

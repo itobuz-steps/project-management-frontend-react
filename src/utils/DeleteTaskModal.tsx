@@ -40,6 +40,12 @@ export function DeleteTaskModal({ open, task, onClose, onDeleted }: Props) {
       confirmLoading={deleting}
       destroyOnHidden
       width={520}
+      styles={{
+        mask: {
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'none',
+        },
+      }}
     >
       <p className="text-neutral-700">
         Are you sure you want to delete{' '}

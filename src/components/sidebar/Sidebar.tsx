@@ -4,10 +4,12 @@ import { FolderKanban, Plus, Menu, X, Home } from 'lucide-react';
 import SidebarProjectsDropdown from './SidebarProjectDropdown';
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+import { CreateProjectModal } from '../createProject';
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [projectModalOpen, setProjectModalOpen] = useState(false);
 
   // Close mobile sidebar on route change or escape key
   useEffect(() => {
@@ -103,6 +105,7 @@ export default function Sidebar() {
                   id="plus-icon"
                   className="plus-icon add-project group hover:bg-primary-300 relative shrink-0 cursor-pointer rounded p-0.5"
                   title="Add project"
+                  onClick={() => setProjectModalOpen(true)}
                 >
                   <Plus size={20} className="stroke-black" />
                 </div>
@@ -124,6 +127,12 @@ export default function Sidebar() {
           <LogoutButton collapsed={collapsed && !mobileOpen} />
         </div>
       </aside>
+
+      {/* Project Modal - rendered outside sidebar */}
+      <CreateProjectModal
+        open={projectModalOpen}
+        onClose={() => setProjectModalOpen(false)}
+      />
     </>
   );
 }

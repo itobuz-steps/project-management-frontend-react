@@ -23,7 +23,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { fetchWithAuth } from '../../api/interceptor';
-import { getProjectById } from '../../../services/projects.service';
+import { getProjectById } from '../../../services/projectService';
 import { getTasks, updateTask } from '../../../services/tasks.service';
 import type { Task, TaskStatus } from '../../../services/types/tasks.types';
 import type { Sprint } from '../../../services/types/sprints.types';
