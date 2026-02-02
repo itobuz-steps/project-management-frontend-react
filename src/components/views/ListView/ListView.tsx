@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { getTasks, updateTask } from '../../../services/tasks.service';
 import type { Task, TaskStatus } from '../../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
@@ -35,7 +34,22 @@ function ListView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const visibleTasks = useMemo(() => tasks, [tasks]);
+  const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
+  const statusFilter = normalize(searchParams.get('status') || '');
+  const priorityFilter = normalize(searchParams.get('priority') || '');
+
+  const visibleTasks = useMemo(() => {
+    if (!statusFilter && !priorityFilter) return tasks;
+    return tasks.filter((task) => {
+      if (statusFilter && normalize(task.status) !== statusFilter) {
+        return false;
+      }
+      if (priorityFilter && normalize(task.priority) !== priorityFilter) {
+        return false;
+      }
+      return true;
+    });
+  }, [priorityFilter, statusFilter, tasks]);
 
   useEffect(() => {
     if (!projectId) {
