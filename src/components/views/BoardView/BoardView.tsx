@@ -22,8 +22,12 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Input, message, Modal } from 'antd';
 import { fetchWithAuth } from '../../api/interceptor';
-import { getProjectById } from '../../../services/projectService';
+import {
+  getProjectById,
+  updateProject,
+} from '../../../services/projectService';
 import { getTasks, updateTask } from '../../../services/tasks.service';
 import type { Task, TaskStatus } from '../../../services/types/tasks.types';
 import type { Sprint } from '../../../services/types/sprints.types';
@@ -32,7 +36,7 @@ import { TaskTypeColor } from '../../../utils/TaskTypeColor';
 import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
 import { DeleteTaskModal } from '../../../utils/DeleteTaskModal';
-import { Trash } from 'lucide-react';
+import { Plus, Trash } from 'lucide-react';
 
 function TaskCard({
   task,
@@ -131,6 +135,12 @@ function BoardView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+  const [isAddColumnOpen, setIsAddColumnOpen] = useState(false);
+  const [newColumnName, setNewColumnName] = useState('');
+  const [isSavingColumn, setIsSavingColumn] = useState(false);
+  const [insertAfterColumn, setInsertAfterColumn] = useState<string | null>(
+    null
+  );
 
   const normalize = useCallback(
     (value?: string) => (value ?? '').toLowerCase().trim(),
@@ -180,6 +190,54 @@ function BoardView() {
       },
     })
   );
+
+  const openAddColumnModal = (columnId: string) => {
+    setNewColumnName('');
+    setInsertAfterColumn(columnId);
+    setIsAddColumnOpen(true);
+  };
+
+  const handleAddColumn = async () => {
+    const trimmed = newColumnName.trim();
+    if (!trimmed) {
+      message.error('Column name is required.');
+      return;
+    }
+
+    if (columns.some((col) => normalize(col) === normalize(trimmed))) {
+      message.error('Column already exists.');
+      return;
+    }
+
+    if (!projectId) return;
+
+    try {
+      setIsSavingColumn(true);
+      const insertIndex = insertAfterColumn
+        ? columns.findIndex((col) => col === insertAfterColumn)
+        : -1;
+
+      const nextColumns = [...columns];
+      if (insertIndex >= 0) {
+        nextColumns.splice(insertIndex + 1, 0, trimmed);
+      } else {
+        nextColumns.push(trimmed);
+      }
+
+      const updated = await updateProject(projectId, {
+        columns: nextColumns,
+      });
+
+      const updatedColumns = updated.columns ?? nextColumns;
+      setColumns(updatedColumns);
+      message.success('Column added.');
+      setIsAddColumnOpen(false);
+    } catch {
+      message.error('Failed to add column.');
+    } finally {
+      setIsSavingColumn(false);
+    }
+  };
 
   useEffect(() => {
     if (!projectId) {
@@ -313,13 +371,26 @@ function BoardView() {
         {columns.map((col) => (
           <div key={col} className="w-72 shrink-0">
             <div className="h-full rounded-lg bg-[#f8f8f8] shadow-sm">
-              <div className="sticky top-0 z-10 flex items-center gap-2 px-4 py-2">
-                <h2 className="text-sm font-semibold text-gray-600 uppercase">
-                  {col}
-                </h2>
-                <span className="rounded-full bg-gray-300 px-2 py-0.5 text-xs font-semibold text-gray-900">
-                  {tasksByColumn[col]?.length ?? 0}
-                </span>
+              <div className="sticky top-0 z-10 flex items-center justify-between gap-2 px-4 py-2">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-semibold text-gray-600 uppercase">
+                    {col}
+                  </h2>
+                  <span className="rounded-full bg-gray-300 px-2 py-0.5 text-xs font-semibold text-gray-900">
+                    {tasksByColumn[col]?.length ?? 0}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Add column"
+                  className="rounded p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    openAddColumnModal(col);
+                  }}
+                >
+                  <Plus size={16} />
+                </button>
               </div>
 
               <ColumnDropZone id={col}>
@@ -395,6 +466,27 @@ function BoardView() {
           </div>
         ) : null}
       </DragOverlay>
+
+      <Modal
+        open={isAddColumnOpen}
+        title="Add column"
+        onCancel={() => setIsAddColumnOpen(false)}
+        onOk={handleAddColumn}
+        confirmLoading={isSavingColumn}
+        destroyOnHidden
+      >
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-gray-700">
+            Column name
+          </label>
+          <Input
+            placeholder="e.g. In Review"
+            value={newColumnName}
+            onChange={(event) => setNewColumnName(event.target.value)}
+            onPressEnter={handleAddColumn}
+          />
+        </div>
+      </Modal>
     </DndContext>
   );
 }
