@@ -6,6 +6,8 @@ import { Outlet, useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../components/api/interceptor';
 import { useProject } from '../context/ProjectContext';
 import { setupPushNotifications } from '../utils/setupNotification';
+import { ForYouPage } from './ForYouPage';
+import { AddTaskModal } from '../utils/addTaskModal';
 
 function Dashboard() {
   const { setProject } = useProject();
@@ -13,6 +15,7 @@ function Dashboard() {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const activeProject = projects.find((p) => p._id === projectId);
+  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
 
   useEffect(() => {
     fetchWithAuth<Project[]>('/project')
@@ -41,11 +44,17 @@ function Dashboard() {
         projectName={activeProject?.name}
         viewMode={viewMode}
         onViewChange={setViewMode}
-        onAddTask={() => alert('Add task clicked')}
+        onAddTask={() => setIsAddTaskOpen(true)}
         onOpenFilters={() => alert('Open filters')}
         onClearFilters={() => alert('Clear filters')}
         hasActiveFilters={true}
         activeUsers={[]}
+      />
+      <AddTaskModal
+        open={isAddTaskOpen}
+        task={{}}
+        onClose={() => setIsAddTaskOpen(false)}
+        onCreate={() => setIsAddTaskOpen(false)}
       />
       <main>
         <Outlet />
