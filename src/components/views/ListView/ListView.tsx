@@ -34,7 +34,22 @@ function ListView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const visibleTasks = useMemo(() => tasks, [tasks]);
+  const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
+  const statusFilter = normalize(searchParams.get('status') || '');
+  const priorityFilter = normalize(searchParams.get('priority') || '');
+
+  const visibleTasks = useMemo(() => {
+    if (!statusFilter && !priorityFilter) return tasks;
+    return tasks.filter((task) => {
+      if (statusFilter && normalize(task.status) !== statusFilter) {
+        return false;
+      }
+      if (priorityFilter && normalize(task.priority) !== priorityFilter) {
+        return false;
+      }
+      return true;
+    });
+  }, [priorityFilter, statusFilter, tasks]);
 
   useEffect(() => {
     if (!projectId) {
