@@ -1,7 +1,14 @@
 import { Flip, ToastContainer } from 'react-toastify';
 import { MainRouter } from './components/routers/MainRouter';
+import { useTheme } from './hooks/useTheme';
+import { useEffect } from 'react';
 
 function App() {
+  const [, setTheme] = useTheme();
+  useEffect(() => {
+    const theme = localStorage.getItem('theme') || 'indigo';
+    setTheme(theme);
+  }, [setTheme]);
   return (
     <>
       <ToastContainer

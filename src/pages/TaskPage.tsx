@@ -34,7 +34,7 @@ export default function TaskPage() {
         <div className="flex h-7 w-7 items-center justify-center rounded bg-gray-100">
           <TaskTypeIcon type={task.type} />
         </div>
-        <Tag color="blue">{task.key}</Tag>
+        <Tag color="primary">{task.key}</Tag>
         <h1 className="text-xl font-semibold">{task.title}</h1>
       </div>
 

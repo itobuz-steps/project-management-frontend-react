@@ -117,7 +117,15 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
           Subtasks ({selectedIds.length})
         </h3>
 
-        <Button size="small" icon={<PlusOutlined />} onClick={openModal}>
+        <Button
+          size="small"
+          icon={<PlusOutlined />}
+          onClick={openModal}
+          style={{
+            backgroundColor: 'var(--color-primary-400)',
+            color: 'white',
+          }}
+        >
           Manage
         </Button>
       </div>

@@ -70,7 +70,7 @@ export function TaskDrawerHeader({
         </div>
 
         {/* TASK KEY */}
-        <Tag color="blue">{task.key}</Tag>
+        <Tag color="primary">{task.key}</Tag>
 
         {/* TITLE */}
         {!editing ? (
@@ -98,7 +98,7 @@ export function TaskDrawerHeader({
 
       {/* RIGHT */}
       <div className="flex items-center gap-2">
-        <Tag color="blue">{task.status}</Tag>
+        <Tag color="primary">{task.status}</Tag>
 
         <Button
           type="text"

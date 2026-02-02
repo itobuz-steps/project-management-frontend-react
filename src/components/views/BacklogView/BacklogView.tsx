@@ -247,6 +247,9 @@ function BacklogView() {
           <TaskTable
             key="backlog"
             sprint={undefined}
+            setSprints={
+              project?.projectType === 'scrum' ? setSprints : undefined
+            }
             tasks={backlogTasks}
             columns={columns || []}
             title="Backlog"

@@ -66,7 +66,7 @@ export function TaskDescription({
             <span className="text-gray-400">Add a description…</span>
           )}
 
-          <span className="ml-2 text-xs text-blue-500 opacity-0 group-hover:opacity-100">
+          <span className="text-primary-500 ml-2 text-xs opacity-0 group-hover:opacity-100">
             Edit
           </span>
         </div>

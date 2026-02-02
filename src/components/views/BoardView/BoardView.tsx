@@ -245,7 +245,7 @@ function BoardView() {
 
   if (!projectId) {
     return (
-      <div className="rounded-lg border bg-blue-50 p-6 text-center text-gray-500">
+      <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500">
         <h2 className="mb-2 text-lg font-semibold text-gray-700">
           No project selected
         </h2>

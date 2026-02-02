@@ -117,7 +117,12 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
                   onChange={(e) => setMessageText(e.target.value)}
                   rows={3}
                 />
-                <Button type="primary" loading={saving} onClick={handleSave}>
+                <Button
+                  type="primary"
+                  loading={saving}
+                  onClick={handleSave}
+                  style={{ backgroundColor: 'var(--color-primary-500)' }}
+                >
                   Save
                 </Button>
               </>

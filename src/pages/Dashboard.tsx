@@ -6,7 +6,6 @@ import { Outlet, useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../components/api/interceptor';
 import { useProject } from '../context/ProjectContext';
 import { setupPushNotifications } from '../utils/setupNotification';
-import { ForYouPage } from './ForYouPage';
 import { AddTaskModal } from '../utils/addTaskModal';
 
 function Dashboard() {
@@ -39,7 +38,7 @@ function Dashboard() {
   const [viewMode, setViewMode] = useState<ViewMode>('backlog');
 
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col gap-1 md:gap-3">
       <TopBar
         projectName={activeProject?.name}
         viewMode={viewMode}

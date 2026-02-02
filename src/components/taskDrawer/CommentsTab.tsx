@@ -82,7 +82,15 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
               maxCount={1}
               showUploadList={false}
             >
-              <Button icon={<PaperClipOutlined />}>Attach</Button>
+              <Button
+                style={{
+                  backgroundColor: 'var(--color-primary-500)',
+                  color: 'white',
+                }}
+                icon={<PaperClipOutlined />}
+              >
+                Attach
+              </Button>
             </Upload>
 
             <Button
@@ -90,6 +98,7 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
               icon={<SendOutlined />}
               loading={submitting}
               onClick={handleSubmit}
+              style={{ backgroundColor: 'var(--color-primary-500)' }}
             >
               Send
             </Button>

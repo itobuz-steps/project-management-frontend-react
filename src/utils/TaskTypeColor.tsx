@@ -20,7 +20,7 @@ export function TaskTypeColor({
       );
     default:
       return (
-        <span className="rounded-xl bg-blue-600 px-1.5 py-0.5 text-white">
+        <span className="bg-primary-600 rounded-xl px-1.5 py-0.5 text-white">
           {children}
         </span>
       );

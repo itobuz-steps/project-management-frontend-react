@@ -30,7 +30,7 @@ export const getSprints = async (): Promise<Sprint[]> => {
 /* ---------------- CREATE SPRINT ---------------- */
 export const createSprint = async (
   payload: CreateSprintPayload
-): Promise<Sprint> => {
+): Promise<{ result: Sprint }> => {
   const res = await fetch(`${BASE_URL}/`, {
     method: 'POST',
     headers: getAuthHeaders(),

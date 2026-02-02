@@ -19,7 +19,7 @@ interface Props {
   onCreate: (task: Task) => void;
 }
 
-export function AddTaskModal({ open, task, onClose, onCreate }: Props) {
+export function AddTaskModal({ open, onClose, onCreate }: Props) {
   const { columns, project } = useProject();
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
@@ -57,6 +57,7 @@ export function AddTaskModal({ open, task, onClose, onCreate }: Props) {
       title="Create Task"
       onCancel={onClose}
       onOk={onSave}
+      okButtonProps={{ style: { backgroundColor: 'var(--color-primary-500)' } }}
       confirmLoading={saving}
       destroyOnHidden
       width={700}

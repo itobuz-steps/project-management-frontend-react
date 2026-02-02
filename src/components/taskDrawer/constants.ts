@@ -4,6 +4,6 @@ export type Priority = (typeof PRIORITIES)[number];
 export const PRIORITY_COLORS: Record<Priority, string> = {
   critical: 'red',
   high: 'orange',
-  medium: 'blue',
+  medium: 'primary',
   low: 'green',
 };

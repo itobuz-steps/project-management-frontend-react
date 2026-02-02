@@ -13,11 +13,11 @@ export interface Sprint {
 }
 
 export interface CreateSprintPayload {
-  name: string;
-  key: string;
-  tasks: string[];
-  dueDate: string;
-  isCompleted: boolean;
+  name?: string;
+  key?: string;
+  tasks?: string[];
+  dueDate?: string;
+  isCompleted?: boolean;
   projectId: string;
 }
 

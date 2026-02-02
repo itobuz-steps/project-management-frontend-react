@@ -54,6 +54,7 @@ export function EditTaskModal({ open, task, onClose, onUpdated }: Props) {
       confirmLoading={saving}
       destroyOnHidden
       width={700}
+      okButtonProps={{ style: { backgroundColor: 'var(--color-primary-500)' } }}
       styles={{
         mask: {
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -149,18 +150,18 @@ export function EditTaskModal({ open, task, onClose, onUpdated }: Props) {
         </div>
 
         {/* <div className="grid grid-cols-3 gap-4">
-          <Form.Item name="blocks" label="Blocks">
-            <Select mode="multiple" placeholder="Select tasks" />
-          </Form.Item>
+            <Form.Item name="blocks" label="Blocks">
+              <Select mode="multiple" placeholder="Select tasks" />
+            </Form.Item>
 
-          <Form.Item name="blockedBy" label="Blocked by Issue">
-            <Select mode="multiple" placeholder="Select issues" />
-          </Form.Item>
+            <Form.Item name="blockedBy" label="Blocked by Issue">
+              <Select mode="multiple" placeholder="Select issues" />
+            </Form.Item>
 
-          <Form.Item name="relatedTo" label="Related To">
-            <Select mode="multiple" placeholder="Select tasks" />
-          </Form.Item>
-        </div> */}
+            <Form.Item name="relatedTo" label="Related To">
+              <Select mode="multiple" placeholder="Select tasks" />
+            </Form.Item>
+          </div> */}
       </Form>
     </Modal>
   );
