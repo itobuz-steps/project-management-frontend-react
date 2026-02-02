@@ -36,8 +36,8 @@ export function TaskTable({
 
   const dueDateRef = useRef<HTMLInputElement>(null);
   const { setNodeRef, isOver } = useDroppable({
-    id: `container:${containerId}`,
-    data: { type: 'container', containerId },
+    id: containerId,
+    data: { containerId },
   });
   const sprintStarted = sprint?.dueDate;
 
@@ -120,10 +120,7 @@ export function TaskTable({
       {/* Sprint Table */}
       {open && (
         <div
-          ref={setNodeRef}
-          className={`no-scrollbar relative mt-2 w-full overflow-x-auto rounded-md border border-gray-200 ${
-            isOver ? 'bg-blue-50' : ''
-          }`}
+          className={`no-scrollbar relative mt-2 w-full overflow-x-auto rounded-md border border-gray-200`}
         >
           <table className="min-w-full table-auto text-left text-sm">
             <thead className="sticky top-0 z-10 border-b bg-gray-100 text-xs text-gray-600 uppercase">
@@ -161,7 +158,10 @@ export function TaskTable({
               </tr>
             </thead>
 
-            <tbody className="divide-y">
+            <tbody
+              ref={setNodeRef}
+              className={`${isOver ? 'bg-blue-50' : ''} divide-y`}
+            >
               <SortableContext
                 items={localTasks.map((task) => task._id)}
                 strategy={verticalListSortingStrategy}

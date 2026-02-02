@@ -312,12 +312,12 @@ function BoardView() {
       <div className="flex gap-4 overflow-x-auto pb-2 sm:gap-6">
         {columns.map((col) => (
           <div key={col} className="w-72 shrink-0">
-            <div className="h-full rounded-lg border bg-blue-50 shadow-sm">
-              <div className="sticky top-0 z-10 flex items-center gap-2 border-b bg-white px-4 py-2">
-                <h2 className="text-sm font-semibold text-gray-900 uppercase">
+            <div className="h-full rounded-lg bg-[#f8f8f8] shadow-sm">
+              <div className="sticky top-0 z-10 flex items-center gap-2 px-4 py-2">
+                <h2 className="text-sm font-semibold text-gray-600 uppercase">
                   {col}
                 </h2>
-                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-900">
+                <span className="rounded-full bg-gray-300 px-2 py-0.5 text-xs font-semibold text-gray-900">
                   {tasksByColumn[col]?.length ?? 0}
                 </span>
               </div>

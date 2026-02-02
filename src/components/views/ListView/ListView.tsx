@@ -158,7 +158,7 @@ function ListView() {
               <td className="p-3 font-medium whitespace-nowrap text-gray-900">
                 {task.title}
               </td>
-              <td className="p-3">
+              <td className="p-3" onClick={(event) => event.stopPropagation()}>
                 <StatusSelect
                   taskId={task._id}
                   value={task.status}
@@ -167,7 +167,7 @@ function ListView() {
                     handleStatusChange(
                       task._id,
                       value as TaskStatus,
-                      task.status
+                      task.status as TaskStatus
                     )
                   }
                 />
