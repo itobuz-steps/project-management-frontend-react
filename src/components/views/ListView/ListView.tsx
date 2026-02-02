@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { getTasks, updateTask } from '../../../services/tasks.service';
 import type { Task, TaskStatus } from '../../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
@@ -27,9 +26,8 @@ const formatDate = (value?: string) => {
 };
 
 function ListView() {
-  const navigate = useNavigate();
   const { projectId } = useParams();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { columns } = useProject();
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -140,12 +138,7 @@ function ListView() {
           visibleTasks.map((task) => (
             <tr
               key={task._id}
-              className={`cursor-pointer hover:bg-gray-50 ${getPriorityBorder(
-                task.priority
-              )}`}
-              onClick={() => {
-                navigate(`/task/${task._id}`);
-              }}
+              className={`hover:bg-gray-50 ${getPriorityBorder(task.priority)}`}
             >
               <td className="p-3">
                 <TaskTypeIcon type={task.type} />
@@ -155,10 +148,19 @@ function ListView() {
                   {task.key ?? task._id}
                 </TaskTypeColor>
               </td>
-              <td className="p-3 font-medium whitespace-nowrap text-gray-900">
+              <td
+                className="cursor-pointer p-3 font-medium whitespace-nowrap text-gray-900 hover:underline"
+                onClick={() => {
+                  setSearchParams((prev) => {
+                    const next = new URLSearchParams(prev);
+                    next.set('taskId', task._id);
+                    return next;
+                  });
+                }}
+              >
                 {task.title}
               </td>
-              <td className="p-3" onClick={(event) => event.stopPropagation()}>
+              <td className="p-3">
                 <StatusSelect
                   taskId={task._id}
                   value={task.status}

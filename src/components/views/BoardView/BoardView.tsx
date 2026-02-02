@@ -70,13 +70,17 @@ function TaskCard({
       className={`rounded-md border border-gray-100 bg-white p-3 shadow-sm ${
         isDragging ? 'opacity-50' : ''
       }`}
-      onClick={() => onOpen()}
       {...attributes}
       {...listeners}
     >
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-sm font-semibold text-gray-900">{task.title}</p>
+          <p
+            className="cursor-pointer text-sm font-semibold text-gray-900 hover:underline"
+            onClick={() => onOpen()}
+          >
+            {task.title}
+          </p>
           <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
             <TaskTypeIcon type={task.type} />
             <TaskTypeColor type={task.type}>
@@ -89,8 +93,7 @@ function TaskCard({
           type="button"
           aria-label="Delete task"
           className="rounded p-1 text-red-500 hover:bg-red-50 hover:text-red-600"
-          onClick={(e) => {
-            e.stopPropagation();
+          onClick={() => {
             setIsDeleteOpen(true);
           }}
         >
@@ -384,8 +387,7 @@ function BoardView() {
                   type="button"
                   aria-label="Add column"
                   className="rounded p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
-                  onClick={(event) => {
-                    event.stopPropagation();
+                  onClick={() => {
                     openAddColumnModal(col);
                   }}
                 >
