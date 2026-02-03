@@ -16,9 +16,45 @@ const api = axios.create({
 
 attachInterceptor(api);
 
-export async function createTask(payload: CreateTaskPayload): Promise<Task> {
-  const res = await api.post<{ result: Task }>(`/`, payload);
-  return res.data.result;
+export async function createTask(task: CreateTaskPayload) {
+  const formData = new FormData();
+
+  formData.append('projectId', task.projectId);
+  formData.append('title', task.title);
+
+  if (task.storyPoint) {
+    formData.append('storyPoint', task.storyPoint);
+  }
+
+  if (task.description) {
+    formData.append('description', task.description);
+  }
+
+  formData.append('type', task.type);
+  formData.append('status', task.status);
+  formData.append('priority', task.priority);
+
+  if (task.dueDate) {
+    formData.append('dueDate', task.dueDate);
+  }
+
+  task.tags?.forEach((tag) => {
+    formData.append('tags[]', tag);
+  });
+
+  if (task.assignee) {
+    formData.append('assignee', task.assignee);
+  }
+
+  if (task.attachments) {
+    Array.from(task.attachments).forEach((file) => {
+      formData.append('attachments', file);
+    });
+  }
+
+  const response = await api.post(`/`, formData);
+
+  return response.data.result;
 }
 
 export default async function getTaskById(

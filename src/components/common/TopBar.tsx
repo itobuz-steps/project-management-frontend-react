@@ -96,7 +96,7 @@ function TopBar({
             {/* Add Task */}
             <button
               onClick={onAddTask}
-              className="bg-primary-600 hover:bg-primary-700 w-full rounded-md px-3.5 py-2 text-sm font-medium text-white sm:w-auto"
+              className="bg-primary-500 hover:bg-primary-600 w-full rounded-md px-3.5 py-2 text-sm font-medium text-white sm:w-auto"
             >
               Add task
               <Plus className="mb-0.5 ml-1 inline-block h-4 w-4" />

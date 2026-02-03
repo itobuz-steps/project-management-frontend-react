@@ -72,6 +72,8 @@ export interface CreateTaskPayload {
   dueDate?: string;
   assignee?: string;
   tags?: string[];
+  attachments: FileList | File[];
+  storyPoint?: string;
 }
 
 export interface UpdateTaskPayload extends Partial<CreateTaskPayload> {
