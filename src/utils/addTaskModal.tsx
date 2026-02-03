@@ -6,6 +6,7 @@ import {
   Modal,
   Select,
   InputNumber,
+  Upload,
 } from 'antd';
 import type { Task, User } from '../services/types/tasks.types';
 import { useEffect, useState } from 'react';
@@ -20,7 +21,7 @@ interface Props {
   onCreate: (task: Task) => void;
 }
 
-export function AddTaskModal({ open, task, onClose, onCreate }: Props) {
+export function AddTaskModal({ open, onClose, onCreate }: Props) {
   const { columns, project } = useProject();
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
@@ -31,8 +32,11 @@ export function AddTaskModal({ open, task, onClose, onCreate }: Props) {
       return;
     }
 
+    console.log('Fetching project members...');
+
     getUsersByProjectId(project._id)
       .then((data) => {
+        console.log({ data });
         const list = Array.isArray(data)
           ? data
           : (data as { result?: User[] })?.result || [];
@@ -47,11 +51,19 @@ export function AddTaskModal({ open, task, onClose, onCreate }: Props) {
   const onSave = async () => {
     try {
       const values = await form.validateFields();
+      console.log({ values });
       if (!project?._id) {
         message.error('Select a project before creating a task.');
         return;
       }
       setSaving(true);
+
+      const attachments = values.attachments?.fileList.map(
+        (fileObj: { originFileObj: File }) => {
+          return fileObj.originFileObj;
+        }
+      );
+      console.log(attachments);
 
       const created = await createTask({
         ...values,
@@ -60,6 +72,7 @@ export function AddTaskModal({ open, task, onClose, onCreate }: Props) {
         type: String(values.type).toLowerCase(),
         dueDate: values.dueDate?.toISOString(),
         assignee: values.assignee || undefined,
+        attachments,
       });
 
       message.success('Task created');
@@ -78,11 +91,26 @@ export function AddTaskModal({ open, task, onClose, onCreate }: Props) {
       title="Create Task"
       onCancel={onClose}
       onOk={onSave}
+      okButtonProps={{ style: { backgroundColor: 'var(--color-primary-500)' } }}
       confirmLoading={saving}
       destroyOnHidden
       width={700}
+      styles={{
+        mask: {
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'none',
+        },
+      }}
     >
-      <Form form={form} layout="vertical">
+      <Form
+        form={form}
+        layout="vertical"
+        styles={{
+          label: {
+            color: 'var(--color-primary-400)',
+          },
+        }}
+      >
         {/* Title + Story Point */}
         <div className="grid grid-cols-3 gap-4">
           <Form.Item
@@ -137,6 +165,23 @@ export function AddTaskModal({ open, task, onClose, onCreate }: Props) {
           </Form.Item>
         </div>
 
+        {/* File Upload */}
+        <Form.Item name="attachments" label="Attachments">
+          <Upload
+            multiple
+            maxCount={5}
+            beforeUpload={() => false}
+            listType="text"
+          >
+            <button
+              type="button"
+              className="hover:border-primary-500 rounded-md border border-dashed border-gray-300 px-4 py-2 transition-colors"
+            >
+              Click to upload files (max 5)
+            </button>
+          </Upload>
+        </Form.Item>
+
         {/* Tags / Due Date / Assignee */}
         <div className="grid grid-cols-3 gap-4">
           <Form.Item name="tags" label="Tags">
@@ -158,20 +203,6 @@ export function AddTaskModal({ open, task, onClose, onCreate }: Props) {
             />
           </Form.Item>
         </div>
-
-        {/* <div className="grid grid-cols-3 gap-4">
-          <Form.Item name="blocks" label="Blocks">
-            <Select mode="multiple" placeholder="Select tasks" />
-          </Form.Item>
-
-          <Form.Item name="blockedBy" label="Blocked by Issue">
-            <Select mode="multiple" placeholder="Select issues" />
-          </Form.Item>
-
-          <Form.Item name="relatedTo" label="Related To">
-            <Select mode="multiple" placeholder="Select tasks" />
-          </Form.Item>
-        </div> */}
       </Form>
     </Modal>
   );

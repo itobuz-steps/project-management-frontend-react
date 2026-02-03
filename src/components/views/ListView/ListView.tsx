@@ -13,7 +13,7 @@ import { listViewHeaders } from './listView.constants';
 const priorityStyles: Record<string, string> = {
   critical: 'bg-red-100 text-red-700',
   high: 'bg-yellow-100 text-yellow-700',
-  medium: 'bg-blue-100 text-blue-700',
+  medium: 'bg-primary-100 text-primary-700',
   low: 'bg-green-100 text-green-700',
 };
 
@@ -101,7 +101,7 @@ function ListView() {
 
   if (!projectId) {
     return (
-      <div className="rounded-lg border bg-blue-50 p-6 text-center text-gray-500">
+      <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500">
         <h2 className="mb-2 text-lg font-semibold text-gray-700">
           No project selected
         </h2>

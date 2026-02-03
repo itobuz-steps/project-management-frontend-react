@@ -63,13 +63,13 @@ function TopBar({
   };
   return (
     <>
-      <header className="mb-3 border-b border-gray-200 bg-white px-4 py-3 shadow-sm sm:px-6">
+      <header className="bg-primary-50 rounded-lg border border-gray-100 p-2 shadow-sm md:p-4">
         <h2 className="mb-2 text-lg font-semibold text-gray-900 sm:mb-3 sm:text-xl">
           {projectName ?? 'No project selected'}
         </h2>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* LEFT: View Switcher */}
-          <div className="flex w-full flex-wrap items-center gap-1 rounded-md bg-gray-100 p-1 sm:w-auto">
+          <div className="flex w-full flex-wrap items-center gap-1 rounded-md border border-gray-200 bg-white p-1 inset-shadow-sm/25 inset-shadow-gray-500 sm:w-auto">
             {views.map((view) => {
               return (
                 <NavLink
@@ -78,9 +78,9 @@ function TopBar({
                   onClick={() => navigate(view.value)}
                   className={({ isActive }) => {
                     return [
-                      'flex-1 rounded-md px-3 py-2 text-sm font-medium transition sm:flex-none sm:px-3.5',
+                      'flex-1 rounded-md px-3 py-2 text-center text-sm font-medium transition sm:flex-none sm:px-3.5',
                       isActive
-                        ? 'bg-white text-gray-900 shadow-sm'
+                        ? 'bg-primary-400 text-white shadow-sm'
                         : 'text-gray-500 hover:text-gray-800',
                     ].join(' ');
                   }}
@@ -96,7 +96,7 @@ function TopBar({
             {/* Add Task */}
             <button
               onClick={onAddTask}
-              className="w-full rounded-md bg-blue-600 px-3.5 py-2 text-sm font-medium text-white hover:bg-blue-700 sm:w-auto"
+              className="bg-primary-500 hover:bg-primary-600 w-full rounded-md px-3.5 py-2 text-sm font-medium text-white sm:w-auto"
             >
               Add task
               <Plus className="mb-0.5 ml-1 inline-block h-4 w-4" />
@@ -117,13 +117,13 @@ function TopBar({
                   <div className="absolute right-0 z-20 mt-2 w-56 rounded-md border border-gray-200 bg-white p-2 shadow-lg">
                     <button
                       onClick={() => setActiveFilter('status')}
-                      className="w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                      className={`${activeFilter === 'status' ? 'bg-gray-100' : ''} w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100`}
                     >
                       Status
                     </button>
                     <button
                       onClick={() => setActiveFilter('priority')}
-                      className="w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                      className={`${activeFilter === 'priority' ? 'bg-gray-100' : ''} w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100`}
                     >
                       Priority
                     </button>
@@ -134,7 +134,7 @@ function TopBar({
                           onChange={(event) =>
                             updateFilterParam('status', event.target.value)
                           }
-                          className="w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none"
+                          className="focus:border-primary-500 w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700 shadow-sm focus:outline-none"
                         >
                           <option value="">All</option>
                           {statusOptions.map((status) => (
@@ -152,7 +152,7 @@ function TopBar({
                           onChange={(event) =>
                             updateFilterParam('priority', event.target.value)
                           }
-                          className="w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none"
+                          className="focus:border-primary-500 w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700 shadow-sm focus:outline-none"
                         >
                           <option value="">All</option>
                           {PRIORITIES.map((priority) => (

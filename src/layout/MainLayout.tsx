@@ -44,7 +44,7 @@ export default function MainLayout() {
       <Sidebar />
       <div className="flex w-full flex-1 flex-col overflow-x-auto pl-0 md:pl-0">
         <Navbar />
-        <main className="flex-1 overflow-y-auto p-2">
+        <main className="flex-1 overflow-y-auto rounded-lg p-2 md:p-4">
           <Outlet />
         </main>
       </div>

@@ -119,7 +119,15 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
           Subtasks ({selectedIds.length})
         </h3>
 
-        <Button size="small" icon={<PlusOutlined />} onClick={openModal}>
+        <Button
+          size="small"
+          icon={<PlusOutlined />}
+          onClick={openModal}
+          style={{
+            backgroundColor: 'var(--color-primary-400)',
+            color: 'white',
+          }}
+        >
           Manage
         </Button>
       </div>
@@ -189,7 +197,12 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
           <Button key="cancel" onClick={() => setModalOpen(false)}>
             Cancel
           </Button>,
-          <Button key="save" type="primary" onClick={handleSaveSubtasks}>
+          <Button
+            key="save"
+            type="primary"
+            onClick={handleSaveSubtasks}
+            style={{ backgroundColor: 'var(--color-primary-500)' }}
+          >
             Save
           </Button>,
         ]}

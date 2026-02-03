@@ -7,11 +7,13 @@ import {
 } from '@dnd-kit/sortable';
 import type { TaskTableProps } from './type';
 import type { TaskPopulated } from '../../services/types/tasks.types';
-import { updateSprint } from '../../services/sprints.service';
+import { updateSprint, createSprint } from '../../services/sprints.service';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
 import { SprintMenu } from './SprintMenu';
 import { TaskRow } from './TaskRow';
+import { SprintButton } from './SprintButton';
+import { useProject } from '../../context/ProjectContext';
 
 export function TaskTable({
   sprint,
@@ -23,6 +25,7 @@ export function TaskTable({
 }: TaskTableProps) {
   const [open, setOpen] = useState(true);
   const [localTasks, setLocalTasks] = useState<TaskPopulated[]>(tasks);
+  const { project } = useProject();
 
   useEffect(() => {
     setLocalTasks(tasks);
@@ -84,6 +87,19 @@ export function TaskTable({
     }
   }
 
+  async function createSprintHandler() {
+    try {
+      const response = await createSprint({ projectId: project?._id || '' });
+      const sprint = response.result;
+
+      setSprints?.((prevSprints) => [sprint, ...prevSprints]);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data.message || 'Failed to create sprint');
+      }
+    }
+  }
+
   return (
     <div className="rounded-lg bg-white shadow-sm">
       {/* Sprint Header */}
@@ -97,7 +113,7 @@ export function TaskTable({
           />
           <span className="font-semibold">{title || sprint?.key}</span>
           {sprint?.dueDate && (
-            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
+            <span className="bg-primary-50 text-primary-600 rounded-full px-2 py-0.5 text-xs font-medium">
               Due {new Date(sprint.dueDate).toLocaleDateString()}
             </span>
           )}
@@ -113,6 +129,12 @@ export function TaskTable({
               startSprint={startSprint}
               completeSprint={completeSprint}
             />
+          )}
+
+          {!sprint && (
+            <SprintButton onClick={createSprintHandler}>
+              Create Sprint
+            </SprintButton>
           )}
         </div>
       </div>
@@ -160,7 +182,7 @@ export function TaskTable({
 
             <tbody
               ref={setNodeRef}
-              className={`${isOver ? 'bg-blue-50' : ''} divide-y`}
+              className={`${isOver ? 'bg-primary-50' : ''} divide-y`}
             >
               <SortableContext
                 items={localTasks.map((task) => task._id)}

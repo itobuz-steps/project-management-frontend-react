@@ -7,6 +7,7 @@ import type {
   TaskResponse,
 } from '../services/types/tasks.types';
 import { attachInterceptor } from '../utils/attachInterceptor';
+import { mapObjectToFormData } from '../utils/mapObjectToFormdata';
 
 const API_URL = `${config.api_base_url}/tasks`;
 
@@ -16,9 +17,13 @@ const api = axios.create({
 
 attachInterceptor(api);
 
-export async function createTask(payload: CreateTaskPayload): Promise<Task> {
-  const res = await api.post<{ result: Task }>(`/`, payload);
-  return res.data.result;
+export async function createTask(task: CreateTaskPayload) {
+  const response = await api.post(
+    `/`,
+    mapObjectToFormData(task as unknown as Record<string, unknown>)
+  );
+
+  return response.data.result;
 }
 
 export default async function getTaskById(

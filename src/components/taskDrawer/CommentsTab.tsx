@@ -1,5 +1,9 @@
 import { Empty, Spin, Input, Button, Upload, message, Space } from 'antd';
-import { SendOutlined, PaperClipOutlined, DeleteOutlined } from '@ant-design/icons';
+import {
+  SendOutlined,
+  PaperClipOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { commentsApi } from '../../services/commentService';
 import type { Comment } from '../../services/types/comments.types';
@@ -91,7 +95,7 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
               <span className="truncate text-gray-700">📎 {file.name}</span>
 
               <Button size="small" type="text" onClick={() => setFile(null)}>
-                <DeleteOutlined/>
+                <DeleteOutlined />
               </Button>
             </div>
           )}
@@ -105,7 +109,14 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
               maxCount={1}
               showUploadList={false}
             >
-              <Button icon={<PaperClipOutlined />}>Attach</Button>
+              <Button
+                style={{
+                  backgroundColor: 'transparent',
+                }}
+                icon={<PaperClipOutlined />}
+              >
+                Attach
+              </Button>
             </Upload>
 
             <Button
@@ -113,6 +124,7 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
               icon={<SendOutlined />}
               loading={submitting}
               onClick={handleSubmit}
+              style={{ backgroundColor: 'var(--color-primary-500)' }}
             >
               Send
             </Button>

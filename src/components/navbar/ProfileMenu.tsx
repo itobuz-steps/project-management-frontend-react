@@ -1,10 +1,29 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ThemePicker } from './ThemePicker';
 
 export default function ProfileMenu() {
   const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [open]);
+
   return (
-    <div className="relative">
+    <div className="relative" ref={menuRef}>
       <button
         id="profileBtn"
         className="border-primary-400 flex items-center rounded-full border-3"
@@ -23,7 +42,7 @@ export default function ProfileMenu() {
       {open && (
         <div
           id="dropdownMenu"
-          className="absolute right-0 z-50 mt-2 w-40 flex-col gap-3 rounded-sm border border-gray-200 bg-white p-4 shadow-lg"
+          className="absolute right-0 z-50 mt-2 w-40 flex-col gap-6 rounded-sm border border-gray-200 bg-white p-4 shadow-lg"
         >
           <Link
             to="/edit-profile"
@@ -32,26 +51,7 @@ export default function ProfileMenu() {
             Edit Profile
           </Link>
 
-          <div className="flex flex-col gap-2">
-            <p className="font-semibold">Select a theme:</p>
-
-            <div className="theme-picker flex w-full justify-between gap-0.5">
-              {[
-                'indigo',
-                'custom_2',
-                'custom_1',
-                'purple',
-                'rose',
-                'custom_3',
-              ].map((theme) => (
-                <div
-                  key={theme}
-                  data-value={theme}
-                  className="theme-option aspect-square size-4 rounded-full transition-all hover:scale-110 hover:shadow-md"
-                />
-              ))}
-            </div>
-          </div>
+          <ThemePicker />
         </div>
       )}
     </div>

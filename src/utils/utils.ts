@@ -5,7 +5,7 @@ export function getPriorityBorder(priority?: string) {
     case 'high':
       return 'border-l-2 border-l-yellow-500';
     case 'medium':
-      return 'border-l-2 border-l-blue-500';
+      return 'border-l-2 border-l-primary-500';
     case 'low':
       return 'border-l-2 border-l-green-500';
     default:

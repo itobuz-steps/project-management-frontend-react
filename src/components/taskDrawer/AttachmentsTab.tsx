@@ -45,7 +45,7 @@ export function AttachmentsTab({ task }: AttachmentsTabProps) {
             return (
               <List.Item className="rounded-md px-6 hover:bg-gray-50">
                 <List.Item.Meta
-                  avatar={<FileOutlined className="text-lg text-blue-500" />}
+                  avatar={<FileOutlined className="text-primary-500 text-lg" />}
                   title={
                     <Link
                       href={fileUrl}
