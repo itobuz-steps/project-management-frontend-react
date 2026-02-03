@@ -1,4 +1,5 @@
-import { THEME_COLORS, useTheme } from '../../hooks/useTheme';
+import { useTheme } from '../../hooks/useTheme';
+import { THEME_COLORS } from '../../config/constants';
 
 export function ThemePicker() {
   const [currentTheme, setCurrentTheme] = useTheme();
