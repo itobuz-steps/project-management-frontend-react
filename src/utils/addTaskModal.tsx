@@ -203,20 +203,6 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
             />
           </Form.Item>
         </div>
-
-        {/* <div className="grid grid-cols-3 gap-4">
-          <Form.Item name="blocks" label="Blocks">
-            <Select mode="multiple" placeholder="Select tasks" />
-          </Form.Item>
-
-          <Form.Item name="blockedBy" label="Blocked by Issue">
-            <Select mode="multiple" placeholder="Select issues" />
-          </Form.Item>
-
-          <Form.Item name="relatedTo" label="Related To">
-            <Select mode="multiple" placeholder="Select tasks" />
-          </Form.Item>
-        </div> */}
       </Form>
     </Modal>
   );
