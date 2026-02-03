@@ -13,8 +13,6 @@ export interface Sprint {
 }
 
 export interface CreateSprintPayload {
-  name?: string;
-  key?: string;
   tasks?: string[];
   dueDate?: string;
   isCompleted?: boolean;
@@ -22,8 +20,6 @@ export interface CreateSprintPayload {
 }
 
 export interface UpdateSprintPayload {
-  name?: string;
-  key?: string;
   tasks?: string[];
   dueDate?: Date;
   isCompleted?: boolean;
