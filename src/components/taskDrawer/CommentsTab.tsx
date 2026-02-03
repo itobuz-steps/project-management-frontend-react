@@ -1,5 +1,5 @@
 import { Empty, Spin, Input, Button, Upload, message, Space } from 'antd';
-import { SendOutlined, PaperClipOutlined } from '@ant-design/icons';
+import { SendOutlined, PaperClipOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { commentsApi } from '../../services/commentService';
 import type { Comment } from '../../services/types/comments.types';
@@ -50,7 +50,15 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
     setSubmitting(true);
     try {
       const newComment = await commentsApi.createComment(formData);
-      setComments((prev) => [...prev, newComment]);
+      setComments((prev) => [
+        ...prev,
+        {
+          ...newComment,
+          author: newComment.author ?? {
+            name: 'You',
+          },
+        },
+      ]);
       setMessageText('');
       setFile(null);
       messageApi.success('Comment added');
@@ -70,8 +78,23 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
             value={messageText}
             onChange={(e) => setMessageText(e.target.value)}
             placeholder="Write a comment..."
-            rows={3}
+            rows={1}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit();
+              }
+            }}
           />
+          {file && (
+            <div className="flex items-center justify-between rounded-md bg-gray-50 px-2 py-1 text-xs">
+              <span className="truncate text-gray-700">📎 {file.name}</span>
+
+              <Button size="small" type="text" onClick={() => setFile(null)}>
+                <DeleteOutlined/>
+              </Button>
+            </div>
+          )}
 
           <Space className="w-full justify-between">
             <Upload

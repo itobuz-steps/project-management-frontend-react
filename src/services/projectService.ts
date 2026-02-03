@@ -8,7 +8,7 @@ import type {
   UpdateProjectPayload,
 } from '../types/project.types';
 import { attachInterceptor } from '../utils/attachInterceptor';
-import type { ProjectResponse } from './types/project.types';
+import type { MemberResponse, ProjectResponse } from './types/project.types';
 
 const API_URL = `${config.api_base_url}/project`;
 
@@ -46,6 +46,14 @@ export const updateProject = async (
 export const deleteProject = async (projectId: string): Promise<void> => {
   await api.delete(`/${projectId}/`);
 };
+
+export const getProjectMembers = async (
+  projectId: string
+): Promise<User[]> => {
+  const response = await api.get<MemberResponse>(`/get-user/${projectId}`);
+  return response.data.result;
+};
+
 export const getUsersByProjectId = async (
   projectId: string
 ): Promise<User[]> => {

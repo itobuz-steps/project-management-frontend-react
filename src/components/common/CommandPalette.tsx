@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
-import { getTasks } from '../../services/tasks.service';
+import { getTasks } from '../../services/taskService';
 import type { Task } from '../../services/types/tasks.types';
 
 interface CommandPaletteProps {

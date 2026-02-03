@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Empty, Spin, Modal, Checkbox, Button, Tag, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { UserCell } from '../../utils/UserCell';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import getTaskById, {
@@ -12,7 +12,7 @@ import { Trash2 } from 'lucide-react';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 
 export function SubtasksTab({ task }: { task: TaskPopulated }) {
-  const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
   const { projectId, taskId: currentTaskId } = useParams();
 
   const [selectedIds, setSelectedIds] = useState<string[]>(
@@ -60,10 +60,12 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
   const openModal = async () => {
     setModalOpen(true);
 
-    const tasks = await getTaskByProjectId(projectId as string);
+    const tasks = await getTaskByProjectId(
+      (projectId as string) ?? task.projectId
+    );
 
     setProjectTasks(
-      tasks.filter((task: TaskPopulated) => task._id !== task._id)
+      tasks.filter((newTask: TaskPopulated) => newTask._id !== task._id)
     );
   };
 
@@ -106,7 +108,7 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
   };
 
   const openSubtask = (subtaskId: string) => {
-    navigate(`/task/${subtaskId}`);
+    setSearchParams({ taskId: subtaskId }, { replace: true });
   };
 
   return (
@@ -153,7 +155,7 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
                 onClick={() => openSubtask(subtask._id)}
               >
                 <div className="font-medium">
-                  {subtask.key} — {subtask.title}
+                  <Tag color="blue">{subtask.key}</Tag> {subtask.title}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-1">
@@ -191,7 +193,14 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         onOk={handleSaveSubtasks}
-        footer={null}
+        footer={[
+          <Button key="cancel" onClick={() => setModalOpen(false)}>
+            Cancel
+          </Button>,
+          <Button key="save" type="primary" onClick={handleSaveSubtasks}>
+            Save
+          </Button>,
+        ]}
         styles={{
           mask: {
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -210,13 +219,18 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
               >
                 <div>
                   <div className="text-sm font-medium">
-                    {task.key} — {task.title}
+                    <Tag color="blue">{task.key}</Tag> {task.title}
                   </div>
 
                   <div className="flex gap-2 text-xs text-gray-500">
-                    <span>{task.type}</span>
-                    <span>·</span>
-                    <span>{task.status}</span>
+                    <div className="flex items-center gap-2">
+                      <TaskTypeIcon type={task.type} />
+                      <span className="text-xs text-gray-600 capitalize">
+                        {task.type}
+                      </span>
+                    </div>
+
+                    <Tag color="gold">{task.status}</Tag>
 
                     {isSubtask && (
                       <Tag color="green" className="ml-2">

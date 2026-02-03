@@ -1,7 +1,7 @@
 import { Modal, message } from 'antd';
 import { useState } from 'react';
 import type { Task } from '../services/types/tasks.types';
-import { deleteTask } from '../services/tasks.service';
+import { deleteTask } from '../services/taskService';
 
 interface Props {
   open: boolean;

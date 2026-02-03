@@ -36,6 +36,19 @@ function BacklogView() {
   const [loading, setLoading] = useState(true);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
 
+  const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
+  const statusFilter = normalize(searchParams.get('status') || '');
+  const priorityFilter = normalize(searchParams.get('priority') || '');
+  const matchesFilters = (task: TaskPopulated) => {
+    if (statusFilter && normalize(task.status) !== statusFilter) {
+      return false;
+    }
+    if (priorityFilter && normalize(task.priority) !== priorityFilter) {
+      return false;
+    }
+    return true;
+  };
+
   /* ---------------- sensors ---------------- */
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -57,7 +70,9 @@ function BacklogView() {
 
   /* ---------------- data load ---------------- */
   useEffect(() => {
-    if (!projectId) return;
+    if (!projectId) {
+      return;
+    }
 
     async function loadData(projectId: string) {
       try {
@@ -100,7 +115,7 @@ function BacklogView() {
     if (projectId) {
       loadData(projectId);
     }
-  }, [projectId, type]);
+  }, [projectId, type, searchParams]);
 
   /* ---------------- guards ---------------- */
   if (!projectId) {
@@ -124,7 +139,10 @@ function BacklogView() {
   const sprintTaskIds = new Set(sprints.flatMap((s) => s.tasks));
 
   const backlogTasks = tasks.filter(
-    (task) => !sprintTaskIds.has(task._id) && task.status !== 'done'
+    (task) =>
+      !sprintTaskIds.has(task._id) &&
+      task.status !== 'done' &&
+      matchesFilters(task)
   );
 
   /* ---------------- render ---------------- */
@@ -223,8 +241,8 @@ function BacklogView() {
               ) : (
                 <div className="w-full space-y-4 overflow-x-auto">
                   {sprints.map((sprint) => {
-                    const sprintTasks = tasks.filter((t) =>
-                      sprint.tasks.includes(t._id)
+                    const sprintTasks = tasks.filter(
+                      (t) => sprint.tasks.includes(t._id) && matchesFilters(t)
                     );
 
                     return sprint.isCompleted ? null : (

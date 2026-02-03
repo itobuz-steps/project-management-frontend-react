@@ -22,9 +22,14 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Input, message, Modal } from 'antd';
 import { fetchWithAuth } from '../../api/interceptor';
-import { getProjectById } from '../../../services/projectService';
-import { getTasks, updateTask } from '../../../services/tasks.service';
+import {
+  getProjectById,
+  updateProject,
+} from '../../../services/projectService';
+import { getTasks } from '../../../services/taskService';
+import { updateTask } from '../../../services/taskService';
 import type { Task, TaskStatus } from '../../../services/types/tasks.types';
 import type { Sprint } from '../../../services/types/sprints.types';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
@@ -32,7 +37,8 @@ import { TaskTypeColor } from '../../../utils/TaskTypeColor';
 import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
 import { DeleteTaskModal } from '../../../utils/DeleteTaskModal';
-import { Trash } from 'lucide-react';
+import { Plus, Trash } from 'lucide-react';
+import { getTypeBorder } from '../../../utils/utils';
 
 function TaskCard({
   task,
@@ -63,30 +69,42 @@ function TaskCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`rounded-md border border-gray-100 bg-white p-3 shadow-sm ${
+      className={`group rounded-md ${getTypeBorder(task.type)} bg-white p-3 shadow-sm ${
         isDragging ? 'opacity-50' : ''
       }`}
-      onClick={() => onOpen()}
       {...attributes}
       {...listeners}
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-2 cursor-pointer">
         <div>
-          <p className="text-sm font-semibold text-gray-900">{task.title}</p>
+          <p
+            className="mb-4 cursor-pointer text-sm font-medium text-gray-900 hover:underline"
+            onClick={() => onOpen()}
+          >
+            {task.title}
+          </p>
           <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
             <TaskTypeIcon type={task.type} />
-            <TaskTypeColor type={task.type}>
-              {task.key ?? task._id}
-            </TaskTypeColor>
+            <span
+              className="p-1 whitespace-nowrap"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(`/task/${task._id}`, '_blank');
+              }}
+            >
+              <TaskTypeColor type={task.type}>
+                {task.key ?? task._id}
+              </TaskTypeColor>
+            </span>
           </p>
         </div>
 
         <button
           type="button"
           aria-label="Delete task"
-          className="rounded p-1 text-red-500 hover:bg-red-50 hover:text-red-600"
-          onClick={(e) => {
-            e.stopPropagation();
+          className="rounded p-1 text-gray-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-50 hover:text-gray-600"
+          onClick={(event) => {
+            event.stopPropagation();
             setIsDeleteOpen(true);
           }}
         >
@@ -131,11 +149,20 @@ function BoardView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+  const [isAddColumnOpen, setIsAddColumnOpen] = useState(false);
+  const [newColumnName, setNewColumnName] = useState('');
+  const [isSavingColumn, setIsSavingColumn] = useState(false);
+  const [insertAfterColumn, setInsertAfterColumn] = useState<string | null>(
+    null
+  );
 
   const normalize = useCallback(
     (value?: string) => (value ?? '').toLowerCase().trim(),
     []
   );
+
+  const statusFilter = normalize(searchParams.get('status') || '');
+  const priorityFilter = normalize(searchParams.get('priority') || '');
 
   const sprintTaskIds = useMemo(() => {
     if (!isScrum) return null;
@@ -152,13 +179,27 @@ function BoardView() {
     return tasks.filter((task) => sprintTaskIds.has(task._id));
   }, [isScrum, sprintTaskIds, tasks]);
 
+  const filteredVisibleTasks = useMemo(() => {
+    if (!statusFilter && !priorityFilter) return visibleTasks;
+
+    return visibleTasks.filter((task) => {
+      if (statusFilter && normalize(task.status) !== statusFilter) {
+        return false;
+      }
+      if (priorityFilter && normalize(task.priority) !== priorityFilter) {
+        return false;
+      }
+      return true;
+    });
+  }, [priorityFilter, statusFilter, normalize, visibleTasks]);
+
   const tasksByColumn = useMemo(() => {
     const map = columns.reduce<Record<string, Task[]>>((acc, col) => {
       acc[col] = [];
       return acc;
     }, {});
 
-    visibleTasks.forEach((task) => {
+    filteredVisibleTasks.forEach((task) => {
       const match = columns.find(
         (col) => normalize(col) === normalize(task.status)
       );
@@ -171,7 +212,7 @@ function BoardView() {
     });
 
     return map;
-  }, [columns, normalize, visibleTasks]);
+  }, [columns, normalize, filteredVisibleTasks]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -180,6 +221,54 @@ function BoardView() {
       },
     })
   );
+
+  const openAddColumnModal = (columnId: string) => {
+    setNewColumnName('');
+    setInsertAfterColumn(columnId);
+    setIsAddColumnOpen(true);
+  };
+
+  const handleAddColumn = async () => {
+    const trimmed = newColumnName.trim();
+    if (!trimmed) {
+      message.error('Column name is required.');
+      return;
+    }
+
+    if (columns.some((col) => normalize(col) === normalize(trimmed))) {
+      message.error('Column already exists.');
+      return;
+    }
+
+    if (!projectId) return;
+
+    try {
+      setIsSavingColumn(true);
+      const insertIndex = insertAfterColumn
+        ? columns.findIndex((col) => col === insertAfterColumn)
+        : -1;
+
+      const nextColumns = [...columns];
+      if (insertIndex >= 0) {
+        nextColumns.splice(insertIndex + 1, 0, trimmed);
+      } else {
+        nextColumns.push(trimmed);
+      }
+
+      const updated = await updateProject(projectId, {
+        columns: nextColumns,
+      });
+
+      const updatedColumns = updated.columns ?? nextColumns;
+      setColumns(updatedColumns);
+      message.success('Column added.');
+      setIsAddColumnOpen(false);
+    } catch {
+      message.error('Failed to add column.');
+    } finally {
+      setIsSavingColumn(false);
+    }
+  };
 
   useEffect(() => {
     if (!projectId) {
@@ -313,13 +402,25 @@ function BoardView() {
         {columns.map((col) => (
           <div key={col} className="w-72 shrink-0">
             <div className="h-full rounded-lg bg-[#f8f8f8] shadow-sm">
-              <div className="sticky top-0 z-10 flex items-center gap-2 px-4 py-2">
-                <h2 className="text-sm font-semibold text-gray-600 uppercase">
-                  {col}
-                </h2>
-                <span className="rounded-full bg-gray-300 px-2 py-0.5 text-xs font-semibold text-gray-900">
-                  {tasksByColumn[col]?.length ?? 0}
-                </span>
+              <div className="sticky top-0 z-10 flex items-center justify-between gap-2 px-4 py-2">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-semibold text-gray-600 uppercase">
+                    {col}
+                  </h2>
+                  <span className="rounded-full bg-gray-300 px-2 py-0.5 text-xs font-semibold text-gray-900">
+                    {tasksByColumn[col]?.length ?? 0}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Add column"
+                  className="rounded p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+                  onClick={() => {
+                    openAddColumnModal(col);
+                  }}
+                >
+                  <Plus size={16} />
+                </button>
               </div>
 
               <ColumnDropZone id={col}>
@@ -395,6 +496,27 @@ function BoardView() {
           </div>
         ) : null}
       </DragOverlay>
+
+      <Modal
+        open={isAddColumnOpen}
+        title="Add column"
+        onCancel={() => setIsAddColumnOpen(false)}
+        onOk={handleAddColumn}
+        confirmLoading={isSavingColumn}
+        destroyOnHidden
+      >
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-gray-700">
+            Column name
+          </label>
+          <Input
+            placeholder="e.g. In Review"
+            value={newColumnName}
+            onChange={(event) => setNewColumnName(event.target.value)}
+            onPressEnter={handleAddColumn}
+          />
+        </div>
+      </Modal>
     </DndContext>
   );
 }

@@ -2,11 +2,12 @@ import { CSS } from '@dnd-kit/utilities';
 import { StatusSelect } from '../../utils/StatusSelect';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { formatDateForInput, getPriorityBorder } from '../../utils/utils';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { updateTask } from '../../services/taskService';
 import { useSortable } from '@dnd-kit/sortable';
 import { message } from 'antd';
 import type { TaskPopulated } from '../../services/types/tasks.types';
+import { TaskTypeColor } from '../../utils/TaskTypeColor';
 
 export function TaskRow({
   task,
@@ -20,7 +21,6 @@ export function TaskRow({
   onPatch: (id: string, patch: Partial<TaskPopulated>) => void;
 }) {
   const [, setSearchParams] = useSearchParams();
-  const { projectId } = useParams();
   // const location = useLocation();
   const {
     attributes,
@@ -46,31 +46,27 @@ export function TaskRow({
       style={{ ...style, touchAction: 'none' }}
       {...attributes}
       {...listeners}
+      onClick={() => {
+        setSearchParams({ taskId: task._id }, { replace: true });
+      }}
     >
       <td className="p-2 text-center whitespace-nowrap">
         <div className="flex justify-center">
           <TaskTypeIcon type={task.type} />
         </div>
       </td>
-
       <td
-        className="text-primary-600 cursor-pointer p-2 font-medium whitespace-nowrap hover:underline"
-        onClick={() =>
-          window.open(`/projects/${projectId}/tasks/${task._id}`, '_blank')
-        }
-      >
-        {task.key}
-      </td>
-
-      <td
-        className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline"
-        onClick={() => {
-          setSearchParams({ taskId: task._id }, { replace: true });
+        className="cursor-pointer p-2 font-medium whitespace-nowrap text-white hover:underline"
+        onClick={(e) => {
+          e.stopPropagation();
+          window.open(`/task/${task._id}`, '_blank');
         }}
       >
+        <TaskTypeColor type={task.type}>{task.key}</TaskTypeColor>
+      </td>
+      <td className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline">
         {task.title}
       </td>
-
       <td className="p-2 px-6 whitespace-nowrap">
         <StatusSelect
           taskId={task._id}
@@ -86,7 +82,6 @@ export function TaskRow({
           }}
         />
       </td>
-
       <td className="p-2 px-6 whitespace-nowrap">
         <div className="flex items-center">
           <img
@@ -96,7 +91,6 @@ export function TaskRow({
           {task.assignee?.name ?? 'Unassigned'}
         </div>
       </td>
-
       <td className="p-2 px-6 whitespace-nowrap">
         <input
           type="date"
@@ -119,7 +113,6 @@ export function TaskRow({
           }`}
         />
       </td>
-
       <td className="p-2 px-6 whitespace-nowrap">
         <div className="flex gap-1">
           {task.tags?.slice(0, 3).map((label) => (
@@ -138,15 +131,12 @@ export function TaskRow({
           )}
         </div>
       </td>
-
       <td className="p-2 px-6 text-xs whitespace-nowrap text-gray-500">
         {task.createdAt ? new Date(task.createdAt).toLocaleDateString() : ''}
       </td>
-
       <td className="p-2 px-6 text-xs whitespace-nowrap text-gray-500">
         {task.updatedAt ? new Date(task.updatedAt).toLocaleDateString() : ''}
       </td>
-
       <td className="p-2 px-6 whitespace-nowrap">
         <div className="flex items-center">
           <img

@@ -77,3 +77,7 @@ export interface CreateTaskPayload {
 export interface UpdateTaskPayload extends Partial<CreateTaskPayload> {
   reporter?: string;
 }
+
+export interface TaskResponse {
+  result: TaskPopulated;
+}
