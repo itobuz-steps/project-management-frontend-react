@@ -1,6 +1,11 @@
 import axios from 'axios';
 import { config } from '../config/config';
-import type { Task, TaskPopulated } from '../services/types/tasks.types';
+import type {
+  CreateTaskPayload,
+  Task,
+  TaskPopulated,
+  TaskResponse,
+} from '../services/types/tasks.types';
 import { attachInterceptor } from '../utils/attachInterceptor';
 
 const API_URL = `${config.api_base_url}/tasks`;
@@ -11,12 +16,14 @@ const api = axios.create({
 
 attachInterceptor(api);
 
-interface TaskResponse {
-  result: TaskPopulated;
+export async function createTask(payload: CreateTaskPayload): Promise<Task> {
+  const res = await api.post<{ result: Task }>(`/`, payload);
+  return res.data.result;
 }
 
-
-export default async function getTaskById(taskId: string): Promise<TaskPopulated> {
+export default async function getTaskById(
+  taskId: string
+): Promise<TaskPopulated> {
   const res = await api.get<TaskResponse>(`/${taskId}`);
 
   return res.data.result;
@@ -38,13 +45,33 @@ export async function getAllTasks(): Promise<TaskPopulated[]> {
 }
 
 export async function getTaskByProjectId(
-    projectId: string,
-    filter: string | null = '',
-    searchInput: string | null = ''
-  ) {
-    const response = await api.get(
-      `/?projectId=${projectId}&filter=${filter}&searchInput=${searchInput}`
-    );
+  projectId: string,
+  filter: string | null = '',
+  searchInput: string | null = ''
+) {
+  const response = await api.get(
+    `/?projectId=${projectId}&filter=${filter}&searchInput=${searchInput}`
+  );
 
-    return response.data.result;
-  }
+  return response.data.result;
+}
+
+export async function deleteTask(taskId: string): Promise<void> {
+  await api.delete(`/${taskId}`);
+}
+
+export async function getUserTasks(): Promise<TaskPopulated[]> {
+  const res = await api.get<{ result: TaskPopulated[] }>(`/me`);
+  return res.data.result;
+}
+
+export async function getTasks(params: {
+  projectId: string;
+  searchInput?: string;
+}): Promise<Task[]> {
+  const res = await api.get<{ result: Task[] }>(`/`, {
+    params,
+  });
+
+  return res.data.result;
+}

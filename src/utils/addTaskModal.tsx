@@ -9,7 +9,7 @@ import {
 } from 'antd';
 import type { Task, User } from '../services/types/tasks.types';
 import { useEffect, useState } from 'react';
-import { createTask } from '../services/tasks.service';
+import { createTask } from '../services/taskService';
 import { getUsersByProjectId } from '../services/projectService';
 import { useProject } from '../context/ProjectContext';
 

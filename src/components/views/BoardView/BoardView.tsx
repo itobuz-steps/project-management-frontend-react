@@ -28,7 +28,8 @@ import {
   getProjectById,
   updateProject,
 } from '../../../services/projectService';
-import { getTasks, updateTask } from '../../../services/tasks.service';
+import { getTasks } from '../../../services/taskService';
+import { updateTask } from '../../../services/taskService';
 import type { Task, TaskStatus } from '../../../services/types/tasks.types';
 import type { Sprint } from '../../../services/types/sprints.types';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
