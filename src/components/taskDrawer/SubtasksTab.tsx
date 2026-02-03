@@ -197,7 +197,12 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
           <Button key="cancel" onClick={() => setModalOpen(false)}>
             Cancel
           </Button>,
-          <Button key="save" type="primary" onClick={handleSaveSubtasks}>
+          <Button
+            key="save"
+            type="primary"
+            onClick={handleSaveSubtasks}
+            style={{ backgroundColor: 'var(--color-primary-500)' }}
+          >
             Save
           </Button>,
         ]}

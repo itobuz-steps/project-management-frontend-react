@@ -82,6 +82,12 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
       confirmLoading={saving}
       destroyOnHidden
       width={700}
+      styles={{
+        mask: {
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'none',
+        },
+      }}
     >
       <Form form={form} layout="vertical">
         {/* Title + Story Point */}
