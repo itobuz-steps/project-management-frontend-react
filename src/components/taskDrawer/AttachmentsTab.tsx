@@ -1,8 +1,5 @@
 import { Empty, List, Typography, Space, Card } from 'antd';
-import {
-  PaperClipOutlined,
-  FileOutlined,
-} from '@ant-design/icons';
+import { PaperClipOutlined, FileOutlined } from '@ant-design/icons';
 import { config } from '../../config/config';
 import type { AttachmentsTabProps } from './taskDrawer.type';
 

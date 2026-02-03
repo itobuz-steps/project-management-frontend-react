@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { getTasks, updateTask } from '../../../services/tasks.service';
+import { getTasks } from '../../../services/taskService';
+import { updateTask } from '../../../services/taskService';
 import type { Task, TaskStatus } from '../../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../../utils/TaskTypeColor';
@@ -63,7 +64,7 @@ function ListView() {
       try {
         setLoading(true);
         setError(null);
-        const { result } = await getTasks({
+        const result = await getTasks({
           projectId,
           searchInput: searchParams.get('searchInput') || '',
         });
