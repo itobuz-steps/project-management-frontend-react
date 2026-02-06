@@ -21,17 +21,17 @@ attachInterceptor(api);
 export const createProject = async (
   payload: CreateProjectPayload
 ): Promise<Project> => {
-  const res = await api.post<Project>('/', payload);
+  const res = await api.post<Project>('', payload);
   return res.data;
 };
 
 export const getProjectById = async (projectId: string): Promise<Project> => {
-  const res = await api.get<ProjectResponse>(`/${projectId}/`);
+  const res = await api.get<ProjectResponse>(`/${projectId}`);
   return res.data.result;
 };
 
 export const getAllProjects = async (): Promise<Project[]> => {
-  const res = await api.get<Project[]>('/');
+  const res = await api.get<Project[]>('');
   return res.data;
 };
 
@@ -39,24 +39,22 @@ export const updateProject = async (
   projectId: string,
   payload: UpdateProjectPayload
 ): Promise<Project> => {
-  const res = await api.put<Project>(`/${projectId}/`, payload);
+  const res = await api.put<Project>(`/${projectId}`, payload);
   return res.data;
 };
 
 export const deleteProject = async (projectId: string): Promise<void> => {
-  await api.delete(`/${projectId}/`);
+  await api.delete(`/${projectId}`);
 };
 
-export const getProjectMembers = async (
-  projectId: string
-): Promise<User[]> => {
-  const response = await api.get<MemberResponse>(`/get-user/${projectId}`);
+export const getProjectMembers = async (projectId: string): Promise<User[]> => {
+  const response = await api.get<MemberResponse>(`/${projectId}/get-user`);
   return response.data.result;
 };
 
 export const getUsersByProjectId = async (
   projectId: string
 ): Promise<User[]> => {
-  const res = await api.get<User[]>(`/get-user/${projectId}`);
+  const res = await api.get<User[]>(`/${projectId}/get-user`);
   return res.data;
 };

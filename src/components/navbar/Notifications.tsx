@@ -14,7 +14,6 @@ export default function Notifications() {
   useEffect(() => {
     async function fetchNotifications() {
       const notifications = await notificationService.getAllNotification(
-        'null',
         page,
         5
       );

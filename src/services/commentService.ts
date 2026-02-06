@@ -6,7 +6,7 @@ import type {
 } from '../services/types/comments.types';
 import { attachInterceptor } from '../utils/attachInterceptor';
 
-const API_URL = `${config.api_base_url}/comments`;
+const API_URL = `${config.api_base_url}/tasks`;
 
 const api = axios.create({
   baseURL: API_URL,
@@ -15,11 +15,11 @@ const api = axios.create({
 attachInterceptor(api);
 
 class CommentsApi {
-  async getAllComments(taskId?: string): Promise<{ result: Comment[] }> {
+  async getAllComments(taskId: string): Promise<{ result: Comment[] }> {
     try {
-      const response = await api.get<{ result: Comment[] }>('/', {
-        params: { taskId },
-      });
+      const response = await api.get<{ result: Comment[] }>(
+        `/${taskId}/comments`
+      );
 
       return response.data;
     } catch (error) {
@@ -28,21 +28,25 @@ class CommentsApi {
     }
   }
 
-  async createComment(formData: FormData): Promise<Comment> {
-    const response = await api.post('/', formData);
+  async createComment(taskId: string, formData: FormData): Promise<Comment> {
+    const response = await api.post(`/${taskId}/comments`, formData);
     return response.data.result;
   }
 
   async updateComment(
-    id: string,
+    taskId: string,
+    commentId: string,
     payload: UpdateCommentPayload
   ): Promise<Comment> {
-    const response = await api.put(`/${id}`, payload);
+    const response = await api.patch(
+      `/${taskId}/comments/${commentId}`,
+      payload
+    );
     return response.data.result;
   }
 
-  async deleteComment(id: string): Promise<void> {
-    await api.delete(`/${id}`);
+  async deleteComment(taskId: string, commentId: string): Promise<void> {
+    await api.delete(`/${taskId}/comments/${commentId}`);
   }
 }
 

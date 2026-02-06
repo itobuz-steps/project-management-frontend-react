@@ -19,7 +19,7 @@ attachInterceptor(api);
 
 export async function createTask(task: CreateTaskPayload) {
   const response = await api.post(
-    `/`,
+    '',
     mapObjectToFormData(task as unknown as Record<string, unknown>)
   );
 
@@ -38,13 +38,13 @@ export async function updateTask(
   taskId: string,
   updates: Partial<TaskPopulated> | Partial<Task>
 ): Promise<TaskPopulated> {
-  const res = await api.put<TaskResponse>(`/${taskId}`, updates);
+  const res = await api.patch<TaskResponse>(`/${taskId}`, updates);
 
   return res.data.result;
 }
 
 export async function getAllTasks(): Promise<TaskPopulated[]> {
-  const res = await api.get<{ result: TaskPopulated[] }>(`/`);
+  const res = await api.get<{ result: TaskPopulated[] }>('');
 
   return res.data.result;
 }
@@ -55,7 +55,7 @@ export async function getTaskByProjectId(
   searchInput: string | null = ''
 ) {
   const response = await api.get(
-    `/?projectId=${projectId}&filter=${filter}&searchInput=${searchInput}`
+    `?projectId=${projectId}&sortBy=${filter}&searchQuery=${searchInput}`
   );
 
   return response.data.result;
@@ -74,8 +74,13 @@ export async function getTasks(params: {
   projectId: string;
   searchInput?: string;
 }): Promise<Task[]> {
-  const res = await api.get<{ result: Task[] }>(`/`, {
-    params,
+  const queryParams = {
+    projectId: params.projectId,
+    ...(params.searchInput && { searchQuery: params.searchInput }),
+  };
+
+  const res = await api.get<{ result: Task[] }>('', {
+    params: queryParams,
   });
 
   return res.data.result;

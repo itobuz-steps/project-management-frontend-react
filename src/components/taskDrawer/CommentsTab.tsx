@@ -44,7 +44,6 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
     }
 
     const formData = new FormData();
-    formData.append('taskId', taskId);
     formData.append('message', messageText);
 
     if (file) {
@@ -53,7 +52,7 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
 
     setSubmitting(true);
     try {
-      const newComment = await commentsApi.createComment(formData);
+      const newComment = await commentsApi.createComment(taskId, formData);
       setComments((prev) => [
         ...prev,
         {

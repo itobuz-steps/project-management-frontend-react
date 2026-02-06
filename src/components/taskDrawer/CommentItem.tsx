@@ -26,9 +26,13 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
 
     setSaving(true);
     try {
-      const updated = await commentsApi.updateComment(comment._id, {
-        message: messageText,
-      });
+      const updated = await commentsApi.updateComment(
+        comment.task as string,
+        comment._id,
+        {
+          message: messageText,
+        }
+      );
 
       onUpdate({
         ...comment,
@@ -44,7 +48,7 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
   };
 
   const handleDelete = async () => {
-    await commentsApi.deleteComment(comment._id);
+    await commentsApi.deleteComment(comment.task as string, comment._id);
     messageApi.success('Comment deleted');
     onDelete(comment._id);
   };

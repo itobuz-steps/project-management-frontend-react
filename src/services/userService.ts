@@ -23,13 +23,13 @@ async function updateUserProfile(
     formData.append('profileImage', profileImage);
   }
 
-  const response = await api.post<IResponse>('/user-update', formData);
+  const response = await api.patch<IResponse>('/profile', formData);
 
   return response.data;
 }
 
 async function getUserInfo(): Promise<IUserResponse> {
-  const response = await api.get<IUserResponse>('/user');
+  const response = await api.get<IUserResponse>('/profile');
 
   return response.data;
 }

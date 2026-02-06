@@ -45,10 +45,10 @@ export async function forgotPassword(
   otp: string,
   newPassword: string
 ): Promise<IResponse> {
-  const response = await api.post<IResponse>('/forgot-password', {
+  const response = await api.post<IResponse>('/reset-password', {
     email,
     otp,
-    newPassword,
+    password: newPassword,
   });
   return response.data;
 }
