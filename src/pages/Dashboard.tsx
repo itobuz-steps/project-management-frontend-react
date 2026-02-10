@@ -3,10 +3,10 @@ import TopBar from '../components/common/TopBar';
 import type { ViewMode } from '../types/TopBar.types';
 import type { Project } from '../types/project.types';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
-import { fetchWithAuth } from '../components/api/interceptor';
 import { useProject } from '../context/ProjectContext';
 import { setupPushNotifications } from '../utils/setupNotification';
 import { AddTaskModal } from '../utils/addTaskModal';
+import { getAllProjects } from '../services/projectService';
 
 function Dashboard() {
   const { setProject } = useProject();
@@ -18,7 +18,7 @@ function Dashboard() {
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
 
   useEffect(() => {
-    fetchWithAuth<Project[]>('/project')
+    getAllProjects()
       .then((projects) => {
         setProjects(projects);
 

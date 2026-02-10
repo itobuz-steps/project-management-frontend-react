@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { TaskPopulated } from '../../services/types/tasks.types';
-import { getUserTasks } from '../../services/taskService';
+import { getAllTasks } from '../../services/taskService';
 import { StatusGroup } from './StatusGroup';
 
 export function TaskContainer() {
@@ -11,7 +11,7 @@ export function TaskContainer() {
 
   useEffect(() => {
     async function fetchTasks() {
-      const res = await getUserTasks();
+      const res = await getAllTasks();
       const tasks = res;
       const groupedTasks: Record<string, TaskPopulated[]> = {};
 

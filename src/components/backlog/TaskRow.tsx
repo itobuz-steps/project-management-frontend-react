@@ -46,9 +46,6 @@ export function TaskRow({
       style={{ ...style, touchAction: 'none' }}
       {...attributes}
       {...listeners}
-      onClick={() => {
-        setSearchParams({ taskId: task._id }, { replace: true });
-      }}
     >
       <td className="p-2 text-center whitespace-nowrap">
         <div className="flex justify-center">
@@ -64,7 +61,12 @@ export function TaskRow({
       >
         <TaskTypeColor type={task.type}>{task.key}</TaskTypeColor>
       </td>
-      <td className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline">
+      <td
+        className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline"
+        onClick={() => {
+          setSearchParams({ taskId: task._id }, { replace: true });
+        }}
+      >
         {task.title}
       </td>
       <td className="p-2 px-6 whitespace-nowrap">

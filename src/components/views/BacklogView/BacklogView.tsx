@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { fetchWithAuth } from '../../api/interceptor';
 import { useParams } from 'react-router-dom';
 import type { Sprint } from '../../../services/types/sprints.types';
 import { TaskTable } from '../../backlog/TaskTable';
-import type { TaskPopulated } from '../../../services/types/tasks.types';
+import type { Task } from '../../../services/types/tasks.types';
 import {
   DndContext,
   DragOverlay,
@@ -16,22 +15,22 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import {
-  addTasksToSprint,
-  removeTaskFromSprint,
-} from '../../../services/sprints.service';
+import { createSprintService } from '../../../services/sprints.service';
 import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
+import { getTasks } from '../../../services/taskService';
 
 function BacklogView() {
   const { projectId } = useParams();
   const { project, columns } = useProject();
+  const sprintService = createSprintService(project?._id as string);
+
   const [searchParams] = useSearchParams();
 
   const type = project?.projectType;
   const isScrum = type === 'scrum';
 
-  const [tasks, setTasks] = useState<TaskPopulated[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
@@ -39,7 +38,7 @@ function BacklogView() {
   const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
   const statusFilter = normalize(searchParams.get('status') || '');
   const priorityFilter = normalize(searchParams.get('priority') || '');
-  const matchesFilters = (task: TaskPopulated) => {
+  const matchesFilters = (task: Task) => {
     if (statusFilter && normalize(task.status) !== statusFilter) {
       return false;
     }
@@ -49,26 +48,22 @@ function BacklogView() {
     return true;
   };
 
-  /* ---------------- sensors ---------------- */
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 6 },
     })
   );
 
-  /* ---------- map for drag overlay ---------- */
   const taskById = useMemo(
     () => new Map(tasks.map((t) => [t._id, t])),
     [tasks]
   );
 
-  /* ---------- container registration ---------- */
   const containerIds = useMemo(
     () => ['backlog', ...sprints.map((s) => s._id)],
     [sprints]
   );
 
-  /* ---------------- data load ---------------- */
   useEffect(() => {
     if (!projectId) {
       return;
@@ -78,33 +73,16 @@ function BacklogView() {
       try {
         setLoading(true);
 
-        const tasksPromise = fetchWithAuth<{ result: TaskPopulated[] }>(
-          '/tasks',
-          {
-            params: {
-              projectId,
-              searchInput: searchParams.get('searchInput') || '',
-            },
-          }
-        );
-
-        const sprintsPromise =
-          type === 'scrum'
-            ? fetchWithAuth<{ result: Sprint[] }>('/sprint', {
-                params: {
-                  projectId,
-                  searchInput: searchParams.get('searchInput') || '',
-                },
-              })
-            : Promise.resolve({ result: [] as Sprint[] });
-
         const [tasksRes, sprintsRes] = await Promise.all([
-          tasksPromise,
-          sprintsPromise,
+          getTasks({
+            projectId,
+            searchInput: searchParams.get('searchInput') || '',
+          }),
+          type === 'scrum' ? sprintService.getSprints() : Promise.resolve([]),
         ]);
 
-        setTasks(tasksRes.result);
-        setSprints(sprintsRes.result.filter((s) => !s.isCompleted));
+        setTasks(tasksRes);
+        setSprints(sprintsRes.filter((sprint) => !sprint.isCompleted));
       } catch (err) {
         console.error('Failed to load backlog', err);
       } finally {
@@ -117,7 +95,6 @@ function BacklogView() {
     }
   }, [projectId, type, searchParams]);
 
-  /* ---------------- guards ---------------- */
   if (!projectId) {
     return (
       <div className="rounded-lg border bg-white p-6 text-center text-gray-500">
@@ -135,7 +112,6 @@ function BacklogView() {
     return <div className="p-4">Loading backlog...</div>;
   }
 
-  /* ---------------- backlog calc ---------------- */
   const sprintTaskIds = new Set(sprints.flatMap((s) => s.tasks));
 
   const backlogTasks = tasks.filter(
@@ -145,7 +121,6 @@ function BacklogView() {
       matchesFilters(task)
   );
 
-  /* ---------------- render ---------------- */
   return (
     <div className="rounded-lg bg-white p-1">
       <DndContext
@@ -207,11 +182,15 @@ function BacklogView() {
           const calls: Promise<unknown>[] = [];
 
           if (sourceSprint) {
-            calls.push(removeTaskFromSprint(sourceSprint._id, taskId));
+            calls.push(
+              sprintService.removeTaskFromSprint(sourceSprint._id, taskId)
+            );
           }
 
           if (targetSprint) {
-            calls.push(addTasksToSprint(targetSprint._id, [taskId]));
+            calls.push(
+              sprintService.addTasksToSprint(targetSprint._id, [taskId])
+            );
           }
 
           if (calls.length) {

@@ -18,12 +18,9 @@ import {
 import {
   SortableContext,
   arrayMove,
-  useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { Input, message, Modal } from 'antd';
-import { fetchWithAuth } from '../../api/interceptor';
 import {
   getProjectById,
   updateProject,
@@ -36,91 +33,9 @@ import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../../utils/TaskTypeColor';
 import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
-import { DeleteTaskModal } from '../../../utils/DeleteTaskModal';
-import { Plus, Trash } from 'lucide-react';
-import { getTypeBorder } from '../../../utils/utils';
-
-function TaskCard({
-  task,
-  column,
-  onOpen,
-}: {
-  task: Task;
-  column: string;
-  onOpen: () => void;
-}) {
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: task._id, data: { type: 'task', column } });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`group rounded-md ${getTypeBorder(task.type)} bg-white p-3 shadow-sm ${
-        isDragging ? 'opacity-50' : ''
-      }`}
-      {...attributes}
-      {...listeners}
-    >
-      <div className="flex items-start justify-between gap-2 cursor-pointer">
-        <div>
-          <p
-            className="mb-4 cursor-pointer text-sm font-medium text-gray-900 hover:underline"
-            onClick={() => onOpen()}
-          >
-            {task.title}
-          </p>
-          <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
-            <TaskTypeIcon type={task.type} />
-            <span
-              className="p-1 whitespace-nowrap"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(`/task/${task._id}`, '_blank');
-              }}
-            >
-              <TaskTypeColor type={task.type}>
-                {task.key ?? task._id}
-              </TaskTypeColor>
-            </span>
-          </p>
-        </div>
-
-        <button
-          type="button"
-          aria-label="Delete task"
-          className="rounded p-1 text-gray-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-50 hover:text-gray-600"
-          onClick={(event) => {
-            event.stopPropagation();
-            setIsDeleteOpen(true);
-          }}
-        >
-          <Trash size={16} />
-        </button>
-      </div>
-
-      <DeleteTaskModal
-        task={task}
-        open={isDeleteOpen}
-        onClose={() => setIsDeleteOpen(false)}
-        onDeleted={() => setIsDeleteOpen(false)}
-      />
-    </div>
-  );
-}
+import { Plus } from 'lucide-react';
+import { createSprintService } from '../../../services/sprints.service';
+import { TaskCard } from './TaskCard';
 
 function ColumnDropZone({ id, children }: { id: string; children: ReactNode }) {
   const { setNodeRef } = useDroppable({
@@ -140,6 +55,7 @@ function BoardView() {
 
   const { projectId } = useParams();
   const { project } = useProject();
+  const sprintService = createSprintService(projectId as string);
   const type = project?.projectType;
   const isScrum = type === 'scrum';
 
@@ -293,12 +209,7 @@ function BoardView() {
             searchInput: searchParams.get('searchInput') || '',
           }),
           isScrum
-            ? fetchWithAuth<{ result?: Sprint[] } | Sprint[]>('/sprint', {
-                params: {
-                  projectId,
-                  searchInput: searchParams.get('searchInput') || '',
-                },
-              })
+            ? sprintService.getSprints()
             : Promise.resolve([] as Sprint[]),
         ]);
 

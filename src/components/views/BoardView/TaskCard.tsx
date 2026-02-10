@@ -1,0 +1,91 @@
+import { useState } from 'react';
+import type { Task } from '../../../services/types/tasks.types';
+import { useSortable } from '@dnd-kit/sortable';
+import { getTypeBorder } from '../../../utils/utils';
+import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
+import { TaskTypeColor } from '../../../utils/TaskTypeColor';
+import { Trash } from 'lucide-react';
+import { DeleteTaskModal } from '../../../utils/DeleteTaskModal';
+import { CSS } from '@dnd-kit/utilities';
+
+export function TaskCard({
+  task,
+  column,
+  onOpen,
+}: {
+  task: Task;
+  column: string;
+  onOpen: () => void;
+}) {
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task._id, data: { type: 'task', column } });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group rounded-md ${getTypeBorder(task.type)} bg-white p-3 shadow-sm ${
+        isDragging ? 'opacity-50' : ''
+      }`}
+      {...attributes}
+      {...listeners}
+    >
+      <div className="flex cursor-pointer items-start justify-between gap-2">
+        <div>
+          <p
+            className="mb-4 cursor-pointer text-sm font-medium text-gray-900 hover:underline"
+            onClick={() => onOpen()}
+          >
+            {task.title}
+          </p>
+          <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+            <TaskTypeIcon type={task.type} />
+            <span
+              className="p-1 whitespace-nowrap"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(`/task/${task._id}`, '_blank');
+              }}
+            >
+              <TaskTypeColor type={task.type}>
+                {task.key ?? task._id}
+              </TaskTypeColor>
+            </span>
+          </p>
+        </div>
+
+        <button
+          type="button"
+          aria-label="Delete task"
+          className="rounded p-1 text-gray-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-50 hover:text-gray-600"
+          onClick={(event) => {
+            event.stopPropagation();
+            setIsDeleteOpen(true);
+          }}
+        >
+          <Trash size={16} />
+        </button>
+      </div>
+
+      <DeleteTaskModal
+        task={task}
+        open={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onDeleted={() => setIsDeleteOpen(false)}
+      />
+    </div>
+  );
+}

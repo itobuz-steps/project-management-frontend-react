@@ -7,7 +7,7 @@ import {
 } from '@dnd-kit/sortable';
 import type { TaskTableProps } from './type';
 import type { TaskPopulated } from '../../services/types/tasks.types';
-import { updateSprint, createSprint } from '../../services/sprints.service';
+import { createSprintService } from '../../services/sprints.service';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
 import { SprintMenu } from './SprintMenu';
@@ -26,6 +26,8 @@ export function TaskTable({
   const [open, setOpen] = useState(true);
   const [localTasks, setLocalTasks] = useState<TaskPopulated[]>(tasks);
   const { project } = useProject();
+
+  const sprintService = createSprintService(project?._id as string);
 
   useEffect(() => {
     setLocalTasks(tasks);
@@ -51,7 +53,7 @@ export function TaskTable({
     const dueDateValue = dueDateRef.current.value;
 
     try {
-      await updateSprint(sprint._id, {
+      await sprintService.updateSprint(sprint._id, {
         dueDate: new Date(dueDateValue),
       });
       setSprints?.((prevSprints) =>
@@ -70,7 +72,7 @@ export function TaskTable({
     if (!sprint) return;
 
     try {
-      await updateSprint(sprint._id, {
+      await sprintService.updateSprint(sprint._id, {
         isCompleted: true,
       });
       setSprints?.((prevSprints) =>
@@ -89,8 +91,10 @@ export function TaskTable({
 
   async function createSprintHandler() {
     try {
-      const response = await createSprint({ projectId: project?._id || '' });
-      const sprint = response.result;
+      const response = await sprintService.createSprint({
+        projectId: project?._id || '',
+      });
+      const sprint = response;
 
       setSprints?.((prevSprints) => [sprint, ...prevSprints]);
     } catch (error) {

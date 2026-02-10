@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { fetchWithAuth } from '../api/interceptor';
 import type { Project } from '../../types/project.types';
+import { getAllProjects } from '../../services/projectService';
 
 function SidebarProjectsDropdown({ collapsed }: { collapsed: boolean }) {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -12,7 +12,7 @@ function SidebarProjectsDropdown({ collapsed }: { collapsed: boolean }) {
   useEffect(() => {
     async function loadProjects() {
       try {
-        const res = await fetchWithAuth<Project[]>('/project');
+        const res = await getAllProjects();
         console.log(res);
         setProjects(res);
       } catch (err) {
