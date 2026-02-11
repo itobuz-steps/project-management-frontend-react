@@ -15,8 +15,7 @@ export default function EditProfileContainer() {
 
       if (response.result.profileImage) {
         setProfileImage(
-          'http://localhost:3001/uploads/profile/' +
-            response.result.profileImage
+          'http://localhost:3000/uploads/' + response.result.profileImage
         );
       }
       setEmail(response.result.email);

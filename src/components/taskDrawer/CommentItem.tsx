@@ -61,8 +61,8 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
           <Avatar
             src={
               comment.author.profileImage
-                ? `${config.api_base_url}/uploads/profile/${comment.author.profileImage}`
-                : '/assets/img/profile.png'
+                ? `${config.api_base_url}/uploads/${comment.author.profileImage}`
+                : '/profile.png'
             }
           >
             {comment.author.name?.[0]}
@@ -90,7 +90,7 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
                     type="text"
                     onClick={() =>
                       window.open(
-                        `${config.api_base_url}/uploads/commentsAttachment/${comment.attachment}`,
+                        `${config.api_base_url}/uploads/${comment.attachment}`,
                         '_blank'
                       )
                     }

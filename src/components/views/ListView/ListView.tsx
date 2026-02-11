@@ -197,7 +197,9 @@ function ListView() {
                   />
                 </td>
                 <td className="p-3 whitespace-nowrap text-gray-700">
-                  {task.assignee ? String(task.assignee) : 'Unassigned'}
+                  {task.assignee?.name
+                    ? String(task.assignee.name)
+                    : 'Unassigned'}
                 </td>
                 <td className="p-3">
                   <span
@@ -210,7 +212,7 @@ function ListView() {
                   </span>
                 </td>
                 <td className="p-3 whitespace-nowrap text-gray-700">
-                  {task.reporter ? String(task.reporter) : 'Unknown'}
+                  {task.reporter?.name ? String(task.reporter.name) : 'Unknown'}
                 </td>
                 <td className="w-full p-3">
                   <div className="flex flex-wrap gap-1 whitespace-nowrap">

@@ -18,8 +18,8 @@ export function NotificationItem({
   }
 
   const profileImage = data.profileImage
-    ? `${config.api_base_url}/uploads/profile/${data.profileImage}`
-    : 'profile.png';
+    ? `${config.api_base_url}/uploads/${data.profileImage}`
+    : '/profile.png';
 
   return (
     <li onClick={handleClick} className="cursor-pointer">

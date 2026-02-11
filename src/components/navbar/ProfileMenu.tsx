@@ -32,7 +32,7 @@ export default function ProfileMenu() {
         <div className="profile-image h-7 w-7 cursor-pointer rounded-full bg-gray-400 sm:h-9 sm:w-9">
           <img
             id="profileImage"
-            src="../assets/img/profile.png"
+            src="profile.png"
             alt="Profile Preview"
             className="size-full rounded-full object-cover"
           />

@@ -8,6 +8,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { message } from 'antd';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TaskTypeColor } from '../../utils/TaskTypeColor';
+import { config } from '../../config/config';
 
 export function TaskRow({
   task,
@@ -30,6 +31,8 @@ export function TaskRow({
     transition,
     isDragging,
   } = useSortable({ id: task._id, data: { type: 'task', containerId } });
+
+  console.log('TaskProfileImage', task.assignee?.profileImage);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -88,7 +91,11 @@ export function TaskRow({
         <div className="flex items-center">
           <img
             className="mr-3 aspect-square h-6 w-6 rounded-full object-cover"
-            src={`${task.assignee?.profileImage}`}
+            src={
+              task.assignee?.profileImage
+                ? `${config.api_base_url}/uploads/${task.assignee?.profileImage}`
+                : '/profile.png'
+            }
           />
           {task.assignee?.name ?? 'Unassigned'}
         </div>
@@ -143,9 +150,11 @@ export function TaskRow({
         <div className="flex items-center">
           <img
             className="mr-3 aspect-square h-6 w-6 rounded-full object-cover"
-            src={`${task.reporter?.profileImage}
-                            ? config.API_BASE_URL + '/uploads/profile/' + task.reporter.avatarUrl
-                            : '../../../assets/img/profile.png'}`}
+            src={
+              task.reporter?.profileImage
+                ? `${config.api_base_url}/uploads/${task.reporter?.profileImage}`
+                : '/profile.png'
+            }
           />
           {task.reporter?.name ?? 'Unknown'}
         </div>
