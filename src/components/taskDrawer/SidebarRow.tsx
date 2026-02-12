@@ -2,16 +2,29 @@ export function SidebarRow({
   label,
   children,
 }: {
-  label: string;
+  label?: string;
   children: React.ReactNode;
 }) {
-  return (
-    <div className="group rounded-md px-1 py-1 transition hover:bg-gray-50">
-      <div className="text-[11px] font-medium tracking-wide text-gray-500">
-        {label}
-      </div>
+  const hasLabel = Boolean(label);
 
-      <div className="mt-0.5 text-sm">{children}</div>
+  return (
+    <div
+      className={`grid items-start text-sm ${
+        hasLabel
+          ? 'grid-cols-1 sm:grid-cols-[112px_minmax(0,1fr)]'
+          : 'grid-cols-1'
+      } `}
+    >
+
+      {hasLabel && (
+        <div className="flex px-2 py-1 text-[11px] leading-6 font-medium tracking-wide text-gray-500 hover:bg-gray-100">
+          {label}
+        </div>
+      )}
+
+      <div className="flex rounded px-2 py-1 leading-6 hover:bg-gray-100">
+        {children}
+      </div>
     </div>
   );
 }

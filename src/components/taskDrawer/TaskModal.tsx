@@ -2,17 +2,14 @@ import type { TaskModalProps } from './taskDrawer.type';
 import { useEffect, useState } from 'react';
 import { Modal, Spin } from 'antd';
 import type { TaskPopulated } from '../../services/types/tasks.types';
-// import { ExportOutlined } from '@ant-design/icons';
 import getTaskById from '../../services/taskService';
 import { TaskView } from './TaskView';
-import { TaskDrawerHeader } from './TaskDrawerHeader';
+import { TaskModalHeader } from './TaskModalHeader';
 import { useIsMobile } from '../../utils/isMobile';
 
 export default function TaskModal({ taskId, onClose }: TaskModalProps) {
   const [task, setTask] = useState<TaskPopulated | null>(null);
   const [loading, setLoading] = useState(false);
-  // const navigate = useNavigate();
-  // const screens = useBreakpoint();
   const isMobile = useIsMobile(768);
 
   useEffect(() => {
@@ -39,19 +36,18 @@ export default function TaskModal({ taskId, onClose }: TaskModalProps) {
     <Modal
       open={!!taskId}
       onCancel={onClose}
-      closable={true}
+      closable={false}
       footer={null}
       centered={!isMobile}
-      width={isMobile ? '100%' : 1000}
+      width={isMobile ? '100%' : 1200}
       styles={{
         header: {
-          padding: '12px 16px',
-          borderBottom: '1px solid #e5e7eb',
           margin: 0,
         },
         body: {
           padding: 0,
           height: isMobile ? 'calc(100vh - 56px)' : '70vh',
+          maxHeight: 700,
           overflow: 'hidden',
         },
 
@@ -63,10 +59,11 @@ export default function TaskModal({ taskId, onClose }: TaskModalProps) {
       destroyOnHidden
       title={
         task && (
-          <TaskDrawerHeader
+          <TaskModalHeader
             task={task}
-            // projectId={projectId!}
             onUpdated={setTask}
+            onClose={onClose}
+            page={false}
           />
         )
       }

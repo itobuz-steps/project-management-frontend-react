@@ -18,7 +18,7 @@ export interface Task {
   reporter?: User;
   assignee?: User;
   parentTask?: string;
-  subTask?: string[];
+  subTasks?: string[];
   labels?: string[];
   tags?: string[];
   attachments?: FileList | File[];
@@ -53,7 +53,7 @@ export interface TaskPopulated {
   reporter?: User;
   assignee?: User;
   parentTask?: string;
-  subTask?: string[];
+  subTasks?: string[];
   labels?: string[];
   attachments?: FileList | File[];
   tags?: string[];
@@ -67,8 +67,9 @@ export interface CreateTaskPayload {
   description?: string;
   type: TaskType;
   key?: string;
-  status: string;
-  priority: TaskPriority;
+  parentTask?: string;
+  status?: string;
+  priority?: TaskPriority;
   dueDate?: string;
   assignee?: string;
   tags?: string[];

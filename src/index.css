@@ -55,7 +55,7 @@ h2 {
 }
 
 h1 {
-  font-size: 20px;
+  font-size: 26px;
 }
 
 .smaller-text {
@@ -64,4 +64,19 @@ h1 {
 
 .btn-primary {
   @apply bg-primary-500 hover:bg-primary-600 mt-4 rounded-lg py-3 font-medium text-white transition-all duration-300;
+}
+
+.ant-collapse-body {
+  padding: 0px 0px 0px 20px !important;
+}
+
+.ant-collapse-header {
+  padding: 10px 0px !important;
+}
+
+/* Outer border */
+.jira-sidebar-collapse {
+  border: 1px solid #e5e7eb; /* light gray */
+  border-radius: 3px;
+  padding: 0px 12px;
 }

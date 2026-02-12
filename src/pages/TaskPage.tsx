@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import type { TaskPopulated } from '../services/types/tasks.types';
 import getTaskById from '../services/taskService';
 import { TaskView } from '../components/taskDrawer/TaskView';
-import { TaskDrawerHeader } from '../components/taskDrawer/TaskDrawerHeader';
+import { TaskModalHeader } from '../components/taskDrawer/TaskModalHeader';
 import { useIsMobile } from '../utils/isMobile';
 
 export default function TaskPage() {
@@ -29,12 +29,13 @@ export default function TaskPage() {
   if (!task) return null;
 
   return (
-    <div className="mx-auto p-6">
+    <div className="mx-auto w-full p-2 min-[1700px]:max-w-7xl">
       {task && (
-        <TaskDrawerHeader
+        <TaskModalHeader
           task={task}
           // projectId={projectId!}
           onUpdated={setTask}
+          page={true}
         />
       )}
 
