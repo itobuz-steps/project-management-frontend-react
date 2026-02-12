@@ -1,115 +1,68 @@
 // src/services/sprint.service.ts
+import axios from 'axios';
 import type {
   Sprint,
   CreateSprintPayload,
   UpdateSprintPayload,
 } from './types/sprints.types';
 import { config } from '../config/config';
+import { attachInterceptor } from '../utils/attachInterceptor';
 
-const BASE_URL = `${config.api_base_url}/sprint`;
+export const createSprintService = (projectId: string) => {
+  const api = axios.create({
+    baseURL: `${config.api_base_url}/project/${projectId}/sprint`,
+  });
 
-const getAuthHeaders = (): HeadersInit => {
-  const token = localStorage.getItem('access_token');
+  attachInterceptor(api);
 
   return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    getSprints: async (): Promise<Sprint[]> => {
+      const res = await api.get<{ result: Sprint[] }>('');
+      return res.data.result;
+    },
+
+    getSprintById: async (sprintId: string): Promise<Sprint> => {
+      const res = await api.get<{ result: Sprint }>(`/${sprintId}`);
+      return res.data.result;
+    },
+
+    createSprint: async (payload: CreateSprintPayload): Promise<Sprint> => {
+      const res = await api.post<{ result: Sprint }>('', payload);
+      return res.data.result;
+    },
+
+    updateSprint: async (
+      sprintId: string,
+      payload: UpdateSprintPayload
+    ): Promise<Sprint> => {
+      const res = await api.put<{ result: Sprint }>(`/${sprintId}`, payload);
+      return res.data.result;
+    },
+
+    deleteSprint: async (sprintId: string): Promise<void> => {
+      await api.delete(`/${sprintId}`);
+    },
+
+    addTasksToSprint: async (
+      sprintId: string,
+      tasks: string[]
+    ): Promise<Sprint> => {
+      const res = await api.patch<{ result: Sprint }>(
+        `/${sprintId}/add-tasks`,
+        { tasks }
+      );
+      return res.data.result;
+    },
+
+    removeTaskFromSprint: async (
+      sprintId: string,
+      taskId: string
+    ): Promise<Sprint> => {
+      const res = await api.patch<{ result: Sprint }>(
+        `/${sprintId}/remove-task`,
+        { task: taskId }
+      );
+      return res.data.result;
+    },
   };
-};
-
-/* ---------------- GET ALL SPRINTS ---------------- */
-export const getSprints = async (): Promise<Sprint[]> => {
-  const res = await fetch(`${BASE_URL}/`, {
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) throw new Error('Failed to fetch sprints');
-  return res.json();
-};
-
-/* ---------------- CREATE SPRINT ---------------- */
-export const createSprint = async (
-  payload: CreateSprintPayload
-): Promise<{ result: Sprint }> => {
-  const res = await fetch(`${BASE_URL}/`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) throw new Error('Failed to create sprint');
-  return res.json();
-};
-
-/* ---------------- GET SPRINT BY ID ---------------- */
-export const getSprintById = async (sprintId: string): Promise<Sprint> => {
-  const res = await fetch(`${BASE_URL}/${sprintId}`, {
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) throw new Error('Failed to fetch sprint');
-  return res.json();
-};
-
-/* ---------------- UPDATE SPRINT ---------------- */
-export const updateSprint = async (
-  sprintId: string,
-  payload: UpdateSprintPayload
-): Promise<Sprint> => {
-  const res = await fetch(`${BASE_URL}/${sprintId}`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) throw new Error('Failed to update sprint');
-  return res.json();
-};
-
-/* ---------------- DELETE SPRINT ---------------- */
-export const deleteSprint = async (sprintId: string): Promise<void> => {
-  const res = await fetch(`${BASE_URL}/${sprintId}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) throw new Error('Failed to delete sprint');
-};
-
-/* ---------------- ADD TASKS TO SPRINT ---------------- */
-export const addTasksToSprint = async (
-  sprintId: string,
-  tasks: string[]
-): Promise<Sprint> => {
-  const res = await fetch(`${BASE_URL}/${sprintId}/addTasks`, {
-    method: 'PATCH',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ tasks }),
-  });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => null);
-    throw new Error(error?.message || 'Failed to update sprint');
-  }
-
-  return res.json();
-};
-
-/* ---------------- REMOVE TASK FROM SPRINT ---------------- */
-export const removeTaskFromSprint = async (
-  sprintId: string,
-  taskId: string
-): Promise<Sprint> => {
-  const res = await fetch(`${BASE_URL}/${sprintId}/removeTasks`, {
-    method: 'PATCH',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ task: taskId }),
-  });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => null);
-    throw new Error(error?.message || 'Failed to update sprint');
-  }
-
-  return res.json();
 };

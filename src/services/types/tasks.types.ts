@@ -15,8 +15,8 @@ export interface Task {
   status: string;
   priority: string;
   dueDate?: string;
-  reporter?: string;
-  assignee?: string;
+  reporter?: User;
+  assignee?: User;
   parentTask?: string;
   subTask?: string[];
   labels?: string[];

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { getTasks } from '../../../services/taskService';
 import { updateTask } from '../../../services/taskService';
 import type { Task, TaskStatus } from '../../../services/types/tasks.types';
@@ -165,16 +165,18 @@ function ListView() {
                 <td className="p-3">
                   <TaskTypeIcon type={task.type} />
                 </td>
-                <td
-                  className="p-3 whitespace-nowrap"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`/task/${task._id}`, '_blank');
-                  }}
-                >
-                  <TaskTypeColor type={task.type}>
-                    {task.key ?? task._id}
-                  </TaskTypeColor>
+                <td>
+                  <Link
+                    to={`/task/${task._id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="h-full w-full p-1 whitespace-nowrap"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <TaskTypeColor type={task.type}>
+                      {task.key ?? task._id}
+                    </TaskTypeColor>
+                  </Link>
                 </td>
                 <td className="p-3 font-medium whitespace-nowrap text-gray-900 hover:underline">
                   {task.title}
@@ -197,7 +199,9 @@ function ListView() {
                   />
                 </td>
                 <td className="p-3 whitespace-nowrap text-gray-700">
-                  {task.assignee ? String(task.assignee) : 'Unassigned'}
+                  {task.assignee?.name
+                    ? String(task.assignee.name)
+                    : 'Unassigned'}
                 </td>
                 <td className="p-3">
                   <span
@@ -210,7 +214,7 @@ function ListView() {
                   </span>
                 </td>
                 <td className="p-3 whitespace-nowrap text-gray-700">
-                  {task.reporter ? String(task.reporter) : 'Unknown'}
+                  {task.reporter?.name ? String(task.reporter.name) : 'Unknown'}
                 </td>
                 <td className="w-full p-3">
                   <div className="flex flex-wrap gap-1 whitespace-nowrap">

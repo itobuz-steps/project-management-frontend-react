@@ -40,7 +40,7 @@ export function AttachmentsTab({ task }: AttachmentsTabProps) {
           dataSource={attachments}
           renderItem={(file) => {
             const fileName = typeof file === 'string' ? file : file.name;
-            const fileUrl = `${config.api_base_url}/uploads/attachments/${fileName}`;
+            const fileUrl = `${config.api_base_url}/uploads/${fileName}`;
 
             return (
               <List.Item className="rounded-md px-6 hover:bg-gray-50">
