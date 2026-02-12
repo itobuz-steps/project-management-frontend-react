@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemePicker } from './ThemePicker';
+import { config } from '../../config/config';
+import userService from '../../services/userService';
 
 export default function ProfileMenu() {
   const [open, setOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState('/profile.png');
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,6 +25,19 @@ export default function ProfileMenu() {
     };
   }, [open]);
 
+  useEffect(() => {
+    async function fetchUserData() {
+      const response = await userService.getUserInfo();
+
+      if (response.result.profileImage) {
+        setProfileImage(
+          `${config.api_base_url}/uploads/` + response.result.profileImage
+        );
+      }
+    }
+    fetchUserData();
+  }, []);
+
   return (
     <div className="relative" ref={menuRef}>
       <button
@@ -32,7 +48,7 @@ export default function ProfileMenu() {
         <div className="profile-image h-7 w-7 cursor-pointer rounded-full bg-gray-400 sm:h-9 sm:w-9">
           <img
             id="profileImage"
-            src="profile.png"
+            src={profileImage}
             alt="Profile Preview"
             className="size-full rounded-full object-cover"
           />

@@ -91,10 +91,9 @@ export function TaskTable({
 
   async function createSprintHandler() {
     try {
-      const response = await sprintService.createSprint({
+      const sprint = await sprintService.createSprint({
         projectId: project?._id || '',
       });
-      const sprint = response;
 
       setSprints?.((prevSprints) => [sprint, ...prevSprints]);
     } catch (error) {
