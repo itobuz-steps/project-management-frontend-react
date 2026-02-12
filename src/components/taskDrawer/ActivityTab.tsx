@@ -7,26 +7,16 @@ import { getTaskActivities } from '../../services/taskService';
 export function ActivityTab({ taskId }: { taskId: string }) {
   const [activities, setActivities] = useState<Activity[]>([]);
   useEffect(() => {
-    let isMounted = true;
-
     async function fetchActivities() {
       try {
         const fetchedActivities = await getTaskActivities(taskId);
-        if (isMounted) {
-          setActivities(fetchedActivities);
-        }
+
+        setActivities(fetchedActivities);
       } catch (error) {
-        if (isMounted) {
-          console.error('Error fetching activities:', error);
-        }
+        console.error('Error fetching activities:', error);
       }
     }
-
     fetchActivities();
-
-    return () => {
-      isMounted = false;
-    };
   }, [taskId]);
 
   return (
@@ -54,7 +44,7 @@ function TimelineTitle({ title }: { title: string }) {
 }
 
 export function TimelineItem({ content }: { content: JSX.Element }) {
-  return <span className="">{content}</span>;
+  return <span>{content}</span>;
 }
 
 function mapActivityListToTimelineProp(activities: Activity[]) {
@@ -115,7 +105,6 @@ function mapActivityListToTimelineProp(activities: Activity[]) {
           </>
         );
         timelineItems.push(createTimelineItem(activity.createdAt, content));
-        delete activity.updatedFields.status;
         break;
 
       case 'ASSIGNEE_CHANGED':
@@ -141,7 +130,6 @@ function mapActivityListToTimelineProp(activities: Activity[]) {
           </>
         );
         timelineItems.push(createTimelineItem(activity.createdAt, content));
-        delete activity.updatedFields.assignee;
         break;
 
       case 'TASK_DELETED':
