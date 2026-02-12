@@ -7,6 +7,7 @@ import { TaskTypeColor } from '../../../utils/TaskTypeColor';
 import { Trash } from 'lucide-react';
 import { DeleteTaskModal } from '../../../utils/DeleteTaskModal';
 import { CSS } from '@dnd-kit/utilities';
+import { Link } from 'react-router-dom';
 
 export function TaskCard({
   task,
@@ -53,17 +54,16 @@ export function TaskCard({
           </p>
           <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
             <TaskTypeIcon type={task.type} />
-            <span
+            <Link
+              to={`/task/${task._id}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="p-1 whitespace-nowrap"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(`/task/${task._id}`, '_blank');
-              }}
             >
               <TaskTypeColor type={task.type}>
                 {task.key ?? task._id}
               </TaskTypeColor>
-            </span>
+            </Link>
           </p>
         </div>
 

@@ -2,7 +2,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { StatusSelect } from '../../utils/StatusSelect';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { formatDateForInput, getPriorityBorder } from '../../utils/utils';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { updateTask } from '../../services/taskService';
 import { useSortable } from '@dnd-kit/sortable';
 import { message } from 'antd';
@@ -32,8 +32,6 @@ export function TaskRow({
     isDragging,
   } = useSortable({ id: task._id, data: { type: 'task', containerId } });
 
-  console.log('TaskProfileImage', task.assignee?.profileImage);
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -55,14 +53,15 @@ export function TaskRow({
           <TaskTypeIcon type={task.type} />
         </div>
       </td>
-      <td
-        className="cursor-pointer p-2 font-medium whitespace-nowrap text-white hover:underline"
-        onClick={(e) => {
-          e.stopPropagation();
-          window.open(`/task/${task._id}`, '_blank');
-        }}
-      >
-        <TaskTypeColor type={task.type}>{task.key}</TaskTypeColor>
+      <td>
+        <Link
+          to={`/task/${task._id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="h-full w-full cursor-pointer p-2 font-medium whitespace-nowrap text-white hover:underline"
+        >
+          <TaskTypeColor type={task.type}>{task.key}</TaskTypeColor>
+        </Link>
       </td>
       <td
         className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline"
