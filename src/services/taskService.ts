@@ -8,6 +8,7 @@ import type {
 } from '../services/types/tasks.types';
 import { attachInterceptor } from '../utils/attachInterceptor';
 import { mapObjectToFormData } from '../utils/mapObjectToFormdata';
+import type { Activity } from './types/activity.types';
 
 const API_URL = `${config.api_base_url}/tasks`;
 
@@ -84,4 +85,18 @@ export async function getTasks(params: {
   });
 
   return res.data.result;
+}
+
+export async function getTaskActivities(taskId: string): Promise<Activity[]> {
+  const res = await api.get<{ activities: Activity[] }>(
+    `/${taskId}/activities`
+  );
+
+  console.log('Fetched activities:', res.data);
+
+  res.data.activities.forEach((activity: Activity) => {
+    activity.createdAt = new Date(activity.createdAt);
+  });
+
+  return res.data.activities;
 }
