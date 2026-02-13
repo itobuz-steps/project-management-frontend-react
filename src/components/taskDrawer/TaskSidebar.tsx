@@ -127,7 +127,7 @@ export function TaskSidebar({
 
                   try {
                     await updateTask(task._id, {
-                      assignee: userId ?? undefined,
+                      assignee: (userId as unknown as User) ?? undefined,
                     });
                   } catch {
                     message.error('Failed to update assignee');

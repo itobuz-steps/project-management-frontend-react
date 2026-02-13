@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { Sprint } from '../../../services/types/sprints.types';
 import { TaskTable } from '../../backlog/TaskTable';
-import type { Task } from '../../../services/types/tasks.types';
+import type { Task, TaskPopulated } from '../../../services/types/tasks.types';
 import {
   DndContext,
   DragOverlay,
@@ -229,7 +229,7 @@ function BacklogView() {
                         key={sprint._id}
                         sprint={sprint}
                         setSprints={setSprints}
-                        tasks={sprintTasks}
+                        tasks={sprintTasks as unknown as TaskPopulated[]}
                         columns={columns || []}
                         containerId={sprint._id}
                       />
@@ -247,7 +247,7 @@ function BacklogView() {
             setSprints={
               project?.projectType === 'scrum' ? setSprints : undefined
             }
-            tasks={backlogTasks}
+            tasks={backlogTasks as unknown as TaskPopulated[]}
             columns={columns || []}
             title="Backlog"
             containerId="backlog"
