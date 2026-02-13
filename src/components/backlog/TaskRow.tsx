@@ -73,7 +73,6 @@ export function TaskRow({
       </td>
       <td className="p-2 px-6 whitespace-nowrap">
         <StatusSelect
-          taskId={task._id}
           value={task.status}
           columns={columns}
           onChange={async (newStatus) => {

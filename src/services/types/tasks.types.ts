@@ -41,7 +41,7 @@ export type User = {
 
 export interface TaskPopulated {
   _id: string;
-  projectId: Project;
+  projectId: Project | string;
   title: string;
   storyPoint?: number;
   description: string;
@@ -73,7 +73,7 @@ export interface CreateTaskPayload {
   dueDate?: string;
   assignee?: string;
   tags?: string[];
-  attachments: FileList | File[];
+  attachments?: FileList | File[];
   storyPoint?: string;
 }
 

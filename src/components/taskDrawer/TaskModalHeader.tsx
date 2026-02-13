@@ -1,14 +1,10 @@
 import { Button, Input, message, type InputRef } from 'antd';
-import {
-  ExportOutlined,
-  ArrowsAltOutlined,
-  CloseOutlined,
-} from '@ant-design/icons';
+import { ArrowsAltOutlined, CloseOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from 'react';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { updateTask } from '../../services/taskService';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
-import { SidebarRow } from './SidebarRow';
+import { SidebarRow } from '../../utils/SidebarRow';
 import { StatusSelect } from '../../utils/StatusSelect';
 import { getProjectById } from '../../services/projectService';
 import getTaskById from '../../services/taskService';
@@ -112,7 +108,7 @@ export function TaskModalHeader({
                 href={`/task/${parentTask._id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="!text-inherit text-gray-500 hover:text-gray-600 hover:underline"
+                className="text-inherit! hover:text-gray-600 hover:underline"
               >
                 {parentTask.key}
               </a>
@@ -126,7 +122,7 @@ export function TaskModalHeader({
             to={`/task/${task._id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="!text-inherit text-gray-500 hover:text-gray-600 hover:underline"
+            className="text-inherit! hover:text-gray-600 hover:underline"
           >
             {task.key}
           </Link>
@@ -137,11 +133,6 @@ export function TaskModalHeader({
             page ? 'pointer-events-none opacity-0' : 'opacity-100'
           }`}
         >
-          <Button
-            size="middle"
-            icon={<ExportOutlined />}
-            onClick={() => window.open(`/task/${task._id}`, '_blank')}
-          />
           <Button
             size="middle"
             icon={<ArrowsAltOutlined />}
@@ -169,7 +160,7 @@ export function TaskModalHeader({
               value={value}
               autoSize={{ minRows: 1, maxRows: 3 }}
               bordered={false}
-              className="!text-2xl font-semibold"
+              className="text-2xl! font-semibold"
               onChange={(e) => setValue(e.target.value)}
               onBlur={save}
               onKeyDown={(e) => {
@@ -191,7 +182,7 @@ export function TaskModalHeader({
           {/* Inline Status */}
           <SidebarRow>
             <StatusSelect
-              className="!px-6 !py-4"
+              className="px-6! py-4!"
               value={task.status}
               columns={columns}
               onChange={async (newStatus) => {

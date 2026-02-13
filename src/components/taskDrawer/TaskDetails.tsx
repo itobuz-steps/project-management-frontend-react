@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, Select, Tag, message, Collapse } from 'antd';
 import type { TaskPopulated, User } from '../../services/types/tasks.types';
 import { updateTask } from '../../services/taskService';
-import { SidebarRow } from './SidebarRow';
+import { SidebarRow } from '../../utils/SidebarRow';
 import { UserCell } from '../../utils/UserCell';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { formatDateForInput } from '../../utils/utils';

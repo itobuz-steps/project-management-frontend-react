@@ -10,7 +10,7 @@ export function StatusSelect({
   value: string;
   columns: string[];
   onChange: (value: string) => void;
-  className: string;
+  className?: string;
 }) {
   const selectedIndex = columns.indexOf(value);
 
@@ -19,6 +19,7 @@ export function StatusSelect({
     if (index === total - 1) return 'bg-green-100 hover:bg-green-150';
     return 'bg-blue-100 hover:bg-blue-200';
   };
+
   return (
     <Dropdown
       trigger={['click']}
@@ -27,7 +28,7 @@ export function StatusSelect({
           key: col,
           label: (
             <span
-              className={`px-2 py-1 rounded text-black ${getColorClass(
+              className={`rounded px-2 py-1 text-black ${getColorClass(
                 index,
                 columns.length
               )}`}
@@ -40,8 +41,12 @@ export function StatusSelect({
       }}
     >
       <Button
+        style={{
+          backgroundColor: 'var(--color-primary-500)',
+          color: 'white',
+        }}
         size="small"
-        className={` ${className} ${getColorClass(selectedIndex, columns.length)} flex items-center gap-1 rounded-full border-none  text-white`}
+        className={` ${className} ${getColorClass(selectedIndex, columns.length)} flex items-center gap-1 rounded-full border-none text-white`}
       >
         <span className="truncate">{value}</span>
         <DownOutlined className="text-[10px]" />

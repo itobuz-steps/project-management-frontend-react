@@ -1,64 +1,71 @@
 import { useEffect, useState } from 'react';
-import { Empty, Spin, Modal, Checkbox, Button, Tag, message } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Collapse, message } from 'antd';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { UserCell } from '../../utils/UserCell';
+
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import getTaskById, {
   getTaskByProjectId,
   updateTask,
 } from '../../services/taskService';
-import { Trash2 } from 'lucide-react';
-import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
+import { getProgressFromSubtasks } from '../../utils/getProgressFromSubtasks';
+import { useSubtaskColumns } from '../subtask/useSubtaskColumns';
+import { SubtasksHeader } from '../subtask/SubtasksHeader';
+import { SubtasksTable } from '../subtask/SubtasksTable';
+import { ManageSubtasks } from '../subtask/ManageSubtasks';
+import { getProjectById } from '../../services/projectService';
 
 export function SubtasksTab({ task }: { task: TaskPopulated }) {
+  const { projectId } = useParams();
   const [, setSearchParams] = useSearchParams();
-  const { projectId, taskId: currentTaskId } = useParams();
-
-  const [selectedIds, setSelectedIds] = useState<string[]>(
-    (task.subTask ?? []) as string[]
-  );
-
-  const [subtasks, setSubtasks] = useState<TaskPopulated[]>([]);
-  const [projectTasks, setProjectTasks] = useState<TaskPopulated[]>([]);
+  const [open, setOpen] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [subtasks, setSubtasks] = useState<TaskPopulated[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>(
+    (task.subTasks ?? []) as string[]
+  );
+  const [manageOpen, setManageOpen] = useState(false);
+
+  const [, setModalOpen] = useState(false);
+  const [projectTasks, setProjectTasks] = useState<TaskPopulated[]>([]);
+
+  const [draftIds, setDraftIds] = useState<string[]>([]);
+
+  const [columns, setColumns] = useState<string[]>([]);
+
+  const progress = getProgressFromSubtasks(subtasks, columns);
 
   useEffect(() => {
-    function setupSelectedIds() {
-      setSelectedIds((task.subTask ?? []) as string[]);
+    async function fetchColumns() {
+      const project = await getProjectById(task.projectId as unknown as string);
+      setColumns(project.columns);
     }
 
-    setupSelectedIds();
-  }, [task._id, task.subTask]);
+    fetchColumns();
+  }, [task.projectId]);
 
   useEffect(() => {
-    if (!selectedIds.length) return;
+    if (!selectedIds.length) {
+      setSubtasks([]);
+      return;
+    }
 
     let cancelled = false;
+    setLoading(true);
 
-    const fetchSubtasks = async () => {
-      setLoading(true);
-
-      const results = await Promise.all(
-        selectedIds.map((id) => getTaskById(id))
-      );
-
-      if (!cancelled) {
-        setSubtasks(results);
-        setLoading(false);
-      }
-    };
-
-    fetchSubtasks();
+    Promise.all(selectedIds.map((id) => getTaskById(id)))
+      .then((res) => {
+        if (!cancelled) setSubtasks(res);
+      })
+      .finally(() => !cancelled && setLoading(false));
 
     return () => {
       cancelled = true;
     };
   }, [selectedIds.join(',')]);
 
-  const openModal = async () => {
+  const openManage = async () => {
     setModalOpen(true);
+    setDraftIds(selectedIds);
 
     const tasks = await getTaskByProjectId(
       (projectId as string) ?? task.projectId
@@ -69,191 +76,103 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
     );
   };
 
-  const toggleSubtask = (subtaskId: string, checked: boolean) => {
-    setSelectedIds((prev) =>
-      checked
-        ? [...new Set([...prev, subtaskId])]
-        : prev.filter((id) => id !== subtaskId)
-    );
+  const saveSubtasks = async () => {
+    try {
+      await updateTask(task._id, { subTasks: draftIds });
+
+      await Promise.all(
+        draftIds.map((id) => updateTask(id, { parentTask: task._id }))
+      );
+
+      setSelectedIds(draftIds);
+      message.success('Subtasks updated');
+      setModalOpen(false);
+    } catch {
+      message.error('Failed to update subtasks');
+    }
   };
 
-  const removeSubtask = async (subtaskId: string) => {
-    const updatedIds = selectedIds.filter((id) => id !== subtaskId);
-    setSelectedIds(updatedIds);
-    setSubtasks((prev) => prev.filter((task) => task._id !== subtaskId));
+  const removeSubtask = async (id: string) => {
+    const updated = selectedIds.filter((task) => task !== id);
+
+    setSelectedIds(updated);
+    setSubtasks((subtask) => subtask.filter((task) => task._id !== id));
 
     try {
-      await updateTask(task._id, {
-        subTask: updatedIds,
-      });
-
+      await updateTask(task._id, { subTasks: updated });
+      await updateTask(id, { parentTask: undefined });
       message.success('Subtask removed');
     } catch {
       message.error('Failed to remove subtask');
     }
   };
 
-  const handleSaveSubtasks = async () => {
-    try {
-      await updateTask(task._id, {
-        subTask: selectedIds,
-      });
-
-      message.success('Subtasks updated');
-      setModalOpen(false);
-    } catch (error) {
-      console.error(error);
-      message.error('Failed to update subtasks');
-    }
+  const openTask = (id: string) => {
+    setSearchParams({ taskId: id }, { replace: true });
   };
 
-  const openSubtask = (subtaskId: string) => {
-    setSearchParams({ taskId: subtaskId }, { replace: true });
+  const updateSubtaskStatus = (id: string, status: string) => {
+    setSubtasks((prev) =>
+      prev.map((task) => (task._id === id ? { ...task, status } : task))
+    );
   };
+
+  const columnsSubtask = useSubtaskColumns({
+    columns,
+    openTask,
+    updateStatus: async (id, status) => {
+      updateSubtaskStatus(id, status);
+      await updateTask(id, { status });
+    },
+    removeSubtask,
+  });
 
   return (
     <>
-      {/* HEADER */}
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-600">
-          Subtasks ({selectedIds.length})
-        </h3>
-
-        <Button
-          size="small"
-          icon={<PlusOutlined />}
-          onClick={openModal}
-          style={{
-            backgroundColor: 'var(--color-primary-400)',
-            color: 'white',
-          }}
-        >
-          Manage
-        </Button>
-      </div>
-
-      {/* CONTENT */}
-      {loading ? (
-        <div className="flex justify-center py-6">
-          <Spin />
-        </div>
-      ) : !selectedIds.length ? (
-        <Empty />
-      ) : (
-        <div className="space-y-2">
-          {subtasks.map((subtask) => (
-            <div
-              key={subtask._id}
-              className={`group flex items-center justify-between rounded-lg border p-3 transition ${
-                currentTaskId === subtask._id
-                  ? 'border-primary-400 bg-primary-50'
-                  : 'bg-white hover:shadow-md'
-              }`}
-            >
-              <div
-                className="flex-1 cursor-pointer"
-                onClick={() => openSubtask(subtask._id)}
-              >
-                <div className="font-medium">
-                  <Tag color="blue">{subtask.key}</Tag> {subtask.title}
-                </div>
-                <div className="mt-1 flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-1">
-                    <TaskTypeIcon type={subtask.type} />
-                    <span className="text-xs text-gray-600 capitalize">
-                      {subtask.type}
-                    </span>
-                  </div>
-
-                  <Tag color="gold">{subtask.status}</Tag>
-
-                  <UserCell user={subtask.assignee} emptyText="Unassigned" />
-                </div>
-              </div>
-
-              <Button
-                size="small"
-                danger
-                type="text"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeSubtask(subtask._id);
+      <Collapse
+        ghost
+        className="jira-subtasks-collapse"
+        activeKey={open ? ['1'] : []}
+        onChange={() => setOpen((o) => !o)}
+        items={[
+          {
+            key: '1',
+            label: (
+              <SubtasksHeader
+                count={selectedIds.length}
+                progress={progress}
+                onAdd={() => {
+                  openManage();
+                  setManageOpen(true);
                 }}
-              >
-                <Trash2 size={16} />
-              </Button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* MODAL */}
-      <Modal
-        title="Manage Subtasks"
-        open={modalOpen}
-        onCancel={() => setModalOpen(false)}
-        onOk={handleSaveSubtasks}
-        footer={[
-          <Button key="cancel" onClick={() => setModalOpen(false)}>
-            Cancel
-          </Button>,
-          <Button
-            key="save"
-            type="primary"
-            onClick={handleSaveSubtasks}
-            style={{ backgroundColor: 'var(--color-primary-500)' }}
-          >
-            Save
-          </Button>,
-        ]}
-        styles={{
-          mask: {
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            backdropFilter: 'none',
-          },
-        }}
-      >
-        <div className="max-h-[420px] space-y-2 overflow-y-auto">
-          {projectTasks.map((task) => {
-            const isSubtask = selectedIds.includes(task._id);
-
-            return (
-              <div
-                key={task._id}
-                className={`flex items-center justify-between rounded border p-2 transition ${isSubtask ? 'border-primary-400 bg-primary-50' : 'hover:bg-gray-50'} `}
-              >
-                <div>
-                  <div className="text-sm font-medium">
-                    <Tag color="blue">{task.key}</Tag> {task.title}
-                  </div>
-
-                  <div className="flex gap-2 text-xs text-gray-500">
-                    <div className="flex items-center gap-2">
-                      <TaskTypeIcon type={task.type} />
-                      <span className="text-xs text-gray-600 capitalize">
-                        {task.type}
-                      </span>
-                    </div>
-
-                    <Tag color="gold">{task.status}</Tag>
-
-                    {isSubtask && (
-                      <Tag color="green" className="ml-2">
-                        Subtask
-                      </Tag>
-                    )}
-                  </div>
-                </div>
-
-                <Checkbox
-                  checked={selectedIds.includes(task._id)}
-                  onChange={(e) => toggleSubtask(task._id, e.target.checked)}
+              />
+            ),
+            children: (
+              <>
+                <SubtasksTable
+                  loading={loading}
+                  subtasks={subtasks}
+                  columns={columnsSubtask}
                 />
-              </div>
-            );
-          })}
-        </div>
-      </Modal>
+
+                {manageOpen && (
+                  <ManageSubtasks
+                    parentTask={task}
+                    projectId={task.projectId as string}
+                    columns={columns}
+                    projectTasks={projectTasks}
+                    setProjectTasks={setProjectTasks}
+                    draftIds={draftIds}
+                    setDraftIds={setDraftIds}
+                    onClose={() => setManageOpen(false)}
+                    onSave={saveSubtasks}
+                  />
+                )}
+              </>
+            ),
+          },
+        ]}
+      />
     </>
   );
 }
