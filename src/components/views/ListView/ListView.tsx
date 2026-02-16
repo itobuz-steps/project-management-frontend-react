@@ -9,6 +9,7 @@ import { StatusSelect } from '../../../utils/StatusSelect';
 import { getPriorityBorder } from '../../../utils/utils';
 import { useProject } from '../../../context/ProjectContext';
 import { listViewHeaders } from './listView.constants';
+import { Skeleton } from 'antd';
 
 const priorityStyles: Record<string, string> = {
   critical: 'bg-red-100 text-red-700',
@@ -129,7 +130,12 @@ function ListView() {
           {loading && (
             <tr>
               <td colSpan={11} className="p-4 text-center text-gray-500">
-                Loading tasks...
+                <div className="flex flex-col gap-2">
+                  <Skeleton.Input active={true} size="default" block={true} />
+                  <Skeleton.Input active={true} size="default" block={true} />
+                  <Skeleton.Input active={true} size="default" block={true} />
+                  <Skeleton.Input active={true} size="default" block={true} />
+                </div>
               </td>
             </tr>
           )}
