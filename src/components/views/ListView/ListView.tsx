@@ -77,7 +77,7 @@ function ListView() {
     };
 
     load();
-  }, [projectId, searchParams]);
+  }, [projectId, searchParams.get('searchInput')]);
 
   const handleStatusChange = (
     taskId: string,
