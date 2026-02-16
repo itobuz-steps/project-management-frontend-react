@@ -44,12 +44,12 @@ export function CreateSprintForm({
               if (
                 !storyPoint ||
                 !Number.isInteger(storyPoint) ||
-                storyPoint === undefined ||
                 storyPoint < 0
               ) {
                 toast.error('Please enter a valid number for story points');
                 return;
               }
+
               createSprintHandler(storyPoint);
               setShowForm(false);
             }}
