@@ -1,54 +1,49 @@
-import { Avatar, Button, Popconfirm, Space, Typography, Input } from 'antd';
+import { Avatar, Button, Popconfirm, Space, Typography } from 'antd';
 import { message } from 'antd';
 import { DeleteOutlined, PaperClipOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-import { marked } from 'marked';
 import { commentsApi } from '../../services/commentService';
 import { config } from '../../config/config';
 import type { CommentItemProps } from './taskDrawer.type';
 import { formatDistanceToNow } from 'date-fns';
+import { TextEditor } from '../textEditor/TextEditor';
 
 const { Text } = Typography;
-const { TextArea } = Input;
 
 export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
   const [messageApi, contextHolder] = message.useMessage();
-
   const [isEditing, setIsEditing] = useState(false);
-  const [messageText, setMessageText] = useState(comment.message);
-  const [, setSaving] = useState(false);
+  const [content, setContent] = useState(comment.message);
+  const [attachments, setAttachments] = useState<File[]>([]);
 
   const handleSave = async () => {
-    if (!messageText.trim()) {
+    if (!content.trim()) {
       messageApi.warning('Comment cannot be empty');
       return;
     }
 
-    setSaving(true);
-    try {
-      const updated = await commentsApi.updateComment(
-        comment.task as string,
-        comment._id,
-        {
-          message: messageText,
-        }
-      );
+    const formData = new FormData();
+    formData.append('message', content);
 
-      onUpdate({
-        ...comment,
-        ...updated,
-        author: comment.author,
-      });
-
-      messageApi.success('Comment updated successfully');
-      setIsEditing(false);
-    } finally {
-      setSaving(false);
+    if (attachments[0]) {
+      formData.append('attachment', attachments[0]);
     }
+
+    const updated = await commentsApi.updateComment(
+      comment.taskId as string,
+      comment._id,
+      {
+        message: content,
+      }
+    );
+
+    onUpdate({ ...comment, ...updated });
+    setIsEditing(false);
+    setAttachments([]);
   };
 
   const handleDelete = async () => {
-    await commentsApi.deleteComment(comment.task as string, comment._id);
+    await commentsApi.deleteComment(comment.taskId as string, comment._id);
     messageApi.success('Comment deleted');
     onDelete(comment._id);
   };
@@ -106,35 +101,23 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
               </Space>
             </Space>
 
-            {/* {!isEditing && (
-              <div className="text-[11px] text-gray-400 opacity-0 transition group-hover:opacity-100">
-                Click to edit · Enter to save
-              </div>
-            )} */}
-
             {!isEditing ? (
               <div
-                className="prose prose-sm max-w-none cursor-text rounded px-1 py-0.5 leading-snug hover:bg-gray-100"
+                className="prose prose-sm max-w-none cursor-text rounded px-1 py-0.5 hover:bg-gray-100"
                 onClick={() => setIsEditing(true)}
-                dangerouslySetInnerHTML={{
-                  __html: marked.parse(comment.message),
-                }}
+                dangerouslySetInnerHTML={{ __html: comment.message }}
               />
             ) : (
-              <TextArea
-                autoFocus
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                rows={3}
-                onBlur={handleSave}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') {
-                    setIsEditing(false);
-                    setMessageText(comment.message);
-                  }
-                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                    handleSave();
-                  }
+              <TextEditor
+                comment
+                content={content}
+                onChange={setContent}
+                onAttachmentsChange={setAttachments}
+                onSave={handleSave}
+                onCancel={() => {
+                  setIsEditing(false);
+                  setContent(comment.message);
+                  setAttachments([]);
                 }}
               />
             )}

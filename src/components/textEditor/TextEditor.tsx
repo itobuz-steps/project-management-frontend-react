@@ -22,6 +22,7 @@ export function TextEditor({
   onChange,
   onSave,
   onCancel,
+  onAttachmentsChange,
   disabled,
 }: {
   comment: boolean;
@@ -29,6 +30,7 @@ export function TextEditor({
   onChange: (html: string) => void;
   onSave: () => void;
   onCancel: () => void;
+  onAttachmentsChange?: (files: File[]) => void;
   disabled?: boolean;
 }) {
   const [attachments, setAttachments] = useState<{ file: File; url: string }[]>(
@@ -157,9 +159,10 @@ export function TextEditor({
           <Upload
             beforeUpload={(file) => {
               const url = URL.createObjectURL(file);
-              setAttachments((prev) => [...prev, { file, url }]);
-              message.success(`${file.name} attached!`);
-              return false; // prevent automatic upload
+              setAttachments([{ file, url }]);
+              onAttachmentsChange?.([file]);
+              message.success(`${file.name} attached`);
+              return false;
             }}
             maxCount={1}
             showUploadList={false}
@@ -244,9 +247,10 @@ export function TextEditor({
                 size="small"
                 type="text"
                 icon={<DeleteOutlined />}
-                onClick={() =>
-                  setAttachments((prev) => prev.filter((_, i) => i !== idx))
-                }
+                onClick={() => {
+                  setAttachments([]);
+                  onAttachmentsChange?.([]);
+                }}
               />
             </div>
           ))}
