@@ -62,7 +62,7 @@ function ListView() {
     };
 
     load();
-  }, [projectId, searchParams]);
+  }, [projectId, searchParams.get('searchInput')]);
 
   const handleUpdate = (taskId: string, patch: Partial<TaskPopulated>) => {
     setTasks((prev) =>
