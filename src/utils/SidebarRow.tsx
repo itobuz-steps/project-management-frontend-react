@@ -15,9 +15,8 @@ export function SidebarRow({
           : 'grid-cols-1'
       } `}
     >
-
       {hasLabel && (
-        <div className="flex px-2 py-1 text-[11px] leading-6 font-medium tracking-wide text-gray-500 hover:bg-gray-100">
+        <div className="mr-4 flex px-2 py-1 text-[11px] leading-6 font-medium tracking-wide text-gray-500 hover:bg-gray-100">
           {label}
         </div>
       )}

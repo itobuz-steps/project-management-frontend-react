@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Button, Select, Tag, message, Collapse } from 'antd';
+import { Button, Select, Tag, DatePicker, message, Collapse } from 'antd';
 import type { TaskPopulated, User } from '../../services/types/tasks.types';
 import { updateTask } from '../../services/taskService';
 import { SidebarRow } from '../../utils/SidebarRow';
 import { UserCell } from '../../utils/UserCell';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
-import { formatDateForInput } from '../../utils/utils';
 import { InputNumber, Dropdown, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import {
   PRIORITIES,
   PRIORITY_COLORS,
@@ -127,7 +127,7 @@ export function TaskDetails({
                         )}
                       </>
                     ) : (
-                      <span className="text-xs text-gray-400">Add labels</span>
+                      <span className="text-sm text-gray-400">Add labels</span>
                     )}
                   </div>
                 ) : (
@@ -289,11 +289,19 @@ export function TaskDetails({
               </SidebarRow>
 
               <SidebarRow label="Due Date">
-                <input
-                  type="date"
-                  value={formatDateForInput(task.dueDate)}
-                  onChange={async (e) => {
-                    const newDate = e.target.value;
+                <DatePicker
+                  className="w-full"
+                  size="small"
+                  placeholder="None"
+                  format="YYYY-MM-DD"
+                  value={task.dueDate ? dayjs(task.dueDate) : null}
+                  status={
+                    task.dueDate && dayjs(task.dueDate).isBefore(dayjs(), 'day')
+                      ? 'error'
+                      : undefined
+                  }
+                  onChange={async (date) => {
+                    const newDate = date ? date.toISOString() : null;
                     if (!newDate) return;
 
                     const optimistic = { ...task, dueDate: newDate };
@@ -303,14 +311,8 @@ export function TaskDetails({
                       await updateTask(task._id, { dueDate: newDate });
                     } catch {
                       message.error('Failed to update due date');
-                      onUpdated(task);
                     }
                   }}
-                  className={`w-full rounded-md border bg-gray-50 p-1 text-sm outline-none ${
-                    task.dueDate && new Date(task.dueDate) < new Date()
-                      ? 'text-red-600'
-                      : ''
-                  }`}
                 />
               </SidebarRow>
 

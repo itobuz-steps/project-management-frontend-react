@@ -1,11 +1,12 @@
 import { CSS } from '@dnd-kit/utilities';
 import { StatusSelect } from '../../utils/StatusSelect';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
-import { formatDateForInput, getPriorityBorder } from '../../utils/utils';
+import { getPriorityBorder } from '../../utils/utils';
+import { DatePicker, message } from 'antd';
+import dayjs from 'dayjs';
 import { Link, useSearchParams } from 'react-router-dom';
 import { updateTask } from '../../services/taskService';
 import { useSortable } from '@dnd-kit/sortable';
-import { message } from 'antd';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TaskTypeColor } from '../../utils/TaskTypeColor';
 import { config } from '../../config/config';
@@ -99,25 +100,29 @@ export function TaskRow({
         </div>
       </td>
       <td className="p-2 px-6 whitespace-nowrap">
-        <input
-          type="date"
-          value={formatDateForInput(task.dueDate)}
-          onChange={async (e) => {
-            const newDate = e.target.value;
-            if (!newDate) return;
+        <DatePicker
+          className="w-full min-w-[100px] max-w-[150px] shrink-0"
+          value={task.dueDate ? dayjs(task.dueDate) : null}
+          placeholder="None"
+          format="YYYY-MM-DD"
+          size="small"
+          status={
+            task.dueDate && dayjs(task.dueDate).isBefore(dayjs(), 'day')
+              ? 'error'
+              : undefined
+          }
+          onChange={async (date) => {
+            if (!date) return;
 
+            const newDate = date.toISOString();
             onPatch(task._id, { dueDate: newDate });
+
             try {
               await updateTask(task._id, { dueDate: newDate });
             } catch {
               message.error('Failed to update due date');
             }
           }}
-          className={`w-28 rounded-md border bg-gray-50 p-1 text-sm outline-none ${
-            task.dueDate && new Date(task.dueDate) < new Date()
-              ? 'text-red-600'
-              : ''
-          }`}
         />
       </td>
       <td className="p-2 px-6 whitespace-nowrap">

@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { Input, message } from 'antd';
+import { useEffect, useState } from 'react';
+import { message } from 'antd';
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { updateTask } from '../../services/taskService';
-
-const { TextArea } = Input;
+import { TextEditor } from '../textEditor/TextEditor';
 
 export function TaskDescription({
   task,
@@ -17,15 +16,10 @@ export function TaskDescription({
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(task.description || '');
   const [saving, setSaving] = useState(false);
-  const ref = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     setValue(task.description || '');
   }, [task.description]);
-
-  useEffect(() => {
-    if (editing) ref.current?.focus();
-  }, [editing]);
 
   const save = async () => {
     if (value === task.description) {
@@ -56,13 +50,13 @@ export function TaskDescription({
     setExpanded(false);
   };
 
-  const preview = task.description?.slice(0, 140) || '';
+  const previewText = value?.replace(/<[^>]+>/g, '').slice(0, 140);
 
   return (
     <div className="my-4">
-      {/* Header (Accordion trigger) */}
+      {/* Header */}
       <div
-        className="flex cursor-pointer items-center gap-2 text-sm font-bold text-gray-900 hover:text-gray-900"
+        className="flex cursor-pointer items-center gap-2 text-sm font-bold"
         onClick={() => {
           setExpanded((v) => !v);
           if (!task.description) setEditing(true);
@@ -77,39 +71,24 @@ export function TaskDescription({
         <div className="mt-2">
           {!editing ? (
             <div
-              className="group cursor-pointer rounded-md bg-gray-100 p-3 text-sm hover:bg-gray-200"
+              className="cursor-pointer rounded-md bg-gray-100 p-3 text-sm hover:bg-gray-200"
               onClick={() => setEditing(true)}
             >
               {task.description ? (
-                <span>{task.description}</span>
+                <div dangerouslySetInnerHTML={{ __html: task.description }} />
               ) : (
                 <span className="text-gray-400">Add a description…</span>
               )}
-
-              <span className="text-primary-500 ml-2 text-xs opacity-0 group-hover:opacity-100">
-                Edit
-              </span>
             </div>
           ) : (
-            <div className="rounded-md border bg-white p-2">
-              <TextArea
-                ref={ref}
-                value={value}
-                rows={4}
-                onChange={(e) => setValue(e.target.value)}
-                onBlur={save}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') cancel();
-                  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-                    save();
-                  }
-                }}
-                disabled={saving}
-              />
-              <div className="mt-1 text-xs text-gray-400">
-                Press <b>Ctrl/Cmd + Enter</b> to save · <b>Esc</b> to cancel
-              </div>
-            </div>
+            <TextEditor
+              comment={false}
+              content={value}
+              onChange={setValue}
+              onSave={save}
+              onCancel={cancel}
+              disabled={saving}
+            />
           )}
         </div>
       )}
@@ -123,10 +102,10 @@ export function TaskDescription({
             setEditing(!task.description);
           }}
         >
-          {preview ? (
+          {previewText ? (
             <span>
-              {preview}
-              {task.description && task.description.length > 140 && '…'}
+              {previewText}
+              {previewText.length >= 140 && '…'}
             </span>
           ) : (
             <span>Add a description…</span>

@@ -24,11 +24,9 @@ export function useSubtaskColumns({
     {
       title: 'Summary',
       render: (_, task) => (
-        <div
-          className="cursor-pointer hover:underline"
-          onClick={() => openTask(task._id)}
-        >
-          <Tag color="blue">{task.key}</Tag> {task.title}
+        <div onClick={() => openTask(task._id)}>
+          <Tag color="blue">{task.key}</Tag>{' '}
+          <span className="cursor-pointer hover:underline">{task.title}</span>
         </div>
       ),
     },
