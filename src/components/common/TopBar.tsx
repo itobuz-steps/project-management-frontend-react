@@ -9,6 +9,7 @@ import {
 import { useMemo, useState } from 'react';
 import { useProject } from '../../context/ProjectContext';
 import { PRIORITIES } from '../taskDrawer/constants';
+import SearchBar from '../navbar/SearchBar';
 // import AvatarGroup from '../AvatarGroup/AvatarGroup';
 
 const views: { label: string; value: ViewMode }[] = [
@@ -69,6 +70,7 @@ function TopBar({
         </h2>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* LEFT: View Switcher */}
+          <SearchBar />
           <div className="flex w-full flex-wrap items-center gap-1 rounded-md border border-gray-200 bg-white p-1 inset-shadow-sm/25 inset-shadow-gray-500 sm:w-auto">
             {views.map((view) => {
               return (
