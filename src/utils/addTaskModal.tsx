@@ -71,7 +71,7 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
         priority: String(values.priority).toLowerCase(),
         type: String(values.type).toLowerCase(),
         dueDate: values.dueDate?.toISOString(),
-        assignee: values.assignee || undefined,
+        assignee: values.assignee || null,
         attachments,
       });
 

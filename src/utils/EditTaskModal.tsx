@@ -30,9 +30,17 @@ export function EditTaskModal({ open, task, onClose, onUpdated }: Props) {
       const values = await form.validateFields();
       setSaving(true);
 
+      console.log('FRONTEND - values:', values);
+      console.log('FRONTEND - Sending payload:', {
+        ...values,
+        dueDate: values.dueDate?.toISOString(),
+        assignee: values.assignee || '',
+      });
+
       const updated = await updateTask(task._id, {
         ...values,
         dueDate: values.dueDate?.toISOString(),
+        assignee: values.assignee ?? '',
       });
 
       message.success('Task updated');
@@ -73,7 +81,7 @@ export function EditTaskModal({ open, task, onClose, onUpdated }: Props) {
           priority: task.priority,
           status: task.status,
           tags: task.tags,
-          assignee: task.assignee,
+          assignee: task.assignee?._id ?? '',
           dueDate: task.dueDate ? dayjs(task.dueDate) : null,
           // blocks: task.blocks,
           // blockedBy: task.blockedBy,
