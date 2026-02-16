@@ -4,16 +4,19 @@ import { Trash2 } from 'lucide-react';
 
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
-import { UserCell } from '../../utils/UserCell';
 import { StatusSelect } from '../../utils/StatusSelect';
 import { PRIORITY_COLORS } from '../taskDrawer/constants';
 import type { Args } from './subtask.types';
+import { AssigneeCell } from '../../utils/AssigneeCell';
 
 export function useSubtaskColumns({
   columns,
   openTask,
   updateStatus,
   removeSubtask,
+  members,
+  loadingMembers,
+  onUpdated,
 }: Args): ColumnsType<TaskPopulated> {
   return [
     {
@@ -64,7 +67,12 @@ export function useSubtaskColumns({
       title: 'Assignee',
       width: 100,
       render: (_, task) => (
-        <UserCell user={task.assignee} emptyText="Unassigned" />
+        <AssigneeCell
+          task={task}
+          members={members}
+          loading={loadingMembers}
+          onUpdated={onUpdated}
+        />
       ),
     },
     {

@@ -39,6 +39,8 @@ export type User = {
   profileImage?: string;
 };
 
+export type TaskAttachment = File | string;
+
 export interface TaskPopulated {
   _id: string;
   projectId: Project | string;
@@ -55,7 +57,7 @@ export interface TaskPopulated {
   parentTask?: string;
   subTasks?: string[];
   labels?: string[];
-  attachments?: FileList | File[];
+  attachments?: TaskAttachment[];
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;

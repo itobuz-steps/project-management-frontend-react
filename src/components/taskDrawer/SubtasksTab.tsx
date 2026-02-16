@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Collapse, message } from 'antd';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import type { TaskPopulated } from '../../services/types/tasks.types';
+import type { TaskPopulated, User } from '../../services/types/tasks.types';
 import getTaskById, {
   getTaskByProjectId,
   updateTask,
@@ -12,7 +12,10 @@ import { useSubtaskColumns } from '../subtask/useSubtaskColumns';
 import { SubtasksHeader } from '../subtask/SubtasksHeader';
 import { SubtasksTable } from '../subtask/SubtasksTable';
 import { ManageSubtasks } from '../subtask/ManageSubtasks';
-import { getProjectById } from '../../services/projectService';
+import {
+  getProjectById,
+  getProjectMembers,
+} from '../../services/projectService';
 
 export function SubtasksTab({ task }: { task: TaskPopulated }) {
   const { projectId } = useParams();
@@ -42,6 +45,34 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
 
     fetchColumns();
   }, [task.projectId]);
+
+  const [members, setMembers] = useState<User[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadMembers() {
+      setLoadingMembers(true);
+      try {
+        const result = await getProjectMembers(task.projectId as string);
+        if (mounted) setMembers(result);
+      } finally {
+        setLoadingMembers(false);
+      }
+    }
+
+    loadMembers();
+    return () => {
+      mounted = false;
+    };
+  }, [task.projectId]);
+
+  const onSubtaskUpdated = (updated: TaskPopulated) => {
+    setSubtasks((prev) =>
+      prev.map((t) => (t._id === updated._id ? updated : t))
+    );
+  };
 
   useEffect(() => {
     if (!selectedIds.length) {
@@ -125,6 +156,9 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
       await updateTask(id, { status });
     },
     removeSubtask,
+    members,
+    loadingMembers,
+    onUpdated: onSubtaskUpdated,
   });
 
   return (

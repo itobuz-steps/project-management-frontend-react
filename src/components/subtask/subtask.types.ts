@@ -1,4 +1,4 @@
-import type { TaskPopulated } from '../../services/types/tasks.types';
+import type { TaskPopulated, User } from '../../services/types/tasks.types';
 import type { ColumnsType } from 'antd/es/table';
 
 export type ManageSubtasksProps = {
@@ -33,4 +33,7 @@ export type Args = {
   openTask: (id: string) => void;
   updateStatus: (id: string, status: string) => Promise<void>;
   removeSubtask: (id: string) => void;
+  members: User[];
+  loadingMembers: boolean;
+  onUpdated: (t: TaskPopulated) => void;
 };

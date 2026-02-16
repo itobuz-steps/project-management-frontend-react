@@ -7,20 +7,27 @@ import dayjs from 'dayjs';
 import { Link, useSearchParams } from 'react-router-dom';
 import { updateTask } from '../../services/taskService';
 import { useSortable } from '@dnd-kit/sortable';
-import type { TaskPopulated } from '../../services/types/tasks.types';
+import type { TaskPopulated, User } from '../../services/types/tasks.types';
 import { TaskTypeColor } from '../../utils/TaskTypeColor';
 import { config } from '../../config/config';
+import { AssigneeCell } from '../../utils/AssigneeCell';
 
 export function TaskRow({
   task,
   containerId,
   columns,
   onPatch,
+  members,
+  loadingMembers,
+  onUpdated,
 }: {
   task: TaskPopulated;
   containerId: string;
   columns: string[];
   onPatch: (id: string, patch: Partial<TaskPopulated>) => void;
+  members: User[];
+  loadingMembers: boolean;
+  onUpdated: (t: TaskPopulated) => void;
 }) {
   const [, setSearchParams] = useSearchParams();
   // const location = useLocation();
@@ -87,21 +94,16 @@ export function TaskRow({
         />
       </td>
       <td className="p-2 px-6 whitespace-nowrap">
-        <div className="flex items-center">
-          <img
-            className="mr-3 aspect-square h-6 w-6 rounded-full object-cover"
-            src={
-              task.assignee?.profileImage
-                ? `${config.api_base_url}/uploads/${task.assignee?.profileImage}`
-                : '/profile.png'
-            }
-          />
-          {task.assignee?.name ?? 'Unassigned'}
-        </div>
+        <AssigneeCell
+          task={task}
+          members={members}
+          loading={loadingMembers}
+          onUpdated={onUpdated}
+        />
       </td>
       <td className="p-2 px-6 whitespace-nowrap">
         <DatePicker
-          className="w-full min-w-[100px] max-w-[150px] shrink-0"
+          className="w-full max-w-[150px] min-w-[100px] shrink-0"
           value={task.dueDate ? dayjs(task.dueDate) : null}
           placeholder="None"
           format="YYYY-MM-DD"

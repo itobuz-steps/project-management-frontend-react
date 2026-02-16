@@ -15,6 +15,7 @@ import {
   TASK_TYPES,
 } from './constants';
 import { getProjectMembers } from '../../services/projectService';
+import { AssigneeCell } from '../../utils/AssigneeCell';
 
 export function TaskDetails({
   task,
@@ -25,7 +26,6 @@ export function TaskDetails({
 }) {
   const [editing, setEditing] = useState<'priority' | 'type' | null>(null);
   const [editingLabels, setEditingLabels] = useState(false);
-  const [editingAssignee, setEditingAssignee] = useState(false);
   const [members, setMembers] = useState<User[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
 
@@ -60,52 +60,13 @@ export function TaskDetails({
           children: (
             <div className="space-y-4">
               <SidebarRow label="Assignee">
-                {!editingAssignee ? (
-                  <div
-                    className="cursor-pointer rounded-md hover:bg-gray-100"
-                    onClick={() => {
-                      setEditingAssignee(true);
-                      loadMembers();
-                    }}
-                  >
-                    <UserCell user={task.assignee} emptyText="Unassigned" />
-                  </div>
-                ) : (
-                  <Select
-                    autoFocus
-                    className="w-full"
-                    loading={loadingMembers}
-                    value={task.assignee?._id ?? null}
-                    placeholder="Unassigned"
-                    allowClear
-                    onBlur={() => setEditingAssignee(false)}
-                    onChange={async (userId) => {
-                      const selectedUser = members.find(
-                        (m) => m._id === userId
-                      );
-
-                      const optimistic: TaskPopulated = {
-                        ...task,
-                        assignee: selectedUser as unknown as User,
-                      };
-                      onUpdated(optimistic);
-                      setEditingAssignee(false);
-
-                      try {
-                        await updateTask(task._id, {
-                          assignee: (userId as unknown as User) ?? undefined,
-                        });
-                      } catch {
-                        message.error('Failed to update assignee');
-                        onUpdated(task);
-                      }
-                    }}
-                    options={members.map((member) => ({
-                      value: member._id,
-                      label: <UserCell user={member} emptyText="—" />,
-                    }))}
-                  />
-                )}
+                <AssigneeCell
+                  task={task}
+                  members={members}
+                  loading={loadingMembers}
+                  loadMembers={loadMembers}
+                  onUpdated={onUpdated}
+                />
               </SidebarRow>
 
               <SidebarRow label="Labels">

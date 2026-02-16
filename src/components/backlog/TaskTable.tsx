@@ -6,7 +6,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import type { TaskTableProps } from './type';
-import type { TaskPopulated } from '../../services/types/tasks.types';
+import type { TaskPopulated, User } from '../../services/types/tasks.types';
 import { createSprintService } from '../../services/sprints.service';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
@@ -14,6 +14,7 @@ import { SprintMenu } from './SprintMenu';
 import { TaskRow } from './TaskRow';
 import { SprintButton } from './SprintButton';
 import { useProject } from '../../context/ProjectContext';
+import { getProjectMembers } from '../../services/projectService';
 
 export function TaskTable({
   sprint,
@@ -32,6 +33,36 @@ export function TaskTable({
   useEffect(() => {
     setLocalTasks(tasks);
   }, [tasks]);
+
+  const [members, setMembers] = useState<User[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadMembers() {
+      if (!project?._id) return;
+
+      setLoadingMembers(true);
+      try {
+        const res = await getProjectMembers(project._id);
+        if (mounted) setMembers(res);
+      } finally {
+        setLoadingMembers(false);
+      }
+    }
+
+    loadMembers();
+    return () => {
+      mounted = false;
+    };
+  }, [project?._id]);
+
+  const onTaskUpdated = (updated: TaskPopulated) => {
+    setLocalTasks((prev) =>
+      prev.map((t) => (t._id === updated._id ? updated : t))
+    );
+  };
 
   const updateTaskInState = (id: string, patch: Partial<TaskPopulated>) => {
     setLocalTasks((previous) =>
@@ -208,6 +239,9 @@ export function TaskTable({
                       containerId={containerId}
                       columns={columns}
                       onPatch={updateTaskInState}
+                      members={members}
+                      loadingMembers={loadingMembers}
+                      onUpdated={onTaskUpdated}
                     />
                   ))
                 )}

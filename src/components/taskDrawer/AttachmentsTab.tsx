@@ -1,66 +1,140 @@
-import { Empty, List, Typography, Space, Card } from 'antd';
-import { PaperClipOutlined, FileOutlined } from '@ant-design/icons';
+import { useMemo, useState } from 'react';
+import { Empty, Typography, Button, Upload, message } from 'antd';
+import type { UploadProps } from 'antd';
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  DownOutlined,
+  RightOutlined,
+} from '@ant-design/icons';
+import type {
+  TaskAttachment,
+  TaskPopulated,
+} from '../../services/types/tasks.types';
+import { updateTask } from '../../services/taskService';
 import { config } from '../../config/config';
-import type { AttachmentsTabProps } from './taskDrawer.type';
 
-const { Text, Link } = Typography;
+const { Link, Text } = Typography;
 
-export function AttachmentsTab({ task }: AttachmentsTabProps) {
-  const attachments = Array.isArray(task.attachments)
-    ? task.attachments
-    : task.attachments
-      ? Array.from(task.attachments)
-      : [];
+export function AttachmentsTab({
+  task,
+  onUpdated,
+}: {
+  task: TaskPopulated;
+  onUpdated?: (task: TaskPopulated) => void;
+}) {
+  const [expanded, setExpanded] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  if (!attachments.length) {
-    return (
-      <div className="flex justify-center py-2">
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No attachments yet"
-        />
-      </div>
-    );
-  }
+  const attachments = useMemo<TaskAttachment[]>(() => {
+    if (!task.attachments) return [];
+    return Array.isArray(task.attachments)
+      ? task.attachments
+      : Array.from(task.attachments);
+  }, [task.attachments]);
+
+  const uploadProps: UploadProps = {
+    multiple: true,
+    showUploadList: false,
+    beforeUpload: async (file) => {
+      const updated = [...attachments, file];
+
+      setSaving(true);
+      onUpdated?.({ ...task, attachments: updated });
+
+      try {
+        await updateTask(task._id, { attachments: updated });
+        message.success('Attachment added');
+      } catch {
+        message.error('Failed to add attachment');
+        onUpdated?.(task);
+      } finally {
+        setSaving(false);
+      }
+
+      return false;
+    },
+  };
+
+  const removeAttachment = async (target: TaskAttachment) => {
+    const updated = attachments.filter((a) => a !== target);
+
+    setSaving(true);
+    onUpdated?.({ ...task, attachments: updated });
+
+    try {
+      await updateTask(task._id, { attachments: updated });
+      message.success('Attachment removed');
+    } catch {
+      message.error('Failed to remove attachment');
+      onUpdated?.(task);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
-    <div className="py-3">
-      <Card
-        size="small"
-        title={
-          <Space>
-            <PaperClipOutlined />
-            <span>Attachments</span>
-          </Space>
-        }
-        className="shadow-sm"
+    <div className="my-4">
+      {/* Header */}
+      <div
+        className="flex cursor-pointer items-center justify-between text-sm font-semibold text-gray-700 hover:text-gray-900"
+        onClick={() => setExpanded((v) => !v)}
       >
-        <List
-          itemLayout="horizontal"
-          dataSource={attachments}
-          renderItem={(file) => {
-            const fileName = typeof file === 'string' ? file : file.name;
-            const fileUrl = `${config.api_base_url}/uploads/${fileName}`;
+        <div className="flex items-center gap-2">
+          {expanded ? <DownOutlined /> : <RightOutlined />}
+          <span>Attachments</span>
+          <span className="font-bold">({attachments.length})</span>
+        </div>
 
-            return (
-              <List.Item className="rounded-md px-6 hover:bg-gray-50">
-                <List.Item.Meta
-                  avatar={<FileOutlined className="text-primary-500 text-lg" />}
-                  title={
-                    <Link
-                      href={fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Text>{fileName}</Text>
+        <div onClick={(e) => e.stopPropagation()}>
+          <Upload {...uploadProps} disabled={saving}>
+            <Button size="small" icon={<PlusOutlined />}>
+              Add
+            </Button>
+          </Upload>
+        </div>
+      </div>
+
+      {/* Body */}
+      {expanded && (
+        <div className="mt-1 ml-4">
+          {!attachments.length ? (
+            <Empty description="No attachments yet" />
+          ) : (
+            <div className="space-y-2">
+              {attachments.map((attachment) => {
+                const isFile = attachment instanceof File;
+
+                const name = isFile ? attachment.name : attachment;
+
+                const url = isFile
+                  ? URL.createObjectURL(attachment)
+                  : `${config.api_base_url}/uploads/attachments/${attachment}`;
+
+                return (
+                  <div
+                    key={`${name}-${isFile ? attachment.size : 'server'}`}
+                    className="group flex items-center justify-between rounded-md bg-gray-100 px-3 py-2 hover:bg-gray-50"
+                  >
+                    <Link href={url} target="_blank">
+                      <Text>{name}</Text>
                     </Link>
-                  }
-                />
-              </List.Item>
-            );
-          }}
-        />
-      </Card>
+
+                    <Button
+                      type="text"
+                      danger
+                      size="small"
+                      icon={<DeleteOutlined />}
+                      className="opacity-0 group-hover:opacity-100"
+                      onClick={() => removeAttachment(attachment)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
