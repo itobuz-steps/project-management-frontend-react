@@ -42,28 +42,30 @@ export function CommandPalette({
   useEffect(() => {
     if (!open || !projectId) return;
 
-    setLoading(true);
+    let ignore = false;
 
-    getTasks({ projectId })
-      .then((res) => {
-        const tasks: Task[] = Array.isArray(res)
-          ? res
-          : (((res as Record<string, unknown>).result as Task[]) ?? []);
+    const fetchRecentTasks = async () => {
+      setLoading(true);
+      const tasks = await getTasks({ projectId });
+      if (ignore) return;
 
-        const recent = [...tasks]
-          .filter((t) => t.createdAt)
-          .sort(
-            (a, b) =>
-              new Date(b.createdAt!).getTime() -
-              new Date(a.createdAt!).getTime()
-          )
-          .slice(0, 5);
+      const recent = [...tasks]
+        .filter((t) => t.createdAt)
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+        )
+        .slice(0, 5);
 
-        setRecentTasks(recent);
-      })
+      setRecentTasks(recent);
+      setLoading(false);
+    };
 
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    fetchRecentTasks();
+
+    return () => {
+      ignore = true;
+    };
   }, [open, projectId]);
 
   // search tasks when value changes (debounced)
@@ -73,20 +75,22 @@ export function CommandPalette({
       return;
     }
 
-    setSearchLoading(true);
-    const timer = setTimeout(() => {
-      getTasks({ projectId, searchInput: value.trim() })
-        .then((res) => {
-          const tasks: Task[] = Array.isArray(res)
-            ? res
-            : (((res as Record<string, unknown>).result as Task[]) ?? []);
-          setSearchResults(tasks);
-        })
-        .catch(console.error)
-        .finally(() => setSearchLoading(false));
+    let ignore = false;
+
+    const timer = setTimeout(async () => {
+      setSearchLoading(true);
+      const tasks = await getTasks({ projectId, searchInput: value.trim() });
+      if (ignore) {
+        return;
+      }
+      setSearchResults(tasks);
+      setSearchLoading(false);
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      ignore = true;
+      clearTimeout(timer);
+    };
   }, [open, projectId, value]);
 
   // esc to close
