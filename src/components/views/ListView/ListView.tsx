@@ -1,37 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { getTasks } from '../../../services/taskService';
 import { updateTask } from '../../../services/taskService';
-import type { Task, TaskStatus } from '../../../services/types/tasks.types';
-import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
-import { TaskTypeColor } from '../../../utils/TaskTypeColor';
-import { StatusSelect } from '../../../utils/StatusSelect';
-import { getPriorityBorder } from '../../../utils/utils';
+import type {
+  Task,
+  TaskPopulated,
+  TaskStatus,
+} from '../../../services/types/tasks.types';
 import { useProject } from '../../../context/ProjectContext';
 import { listViewHeaders } from './listView.constants';
-
-const priorityStyles: Record<string, string> = {
-  critical: 'bg-red-100 text-red-700',
-  high: 'bg-yellow-100 text-yellow-700',
-  medium: 'bg-primary-100 text-primary-700',
-  low: 'bg-green-100 text-green-700',
-};
-
-const formatDate = (value?: string) => {
-  if (!value) return '—';
-  return new Date(value).toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-};
+import { TaskRow } from '../../backlog/TaskRow';
 
 function ListView() {
   const { projectId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const { columns } = useProject();
 
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskPopulated[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -79,22 +64,14 @@ function ListView() {
     load();
   }, [projectId, searchParams]);
 
-  const handleStatusChange = (
-    taskId: string,
-    nextStatus: TaskStatus,
-    previousStatus: TaskStatus
-  ) => {
+  const handleUpdate = (taskId: string, patch: Partial<TaskPopulated>) => {
     setTasks((prev) =>
-      prev.map((task) =>
-        task._id === taskId ? { ...task, status: nextStatus } : task
-      )
+      prev.map((task) => (task._id === taskId ? { ...task, ...patch } : task))
     );
 
-    void updateTask(taskId, { status: nextStatus }).catch(() => {
+    void updateTask(taskId, patch).catch(() => {
       setTasks((prev) =>
-        prev.map((task) =>
-          task._id === taskId ? { ...task, status: previousStatus } : task
-        )
+        prev.map((task) => (task._id === taskId ? { ...task, ...patch } : task))
       );
     });
   };
@@ -114,14 +91,39 @@ function ListView() {
 
   return (
     <div className="no-scrollbar relative mt-2 w-full overflow-x-auto rounded-md border border-gray-200">
-      <table className="min-w-full table-auto overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
-        <thead className="z-10 bg-[#f8f8f8] text-xs font-semibold text-gray-500 uppercase">
+      <table className="min-w-full table-auto text-left text-sm">
+        <thead className="sticky top-0 z-10 border-b bg-gray-100 text-xs text-gray-600 uppercase">
           <tr>
-            {listViewHeaders.map((header) => (
-              <th key={header.key} className="p-3">
-                {header.label}
-              </th>
-            ))}
+            <th scope="col" className="p-2 text-center">
+              Type
+            </th>
+            <th scope="col" className="p-2">
+              Key
+            </th>
+            <th scope="col" className="p-2 px-6">
+              Summary
+            </th>
+            <th scope="col" className="p-2 px-6">
+              Status
+            </th>
+            <th scope="col" className="p-2 px-6">
+              Assignee
+            </th>
+            <th scope="col" className="p-2 px-6">
+              Due Date
+            </th>
+            <th scope="col" className="p-2 px-6">
+              Labels
+            </th>
+            <th scope="col" className="p-2 px-6">
+              Created
+            </th>
+            <th scope="col" className="p-2 px-6">
+              Updated
+            </th>
+            <th scope="col" className="p-2 px-6">
+              Reporter
+            </th>
           </tr>
         </thead>
 
@@ -153,99 +155,13 @@ function ListView() {
           {!loading &&
             !error &&
             visibleTasks.map((task) => (
-              <tr
+              <TaskRow
                 key={task._id}
-                className={`cursor-pointer hover:bg-gray-50 ${getPriorityBorder(
-                  task.priority
-                )}`}
-                onClick={() => {
-                  setSearchParams({ taskId: task._id }, { replace: true });
-                }}
-              >
-                <td className="p-3">
-                  <TaskTypeIcon type={task.type} />
-                </td>
-                <td>
-                  <Link
-                    to={`/task/${task._id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="h-full w-full p-1 whitespace-nowrap"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <TaskTypeColor type={task.type}>
-                      {task.key ?? task._id}
-                    </TaskTypeColor>
-                  </Link>
-                </td>
-                <td className="p-3 font-medium whitespace-nowrap text-gray-900 hover:underline">
-                  {task.title}
-                </td>
-                <td
-                  className="p-3"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <StatusSelect
-                    taskId={task._id}
-                    value={task.status}
-                    columns={columns}
-                    onChange={(value) =>
-                      handleStatusChange(
-                        task._id,
-                        value as TaskStatus,
-                        task.status as TaskStatus
-                      )
-                    }
-                  />
-                </td>
-                <td className="p-3 whitespace-nowrap text-gray-700">
-                  {task.assignee?.name
-                    ? String(task.assignee.name)
-                    : 'Unassigned'}
-                </td>
-                <td className="p-3">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${
-                      priorityStyles[task.priority] ||
-                      'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    {task.priority}
-                  </span>
-                </td>
-                <td className="p-3 whitespace-nowrap text-gray-700">
-                  {task.reporter?.name ? String(task.reporter.name) : 'Unknown'}
-                </td>
-                <td className="w-full p-3">
-                  <div className="flex flex-wrap gap-1 whitespace-nowrap">
-                    {task.tags?.slice(0, 1).map((label) => (
-                      <span
-                        key={label}
-                        className="rounded bg-blue-100 px-2 py-0.5 text-xs whitespace-nowrap text-blue-700"
-                      >
-                        {label}
-                      </span>
-                    ))}
-                    {task.tags && task.tags.length > 1 && (
-                      <span className="rounded bg-gray-200 px-2 py-0.5 text-xs whitespace-nowrap">
-                        +{task.tags.length - 1}
-                      </span>
-                    )}
-                    {!task.tags?.length && (
-                      <span className="text-xs text-gray-400">—</span>
-                    )}
-                  </div>
-                </td>
-                <td className="p-3 whitespace-nowrap text-gray-600">
-                  {formatDate(task.createdAt)}
-                </td>
-                <td className="p-3 whitespace-nowrap text-gray-600">
-                  {formatDate(task.dueDate)}
-                </td>
-                <td className="p-3 whitespace-nowrap text-gray-600">
-                  {formatDate(task.updatedAt)}
-                </td>
-              </tr>
+                task={task}
+                onPatch={handleUpdate}
+                columns={columns}
+                containerId={projectId}
+              />
             ))}
         </tbody>
       </table>
