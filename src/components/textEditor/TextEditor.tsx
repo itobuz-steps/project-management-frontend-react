@@ -15,6 +15,7 @@ import type { Level } from '@tiptap/extension-heading';
 import { Upload, Button, message } from 'antd';
 import { PaperClipOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import type { TextEditorProps } from './textEditor.type';
 
 export function TextEditor({
   comment,
@@ -24,15 +25,7 @@ export function TextEditor({
   onCancel,
   onAttachmentsChange,
   disabled,
-}: {
-  comment: boolean;
-  content: string;
-  onChange: (html: string) => void;
-  onSave: () => void;
-  onCancel: () => void;
-  onAttachmentsChange?: (files: File[]) => void;
-  disabled?: boolean;
-}) {
+}: TextEditorProps) {
   const [attachments, setAttachments] = useState<{ file: File; url: string }[]>(
     []
   );

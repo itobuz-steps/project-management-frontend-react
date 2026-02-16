@@ -151,9 +151,9 @@ export function TaskDetails({
                         onUpdated(task);
                       }
                     }}
-                    options={PRIORITIES.map((p) => ({
-                      value: p,
-                      label: <span className="capitalize">{p}</span>,
+                    options={PRIORITIES.map((priority) => ({
+                      value: priority,
+                      label: <span className="capitalize">{priority}</span>,
                     }))}
                   />
                 )}

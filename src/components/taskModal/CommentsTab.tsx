@@ -5,6 +5,7 @@ import type { Comment } from '../../services/types/comments.types';
 import { CommentItem } from './CommentItem';
 import type { CommentsTabProps } from './taskDrawer.type';
 import { TextEditor } from '../textEditor/TextEditor';
+import { COMMENT_TEMPLATES } from './constants';
 
 export function CommentsTab({ taskId }: CommentsTabProps) {
   const [comments, setComments] = useState<Comment[]>([]);
@@ -13,12 +14,6 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [content, setContent] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
-
-  const COMMENT_TEMPLATES = [
-    'Who is working on this?',
-    'Status update:',
-    'Thanks!',
-  ];
 
   const handleSubmit = async () => {
     if (!content.trim()) {
@@ -99,16 +94,16 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
 
                 {/* Templates */}
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {COMMENT_TEMPLATES.map((tpl) => (
+                  {COMMENT_TEMPLATES.map((template) => (
                     <button
-                      key={tpl}
+                      key={template}
                       onClick={() => {
-                        setContent(tpl + ' ');
+                        setContent(template + ' ');
                         setIsComposerOpen(true);
                       }}
                       className="rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 hover:bg-gray-50"
                     >
-                      {tpl}
+                      {template}
                     </button>
                   ))}
                 </div>
@@ -148,11 +143,15 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
               key={comment._id}
               comment={comment}
               onDelete={(id) =>
-                setComments((prev) => prev.filter((c) => c._id !== id))
+                setComments((prev) =>
+                  prev.filter((comment) => comment._id !== id)
+                )
               }
               onUpdate={(updated) =>
                 setComments((prev) =>
-                  prev.map((c) => (c._id === updated._id ? updated : c))
+                  prev.map((comment) =>
+                    comment._id === updated._id ? updated : comment
+                  )
                 )
               }
             />

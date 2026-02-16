@@ -46,21 +46,21 @@ export function ManageSubtasks({
 
       {/* List */}
       <div className="max-h-[260px] overflow-y-auto">
-        {projectTasks.map((t) => {
-          const checked = draftIds.includes(t._id);
+        {projectTasks.map((task) => {
+          const checked = draftIds.includes(task._id);
 
           return (
             <div
-              key={t._id}
+              key={task._id}
               className={`flex items-center justify-between border-b border-gray-200 px-2 py-1 transition ${
                 checked ? 'bg-primary-50' : 'hover:bg-gray-100'
               }`}
             >
               <div className="flex items-center gap-2 truncate text-sm text-gray-700">
-                <TaskTypeIcon type={t.type} />
+                <TaskTypeIcon type={task.type} />
                 <span className="truncate">
-                  <span className="mr-1 text-gray-500">{t.key}</span>
-                  {t.title}
+                  <span className="mr-1 text-gray-500">{task.key}</span>
+                  {task.title}
                 </span>
               </div>
 
@@ -69,8 +69,8 @@ export function ManageSubtasks({
                 onChange={(e) =>
                   setDraftIds((prev) =>
                     e.target.checked
-                      ? [...prev, t._id]
-                      : prev.filter((x) => x !== t._id)
+                      ? [...prev, task._id]
+                      : prev.filter((x) => x !== task._id)
                   )
                 }
               />
@@ -100,7 +100,7 @@ export function ManageSubtasks({
                   status: columns[0],
                 });
 
-                setProjectTasks((p) => [...p, newTask]);
+                setProjectTasks((project) => [...project, newTask]);
                 setDraftIds((ids) => [...ids, newTask._id]);
 
                 setNewTitle('');

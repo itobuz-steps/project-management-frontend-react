@@ -57,7 +57,7 @@ export function AttachmentsTab({
   };
 
   const removeAttachment = async (target: TaskAttachment) => {
-    const updated = attachments.filter((a) => a !== target);
+    const updated = attachments.filter((attachment) => attachment !== target);
 
     setSaving(true);
     onUpdated?.({ ...task, attachments: updated });

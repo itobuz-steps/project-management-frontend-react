@@ -9,3 +9,9 @@ export const PRIORITY_COLORS: Record<Priority, string> = {
 };
 
 export const STORY_POINTS = [1, 2, 3, 5, 8, 13];
+
+export const COMMENT_TEMPLATES = [
+  'Who is working on this?',
+  'Status update:',
+  'Thanks!',
+];
