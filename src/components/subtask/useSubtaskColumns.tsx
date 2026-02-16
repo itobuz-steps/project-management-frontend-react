@@ -5,7 +5,7 @@ import { Trash2 } from 'lucide-react';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { StatusSelect } from '../../utils/StatusSelect';
-import { PRIORITY_COLORS } from '../taskDrawer/constants';
+import { PRIORITY_COLORS } from '../taskModal/constants';
 import type { Args } from './subtask.types';
 import { AssigneeCell } from '../../utils/AssigneeCell';
 

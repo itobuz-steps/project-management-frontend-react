@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { TaskPopulated } from '../services/types/tasks.types';
 import getTaskById from '../services/taskService';
-import { TaskView } from '../components/taskDrawer/TaskView';
-import { TaskModalHeader } from '../components/taskDrawer/TaskModalHeader';
+import { TaskView } from '../components/taskModal/TaskView';
+import { TaskModalHeader } from '../components/taskModal/TaskModalHeader';
 import { useIsMobile } from '../utils/isMobile';
 
 export default function TaskPage() {

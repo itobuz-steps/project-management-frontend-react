@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/sidebar/Sidebar';
 import Navbar from '../components/navbar/Navbar';
-import TaskModal from '../components/taskDrawer/TaskModal';
+import TaskModal from '../components/taskModal/TaskModal';
 import { CommandPalette } from '../components/common/CommandPalette';
 import { useSearchParams } from 'react-router-dom';
 
