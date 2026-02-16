@@ -94,7 +94,7 @@ function BacklogView() {
     if (projectId) {
       loadData(projectId);
     }
-  }, [projectId, type, searchParams]);
+  }, [projectId, type, searchParams.get('searchInput')]);
 
   if (!projectId) {
     return (
