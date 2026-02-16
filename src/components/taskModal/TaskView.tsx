@@ -30,7 +30,7 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
       className={`no-scrollbar flex h-full ${isMobile ? 'flex-col overflow-y-auto' : 'overflow-hidden'} `}
     >
       <div
-        className={`flex-1 ${isMobile ? 'overflow-visible' : 'overflow-y-auto pr-2'} `}
+        className={`flex-1 ${isMobile ? 'overflow-visible' : 'overflow-y-auto pr-3'} `}
       >
         <TaskDescription
           task={task}

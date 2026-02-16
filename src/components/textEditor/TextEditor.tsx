@@ -207,7 +207,7 @@ export function TextEditor({
       {/* Editor */}
       <EditorContent
         editor={editor}
-        className="prose prose-sm max-w-none p-4 text-gray-800 focus:outline-none"
+        className="prose prose-sm max-w-none p-3 text-gray-800 focus:outline-none"
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
             e.preventDefault();
@@ -223,18 +223,18 @@ export function TextEditor({
       {/* Attachments below editor */}
       {attachments.length > 0 && (
         <div className="mt-2 flex flex-col gap-1 px-4">
-          {attachments.map((att, idx) => (
+          {attachments.map((attachment, idx) => (
             <div
               key={idx}
               className="flex items-center justify-between rounded-md bg-gray-50 px-2 py-1 text-sm"
             >
               <a
-                href={att.url}
+                href={attachment.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 truncate text-gray-700"
               >
-                <PaperClipOutlined /> {att.file.name}
+                <PaperClipOutlined /> {attachment.file.name}
               </a>
               <Button
                 size="small"
