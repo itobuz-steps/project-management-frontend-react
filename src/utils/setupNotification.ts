@@ -1,8 +1,8 @@
+import { config } from '../config/config';
 import notificationService from '../services/notificationService';
 import userService from '../services/userService';
 
-const PUBLIC_VAPID_KEY =
-  'BBxyBixxdLHGQaKCZSYguTcuFmIW9tyQQnMKOsZcQxgwjBFsHRWbSXMK2aiqQqOWkCriNtu6mDnRljyFzss8kOU';
+const PUBLIC_VAPID_KEY = config.vapid_public_key;
 
 export function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
