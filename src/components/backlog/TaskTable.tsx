@@ -12,7 +12,6 @@ import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
 import { SprintMenu } from './SprintMenu';
 import { TaskRow } from './TaskRow';
-import { SprintButton } from './SprintButton';
 import { useProject } from '../../context/ProjectContext';
 import { CreateSprintForm } from './CreateSprintForm';
 
@@ -138,7 +137,7 @@ export function TaskTable({
             />
           )}
 
-          {!sprint && (
+          {!sprint && project?.projectType == 'scrum' && (
             <CreateSprintForm createSprintHandler={createSprintHandler} />
           )}
         </div>
