@@ -14,6 +14,7 @@ import { SprintMenu } from './SprintMenu';
 import { TaskRow } from './TaskRow';
 import { SprintButton } from './SprintButton';
 import { useProject } from '../../context/ProjectContext';
+import { CreateSprintForm } from './CreateSprintForm';
 
 export function TaskTable({
   sprint,
@@ -89,10 +90,11 @@ export function TaskTable({
     }
   }
 
-  async function createSprintHandler() {
+  async function createSprintHandler(storyPoint: number) {
     try {
       const sprint = await sprintService.createSprint({
         projectId: project?._id || '',
+        storyPoint,
       });
 
       setSprints?.((prevSprints) => [sprint, ...prevSprints]);
@@ -106,25 +108,27 @@ export function TaskTable({
   return (
     <div className="rounded-lg bg-white shadow-sm">
       {/* Sprint Header */}
-      <div className="flex w-full items-center justify-between rounded-t-lg bg-gray-100 px-4 py-2 text-left hover:bg-gray-100">
+      <div className="flex w-full items-center justify-between rounded-t-lg bg-gray-100 px-1 py-2 text-left hover:bg-gray-100 sm:px-4">
         <div
           onClick={() => setOpen(!open)}
-          className="flex cursor-pointer items-center gap-2"
+          className="xs:gap-2 flex cursor-pointer items-center gap-1"
         >
           <ChevronDown
             className={`h-4 w-4 transition ${open ? '' : '-rotate-90'}`}
           />
-          <span className="font-semibold">{title || sprint?.key}</span>
-          {sprint?.dueDate && (
-            <span className="bg-primary-50 text-primary-600 rounded-full px-2 py-0.5 text-xs font-medium">
-              Due {new Date(sprint.dueDate).toLocaleDateString()}
-            </span>
-          )}
+          <div className="xs:flex-row xs:items-center xs:gap-2 flex flex-col items-start gap-1">
+            <span className="font-semibold">{title || sprint?.key}</span>
+            {sprint?.dueDate && (
+              <span className="bg-primary-50 text-primary-600 rounded-full py-0.5 text-xs font-medium">
+                Due {new Date(sprint.dueDate).toLocaleDateString()}
+              </span>
+            )}
+          </div>
         </div>
-        <div className="space-x-4">
-          <span className="text-xs text-gray-400">
-            {tasks.length} issue{tasks.length !== 1 && 's'}
-          </span>
+        <span className="xs:mr-4 mr-1 ml-auto text-xs text-gray-400">
+          {tasks.length} issue{tasks.length !== 1 && 's'}
+        </span>
+        <div className="xs:flex-row xs:gap-4 flex flex-col items-center gap-1">
           {sprint && (
             <SprintMenu
               dueDateRef={dueDateRef}
@@ -135,9 +139,7 @@ export function TaskTable({
           )}
 
           {!sprint && (
-            <SprintButton onClick={createSprintHandler}>
-              Create Sprint
-            </SprintButton>
+            <CreateSprintForm createSprintHandler={createSprintHandler} />
           )}
         </div>
       </div>
