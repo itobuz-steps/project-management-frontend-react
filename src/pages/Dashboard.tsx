@@ -7,6 +7,8 @@ import { useProject } from '../context/ProjectContext';
 import { setupPushNotifications } from '../utils/setupNotification';
 import { AddTaskModal } from '../utils/addTaskModal';
 import { getAllProjects } from '../services/projectService';
+import { toast } from 'react-toastify';
+import userService from '../services/userService';
 
 function Dashboard() {
   const { setProject } = useProject();
@@ -18,18 +20,29 @@ function Dashboard() {
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
 
   useEffect(() => {
-    getAllProjects()
-      .then((projects) => {
+    async function fetchProjects() {
+      try {
+        const projects = await getAllProjects();
+        const userInfo = await userService.getUserInfo();
         setProjects(projects);
 
         const active = projects.find((p) => p._id === projectId);
+        const memberRole = active?.members.find(
+          (m) => m.user === userInfo.result._id
+        )?.role;
 
-        setProject(active);
-      })
-      .catch(() => {
+        if (!memberRole) {
+          setProject({ ...active!, currentUserRole: 'superadmin' });
+        } else {
+          setProject({ ...active!, currentUserRole: memberRole });
+        }
+      } catch {
+        toast.error('Failed to load projects');
         setProjects([]);
         setProject(undefined);
-      });
+      }
+    }
+    fetchProjects();
   }, [projectId, setProject]);
 
   useEffect(() => {
