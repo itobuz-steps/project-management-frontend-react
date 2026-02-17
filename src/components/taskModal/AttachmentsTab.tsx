@@ -27,7 +27,10 @@ export function AttachmentsTab({
   const [saving, setSaving] = useState(false);
 
   const attachments = useMemo<TaskAttachment[]>(() => {
-    if (!task.attachments) return [];
+    if (!task.attachments) {
+      return [];
+    }
+
     return Array.isArray(task.attachments)
       ? task.attachments
       : Array.from(task.attachments);

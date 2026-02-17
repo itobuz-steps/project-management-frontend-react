@@ -22,7 +22,7 @@ export function AssigneeCell({
   if (!editing) {
     return (
       <div
-        className="cursor-pointer rounded-md hover:bg-gray-100"
+        className="flex h-7 cursor-pointer items-center rounded-md hover:bg-gray-100"
         onClick={() => {
           setEditing(true);
           loadMembers?.();
@@ -36,7 +36,7 @@ export function AssigneeCell({
   return (
     <Select
       autoFocus
-      className="w-full"
+      className="h-7 w-full"
       size="small"
       loading={loading}
       value={task.assignee?._id ?? null}

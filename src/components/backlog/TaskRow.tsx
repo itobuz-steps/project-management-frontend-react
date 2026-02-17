@@ -85,7 +85,7 @@ export function TaskRow({
           }}
         />
       </td>
-      <td className="space-padding px-10 whitespace-nowrap">
+      <td className="space-padding w-[200px] px-10 whitespace-nowrap">
         <AssigneeCell
           task={task}
           members={members}

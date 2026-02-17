@@ -57,7 +57,9 @@ export function TaskModalHeader({
   }, [task.projectId]);
 
   useEffect(() => {
-    if (editing) inputRef.current?.focus();
+    if (editing) {
+      inputRef.current?.focus();
+    }
   }, [editing]);
 
   const save = async () => {
@@ -83,7 +85,7 @@ export function TaskModalHeader({
   };
 
   return (
-    <div className="flex flex-col pr-3">
+    <div className="flex flex-col pr-1">
       <div className="flex items-center justify-between text-sm text-gray-500">
         <div className="flex items-center gap-1">
           {/* Parent task */}
@@ -162,7 +164,7 @@ export function TaskModalHeader({
           )}
         </div>
 
-        <div className={`flex md:w-[288px] lg:w-[388px]`}>
+        <div className={`flex md:w-[296px] lg:w-[396px]`}>
           {/* Inline Status */}
           <SidebarRow>
             <StatusSelect
