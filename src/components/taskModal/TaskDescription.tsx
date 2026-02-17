@@ -56,7 +56,7 @@ export function TaskDescription({
     <div className="my-4">
       {/* Header */}
       <div
-        className="flex cursor-pointer items-center gap-2 text-sm font-bold"
+        className="flex cursor-pointer items-center gap-2 text-base font-bold"
         onClick={() => {
           setExpanded((dropdown) => !dropdown);
 
@@ -66,7 +66,7 @@ export function TaskDescription({
         }}
       >
         {expanded ? <DownOutlined /> : <RightOutlined />}
-        <span>Description</span>
+        <span className="text-base">Description</span>
       </div>
 
       {/* Body */}

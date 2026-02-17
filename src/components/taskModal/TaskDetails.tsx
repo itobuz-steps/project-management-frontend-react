@@ -55,7 +55,7 @@ export function TaskDetails({
         {
           key: 'details',
           label: (
-            <span className="px-2 py-1 text-base font-semibold text-gray-700">
+            <span className="px-2 py-1 text-base font-semibold text-gray-900">
               Details
             </span>
           ),

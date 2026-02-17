@@ -9,7 +9,7 @@ export function SubtasksHeader({
 }: SubtasksHeaderProps) {
   return (
     <div className="flex w-full items-center gap-3">
-      <span className="text-sm font-bold whitespace-nowrap">
+      <span className="text-base font-bold whitespace-nowrap">
         Subtasks ({count})
       </span>
 

@@ -28,6 +28,7 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
   return (
     <div className="no-scrollbar flex h-full flex-col overflow-y-auto md:flex-row md:overflow-hidden">
       <div className="flex-1 overflow-visible md:overflow-y-auto md:pr-3">
+        {isMobile && <TaskDetails task={task} onUpdated={onUpdated} />}
         <TaskDescription
           task={task}
           onPatch={(_, patch) => {
@@ -39,15 +40,11 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
         <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
       </div>
 
-      {!isMobile ? (
+      {!isMobile && (
         <div className="shrink-0 p-2 pt-1 sm:w-[200px] md:w-[300px] lg:w-[400px]">
           <div className="sticky max-h-[calc(100vh-160px)] overflow-auto">
             <TaskDetails task={task} onUpdated={onUpdated} />
           </div>
-        </div>
-      ) : (
-        <div>
-          <TaskDetails task={task} onUpdated={onUpdated} />
         </div>
       )}
     </div>

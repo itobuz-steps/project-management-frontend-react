@@ -159,7 +159,7 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
     <>
       <Collapse
         ghost
-        className="jira-subtasks-collapse"
+        className="jira-subtasks-collapse text-base"
         activeKey={open ? ['1'] : []}
         onChange={() => setOpen((open) => !open)}
         items={[
