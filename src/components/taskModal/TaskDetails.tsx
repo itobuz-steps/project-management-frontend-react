@@ -30,7 +30,9 @@ export function TaskDetails({
   const [loadingMembers, setLoadingMembers] = useState(false);
 
   const loadMembers = async () => {
-    if (members.length) return;
+    if (members.length) {
+      return;
+    }
 
     setLoadingMembers(true);
     try {
@@ -100,8 +102,7 @@ export function TaskDetails({
                     placeholder="Add labels"
                     onBlur={() => setEditingLabels(false)}
                     onChange={async (values) => {
-                      const optimistic = { ...task, tags: values };
-                      onUpdated(optimistic);
+                      onUpdated({ ...task, tags: values });
                       setEditingLabels(false);
 
                       try {
@@ -140,8 +141,7 @@ export function TaskDetails({
                     className="w-full"
                     onBlur={() => setEditing(null)}
                     onChange={async (newPriority) => {
-                      const optimistic = { ...task, priority: newPriority };
-                      onUpdated(optimistic);
+                      onUpdated({ ...task, priority: newPriority });
                       setEditing(null);
 
                       try {
@@ -176,8 +176,7 @@ export function TaskDetails({
                     className="w-full"
                     onBlur={() => setEditing(null)}
                     onChange={async (newType) => {
-                      const optimistic = { ...task, type: newType };
-                      onUpdated(optimistic);
+                      onUpdated({ ...task, type: newType });
                       setEditing(null);
 
                       try {
@@ -208,11 +207,10 @@ export function TaskDetails({
                     value={task.storyPoint}
                     placeholder="—"
                     onChange={async (value) => {
-                      const optimistic = {
+                      onUpdated({
                         ...task,
                         storyPoint: value ?? undefined,
-                      };
-                      onUpdated(optimistic);
+                      });
 
                       try {
                         await updateTask(task._id, {
@@ -227,15 +225,14 @@ export function TaskDetails({
 
                   <Dropdown
                     menu={{
-                      items: STORY_POINTS.map((n) => ({
-                        key: n,
-                        label: n,
+                      items: STORY_POINTS.map((points) => ({
+                        key: points,
+                        label: points,
                         onClick: async () => {
-                          const optimistic = { ...task, storyPoint: n };
-                          onUpdated(optimistic);
+                          onUpdated({ ...task, storyPoint: points });
 
                           try {
-                            await updateTask(task._id, { storyPoint: n });
+                            await updateTask(task._id, { storyPoint: points });
                           } catch {
                             message.error('Failed to update story points');
                             onUpdated(task);
@@ -263,10 +260,11 @@ export function TaskDetails({
                   }
                   onChange={async (date) => {
                     const newDate = date ? date.toISOString() : null;
-                    if (!newDate) return;
+                    if (!newDate) {
+                      return;
+                    }
 
-                    const optimistic = { ...task, dueDate: newDate };
-                    onUpdated(optimistic);
+                    onUpdated({ ...task, dueDate: newDate });
 
                     try {
                       await updateTask(task._id, { dueDate: newDate });

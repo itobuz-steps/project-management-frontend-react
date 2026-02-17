@@ -43,7 +43,9 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
-    if (!taskId) return;
+    if (!taskId) {
+      return;
+    }
 
     const fetchComments = async () => {
       setLoading(true);
@@ -61,7 +63,7 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'm' && !isComposerOpen) {
-        e.preventDefault();
+        // e.preventDefault();
         setIsComposerOpen(true);
       }
     };
@@ -114,6 +116,7 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
               </>
             ) : (
               <TextEditor
+                key={content === '' ? 'empty' : 'filled'}
                 comment
                 content={content}
                 onChange={setContent}

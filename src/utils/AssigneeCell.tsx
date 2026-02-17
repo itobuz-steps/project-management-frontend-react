@@ -4,21 +4,19 @@ import type { TaskPopulated, User } from '../services/types/tasks.types';
 import { UserCell } from './UserCell';
 import { updateTask } from '../services/taskService';
 
-type Props = {
-  task: TaskPopulated;
-  members: User[];
-  loading: boolean;
-  onUpdated: (t: TaskPopulated) => void;
-  loadMembers?: () => void;
-};
-
 export function AssigneeCell({
   task,
   members,
   loading,
   onUpdated,
   loadMembers,
-}: Props) {
+}: {
+  task: TaskPopulated;
+  members: User[];
+  loading: boolean;
+  onUpdated: (t: TaskPopulated) => void;
+  loadMembers?: () => void;
+}) {
   const [editing, setEditing] = useState(false);
 
   if (!editing) {
@@ -39,13 +37,15 @@ export function AssigneeCell({
     <Select
       autoFocus
       className="w-full"
+      size="small"
       loading={loading}
       value={task.assignee?._id ?? null}
       placeholder="Unassigned"
       allowClear
       onBlur={() => setEditing(false)}
       onChange={async (userId) => {
-        const selectedUser = members.find((m) => m._id === userId) ?? null;
+        const selectedUser =
+          members.find((member) => member._id === userId) ?? null;
 
         const optimistic: TaskPopulated = {
           ...task,
@@ -57,16 +57,15 @@ export function AssigneeCell({
 
         try {
           await updateTask(task._id, {
-            assignee: userId as unknown as User ?? undefined,
+            assignee: (userId as unknown as User) ?? undefined,
           });
         } catch {
           message.error('Failed to update assignee');
-          onUpdated(task); // rollback
         }
       }}
       options={members.map((member) => ({
         value: member._id,
-        label: <UserCell user={member} emptyText="—" />,
+        label: <UserCell user={member} emptyText="Unassigned" />,
       }))}
     />
   );

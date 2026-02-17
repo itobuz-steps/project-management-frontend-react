@@ -15,8 +15,14 @@ export function StatusSelect({
   const selectedIndex = columns.indexOf(value);
 
   const getColorClass = (index: number, total: number) => {
-    if (index === 0) return 'bg-gray-100 hover:bg-gray-150';
-    if (index === total - 1) return 'bg-green-100 hover:bg-green-150';
+    if (index === 0) {
+      return 'bg-gray-100 hover:bg-gray-150';
+    }
+
+    if (index === total - 1) {
+      return 'bg-green-100 hover:bg-green-150';
+    }
+
     return 'bg-blue-100 hover:bg-blue-200';
   };
 

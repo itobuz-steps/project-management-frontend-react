@@ -78,7 +78,7 @@ export function AttachmentsTab({
       {/* Header */}
       <div
         className="flex cursor-pointer items-center justify-between text-sm font-semibold text-gray-700 hover:text-gray-900"
-        onClick={() => setExpanded((v) => !v)}
+        onClick={() => setExpanded((dropdown) => !dropdown)}
       >
         <div className="flex items-center gap-2">
           {expanded ? <DownOutlined /> : <RightOutlined />}

@@ -7,6 +7,7 @@ import { config } from '../../config/config';
 import type { CommentItemProps } from './taskDrawer.type';
 import { formatDistanceToNow } from 'date-fns';
 import { TextEditor } from '../textEditor/TextEditor';
+import { Link } from 'react-router-dom';
 
 const { Text } = Typography;
 
@@ -80,16 +81,12 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
 
               <Space className="opacity-0 transition group-hover:opacity-100">
                 {comment.attachment && (
-                  <Button
-                    icon={<PaperClipOutlined />}
-                    type="text"
-                    onClick={() =>
-                      window.open(
-                        `${config.api_base_url}/uploads/${comment.attachment}`,
-                        '_blank'
-                      )
-                    }
-                  />
+                  <Link
+                    to={`${config.api_base_url}/uploads/${comment.attachment}`}
+                    target="_blank"
+                  >
+                    <Button icon={<PaperClipOutlined />} type="text" />
+                  </Link>
                 )}
 
                 <Popconfirm

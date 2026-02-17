@@ -1,5 +1,5 @@
 import type { Sprint } from '../../services/types/sprints.types';
-import type { TaskPopulated } from '../../services/types/tasks.types';
+import type { TaskPopulated, User } from '../../services/types/tasks.types';
 
 export interface TaskTableProps {
   sprint?: Sprint;
@@ -8,4 +8,14 @@ export interface TaskTableProps {
   columns: string[];
   title?: string;
   containerId: string;
+}
+
+export interface TaskRowProps{
+  task: TaskPopulated;
+  containerId: string;
+  columns: string[];
+  onPatch: (id: string, patch: Partial<TaskPopulated>) => void;
+  members: User[];
+  loadingMembers: boolean;
+  onUpdated: (t: TaskPopulated) => void;
 }

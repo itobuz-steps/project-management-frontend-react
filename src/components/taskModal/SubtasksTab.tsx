@@ -50,27 +50,22 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
   const [loadingMembers, setLoadingMembers] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
-
     async function loadMembers() {
       setLoadingMembers(true);
       try {
         const result = await getProjectMembers(task.projectId as string);
-        if (mounted) setMembers(result);
+        setMembers(result);
       } finally {
         setLoadingMembers(false);
       }
     }
 
     loadMembers();
-    return () => {
-      mounted = false;
-    };
   }, [task.projectId]);
 
   const onSubtaskUpdated = (updated: TaskPopulated) => {
     setSubtasks((prev) =>
-      prev.map((t) => (t._id === updated._id ? updated : t))
+      prev.map((task) => (task._id === updated._id ? updated : task))
     );
   };
 
@@ -80,18 +75,17 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
       return;
     }
 
-    let cancelled = false;
-    setLoading(true);
-
-    Promise.all(selectedIds.map((id) => getTaskById(id)))
-      .then((res) => {
-        if (!cancelled) setSubtasks(res);
-      })
-      .finally(() => !cancelled && setLoading(false));
-
-    return () => {
-      cancelled = true;
+    const fetchSubtasks = async () => {
+      setLoading(true);
+      try {
+        const res = await Promise.all(selectedIds.map((id) => getTaskById(id)));
+        setSubtasks(res);
+      } finally {
+        setLoading(false);
+      }
     };
+
+    fetchSubtasks();
   }, [selectedIds.join(',')]);
 
   const openManage = async () => {
@@ -167,7 +161,7 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
         ghost
         className="jira-subtasks-collapse"
         activeKey={open ? ['1'] : []}
-        onChange={() => setOpen((o) => !o)}
+        onChange={() => setOpen((open) => !open)}
         items={[
           {
             key: '1',

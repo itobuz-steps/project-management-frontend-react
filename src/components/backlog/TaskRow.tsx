@@ -7,10 +7,10 @@ import dayjs from 'dayjs';
 import { Link, useSearchParams } from 'react-router-dom';
 import { updateTask } from '../../services/taskService';
 import { useSortable } from '@dnd-kit/sortable';
-import type { TaskPopulated, User } from '../../services/types/tasks.types';
 import { TaskTypeColor } from '../../utils/TaskTypeColor';
 import { config } from '../../config/config';
 import { AssigneeCell } from '../../utils/AssigneeCell';
+import type { TaskRowProps } from './type';
 
 export function TaskRow({
   task,
@@ -20,17 +20,8 @@ export function TaskRow({
   members,
   loadingMembers,
   onUpdated,
-}: {
-  task: TaskPopulated;
-  containerId: string;
-  columns: string[];
-  onPatch: (id: string, patch: Partial<TaskPopulated>) => void;
-  members: User[];
-  loadingMembers: boolean;
-  onUpdated: (t: TaskPopulated) => void;
-}) {
+}: TaskRowProps) {
   const [, setSearchParams] = useSearchParams();
-  // const location = useLocation();
   const {
     attributes,
     listeners,
@@ -71,15 +62,16 @@ export function TaskRow({
           <TaskTypeColor type={task.type}>{task.key}</TaskTypeColor>
         </Link>
       </td>
+
       <td
-        className="cursor-pointer p-2 px-6 whitespace-nowrap hover:underline"
+        className="space-padding cursor-pointer whitespace-nowrap hover:underline"
         onClick={() => {
           setSearchParams({ taskId: task._id }, { replace: true });
         }}
       >
         {task.title}
       </td>
-      <td className="p-2 px-6 whitespace-nowrap">
+      <td className="space-padding whitespace-nowrap">
         <StatusSelect
           value={task.status}
           columns={columns}
@@ -93,7 +85,7 @@ export function TaskRow({
           }}
         />
       </td>
-      <td className="p-2 px-6 whitespace-nowrap">
+      <td className="space-padding px-10 whitespace-nowrap">
         <AssigneeCell
           task={task}
           members={members}
@@ -101,7 +93,7 @@ export function TaskRow({
           onUpdated={onUpdated}
         />
       </td>
-      <td className="p-2 px-6 whitespace-nowrap">
+      <td className="space-padding whitespace-nowrap">
         <DatePicker
           className="w-full max-w-[150px] min-w-[100px] shrink-0"
           value={task.dueDate ? dayjs(task.dueDate) : null}
@@ -114,7 +106,9 @@ export function TaskRow({
               : undefined
           }
           onChange={async (date) => {
-            if (!date) return;
+            if (!date) {
+              return;
+            }
 
             const newDate = date.toISOString();
             onPatch(task._id, { dueDate: newDate });
@@ -127,7 +121,7 @@ export function TaskRow({
           }}
         />
       </td>
-      <td className="p-2 px-6 whitespace-nowrap">
+      <td className="space-padding whitespace-nowrap">
         <div className="flex gap-1">
           {task.tags?.slice(0, 3).map((label) => (
             <span
@@ -145,13 +139,13 @@ export function TaskRow({
           )}
         </div>
       </td>
-      <td className="p-2 px-6 text-xs whitespace-nowrap text-gray-500">
+      <td className="space-padding text-xs whitespace-nowrap text-gray-500">
         {task.createdAt ? new Date(task.createdAt).toLocaleDateString() : ''}
       </td>
-      <td className="p-2 px-6 text-xs whitespace-nowrap text-gray-500">
+      <td className="space-padding text-xs whitespace-nowrap text-gray-500">
         {task.updatedAt ? new Date(task.updatedAt).toLocaleDateString() : ''}
       </td>
-      <td className="p-2 px-6 whitespace-nowrap">
+      <td className="space-padding whitespace-nowrap">
         <div className="flex items-center">
           <img
             className="mr-3 aspect-square h-6 w-6 rounded-full object-cover"

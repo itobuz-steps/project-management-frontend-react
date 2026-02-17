@@ -38,29 +38,27 @@ export function TaskTable({
   const [loadingMembers, setLoadingMembers] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
-
     async function loadMembers() {
-      if (!project?._id) return;
+      if (!project?._id) {
+        return;
+      }
 
       setLoadingMembers(true);
+
       try {
         const res = await getProjectMembers(project._id);
-        if (mounted) setMembers(res);
+        setMembers(res);
       } finally {
         setLoadingMembers(false);
       }
     }
 
     loadMembers();
-    return () => {
-      mounted = false;
-    };
   }, [project?._id]);
 
   const onTaskUpdated = (updated: TaskPopulated) => {
     setLocalTasks((prev) =>
-      prev.map((t) => (t._id === updated._id ? updated : t))
+      prev.map((task) => (task._id === updated._id ? updated : task))
     );
   };
 
@@ -78,8 +76,13 @@ export function TaskTable({
   const sprintStarted = sprint?.dueDate;
 
   async function startSprint() {
-    if (!sprint) return;
-    if (!dueDateRef.current || !dueDateRef.current.value) return;
+    if (!sprint) {
+      return;
+    }
+
+    if (!dueDateRef.current || !dueDateRef.current.value) {
+      return;
+    }
 
     const dueDateValue = dueDateRef.current.value;
 
@@ -88,11 +91,14 @@ export function TaskTable({
         dueDate: new Date(dueDateValue),
       });
       setSprints?.((prevSprints) =>
-        prevSprints.map((s) =>
-          s._id === sprint._id ? { ...s, dueDate: new Date(dueDateValue) } : s
+        prevSprints.map((sprint) =>
+          sprint._id === sprint._id
+            ? { ...sprint, dueDate: new Date(dueDateValue) }
+            : sprint
         )
       );
     } catch (error) {
+      
       if (error instanceof AxiosError) {
         toast.error(error.response?.data.message || 'Failed to start sprint');
       }
@@ -100,15 +106,17 @@ export function TaskTable({
   }
 
   async function completeSprint() {
-    if (!sprint) return;
+    if (!sprint) {
+      return;
+    }
 
     try {
       await sprintService.updateSprint(sprint._id, {
         isCompleted: true,
       });
       setSprints?.((prevSprints) =>
-        prevSprints.map((s) =>
-          s._id === sprint._id ? { ...s, isCompleted: true } : s
+        prevSprints.map((sprint) =>
+          sprint._id === sprint._id ? { ...sprint, isCompleted: true } : sprint
         )
       );
     } catch (error) {
@@ -187,28 +195,28 @@ export function TaskTable({
                 <th scope="col" className="p-2">
                   Key
                 </th>
-                <th scope="col" className="p-2 px-6">
+                <th scope="col" className="space-padding">
                   Summary
                 </th>
-                <th scope="col" className="p-2 px-6">
+                <th scope="col" className="space-padding">
                   Status
                 </th>
-                <th scope="col" className="p-2 px-6">
+                <th scope="col" className="space-padding px-10">
                   Assignee
                 </th>
-                <th scope="col" className="p-2 px-6">
+                <th scope="col" className="space-padding">
                   Due Date
                 </th>
-                <th scope="col" className="p-2 px-6">
+                <th scope="col" className="space-padding">
                   Labels
                 </th>
-                <th scope="col" className="p-2 px-6">
+                <th scope="col" className="space-padding">
                   Created
                 </th>
-                <th scope="col" className="p-2 px-6">
+                <th scope="col" className="space-padding">
                   Updated
                 </th>
-                <th scope="col" className="p-2 px-6">
+                <th scope="col" className="space-padding">
                   Reporter
                 </th>
               </tr>

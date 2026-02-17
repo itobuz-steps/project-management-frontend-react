@@ -58,8 +58,11 @@ export function TaskDescription({
       <div
         className="flex cursor-pointer items-center gap-2 text-sm font-bold"
         onClick={() => {
-          setExpanded((v) => !v);
-          if (!task.description) setEditing(true);
+          setExpanded((dropdown) => !dropdown);
+
+          if (!task.description) {
+            setEditing(true);
+          }
         }}
       >
         {expanded ? <DownOutlined /> : <RightOutlined />}

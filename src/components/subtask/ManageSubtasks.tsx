@@ -70,7 +70,7 @@ export function ManageSubtasks({
                   setDraftIds((prev) =>
                     e.target.checked
                       ? [...prev, task._id]
-                      : prev.filter((x) => x !== task._id)
+                      : prev.filter((subtask) => subtask !== task._id)
                   )
                 }
               />

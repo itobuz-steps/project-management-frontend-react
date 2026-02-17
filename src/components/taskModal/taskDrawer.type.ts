@@ -26,3 +26,10 @@ export type ViewProps = {
   onUpdated: (t: TaskPopulated) => void;
   loading?: boolean;
 };
+
+export type HeaderProps = {
+  task: TaskPopulated;
+  onUpdated: (t: TaskPopulated) => void;
+  onClose?: () => void;
+  page: boolean;
+}

@@ -13,23 +13,21 @@ export default function TaskModal({ taskId, onClose }: TaskModalProps) {
   const isMobile = useIsMobile(768);
 
   useEffect(() => {
-    if (!taskId) return;
-    let cancelled = false;
+    if (!taskId) {
+      return;
+    }
 
     async function loadTask() {
       try {
         setLoading(true);
         const data = await getTaskById(taskId);
-        if (!cancelled) setTask(data);
+        setTask(data);
       } finally {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       }
     }
 
     loadTask();
-    return () => {
-      cancelled = true;
-    };
   }, [taskId]);
 
   return (
@@ -38,19 +36,11 @@ export default function TaskModal({ taskId, onClose }: TaskModalProps) {
       onCancel={onClose}
       closable={false}
       footer={null}
-      centered={!isMobile}
-      width={isMobile ? '100%' : 1200}
+      centered
+      width={1200}
+      className="task-modal"
+      rootClassName="task-modal-root"
       styles={{
-        header: {
-          margin: 0,
-        },
-        body: {
-          padding: 0,
-          height: isMobile ? 'calc(100vh - 56px)' : '70vh',
-          maxHeight: 700,
-          overflow: 'hidden',
-        },
-
         mask: {
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           backdropFilter: 'none',

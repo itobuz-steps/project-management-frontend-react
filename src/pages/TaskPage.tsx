@@ -14,7 +14,9 @@ export default function TaskPage() {
   const isMobile = useIsMobile(768);
 
   useEffect(() => {
-    if (!taskId) return;
+    if (!taskId) {
+      return;
+    }
 
     async function load() {
       setLoading(true);
@@ -26,7 +28,9 @@ export default function TaskPage() {
     load();
   }, [taskId]);
 
-  if (!task) return null;
+  if (!task) {
+    return null;
+  }
 
   return (
     <div className="mx-auto w-full p-2 min-[1700px]:max-w-7xl">

@@ -8,26 +8,20 @@ import { SidebarRow } from '../../utils/SidebarRow';
 import { StatusSelect } from '../../utils/StatusSelect';
 import { getProjectById } from '../../services/projectService';
 import getTaskById from '../../services/taskService';
-import { useIsMobile } from '../../utils/isMobile';
 import { Link } from 'react-router-dom';
+import type { HeaderProps } from './taskDrawer.type';
 
 export function TaskModalHeader({
   task,
   onUpdated,
   onClose,
   page,
-}: {
-  task: TaskPopulated;
-  onUpdated: (t: TaskPopulated) => void;
-  onClose?: () => void;
-  page: boolean;
-}) {
+}: HeaderProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(task.title);
   const [saving, setSaving] = useState(false);
   const [columns, setColumns] = useState<string[]>([]);
   const [parentTask, setParentTask] = useState<TaskPopulated | null>(null);
-  const isMobile = useIsMobile(768);
 
   const inputRef = useRef<InputRef>(null);
 
@@ -41,24 +35,16 @@ export function TaskModalHeader({
       return;
     }
 
-    let cancelled = false;
-
     async function fetchParentTask() {
       try {
         const parent = await getTaskById(task.parentTask as string);
-        if (!cancelled) {
-          setParentTask(parent);
-        }
+        setParentTask(parent);
       } catch {
         setParentTask(null);
       }
     }
 
     fetchParentTask();
-
-    return () => {
-      cancelled = true;
-    };
   }, [task.parentTask]);
 
   useEffect(() => {
@@ -104,14 +90,14 @@ export function TaskModalHeader({
           {parentTask && (
             <>
               <TaskTypeIcon type={parentTask.type} />
-              <a
-                href={`/task/${parentTask._id}`}
+              <Link
+                to={`/task/${parentTask._id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-inherit! hover:text-gray-600 hover:underline"
               >
                 {parentTask.key}
-              </a>
+              </Link>
 
               <span className="mx-1">/</span>
             </>
@@ -133,11 +119,9 @@ export function TaskModalHeader({
             page ? 'pointer-events-none opacity-0' : 'opacity-100'
           }`}
         >
-          <Button
-            size="middle"
-            icon={<ArrowsAltOutlined />}
-            onClick={() => window.open(`/task/${task._id}`, '_blank')}
-          />
+          <Link to={`/task/${task._id}`} target="_blank">
+            <Button size="middle" icon={<ArrowsAltOutlined />} />
+          </Link>
           <Button size="middle" icon={<CloseOutlined />} onClick={onClose} />
         </div>
       </div>
@@ -165,7 +149,7 @@ export function TaskModalHeader({
               onBlur={save}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
+                  // e.preventDefault();
                   save();
                 }
                 if (e.key === 'Escape') {
@@ -178,7 +162,7 @@ export function TaskModalHeader({
           )}
         </div>
 
-        <div className={`flex ${isMobile ? '' : 'w-[380px]'} `}>
+        <div className={`flex md:w-[288px] lg:w-[388px]`}>
           {/* Inline Status */}
           <SidebarRow>
             <StatusSelect
@@ -186,8 +170,7 @@ export function TaskModalHeader({
               value={task.status}
               columns={columns}
               onChange={async (newStatus) => {
-                const optimistic = { ...task, status: newStatus };
-                onUpdated(optimistic);
+                onUpdated({ ...task, status: newStatus });
 
                 try {
                   await updateTask(task._id, { status: newStatus });

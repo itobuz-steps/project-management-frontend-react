@@ -12,10 +12,11 @@ import TableHeader from '@tiptap/extension-table-header';
 import TableCell from '@tiptap/extension-table-cell';
 import Emoji from '@tiptap/extension-emoji';
 import type { Level } from '@tiptap/extension-heading';
-import { Upload, Button, message } from 'antd';
+import { Upload, Button, message, Select } from 'antd';
 import { PaperClipOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-import type { TextEditorProps } from './textEditor.type';
+import { headingOptions, type TextEditorProps } from './textEditor.type';
+import { Link as RouterLink } from 'react-router-dom';
 
 export function TextEditor({
   comment,
@@ -65,7 +66,9 @@ export function TextEditor({
     },
   });
 
-  if (!editor) return null;
+  if (!editor) {
+    return null;
+  }
 
   const btn =
     'h-8 min-w-[32px] rounded-md px-2 text-sm font-medium text-gray-700 hover:bg-gray-100 active:bg-gray-200';
@@ -76,10 +79,12 @@ export function TextEditor({
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-1 border-b border-gray-200 bg-gray-50 p-2">
         {/* Headings */}
-        <select
-          className="h-8 rounded-md border border-gray-300 bg-white px-2 text-sm text-gray-700 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-          onChange={(e) => {
-            const value = e.target.value;
+        <Select
+          size="small"
+          className="w-32"
+          options={headingOptions}
+          placeholder="Text"
+          onChange={(value) => {
             if (!value) {
               editor.chain().focus().setParagraph().run();
             } else {
@@ -90,44 +95,41 @@ export function TextEditor({
                 .run();
             }
           }}
-        >
-          <option value="">Text</option>
-          {[1, 2, 3, 4, 5, 6].map((l) => (
-            <option key={l} value={l}>
-              Heading {l}
-            </option>
-          ))}
-        </select>
+        />
 
         <div className="mx-1 h-5 w-px bg-gray-300" />
 
-        <button
+        <Button
+          size="small"
           title="Bold"
           className={`${btn} ${editor.isActive('bold') ? btnActive : ''}`}
           onClick={() => editor.chain().focus().toggleBold().run()}
         >
           B
-        </button>
+        </Button>
 
-        <button
+        <Button
+          size="small"
           title="Italic"
           className={`${btn} ${editor.isActive('italic') ? btnActive : ''}`}
           onClick={() => editor.chain().focus().toggleItalic().run()}
         >
           I
-        </button>
+        </Button>
 
         <div className="mx-1 h-5 w-px bg-gray-300" />
 
-        <button
+        <Button
+          size="small"
           title="Bullet List"
           className={`${btn} ${editor.isActive('bulletList') ? btnActive : ''}`}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
           •
-        </button>
+        </Button>
 
-        <button
+        <Button
+          size="small"
           title="Numbered List"
           className={`${btn} ${
             editor.isActive('orderedList') ? btnActive : ''
@@ -135,15 +137,16 @@ export function TextEditor({
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
         >
           1.
-        </button>
+        </Button>
 
-        <button
+        <Button
+          size="small"
           title="Check Box"
           className={`${btn} ${editor.isActive('taskList') ? btnActive : ''}`}
           onClick={() => editor.chain().focus().toggleTaskList().run()}
         >
           ☑
-        </button>
+        </Button>
 
         <div className="mx-1 h-5 w-px bg-gray-300" />
 
@@ -161,6 +164,7 @@ export function TextEditor({
             showUploadList={false}
           >
             <Button
+              size="small"
               style={{ backgroundColor: 'transparent' }}
               icon={<PaperClipOutlined />}
             >
@@ -169,23 +173,26 @@ export function TextEditor({
           </Upload>
         )}
 
-        <button
+        <Button
+          size="small"
           title="Mentions"
           className={`${btn} ${comment ? 'block' : 'hidden'}`}
           onClick={() => editor.chain().focus().insertContent('@').run()}
         >
           @
-        </button>
+        </Button>
 
-        <button
+        <Button
+          size="small"
           title="Emoji"
           className={btn}
           onClick={() => editor.chain().focus().insertContent('😊').run()}
         >
           🙂
-        </button>
+        </Button>
 
-        <button
+        <Button
+          size="small"
           title="3x3 Table"
           className={btn}
           onClick={() =>
@@ -193,15 +200,16 @@ export function TextEditor({
           }
         >
           ▦
-        </button>
+        </Button>
 
-        <button
+        <Button
+          size="small"
           title="Code"
           className={`${btn} ${editor.isActive('codeBlock') ? btnActive : ''}`}
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         >
           {'</>'}
-        </button>
+        </Button>
       </div>
 
       {/* Editor */}
@@ -210,11 +218,11 @@ export function TextEditor({
         className="prose prose-sm max-w-none p-3 text-gray-800 focus:outline-none"
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
-            e.preventDefault();
+            // e.preventDefault();
             onCancel();
           }
           if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-            e.preventDefault();
+            // e.preventDefault();
             onSave();
           }
         }}
@@ -228,14 +236,16 @@ export function TextEditor({
               key={idx}
               className="flex items-center justify-between rounded-md bg-gray-50 px-2 py-1 text-sm"
             >
-              <a
-                href={attachment.url}
+              <RouterLink
+                to={attachment.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 truncate text-gray-700"
               >
-                <PaperClipOutlined /> {attachment.file.name}
-              </a>
+                <PaperClipOutlined />
+                <span className="truncate">{attachment.file.name}</span>
+              </RouterLink>
+
               <Button
                 size="small"
                 type="text"
