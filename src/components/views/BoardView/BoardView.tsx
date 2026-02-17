@@ -322,16 +322,20 @@ function BoardView() {
                     {tasksByColumn[col]?.length ?? 0}
                   </span>
                 </div>
-                <button
-                  type="button"
-                  aria-label="Add column"
-                  className="rounded p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
-                  onClick={() => {
-                    openAddColumnModal(col);
-                  }}
-                >
-                  <Plus size={16} />
-                </button>
+                {project &&
+                  (project?.currentUserRole === 'admin' ||
+                    project?.currentUserRole === 'superadmin') && (
+                    <button
+                      type="button"
+                      aria-label="Add column"
+                      className="rounded p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+                      onClick={() => {
+                        openAddColumnModal(col);
+                      }}
+                    >
+                      <Plus size={16} />
+                    </button>
+                  )}
               </div>
 
               <ColumnDropZone id={col}>
