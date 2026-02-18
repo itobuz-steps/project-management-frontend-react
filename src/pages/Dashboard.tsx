@@ -28,11 +28,11 @@ function Dashboard() {
         const userInfo = await userService.getUserInfo();
         setProjects(projects);
 
-        const active = projects.find((p) => p._id === projectId);
+        const active = projects.find((project) => project._id === projectId);
         setProject(active);
 
         const memberRole = active?.members.find(
-          (m) => m.user === userInfo.result._id
+          (member) => member.user === userInfo.result._id
         )?.role;
 
         if (!memberRole) {

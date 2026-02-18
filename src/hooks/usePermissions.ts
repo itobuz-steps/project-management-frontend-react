@@ -30,14 +30,14 @@ export const usePermissions = () => {
    */
   const canAny = useCallback(
     (permissions: Permission[]) => {
-      return permissions.some((p) => permissionSet.has(p));
+      return permissions.some((permission) => permissionSet.has(permission));
     },
     [permissionSet]
   );
 
   const canAll = useCallback(
     (permissions: Permission[]) => {
-      return permissions.every((p) => permissionSet.has(p));
+      return permissions.every((permission) => permissionSet.has(permission));
     },
     [permissionSet]
   );
