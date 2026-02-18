@@ -2,18 +2,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { getTasks } from '../../../services/taskService';
 import { updateTask } from '../../../services/taskService';
-import type {
-  Task,
-  TaskPopulated,
-  TaskStatus,
-} from '../../../services/types/tasks.types';
+import type { TaskPopulated } from '../../../services/types/tasks.types';
 import { useProject } from '../../../context/ProjectContext';
-import { listViewHeaders } from './listView.constants';
 import { TaskRow } from '../../backlog/TaskRow';
+import { Skeleton } from 'antd';
 
 function ListView() {
   const { projectId } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const { columns } = useProject();
 
   const [tasks, setTasks] = useState<TaskPopulated[]>([]);
@@ -131,7 +127,12 @@ function ListView() {
           {loading && (
             <tr>
               <td colSpan={11} className="p-4 text-center text-gray-500">
-                Loading tasks...
+                <div className="flex flex-col gap-2">
+                  <Skeleton.Input active={true} size="default" block={true} />
+                  <Skeleton.Input active={true} size="default" block={true} />
+                  <Skeleton.Input active={true} size="default" block={true} />
+                  <Skeleton.Input active={true} size="default" block={true} />
+                </div>
               </td>
             </tr>
           )}
