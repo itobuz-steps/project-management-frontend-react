@@ -17,6 +17,7 @@ export interface CreateSprintPayload {
   dueDate?: string;
   isCompleted?: boolean;
   projectId: string;
+  storyPoint: number;
 }
 
 export interface UpdateSprintPayload {

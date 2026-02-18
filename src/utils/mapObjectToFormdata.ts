@@ -10,8 +10,9 @@ export function mapObjectToFormData(obj: Record<string, unknown>): FormData {
       obj[key].forEach((item) => formData.append(key + '[]', item));
       continue;
     }
-
-    formData.append(key, obj[key] as string | File);
+    if (obj[key]) {
+      formData.append(key, obj[key] as string | File);
+    }
   }
   return formData;
 }

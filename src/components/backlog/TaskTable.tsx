@@ -9,7 +9,6 @@ import type { TaskTableProps } from './type';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { SprintMenu } from './SprintMenu';
 import { TaskRow } from './TaskRow';
-import { SprintButton } from './SprintButton';
 import { useProject } from '../../context/ProjectContext';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../hooks/useSprintActions';
