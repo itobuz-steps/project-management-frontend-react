@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import { useProject } from '../../context/ProjectContext';
-import { PRIORITIES } from '../taskDrawer/constants';
+import { PRIORITIES } from '../taskModal/constants';
 import SearchBar from '../navbar/SearchBar';
 // import AvatarGroup from '../AvatarGroup/AvatarGroup';
 

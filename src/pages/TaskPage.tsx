@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { TaskPopulated } from '../services/types/tasks.types';
 import getTaskById from '../services/taskService';
-import { TaskView } from '../components/taskDrawer/TaskView';
-import { TaskDrawerHeader } from '../components/taskDrawer/TaskDrawerHeader';
+import { TaskView } from '../components/taskModal/TaskView';
+import { TaskModalHeader } from '../components/taskModal/TaskModalHeader';
 import { useIsMobile } from '../utils/isMobile';
 
 export default function TaskPage() {
@@ -14,7 +14,9 @@ export default function TaskPage() {
   const isMobile = useIsMobile(768);
 
   useEffect(() => {
-    if (!taskId) return;
+    if (!taskId) {
+      return;
+    }
 
     async function load() {
       setLoading(true);
@@ -26,15 +28,18 @@ export default function TaskPage() {
     load();
   }, [taskId]);
 
-  if (!task) return null;
+  if (!task) {
+    return null;
+  }
 
   return (
-    <div className="mx-auto p-6">
+    <div className="mx-auto w-full p-2 min-[1700px]:max-w-7xl">
       {task && (
-        <TaskDrawerHeader
+        <TaskModalHeader
           task={task}
           // projectId={projectId!}
           onUpdated={setTask}
+          page={true}
         />
       )}
 
