@@ -9,12 +9,14 @@ import { AddTaskModal } from '../utils/addTaskModal';
 import { getAllProjects } from '../services/projectService';
 import { toast } from 'react-toastify';
 import userService from '../services/userService';
+import { useAuthContext } from '../context/AuthContext';
 
 function Dashboard() {
   const { setProject } = useProject();
+  const { setRole } = useAuthContext();
+
   const { projectId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-
   const [projects, setProjects] = useState<Project[]>([]);
   const activeProject = projects.find((p) => p._id === projectId);
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
@@ -27,14 +29,16 @@ function Dashboard() {
         setProjects(projects);
 
         const active = projects.find((p) => p._id === projectId);
+        setProject(active);
+
         const memberRole = active?.members.find(
           (m) => m.user === userInfo.result._id
         )?.role;
 
         if (!memberRole) {
-          setProject({ ...active!, currentUserRole: 'superadmin' });
+          setRole('superadmin');
         } else {
-          setProject({ ...active!, currentUserRole: memberRole });
+          setRole(memberRole);
         }
       } catch {
         toast.error('Failed to load projects');
@@ -43,7 +47,7 @@ function Dashboard() {
       }
     }
     fetchProjects();
-  }, [projectId, setProject]);
+  }, [projectId, setProject, setRole]);
 
   useEffect(() => {
     setupPushNotifications();

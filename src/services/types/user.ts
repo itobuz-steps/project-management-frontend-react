@@ -6,4 +6,6 @@ interface IUserResponse extends IResponse {
   message?: string;
 }
 
-export type { IUserResponse };
+type Role = 'member' | 'admin' | 'superadmin';
+
+export type { IUserResponse, Role };

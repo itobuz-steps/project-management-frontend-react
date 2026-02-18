@@ -1,13 +1,10 @@
 import { createContext, useContext } from 'react';
 import type { Project } from '../types/project.types';
 
-export type ProjectWithRole = Project & {
-  currentUserRole: 'superadmin' | 'admin' | 'member';
-};
 interface ProjectContextValue {
-  project?: ProjectWithRole;
+  project?: Project;
   columns: string[];
-  setProject: (project?: ProjectWithRole) => void;
+  setProject: (project?: Project) => void;
 }
 
 export const ProjectContext = createContext<ProjectContextValue | null>(null);

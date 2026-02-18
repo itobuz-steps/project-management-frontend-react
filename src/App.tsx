@@ -3,6 +3,7 @@ import { MainRouter } from './components/routers/MainRouter';
 import { useTheme } from './hooks/useTheme';
 import { useEffect } from 'react';
 import './App.scss';
+import { AuthProvider } from './context/AuthProvider';
 
 function App() {
   const [, setTheme] = useTheme();
@@ -26,7 +27,9 @@ function App() {
         transition={Flip}
         limit={3}
       />
-      <MainRouter />
+      <AuthProvider>
+        <MainRouter />
+      </AuthProvider>
     </>
   );
 }
