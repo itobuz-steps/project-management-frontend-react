@@ -125,7 +125,7 @@ export function TaskModalHeader({
           )}
         </div>
 
-        <div className="md:w-[296px] lg:w-[396px]">
+        <div className="flex">
           <SidebarRow>
             <StatusSelect
               className="px-6! py-4!"
