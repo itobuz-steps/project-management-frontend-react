@@ -19,6 +19,7 @@ export type HeaderProps = {
   onUpdated: (t: TaskPopulated) => void;
   onClose?: () => void;
   page: boolean;
+  drawer: boolean;
 };
 
 export type TaskDescriptionProps = {

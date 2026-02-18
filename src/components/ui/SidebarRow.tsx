@@ -6,9 +6,7 @@ export function SidebarRow({ label, children }: SidebarRowType) {
   return (
     <div
       className={`grid items-start text-sm ${
-        hasLabel
-          ? 'grid-cols-1 sm:grid-cols-[112px_minmax(0,1fr)]'
-          : 'grid-cols-1'
+        hasLabel ? 'grid-cols-[112px_minmax(0,1fr)]' : 'grid-cols-1'
       } `}
     >
       {hasLabel && (

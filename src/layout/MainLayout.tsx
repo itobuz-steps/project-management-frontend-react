@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Sidebar from '../components/sidebar/Sidebar';
 import Navbar from '../components/navbar/Navbar';
-import TaskModal from '../components/taskModal/TaskModal';
+import TaskDrawer from '../components/drawer/TaskDrawer';
 import { CommandPalette } from '../components/common/CommandPalette';
 import { useSearchParams } from 'react-router-dom';
+import TaskModal from '../components/taskModal/TaskModal';
 
 export default function MainLayout() {
   // const [collapsed, setCollapsed] = useState(false);
@@ -28,6 +30,9 @@ export default function MainLayout() {
 
   const taskId = searchParams.get('taskId');
 
+  const location = useLocation();
+  const isBacklog = location.pathname.includes('/backlog');
+
   return (
     <div className="relative flex h-screen w-full overflow-hidden">
       <Sidebar />
@@ -38,18 +43,31 @@ export default function MainLayout() {
         </main>
       </div>
 
-      {taskId && (
-        <TaskModal
-          taskId={taskId}
-          onClose={() =>
-            setSearchParams((prev) => {
-              const next = new URLSearchParams(prev);
-              next.delete('taskId');
-              return next;
-            })
-          }
-        />
-      )}
+      {taskId ? (
+        isBacklog ? (
+          <TaskDrawer
+            taskId={taskId}
+            onClose={() =>
+              setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                next.delete('taskId');
+                return next;
+              })
+            }
+          />
+        ) : (
+          <TaskModal
+            taskId={taskId}
+            onClose={() =>
+              setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                next.delete('taskId');
+                return next;
+              })
+            }
+          />
+        )
+      ) : null}
       <CommandPalette
         open={open}
         onClose={() => {
