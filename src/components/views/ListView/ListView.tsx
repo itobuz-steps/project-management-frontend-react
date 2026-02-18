@@ -4,7 +4,7 @@ import { getTasks } from '../../../services/taskService';
 import type { TaskPopulated } from '../../../services/types/tasks.types';
 import { useProject } from '../../../context/ProjectContext';
 import { TaskRow } from '../../backlog/TaskRow';
-import { useProjectMeta } from '../../../hooks/useProjectMeta';
+import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
 import { taskTableColumns } from '../../../config/constants';
 
 function ListView() {
@@ -12,7 +12,7 @@ function ListView() {
   const [searchParams] = useSearchParams();
   const { columns } = useProject();
 
-  const { members, loadingMembers } = useProjectMeta(projectId);
+  const { members, loadingMembers } = useProjectMetaData(projectId);
 
   const [tasks, setTasks] = useState<TaskPopulated[]>([]);
   const [loading, setLoading] = useState(false);

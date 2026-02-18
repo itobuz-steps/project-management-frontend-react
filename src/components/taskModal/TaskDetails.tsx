@@ -14,7 +14,7 @@ import {
 import { AssigneeCell } from '../ui/AssigneeCell';
 import type { EditingField, TaskDetailsProps } from './taskModal.types';
 import { useTaskUpdate } from '../../hooks/useTaskUpdate';
-import { useProjectMeta } from '../../hooks/useProjectMeta';
+import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { DueDateCell } from '../ui/DueDateCell';
 
 export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
@@ -23,7 +23,9 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
 
   const { update } = useTaskUpdate(task._id, onUpdated);
 
-  const { members, loadingMembers } = useProjectMeta(task.projectId as string);
+  const { members, loadingMembers } = useProjectMetaData(
+    task.projectId as string
+  );
 
   return (
     <Collapse

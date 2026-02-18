@@ -7,7 +7,7 @@ import { StatusSelect } from '../ui/StatusSelect';
 import { Link } from 'react-router-dom';
 import type { HeaderProps } from './taskModal.types';
 import { useParentTask } from '../../hooks/useParentTask';
-import { useProjectMeta } from '../../hooks/useProjectMeta';
+import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 
 export function TaskModalHeader({
@@ -22,7 +22,7 @@ export function TaskModalHeader({
   const inputRef = useRef<InputRef>(null);
 
   const parentTask = useParentTask(task.parentTask);
-  const { columns } = useProjectMeta(task.projectId as string);
+  const { columns } = useProjectMetaData(task.projectId as string);
 
   const { update } = useTaskUpdate(task._id, onUpdated);
 

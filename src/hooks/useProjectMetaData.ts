@@ -3,7 +3,7 @@ import { getProjectById, getProjectMembers } from '../services/projectService';
 import type { User } from '../services/types/tasks.types';
 import { message } from 'antd';
 
-export function useProjectMeta(projectId?: string) {
+export function useProjectMetaData(projectId?: string) {
   const [columns, setColumns] = useState<string[]>([]);
   const [members, setMembers] = useState<User[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);

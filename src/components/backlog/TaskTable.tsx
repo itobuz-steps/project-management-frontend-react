@@ -11,7 +11,7 @@ import { SprintMenu } from './SprintMenu';
 import { TaskRow } from './TaskRow';
 import { SprintButton } from './SprintButton';
 import { useProject } from '../../context/ProjectContext';
-import { useProjectMeta } from '../../hooks/useProjectMeta';
+import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../hooks/useSprintActions';
 import { taskTableColumns } from '../../config/constants';
 
@@ -27,7 +27,7 @@ export function TaskTable({
   const [localTasks, setLocalTasks] = useState(tasks);
   const { project } = useProject();
 
-  const { members, loadingMembers } = useProjectMeta(project?._id);
+  const { members, loadingMembers } = useProjectMetaData(project?._id);
 
   const { dueDateRef, startSprint, completeSprint, createSprint } =
     useSprintActions(project?._id, setSprints);

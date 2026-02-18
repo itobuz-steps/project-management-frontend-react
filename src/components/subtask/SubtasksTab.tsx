@@ -10,14 +10,14 @@ import { SubtasksTable } from './SubtasksTable';
 import { ManageSubtasks } from './ManageSubtasks';
 import { useManageSubtasks } from '../../hooks/useManageSubtasksModal';
 import { useSubtasks } from '../../hooks/useSubtasks';
-import { useProjectMeta } from '../../hooks/useProjectMeta';
+import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 
 export function SubtasksTab({ task }: { task: TaskPopulated }) {
   const { projectId } = useParams();
   const [, setSearchParams] = useSearchParams();
   const [open, setOpen] = useState(true);
 
-  const { columns, members, loadingMembers } = useProjectMeta(
+  const { columns, members, loadingMembers } = useProjectMetaData(
     task.projectId as string
   );
   const {

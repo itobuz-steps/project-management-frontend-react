@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import { TextEditor } from '../textEditor/TextEditor';
 import { useTaskUpdate } from '../../hooks/useTaskUpdate';
@@ -17,18 +17,6 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
     setValue(task.description || '');
   }, [task.description]);
 
-  const previewText = useMemo(() => {
-    if (!value) {
-      return '';
-    }
-
-    return value
-      .replace(/[`*_>#~\-![\]()]/g, '')
-      .replace(/\n+/g, ' ')
-      .trim()
-      .slice(0, 140);
-  }, [value]);
-
   const save = async () => {
     if (value === task.description) {
       closeEditor();
@@ -36,7 +24,6 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
     }
 
     setSaving(true);
-
     try {
       await update({ description: value }, 'Failed to update description');
     } finally {
@@ -60,17 +47,23 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
     setEditing(false);
   };
 
+  const toggleExpanded = () => {
+    if (expanded) {
+      closeEditor();
+    } else {
+      setExpanded(true);
+      if (!task.description) {
+        setEditing(true);
+      }
+    }
+  };
+
   return (
     <div className="my-4">
       {/* Header */}
       <div
         className="flex cursor-pointer items-center gap-2 text-base font-bold"
-        onClick={() => {
-          setExpanded((dropdown) => !dropdown);
-          if (!task.description) {
-            setEditing(true);
-          }
-        }}
+        onClick={toggleExpanded}
       >
         {expanded ? <DownOutlined /> : <RightOutlined />}
         <span className="text-base">Description</span>
@@ -78,7 +71,7 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
 
       {/* Expanded body */}
       {expanded && (
-        <div className="mt-2">
+        <div className="mt-2 ml-5">
           {!editing ? (
             <div
               className="cursor-pointer rounded-md bg-gray-100 p-3 text-sm hover:bg-gray-200"
@@ -99,23 +92,6 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
               onCancel={cancel}
               disabled={saving}
             />
-          )}
-        </div>
-      )}
-
-      {/* Collapsed preview */}
-      {!expanded && (
-        <div
-          className="mt-1 ml-5 line-clamp-2 cursor-pointer text-sm text-gray-500 hover:text-gray-700"
-          onClick={openEditor}
-        >
-          {previewText ? (
-            <>
-              {previewText}
-              {previewText.length >= 140 && '…'}
-            </>
-          ) : (
-            <span>Add a description…</span>
           )}
         </div>
       )}
