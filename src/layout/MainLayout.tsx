@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/sidebar/Sidebar';
 import Navbar from '../components/navbar/Navbar';
-import TaskModal from '../components/taskDrawer/TaskModal';
+import TaskModal from '../components/taskModal/TaskModal';
 import { CommandPalette } from '../components/common/CommandPalette';
 import { useSearchParams } from 'react-router-dom';
 
@@ -12,7 +12,7 @@ export default function MainLayout() {
   // const [openTaskId, setOpenTaskId] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [open, setOpen] = useState(false);
-  const searchValue = searchParams.get('searchInput') || '';
+  const [paletteSearch, setPaletteSearch] = useState('');
 
   // Cmd + K / Ctrl + K
   useEffect(() => {
@@ -25,17 +25,6 @@ export default function MainLayout() {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, []);
-  const updateSearch = (value: string) => {
-    const next = new URLSearchParams(searchParams);
-
-    if (value.trim()) {
-      next.set('searchInput', value);
-    } else {
-      next.delete('searchInput');
-    }
-
-    setSearchParams(next, { replace: true });
-  };
 
   const taskId = searchParams.get('taskId');
 
@@ -63,9 +52,12 @@ export default function MainLayout() {
       )}
       <CommandPalette
         open={open}
-        onClose={() => setOpen(false)}
-        value={searchValue}
-        onChange={updateSearch}
+        onClose={() => {
+          setOpen(false);
+          setPaletteSearch('');
+        }}
+        value={paletteSearch}
+        onChange={setPaletteSearch}
       />
     </div>
   );

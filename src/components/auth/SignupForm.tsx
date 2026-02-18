@@ -44,6 +44,7 @@ export function SignupForm() {
         type="text"
         placeholder="Username"
         required
+        className={`${errors.username ? 'border-red-400' : ''}`}
       />
       <Input
         {...register('email', { required: true })}
@@ -52,17 +53,28 @@ export function SignupForm() {
         required
       />
       <Input
-        {...register('password', { required: true, minLength: 6 })}
+        {...register('password', {
+          required: true,
+          minLength: 8,
+          pattern:
+            /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/,
+        })}
         type="password"
         placeholder="Password"
         required
       />
-      <div className="mr-auto flex-col text-start text-red-400">
+      <div className="mr-auto max-w-xs flex-col text-start text-red-400">
         {errors.username?.type === 'required' && <p>Username is required</p>}
         {errors.email?.type === 'required' && <p>Email is required</p>}
         {errors.password?.type === 'required' && <p>Password is required</p>}
         {errors.password?.type === 'minLength' && (
-          <p>Password must be at least 6 characters</p>
+          <p>Password must be at least 8 characters</p>
+        )}
+        {errors.password?.type === 'pattern' && (
+          <p>
+            Password must include at least one uppercase letter, one number, and
+            one special character
+          </p>
         )}
       </div>
       <button

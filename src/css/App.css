@@ -1,0 +1,7 @@
+.task-drawer .ant-drawer-header-title {
+  align-items: flex-start;
+}
+
+.task-drawer .ant-drawer-close {
+  margin-top: 2px;
+}

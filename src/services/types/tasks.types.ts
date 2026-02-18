@@ -18,7 +18,7 @@ export interface Task {
   reporter?: User;
   assignee?: User;
   parentTask?: string;
-  subTask?: string[];
+  subTasks?: string[];
   labels?: string[];
   tags?: string[];
   attachments?: FileList | File[];
@@ -39,9 +39,11 @@ export type User = {
   profileImage?: string;
 };
 
+export type TaskAttachment = File | string;
+
 export interface TaskPopulated {
   _id: string;
-  projectId: Project;
+  projectId: Project | string;
   title: string;
   storyPoint?: number;
   description: string;
@@ -53,9 +55,9 @@ export interface TaskPopulated {
   reporter?: User;
   assignee?: User;
   parentTask?: string;
-  subTask?: string[];
+  subTasks?: string[];
   labels?: string[];
-  attachments?: FileList | File[];
+  attachments?: TaskAttachment[];
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -67,12 +69,13 @@ export interface CreateTaskPayload {
   description?: string;
   type: TaskType;
   key?: string;
-  status: string;
-  priority: TaskPriority;
+  parentTask?: string;
+  status?: string;
+  priority?: TaskPriority;
   dueDate?: string;
   assignee?: string;
   tags?: string[];
-  attachments: FileList | File[];
+  attachments?: FileList | File[];
   storyPoint?: string;
 }
 

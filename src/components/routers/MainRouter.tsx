@@ -14,17 +14,53 @@ import BoardView from '../views/BoardView/BoardView';
 import ListView from '../views/ListView/ListView';
 import { ForYouPage } from '../../pages/ForYouPage';
 import { ProtectedRoute } from '../common/ProtectedRoute';
+import { AuthRedirect } from '../../utils/AuthRedirect';
 
 export function MainRouter() {
   return (
     <BrowserRouter>
       <Routes>
         {/* Public routes */}
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/verify-otp" element={<VerifyOtpPage />} />
-        <Route path="/invite/join" element={<AcceptInvitePage />} />
+        <Route
+          path="/signup"
+          element={
+            <AuthRedirect>
+              <SignupPage />
+            </AuthRedirect>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <AuthRedirect>
+              <LoginPage />
+            </AuthRedirect>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <AuthRedirect>
+              <ForgotPasswordPage />
+            </AuthRedirect>
+          }
+        />
+        <Route
+          path="/verify-otp"
+          element={
+            <AuthRedirect>
+              <VerifyOtpPage />
+            </AuthRedirect>
+          }
+        />
+        <Route
+          path="/invite/join"
+          element={
+            <AuthRedirect>
+              <AcceptInvitePage />
+            </AuthRedirect>
+          }
+        />
         {/* Protected routes */}
         <Route element={<ProtectedRoute redirectPath="/login" />}>
           <Route path="/edit-profile" element={<EditProfilePage />} />

@@ -20,7 +20,7 @@ import {
   arrayMove,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Input, message, Modal } from 'antd';
+import { Input, message, Modal, Skeleton } from 'antd';
 import {
   getProjectById,
   updateProject,
@@ -196,8 +196,6 @@ function BoardView() {
       return;
     }
 
-    let isMounted = true;
-
     const load = async () => {
       try {
         setLoading(true);
@@ -223,23 +221,18 @@ function BoardView() {
           ? sprintsResp
           : ((sprintsResp as { result?: Sprint[] }).result ?? []);
 
-        if (isMounted) {
-          setColumns(projectColumns);
-          setTasks(taskPayload);
-          setSprints(sprintPayload);
-        }
+        setColumns(projectColumns);
+        setTasks(taskPayload);
+        setSprints(sprintPayload);
       } catch {
-        if (isMounted) setError('Failed to load tasks.');
+        setError('Failed to load tasks.');
       } finally {
-        if (isMounted) setLoading(false);
+        setLoading(false);
       }
     };
 
     load();
 
-    return () => {
-      isMounted = false;
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isScrum, projectId, searchParams.get('searchInput')]);
 
@@ -256,7 +249,40 @@ function BoardView() {
     );
   }
 
-  return (
+  return loading ? (
+    <div className="flex gap-3 overflow-x-auto">
+      <div className="flex flex-col gap-1">
+        <Skeleton.Node
+          active={true}
+          style={{ width: '16rem', height: '40px' }}
+        />
+        <Skeleton.Node
+          active={true}
+          style={{ width: '16rem', height: '400px' }}
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <Skeleton.Node
+          active={true}
+          style={{ width: '16rem', height: '40px' }}
+        />
+        <Skeleton.Node
+          active={true}
+          style={{ width: '16rem', height: '400px' }}
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <Skeleton.Node
+          active={true}
+          style={{ width: '16rem', height: '40px' }}
+        />
+        <Skeleton.Node
+          active={true}
+          style={{ width: '16rem', height: '400px' }}
+        />
+      </div>
+    </div>
+  ) : (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCorners}

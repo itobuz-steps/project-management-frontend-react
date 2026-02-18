@@ -1,9 +1,18 @@
 import { LogOut } from 'lucide-react';
 import type { Props } from '../../types/sidebar.types';
+import { useNavigate } from 'react-router-dom';
 
 export default function LogoutButton({ collapsed }: Props) {
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    navigate('/');
+  }
+
   return (
-    <div className="group my-5 mt-auto">
+    <button onClick={handleLogout} className="group my-5 mt-auto">
       <a
         id="logout-btn"
         className="flex cursor-pointer items-center gap-4 overflow-hidden rounded-lg bg-gray-50 p-2 text-red-700 shadow hover:bg-red-200 hover:text-red-800"
@@ -19,6 +28,6 @@ export default function LogoutButton({ collapsed }: Props) {
           Logout
         </span>
       </a>
-    </div>
+    </button>
   );
 }
