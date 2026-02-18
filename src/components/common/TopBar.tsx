@@ -10,6 +10,7 @@ import { useMemo, useState } from 'react';
 import { useProject } from '../../context/ProjectContext';
 import { PRIORITIES } from '../taskDrawer/constants';
 import SearchBar from '../navbar/SearchBar';
+import { InviteUserContainer } from './InviteUserContainer';
 // import AvatarGroup from '../AvatarGroup/AvatarGroup';
 
 const views: { label: string; value: ViewMode }[] = [
@@ -64,10 +65,14 @@ function TopBar({
   };
   return (
     <>
-      <header className="bg-primary-50 rounded-lg border border-gray-100 p-2 shadow-sm md:p-4">
-        <h2 className="mb-2 text-lg font-semibold text-gray-900 sm:mb-3 sm:text-xl">
-          {projectName ?? 'No project selected'}
-        </h2>
+      <header className="bg-primary-50 flex flex-col gap-2 rounded-lg border border-gray-100 p-2 shadow-sm sm:gap-3 md:p-4">
+        <div className="flex items-center justify-between text-center">
+          <h2 className="flex items-center text-lg font-semibold text-gray-900 sm:text-xl">
+            {projectName ?? 'No project selected'}
+          </h2>
+          <InviteUserContainer />
+        </div>
+
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* LEFT: View Switcher */}
           <SearchBar />
