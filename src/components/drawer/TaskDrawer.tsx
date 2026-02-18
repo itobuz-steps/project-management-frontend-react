@@ -13,16 +13,22 @@ export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
   const isMobile = useIsMobile(768);
 
   useEffect(() => {
-    if (!taskId) return;
+    if (!taskId) {
+      return;
+    }
     let cancelled = false;
 
     async function loadTask() {
       try {
         setLoading(true);
         const data = await getTaskById(taskId);
-        if (!cancelled) setTask(data);
+        if (!cancelled) {
+          setTask(data);
+        }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
@@ -32,7 +38,9 @@ export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
     };
   }, [taskId]);
 
-  if (!taskId) return null;
+  if (!taskId) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex" aria-hidden={false}>
@@ -67,7 +75,7 @@ export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
               <DrawerTaskView
                 task={task}
                 isMobile={isMobile}
-                onUpdated={(t) => setTask(t)}
+                onUpdated={(task) => setTask(task)}
               />
             )}
           </div>
