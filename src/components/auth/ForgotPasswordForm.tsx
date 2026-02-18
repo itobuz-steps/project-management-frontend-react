@@ -101,14 +101,25 @@ export function ForgotPasswordForm() {
           placeholder="Enter new password"
           {...register('newPassword', {
             required: true,
-            minLength: 6,
+            minLength: 8,
+            pattern:
+              /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/,
             disabled: !otpSent,
           })}
         />
       </div>
-      <div className="flex flex-col">
+      <div className="mr-auto max-w-xs flex-col text-start text-red-400">
         {errors.email && <p>Email is invalid</p>}
-        {errors.newPassword && <p>Password is invalid</p>}
+        {errors.newPassword?.type === 'required' && <p>Password is required</p>}
+        {errors.newPassword?.type === 'minLength' && (
+          <p>Password must be at least 8 characters</p>
+        )}
+        {errors.newPassword?.type === 'pattern' && (
+          <p>
+            Password must include at least one uppercase letter, one number, and
+            one special character
+          </p>
+        )}
         {errors.otp && <p>OTP is invalid</p>}{' '}
       </div>
       <button

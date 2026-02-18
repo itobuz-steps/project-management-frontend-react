@@ -6,6 +6,7 @@ import { useProject } from '../../../context/ProjectContext';
 import { TaskRow } from '../../backlog/TaskRow';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
 import { taskTableColumns } from '../../../config/constants';
+import { Skeleton } from 'antd';
 
 function ListView() {
   const { projectId } = useParams();
@@ -98,7 +99,12 @@ function ListView() {
           {loading && (
             <tr>
               <td colSpan={11} className="p-4 text-center text-gray-500">
-                Loading tasks...
+                <div className="flex flex-col gap-2">
+                  <Skeleton.Input active={true} size="default" block={true} />
+                  <Skeleton.Input active={true} size="default" block={true} />
+                  <Skeleton.Input active={true} size="default" block={true} />
+                  <Skeleton.Input active={true} size="default" block={true} />
+                </div>
               </td>
             </tr>
           )}
