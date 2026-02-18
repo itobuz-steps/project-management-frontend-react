@@ -43,15 +43,6 @@ export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
           isMobile ? 'w-full' : 'w-96'
         }`}
       >
-        {/* Close button top-right */}
-        {/* <button
-          type="button"
-          aria-label="Close task drawer"
-          onClick={onClose}
-          className="absolute top-3 right-3 z-10 rounded p-2 hover:bg-gray-100"
-        >
-          <CloseOutlined />
-        </button> */}
         <div className="flex h-full flex-col">
           <div className="p-3">
             {task && (
@@ -60,6 +51,7 @@ export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
                 onUpdated={setTask}
                 onClose={onClose}
                 page={false}
+                drawer={true}
               />
             )}
           </div>

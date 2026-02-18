@@ -15,6 +15,7 @@ export function TaskModalHeader({
   onUpdated,
   onClose,
   page,
+  drawer,
 }: HeaderProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(task.title);
@@ -125,7 +126,7 @@ export function TaskModalHeader({
           )}
         </div>
 
-        <div className="flex">
+        <div className={`${drawer ? 'flex' : 'md:w-[296px] lg:w-[396px]'}`}>
           <SidebarRow>
             <StatusSelect
               className="px-6! py-4!"

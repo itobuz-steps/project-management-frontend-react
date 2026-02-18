@@ -50,3 +50,5 @@ export interface DrawerSidebarRowProps {
   label: string;
   children: React.ReactNode;
 }
+
+export type ActivityTab = 'comments' | 'attachments';

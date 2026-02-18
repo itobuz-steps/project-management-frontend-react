@@ -4,17 +4,11 @@ import { AttachmentsTab } from '../attachment/AttachmentsTab';
 import { CommentsTab } from '../comment/CommentsTab';
 import { TaskDescription } from '../taskModal/TaskDescription';
 import { TaskDetails } from '../taskModal/TaskDetails';
-import type { DrawerViewProps } from './drawer.type';
-
-type ActivityTab = 'comments' | 'attachments';
+import { tabs } from './tabsConfig';
+import type { ActivityTab, DrawerViewProps } from './drawer.type';
 
 export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
   const [activeTab, setActiveTab] = useState<ActivityTab>('comments');
-
-  const tabs: { key: ActivityTab; label: string }[] = [
-    { key: 'comments', label: 'Comments' },
-    { key: 'attachments', label: 'Attachments' },
-  ];
 
   return (
     <div
