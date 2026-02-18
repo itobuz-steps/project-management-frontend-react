@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Select, message } from 'antd';
-import type { TaskPopulated, User } from '../services/types/tasks.types';
+import type { TaskPopulated, User } from '../../services/types/tasks.types';
 import { UserCell } from './UserCell';
-import { updateTask } from '../services/taskService';
+import { updateTask } from '../../services/taskService';
+import type { AssigneeCellType } from './ui.types';
 
 export function AssigneeCell({
   task,
@@ -10,13 +11,7 @@ export function AssigneeCell({
   loading,
   onUpdated,
   loadMembers,
-}: {
-  task: TaskPopulated;
-  members: User[];
-  loading: boolean;
-  onUpdated: (t: TaskPopulated) => void;
-  loadMembers?: () => void;
-}) {
+}: AssigneeCellType) {
   const [editing, setEditing] = useState(false);
 
   if (!editing) {

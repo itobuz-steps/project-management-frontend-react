@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Button, Select, Tag, DatePicker, message, Collapse } from 'antd';
-import type { TaskPopulated, User } from '../../services/types/tasks.types';
-import { updateTask } from '../../services/taskService';
-import { SidebarRow } from '../../utils/SidebarRow';
-import { UserCell } from '../../utils/UserCell';
+import { Button, Select, Tag, DatePicker, Collapse } from 'antd';
+import type { TaskPopulated } from '../../services/types/tasks.types';
+import { SidebarRow } from '../ui/SidebarRow';
+import { UserCell } from '../ui/UserCell';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { InputNumber, Dropdown, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
@@ -14,48 +13,32 @@ import {
   STORY_POINTS,
   TASK_TYPES,
 } from './constants';
-import { getProjectMembers } from '../../services/projectService';
-import { AssigneeCell } from '../../utils/AssigneeCell';
+import { AssigneeCell } from '../ui/AssigneeCell';
+import type { EditingField, TaskDetailsProps } from './taskModal.types';
+import { useTaskPatch } from '../../hooks/useTaskPatch';
+import { useProjectMeta } from '../../hooks/useProjectMeta';
 
-export function TaskDetails({
-  task,
-  onUpdated,
-}: {
-  task: TaskPopulated;
-  onUpdated: (t: TaskPopulated) => void;
-}) {
-  const [editing, setEditing] = useState<'priority' | 'type' | null>(null);
+export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
+  const [editing, setEditing] = useState<EditingField>(null);
   const [editingLabels, setEditingLabels] = useState(false);
-  const [members, setMembers] = useState<User[]>([]);
-  const [loadingMembers, setLoadingMembers] = useState(false);
 
-  const loadMembers = async () => {
-    if (members.length) {
-      return;
-    }
+  const { patchTask } = useTaskPatch<TaskPopulated>(task._id, (_, patch) =>
+    onUpdated({ ...task, ...patch })
+  );
 
-    setLoadingMembers(true);
-    try {
-      const result = await getProjectMembers(
-        task.projectId as unknown as string
-      );
-      setMembers(result);
-    } finally {
-      setLoadingMembers(false);
-    }
-  };
+  const { members, loadingMembers } = useProjectMeta(task.projectId as string);
 
   return (
     <Collapse
       ghost
       bordered
       defaultActiveKey={['details']}
-      className="jira-sidebar-collapse"
+      className="task-details-collapse"
       items={[
         {
           key: 'details',
           label: (
-            <span className="px-2 py-1 text-base font-semibold text-gray-900">
+            <span className="text-base font-semibold text-gray-900">
               Details
             </span>
           ),
@@ -66,11 +49,11 @@ export function TaskDetails({
                   task={task}
                   members={members}
                   loading={loadingMembers}
-                  loadMembers={loadMembers}
                   onUpdated={onUpdated}
                 />
               </SidebarRow>
 
+              {/* Labels */}
               <SidebarRow label="Labels">
                 {!editingLabels ? (
                   <div
@@ -79,12 +62,11 @@ export function TaskDetails({
                   >
                     {task.tags?.length ? (
                       <>
-                        {task.tags.slice(0, 3).map((label) => (
-                          <Tag key={label} color="blue">
-                            {label}
+                        {task.tags.slice(0, 3).map((tag) => (
+                          <Tag key={tag} color="blue">
+                            {tag}
                           </Tag>
                         ))}
-
                         {task.tags.length > 3 && (
                           <Tag>+{task.tags.length - 3}</Tag>
                         )}
@@ -97,42 +79,31 @@ export function TaskDetails({
                   <Select
                     autoFocus
                     mode="tags"
-                    style={{ width: '100%' }}
+                    className="w-full"
                     value={task.tags}
-                    placeholder="Add labels"
                     onBlur={() => setEditingLabels(false)}
-                    onChange={async (values) => {
-                      onUpdated({ ...task, tags: values });
+                    onChange={(tags) => {
                       setEditingLabels(false);
-
-                      try {
-                        await updateTask(task._id, { tags: values });
-                      } catch {
-                        message.error('Failed to update labels');
-                        onUpdated(task);
-                      }
+                      patchTask({ tags }, 'Failed to update labels');
                     }}
                   />
                 )}
               </SidebarRow>
 
+              {/* Priority */}
               <SidebarRow label="Priority">
                 {editing !== 'priority' ? (
-                  <div
+                  <Tag
+                    className="cursor-pointer capitalize"
+                    color={
+                      PRIORITY_COLORS[
+                        task.priority as keyof typeof PRIORITY_COLORS
+                      ]
+                    }
                     onClick={() => setEditing('priority')}
-                    className="flex cursor-pointer items-center rounded-md hover:bg-gray-100"
                   >
-                    <Tag
-                      className="m-0 capitalize"
-                      color={
-                        PRIORITY_COLORS[
-                          task.priority as keyof typeof PRIORITY_COLORS
-                        ] ?? 'green'
-                      }
-                    >
-                      {task.priority}
-                    </Tag>
-                  </div>
+                    {task.priority}
+                  </Tag>
                 ) : (
                   <Select
                     autoFocus
@@ -140,33 +111,27 @@ export function TaskDetails({
                     value={task.priority}
                     className="w-full"
                     onBlur={() => setEditing(null)}
-                    onChange={async (newPriority) => {
-                      onUpdated({ ...task, priority: newPriority });
+                    onChange={(priority) => {
                       setEditing(null);
-
-                      try {
-                        await updateTask(task._id, { priority: newPriority });
-                      } catch {
-                        message.error('Failed to update priority');
-                        onUpdated(task);
-                      }
+                      patchTask({ priority }, 'Failed to update priority');
                     }}
-                    options={PRIORITIES.map((priority) => ({
-                      value: priority,
-                      label: <span className="capitalize">{priority}</span>,
+                    options={PRIORITIES.map((p) => ({
+                      value: p,
+                      label: <span className="capitalize">{p}</span>,
                     }))}
                   />
                 )}
               </SidebarRow>
 
+              {/* Type */}
               <SidebarRow label="Type">
                 {editing !== 'type' ? (
                   <div
+                    className="flex cursor-pointer items-center gap-2"
                     onClick={() => setEditing('type')}
-                    className="flex cursor-pointer items-center gap-2 rounded-md hover:bg-gray-100"
                   >
                     <TaskTypeIcon type={task.type} />
-                    <span className="text-sm capitalize">{task.type}</span>
+                    <span className="capitalize">{task.type}</span>
                   </div>
                 ) : (
                   <Select
@@ -175,23 +140,16 @@ export function TaskDetails({
                     value={task.type}
                     className="w-full"
                     onBlur={() => setEditing(null)}
-                    onChange={async (newType) => {
-                      onUpdated({ ...task, type: newType });
+                    onChange={(type) => {
                       setEditing(null);
-
-                      try {
-                        await updateTask(task._id, { type: newType });
-                      } catch {
-                        message.error('Failed to update type');
-                        onUpdated(task);
-                      }
+                      patchTask({ type }, 'Failed to update type');
                     }}
                     options={TASK_TYPES.map((type) => ({
                       value: type,
                       label: (
                         <div className="flex items-center gap-2 capitalize">
                           <TaskTypeIcon type={type} />
-                          <span>{type}</span>
+                          {type}
                         </div>
                       ),
                     }))}
@@ -199,6 +157,7 @@ export function TaskDetails({
                 )}
               </SidebarRow>
 
+              {/* Story Points */}
               <SidebarRow label="Story Points">
                 <Space.Compact className="w-full">
                   <InputNumber
@@ -206,21 +165,12 @@ export function TaskDetails({
                     min={0}
                     value={task.storyPoint}
                     placeholder="—"
-                    onChange={async (value) => {
-                      onUpdated({
-                        ...task,
-                        storyPoint: value ?? undefined,
-                      });
-
-                      try {
-                        await updateTask(task._id, {
-                          storyPoint: value ?? undefined,
-                        });
-                      } catch {
-                        message.error('Failed to update story points');
-                        onUpdated(task);
-                      }
-                    }}
+                    onChange={(value) =>
+                      patchTask(
+                        { storyPoint: value ?? undefined },
+                        'Failed to update story points'
+                      )
+                    }
                   />
 
                   <Dropdown
@@ -228,16 +178,11 @@ export function TaskDetails({
                       items: STORY_POINTS.map((points) => ({
                         key: points,
                         label: points,
-                        onClick: async () => {
-                          onUpdated({ ...task, storyPoint: points });
-
-                          try {
-                            await updateTask(task._id, { storyPoint: points });
-                          } catch {
-                            message.error('Failed to update story points');
-                            onUpdated(task);
-                          }
-                        },
+                        onClick: () =>
+                          patchTask(
+                            { storyPoint: points },
+                            'Failed to update story points'
+                          ),
                       })),
                     }}
                   >
@@ -246,11 +191,11 @@ export function TaskDetails({
                 </Space.Compact>
               </SidebarRow>
 
+              {/* Due Date */}
               <SidebarRow label="Due Date">
                 <DatePicker
-                  className="w-full"
                   size="small"
-                  placeholder="None"
+                  className="w-full"
                   format="YYYY-MM-DD"
                   value={task.dueDate ? dayjs(task.dueDate) : null}
                   status={
@@ -258,24 +203,16 @@ export function TaskDetails({
                       ? 'error'
                       : undefined
                   }
-                  onChange={async (date) => {
-                    const newDate = date ? date.toISOString() : null;
-                    if (!newDate) {
-                      return;
-                    }
-
-                    onUpdated({ ...task, dueDate: newDate });
-
-                    try {
-                      await updateTask(task._id, { dueDate: newDate });
-                    } catch {
-                      message.error('Failed to update due date');
-                    }
-                  }}
+                  onChange={(date) =>
+                    patchTask(
+                      { dueDate: date?.toISOString() },
+                      'Failed to update due date'
+                    )
+                  }
                 />
               </SidebarRow>
 
-              <div className="mb-4">
+              <div className="pb-3">
                 <SidebarRow label="Reporter">
                   <UserCell user={task.reporter} emptyText="—" />
                 </SidebarRow>

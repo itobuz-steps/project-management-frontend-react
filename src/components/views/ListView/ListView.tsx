@@ -5,7 +5,7 @@ import { updateTask } from '../../../services/taskService';
 import type { Task, TaskStatus } from '../../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../../utils/TaskTypeColor';
-import { StatusSelect } from '../../../utils/StatusSelect';
+import { StatusSelect } from '../../ui/StatusSelect';
 import { getPriorityBorder } from '../../../utils/utils';
 import { useProject } from '../../../context/ProjectContext';
 import { listViewHeaders } from './listView.constants';

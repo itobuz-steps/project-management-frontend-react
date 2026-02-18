@@ -1,22 +1,11 @@
-import { EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import TaskList from '@tiptap/extension-task-list';
-import TaskItem from '@tiptap/extension-task-item';
-import Link from '@tiptap/extension-link';
-import Mention from '@tiptap/extension-mention';
-import Placeholder from '@tiptap/extension-placeholder';
-import { TextStyle } from '@tiptap/extension-text-style';
-import { Table } from '@tiptap/extension-table';
-import TableRow from '@tiptap/extension-table-row';
-import TableHeader from '@tiptap/extension-table-header';
-import TableCell from '@tiptap/extension-table-cell';
-import Emoji from '@tiptap/extension-emoji';
+import { EditorContent } from '@tiptap/react';
 import type { Level } from '@tiptap/extension-heading';
 import { Upload, Button, message, Select } from 'antd';
 import { PaperClipOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { headingOptions, type TextEditorProps } from './textEditor.type';
 import { Link as RouterLink } from 'react-router-dom';
+import { useTextEditor } from '../../hooks/useTextEditor';
 
 export function TextEditor({
   comment,
@@ -31,40 +20,7 @@ export function TextEditor({
     []
   );
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({ codeBlock: {} }),
-      TaskList,
-      TaskItem.configure({ nested: true }),
-      Link.configure({ openOnClick: false }),
-      TextStyle,
-      Emoji,
-      Table.configure({ resizable: true }),
-      TableRow,
-      TableHeader,
-      TableCell,
-      Mention.configure({
-        HTMLAttributes: {
-          class: 'text-blue-600 font-medium',
-        },
-        suggestion: {
-          items: ({ query }) =>
-            ['@John', '@Jane', '@Team'].filter((item) =>
-              item.toLowerCase().includes(query.toLowerCase())
-            ),
-        },
-      }),
-      Placeholder.configure({
-        placeholder: 'Add a description…',
-      }),
-    ],
-    content,
-    editable: !disabled,
-    autofocus: true,
-    onUpdate({ editor }) {
-      onChange(editor.getHTML());
-    },
-  });
+  const editor = useTextEditor({ content, disabled, onChange });
 
   if (!editor) {
     return null;
@@ -87,13 +43,13 @@ export function TextEditor({
           onChange={(value) => {
             if (!value) {
               editor.chain().focus().setParagraph().run();
-            } else {
-              editor
-                .chain()
-                .focus()
-                .toggleHeading({ level: Number(value) as Level })
-                .run();
             }
+
+            editor
+              .chain()
+              .focus()
+              .toggleHeading({ level: Number(value) as Level })
+              .run();
           }}
         />
 
@@ -218,47 +174,43 @@ export function TextEditor({
         className="prose prose-sm max-w-none p-3 text-gray-800 focus:outline-none"
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
-            // e.preventDefault();
             onCancel();
           }
           if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-            // e.preventDefault();
             onSave();
           }
         }}
       />
 
       {/* Attachments below editor */}
-      {attachments.length > 0 && (
-        <div className="mt-2 flex flex-col gap-1 px-4">
-          {attachments.map((attachment, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-between rounded-md bg-gray-50 px-2 py-1 text-sm"
+      <div className="mt-2 flex flex-col gap-1 px-4">
+        {attachments.map((attachment, idx) => (
+          <div
+            key={idx}
+            className="flex items-center justify-between rounded-md bg-gray-50 px-2 py-1 text-sm"
+          >
+            <RouterLink
+              to={attachment.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 truncate text-gray-700"
             >
-              <RouterLink
-                to={attachment.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 truncate text-gray-700"
-              >
-                <PaperClipOutlined />
-                <span className="truncate">{attachment.file.name}</span>
-              </RouterLink>
+              <PaperClipOutlined />
+              <span className="truncate">{attachment.file.name}</span>
+            </RouterLink>
 
-              <Button
-                size="small"
-                type="text"
-                icon={<DeleteOutlined />}
-                onClick={() => {
-                  setAttachments([]);
-                  onAttachmentsChange?.([]);
-                }}
-              />
-            </div>
-          ))}
-        </div>
-      )}
+            <Button
+              size="small"
+              type="text"
+              icon={<DeleteOutlined />}
+              onClick={() => {
+                setAttachments([]);
+                onAttachmentsChange?.([]);
+              }}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

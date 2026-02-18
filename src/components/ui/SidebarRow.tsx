@@ -1,10 +1,6 @@
-export function SidebarRow({
-  label,
-  children,
-}: {
-  label?: string;
-  children: React.ReactNode;
-}) {
+import type { SidebarRowType } from './ui.types';
+
+export function SidebarRow({ label, children }: SidebarRowType) {
   const hasLabel = Boolean(label);
 
   return (

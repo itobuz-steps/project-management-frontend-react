@@ -1,20 +1,19 @@
 import { ChevronDown } from 'lucide-react';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import type { TaskTableProps } from './type';
-import type { TaskPopulated, User } from '../../services/types/tasks.types';
-import { createSprintService } from '../../services/sprints.service';
-import { toast } from 'react-toastify';
-import { AxiosError } from 'axios';
+import type { TaskPopulated } from '../../services/types/tasks.types';
 import { SprintMenu } from './SprintMenu';
 import { TaskRow } from './TaskRow';
 import { SprintButton } from './SprintButton';
 import { useProject } from '../../context/ProjectContext';
-import { getProjectMembers } from '../../services/projectService';
+import { useProjectMeta } from '../../hooks/useProjectMeta';
+import { useSprintActions } from '../../hooks/useSprintActions';
+import { taskTableColumns } from '../../config/constants';
 
 export function TaskTable({
   sprint,
@@ -25,212 +24,98 @@ export function TaskTable({
   containerId,
 }: TaskTableProps) {
   const [open, setOpen] = useState(true);
-  const [localTasks, setLocalTasks] = useState<TaskPopulated[]>(tasks);
+  const [localTasks, setLocalTasks] = useState(tasks);
   const { project } = useProject();
+  
+  const { members, loadingMembers } = useProjectMeta(project?._id);
 
-  const sprintService = createSprintService(project?._id as string);
+  const { dueDateRef, startSprint, completeSprint, createSprint } =
+    useSprintActions(project?._id, setSprints);
+
+  const { setNodeRef, isOver } = useDroppable({
+    id: containerId,
+    data: { containerId },
+  });
 
   useEffect(() => {
     setLocalTasks(tasks);
   }, [tasks]);
 
-  const [members, setMembers] = useState<User[]>([]);
-  const [loadingMembers, setLoadingMembers] = useState(false);
-
-  useEffect(() => {
-    async function loadMembers() {
-      if (!project?._id) {
-        return;
-      }
-
-      setLoadingMembers(true);
-
-      try {
-        const res = await getProjectMembers(project._id);
-        setMembers(res);
-      } finally {
-        setLoadingMembers(false);
-      }
-    }
-
-    loadMembers();
-  }, [project?._id]);
-
-  const onTaskUpdated = (updated: TaskPopulated) => {
+  const handleTaskUpdated = (updated: TaskPopulated) => {
     setLocalTasks((prev) =>
       prev.map((task) => (task._id === updated._id ? updated : task))
     );
   };
 
-  const updateTaskInState = (id: string, patch: Partial<TaskPopulated>) => {
-    setLocalTasks((previous) =>
-      previous.map((task) => (task._id === id ? { ...task, ...patch } : task))
+  const patchTaskInState = (id: string, patch: Partial<TaskPopulated>) => {
+    setLocalTasks((prev) =>
+      prev.map((task) => (task._id === id ? { ...task, ...patch } : task))
     );
   };
 
-  const dueDateRef = useRef<HTMLInputElement>(null);
-  const { setNodeRef, isOver } = useDroppable({
-    id: containerId,
-    data: { containerId },
-  });
-  const sprintStarted = sprint?.dueDate;
-
-  async function startSprint() {
-    if (!sprint) {
-      return;
-    }
-
-    if (!dueDateRef.current || !dueDateRef.current.value) {
-      return;
-    }
-
-    const dueDateValue = dueDateRef.current.value;
-
-    try {
-      await sprintService.updateSprint(sprint._id, {
-        dueDate: new Date(dueDateValue),
-      });
-      setSprints?.((prevSprints) =>
-        prevSprints.map((sprint) =>
-          sprint._id === sprint._id
-            ? { ...sprint, dueDate: new Date(dueDateValue) }
-            : sprint
-        )
-      );
-    } catch (error) {
-      
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data.message || 'Failed to start sprint');
-      }
-    }
-  }
-
-  async function completeSprint() {
-    if (!sprint) {
-      return;
-    }
-
-    try {
-      await sprintService.updateSprint(sprint._id, {
-        isCompleted: true,
-      });
-      setSprints?.((prevSprints) =>
-        prevSprints.map((sprint) =>
-          sprint._id === sprint._id ? { ...sprint, isCompleted: true } : sprint
-        )
-      );
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(
-          error.response?.data.message || 'Failed to complete sprint'
-        );
-      }
-    }
-  }
-
-  async function createSprintHandler() {
-    try {
-      const sprint = await sprintService.createSprint({
-        projectId: project?._id || '',
-      });
-
-      setSprints?.((prevSprints) => [sprint, ...prevSprints]);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data.message || 'Failed to create sprint');
-      }
-    }
-  }
+  const sprintStarted = Boolean(sprint?.dueDate);
 
   return (
     <div className="rounded-lg bg-white shadow-sm">
-      {/* Sprint Header */}
-      <div className="flex w-full items-center justify-between rounded-t-lg bg-gray-100 px-4 py-2 text-left hover:bg-gray-100">
+      {/* Header */}
+      <div className="flex items-center justify-between rounded-t-lg bg-gray-100 px-4 py-2">
         <div
-          onClick={() => setOpen(!open)}
+          onClick={() => setOpen((dropdown) => !dropdown)}
           className="flex cursor-pointer items-center gap-2"
         >
           <ChevronDown
             className={`h-4 w-4 transition ${open ? '' : '-rotate-90'}`}
           />
           <span className="font-semibold">{title || sprint?.key}</span>
+
           {sprint?.dueDate && (
             <span className="bg-primary-50 text-primary-600 rounded-full px-2 py-0.5 text-xs font-medium">
               Due {new Date(sprint.dueDate).toLocaleDateString()}
             </span>
           )}
         </div>
+
         <div className="space-x-4">
           <span className="text-xs text-gray-400">
             {tasks.length} issue{tasks.length !== 1 && 's'}
           </span>
-          {sprint && (
+
+          {sprint ? (
             <SprintMenu
               dueDateRef={dueDateRef}
-              sprintStarted={!!sprintStarted}
-              startSprint={startSprint}
-              completeSprint={completeSprint}
+              sprintStarted={sprintStarted}
+              startSprint={() => startSprint(sprint)}
+              completeSprint={() => completeSprint(sprint)}
             />
-          )}
-
-          {!sprint && (
-            <SprintButton onClick={createSprintHandler}>
-              Create Sprint
-            </SprintButton>
+          ) : (
+            <SprintButton onClick={createSprint}>Create Sprint</SprintButton>
           )}
         </div>
       </div>
 
-      {/* Sprint Table */}
+      {/* Table */}
       {open && (
-        <div
-          className={`no-scrollbar relative mt-2 w-full overflow-x-auto rounded-md border border-gray-200`}
-        >
+        <div className="relative mt-2 overflow-x-auto rounded-md border border-gray-200">
           <table className="min-w-full table-auto text-left text-sm">
             <thead className="sticky top-0 z-10 border-b bg-gray-100 text-xs text-gray-600 uppercase">
               <tr>
-                <th scope="col" className="p-2 text-center">
-                  Type
-                </th>
-                <th scope="col" className="p-2">
-                  Key
-                </th>
-                <th scope="col" className="space-padding">
-                  Summary
-                </th>
-                <th scope="col" className="space-padding">
-                  Status
-                </th>
-                <th scope="col" className="space-padding px-10">
-                  Assignee
-                </th>
-                <th scope="col" className="space-padding">
-                  Due Date
-                </th>
-                <th scope="col" className="space-padding">
-                  Labels
-                </th>
-                <th scope="col" className="space-padding">
-                  Created
-                </th>
-                <th scope="col" className="space-padding">
-                  Updated
-                </th>
-                <th scope="col" className="space-padding">
-                  Reporter
-                </th>
+                {taskTableColumns.map(({ label, className }) => (
+                  <th key={label} className={className}>
+                    {label}
+                  </th>
+                ))}
               </tr>
             </thead>
 
             <tbody
               ref={setNodeRef}
-              className={`${isOver ? 'bg-primary-50' : ''} divide-y`}
+              className={`divide-y ${isOver ? 'bg-primary-50' : ''}`}
             >
               <SortableContext
                 items={localTasks.map((task) => task._id)}
                 strategy={verticalListSortingStrategy}
               >
-                {tasks.length === 0 ? (
+                {localTasks.length === 0 ? (
                   <tr>
                     <td
                       colSpan={12}
@@ -246,10 +131,10 @@ export function TaskTable({
                       task={task}
                       containerId={containerId}
                       columns={columns}
-                      onPatch={updateTaskInState}
+                      onPatch={patchTaskInState}
                       members={members}
                       loadingMembers={loadingMembers}
-                      onUpdated={onTaskUpdated}
+                      onUpdated={handleTaskUpdated}
                     />
                   ))
                 )}

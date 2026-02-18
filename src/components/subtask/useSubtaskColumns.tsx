@@ -4,10 +4,10 @@ import { Trash2 } from 'lucide-react';
 
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
-import { StatusSelect } from '../../utils/StatusSelect';
+import { StatusSelect } from '../ui/StatusSelect';
 import { PRIORITY_COLORS } from '../taskModal/constants';
 import type { Args } from './subtask.types';
-import { AssigneeCell } from '../../utils/AssigneeCell';
+import { AssigneeCell } from '../ui/AssigneeCell';
 
 export function useSubtaskColumns({
   columns,

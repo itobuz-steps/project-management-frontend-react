@@ -1,15 +1,15 @@
-import { Button, Input, message, type InputRef } from 'antd';
+import { Button, Input, type InputRef } from 'antd';
 import { ArrowsAltOutlined, CloseOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from 'react';
 import type { TaskPopulated } from '../../services/types/tasks.types';
-import { updateTask } from '../../services/taskService';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
-import { SidebarRow } from '../../utils/SidebarRow';
-import { StatusSelect } from '../../utils/StatusSelect';
-import { getProjectById } from '../../services/projectService';
-import getTaskById from '../../services/taskService';
+import { SidebarRow } from '../ui/SidebarRow';
+import { StatusSelect } from '../ui/StatusSelect';
 import { Link } from 'react-router-dom';
-import type { HeaderProps } from './taskDrawer.type';
+import type { HeaderProps } from './taskModal.types';
+import { useParentTask } from '../../hooks/useParentTask';
+import { useProjectMeta } from '../../hooks/useProjectMeta';
+import { useTaskPatch } from '../../hooks/useTaskPatch';
 
 export function TaskModalHeader({
   task,
@@ -19,42 +19,19 @@ export function TaskModalHeader({
 }: HeaderProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(task.title);
-  const [saving, setSaving] = useState(false);
-  const [columns, setColumns] = useState<string[]>([]);
-  const [parentTask, setParentTask] = useState<TaskPopulated | null>(null);
 
   const inputRef = useRef<InputRef>(null);
+
+  const parentTask = useParentTask(task.parentTask as string | undefined);
+  const { columns } = useProjectMeta(task.projectId as string | undefined);
+
+  const { patchTask } = useTaskPatch<TaskPopulated>(task._id, (_, patch) =>
+    onUpdated({ ...task, ...patch })
+  );
 
   useEffect(() => {
     setValue(task.title);
   }, [task.title]);
-
-  useEffect(() => {
-    if (!task.parentTask) {
-      setParentTask(null);
-      return;
-    }
-
-    async function fetchParentTask() {
-      try {
-        const parent = await getTaskById(task.parentTask as string);
-        setParentTask(parent);
-      } catch {
-        setParentTask(null);
-      }
-    }
-
-    fetchParentTask();
-  }, [task.parentTask]);
-
-  useEffect(() => {
-    async function fetchColumns() {
-      const project = await getProjectById(task.projectId as unknown as string);
-      setColumns(project.columns);
-    }
-
-    fetchColumns();
-  }, [task.projectId]);
 
   useEffect(() => {
     if (editing) {
@@ -62,33 +39,23 @@ export function TaskModalHeader({
     }
   }, [editing]);
 
-  const save = async () => {
+  const saveTitle = async () => {
     if (!value.trim() || value === task.title) {
       setEditing(false);
       setValue(task.title);
       return;
     }
 
-    setSaving(true);
-    onUpdated({ ...task, title: value });
+    await patchTask({ title: value }, 'Failed to update title');
 
-    try {
-      await updateTask(task._id, { title: value });
-    } catch {
-      message.error('Failed to update title');
-      onUpdated(task);
-      setValue(task.title);
-    } finally {
-      setSaving(false);
-      setEditing(false);
-    }
+    setEditing(false);
   };
 
   return (
     <div className="flex flex-col pr-1">
+      {/* Top row */}
       <div className="flex items-center justify-between text-sm text-gray-500">
         <div className="flex items-center gap-1">
-          {/* Parent task */}
           {parentTask && (
             <>
               <TaskTypeIcon type={parentTask.type} />
@@ -100,7 +67,6 @@ export function TaskModalHeader({
               >
                 {parentTask.key}
               </Link>
-
               <span className="mx-1">/</span>
             </>
           )}
@@ -130,9 +96,9 @@ export function TaskModalHeader({
 
       <div className="h-4" />
 
-      <div className="flex flex-row justify-between gap-2">
+      {/* Title + status */}
+      <div className="flex justify-between gap-2">
         <div className="flex items-center">
-          {/* Title */}
           {!editing ? (
             <h1
               className="cursor-pointer rounded px-1 text-2xl font-semibold hover:bg-gray-100"
@@ -148,39 +114,30 @@ export function TaskModalHeader({
               bordered={false}
               className="text-2xl! font-semibold"
               onChange={(e) => setValue(e.target.value)}
-              onBlur={save}
+              onBlur={saveTitle}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
-                  // e.preventDefault();
-                  save();
+                  saveTitle();
                 }
+
                 if (e.key === 'Escape') {
                   setEditing(false);
                   setValue(task.title);
                 }
               }}
-              disabled={saving}
             />
           )}
         </div>
 
-        <div className={`flex md:w-[296px] lg:w-[396px]`}>
-          {/* Inline Status */}
+        <div className="md:w-[296px] lg:w-[396px]">
           <SidebarRow>
             <StatusSelect
               className="px-6! py-4!"
               value={task.status}
               columns={columns}
-              onChange={async (newStatus) => {
-                onUpdated({ ...task, status: newStatus });
-
-                try {
-                  await updateTask(task._id, { status: newStatus });
-                } catch {
-                  message.error('Failed to update status');
-                  onUpdated(task);
-                }
-              }}
+              onChange={(status) =>
+                patchTask({ status }, 'Failed to update status')
+              }
             />
           </SidebarRow>
         </div>

@@ -1,56 +1,60 @@
-import { useEffect, useState } from 'react';
-import { message } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import type { TaskPopulated } from '../../services/types/tasks.types';
-import { updateTask } from '../../services/taskService';
 import { TextEditor } from '../textEditor/TextEditor';
+import { useTaskPatch } from '../../hooks/useTaskPatch';
+import type { TaskDescriptionProps } from './taskModal.types';
 
-export function TaskDescription({
-  task,
-  onPatch,
-}: {
-  task: TaskPopulated;
-  onPatch?: (id: string, patch: Partial<TaskPopulated>) => void;
-}) {
+export function TaskDescription({ task, onPatch }: TaskDescriptionProps) {
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(task.description || '');
   const [saving, setSaving] = useState(false);
 
+  const { patchTask } = useTaskPatch<TaskPopulated>(
+    task._id,
+    onPatch ?? (() => {})
+  );
+
   useEffect(() => {
     setValue(task.description || '');
   }, [task.description]);
 
+  const previewText = useMemo(
+    () => value?.replace(/<[^>]+>/g, '').slice(0, 140),
+    [value]
+  );
+
   const save = async () => {
     if (value === task.description) {
-      setEditing(false);
-      setExpanded(false);
+      closeEditor();
       return;
     }
 
     setSaving(true);
-    onPatch?.(task._id, { description: value });
 
     try {
-      await updateTask(task._id, { description: value });
-      message.success('Description updated');
-    } catch {
-      message.error('Failed to update description');
-      setValue(task.description || '');
+      await patchTask({ description: value }, 'Failed to update description');
     } finally {
       setSaving(false);
-      setEditing(false);
-      setExpanded(false);
+      closeEditor();
     }
   };
 
   const cancel = () => {
     setValue(task.description || '');
-    setEditing(false);
-    setExpanded(false);
+    closeEditor();
   };
 
-  const previewText = value?.replace(/<[^>]+>/g, '').slice(0, 140);
+  const openEditor = () => {
+    setExpanded(true);
+    setEditing(true);
+  };
+
+  const closeEditor = () => {
+    setExpanded(false);
+    setEditing(false);
+  };
 
   return (
     <div className="my-4">
@@ -59,7 +63,6 @@ export function TaskDescription({
         className="flex cursor-pointer items-center gap-2 text-base font-bold"
         onClick={() => {
           setExpanded((dropdown) => !dropdown);
-
           if (!task.description) {
             setEditing(true);
           }
@@ -69,16 +72,20 @@ export function TaskDescription({
         <span className="text-base">Description</span>
       </div>
 
-      {/* Body */}
+      {/* Expanded body */}
       {expanded && (
         <div className="mt-2">
           {!editing ? (
             <div
               className="cursor-pointer rounded-md bg-gray-100 p-3 text-sm hover:bg-gray-200"
-              onClick={() => setEditing(true)}
+              onClick={openEditor}
             >
               {task.description ? (
-                <div dangerouslySetInnerHTML={{ __html: task.description }} />
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: task.description,
+                  }}
+                />
               ) : (
                 <span className="text-gray-400">Add a description…</span>
               )}
@@ -100,16 +107,13 @@ export function TaskDescription({
       {!expanded && (
         <div
           className="mt-1 ml-5 cursor-pointer text-sm text-gray-500 hover:text-gray-700"
-          onClick={() => {
-            setExpanded(true);
-            setEditing(!task.description);
-          }}
+          onClick={openEditor}
         >
           {previewText ? (
-            <span>
+            <>
               {previewText}
               {previewText.length >= 140 && '…'}
-            </span>
+            </>
           ) : (
             <span>Add a description…</span>
           )}

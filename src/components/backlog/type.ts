@@ -10,7 +10,7 @@ export interface TaskTableProps {
   containerId: string;
 }
 
-export interface TaskRowProps{
+export interface TaskRowProps {
   task: TaskPopulated;
   containerId: string;
   columns: string[];

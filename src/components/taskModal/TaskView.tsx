@@ -1,8 +1,8 @@
-import { SubtasksTab } from './SubtasksTab';
-import { AttachmentsTab } from './AttachmentsTab';
-import { CommentsTab } from './CommentsTab';
+import { SubtasksTab } from '../subtask/SubtasksTab';
+import { AttachmentsTab } from '../attachment/AttachmentsTab';
+import { CommentsTab } from '../comment/CommentsTab';
 import { TaskDescription } from './TaskDescription';
-import type { ViewProps } from './taskDrawer.type';
+import type { ViewProps } from './taskModal.types';
 import { TaskDetails } from './TaskDetails';
 import { Tabs, type TabsProps } from 'antd';
 import { ActivityTab } from './ActivityTab';

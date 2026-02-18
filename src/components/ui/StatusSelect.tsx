@@ -1,17 +1,13 @@
 import { Dropdown, Button } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
+import type { StatusSelectType } from './ui.types';
 
 export function StatusSelect({
   value,
   columns,
   onChange,
   className = '',
-}: {
-  value: string;
-  columns: string[];
-  onChange: (value: string) => void;
-  className?: string;
-}) {
+}: StatusSelectType) {
   const selectedIndex = columns.indexOf(value);
 
   const getColorClass = (index: number, total: number) => {

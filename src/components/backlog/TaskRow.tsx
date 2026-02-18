@@ -1,16 +1,16 @@
 import { CSS } from '@dnd-kit/utilities';
-import { StatusSelect } from '../../utils/StatusSelect';
+import { StatusSelect } from '../ui/StatusSelect';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { getPriorityBorder } from '../../utils/utils';
-import { DatePicker, message } from 'antd';
 import dayjs from 'dayjs';
-import { Link, useSearchParams } from 'react-router-dom';
-import { updateTask } from '../../services/taskService';
 import { useSortable } from '@dnd-kit/sortable';
-import { TaskTypeColor } from '../../utils/TaskTypeColor';
 import { config } from '../../config/config';
-import { AssigneeCell } from '../../utils/AssigneeCell';
+import { AssigneeCell } from '../ui/AssigneeCell';
 import type { TaskRowProps } from './type';
+import { useTaskPatch } from '../../hooks/useTaskPatch';
+import { TaskKeyCell } from '../ui/TaskKeyCell';
+import { TaskTitleCell } from '../ui/TaskTitleCell';
+import { DueDateCell } from '../ui/DueDateCell';
 
 export function TaskRow({
   task,
@@ -21,7 +21,6 @@ export function TaskRow({
   loadingMembers,
   onUpdated,
 }: TaskRowProps) {
-  const [, setSearchParams] = useSearchParams();
   const {
     attributes,
     listeners,
@@ -29,7 +28,12 @@ export function TaskRow({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: task._id, data: { type: 'task', containerId } });
+  } = useSortable({
+    id: task._id,
+    data: { type: 'task', containerId },
+  });
+
+  const { patchTask } = useTaskPatch<typeof task>(task._id, onPatch);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -52,40 +56,25 @@ export function TaskRow({
           <TaskTypeIcon type={task.type} />
         </div>
       </td>
-      <td>
-        <Link
-          to={`/task/${task._id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="h-full w-full cursor-pointer p-2 font-medium whitespace-nowrap text-white hover:underline"
-        >
-          <TaskTypeColor type={task.type}>{task.key}</TaskTypeColor>
-        </Link>
-      </td>
 
-      <td
-        className="space-padding cursor-pointer whitespace-nowrap hover:underline"
-        onClick={() => {
-          setSearchParams({ taskId: task._id }, { replace: true });
-        }}
-      >
-        {task.title}
-      </td>
-      <td className="space-padding whitespace-nowrap">
+      <TaskKeyCell
+        taskId={task._id}
+        type={task.type}
+        taskKey={task.key as string}
+      />
+
+      <TaskTitleCell title={task.title} taskId={task._id} />
+
+      <td className="p-3 px-6 whitespace-nowrap">
         <StatusSelect
           value={task.status}
           columns={columns}
-          onChange={async (newStatus) => {
-            onPatch(task._id, { status: newStatus });
-            try {
-              await updateTask(task._id, { status: newStatus });
-            } catch {
-              message.error('Failed to update status');
-            }
-          }}
+          onChange={(status) =>
+            patchTask({ status }, 'Failed to update status')
+          }
         />
       </td>
-      <td className="space-padding w-[200px] px-10 whitespace-nowrap">
+      <td className="w-[200px] p-3 px-10 whitespace-nowrap">
         <AssigneeCell
           task={task}
           members={members}
@@ -93,42 +82,22 @@ export function TaskRow({
           onUpdated={onUpdated}
         />
       </td>
-      <td className="space-padding whitespace-nowrap">
-        <DatePicker
-          className="w-full max-w-[150px] min-w-[100px] shrink-0"
-          value={task.dueDate ? dayjs(task.dueDate) : null}
-          placeholder="None"
-          format="YYYY-MM-DD"
-          size="small"
-          status={
-            task.dueDate && dayjs(task.dueDate).isBefore(dayjs(), 'day')
-              ? 'error'
-              : undefined
-          }
-          onChange={async (date) => {
-            if (!date) {
-              return;
-            }
 
-            const newDate = date.toISOString();
-            onPatch(task._id, { dueDate: newDate });
+      <DueDateCell
+        dueDate={task.dueDate}
+        onChange={(dueDate) =>
+          patchTask({ dueDate }, 'Failed to update due date')
+        }
+      />
 
-            try {
-              await updateTask(task._id, { dueDate: newDate });
-            } catch {
-              message.error('Failed to update due date');
-            }
-          }}
-        />
-      </td>
-      <td className="space-padding whitespace-nowrap">
+      <td className="p-3 px-6 whitespace-nowrap">
         <div className="flex gap-1">
-          {task.tags?.slice(0, 3).map((label) => (
+          {task.tags?.slice(0, 3).map((tag) => (
             <span
-              key={label}
+              key={tag}
               className="bg-primary-100 text-primary-700 rounded px-2 py-0.5 text-xs"
             >
-              {label}
+              {tag}
             </span>
           ))}
 
@@ -139,19 +108,22 @@ export function TaskRow({
           )}
         </div>
       </td>
-      <td className="space-padding text-xs whitespace-nowrap text-gray-500">
-        {task.createdAt ? new Date(task.createdAt).toLocaleDateString() : ''}
+
+      <td className="p-3 px-6 text-xs text-gray-500">
+        {task.createdAt && dayjs(task.createdAt).format('DD-MM-YYYY')}
       </td>
-      <td className="space-padding text-xs whitespace-nowrap text-gray-500">
-        {task.updatedAt ? new Date(task.updatedAt).toLocaleDateString() : ''}
+
+      <td className="p-3 px-6 text-xs text-gray-500">
+        {task.updatedAt && dayjs(task.updatedAt).format('DD-MM-YYYY')}
       </td>
-      <td className="space-padding whitespace-nowrap">
+
+      <td className="p-3 px-6 whitespace-nowrap">
         <div className="flex items-center">
           <img
-            className="mr-3 aspect-square h-6 w-6 rounded-full object-cover"
+            className="mr-3 h-6 w-6 rounded-full object-cover"
             src={
               task.reporter?.profileImage
-                ? `${config.api_base_url}/uploads/${task.reporter?.profileImage}`
+                ? `${config.api_base_url}/uploads/${task.reporter.profileImage}`
                 : '/profile.png'
             }
           />

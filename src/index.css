@@ -75,14 +75,14 @@ h1 {
 }
 
 /* Outer border */
-.jira-sidebar-collapse {
-  border: 1px solid #e5e7eb; /* light gray */
+.task-details-collapse {
+  border: 1px solid #e5e7eb;
   border-radius: 3px;
   padding: 0px 12px;
 }
 
 @media (max-width: 765px) {
-  .jira-sidebar-collapse {
+  .task-details-collapse {
     border: 0px solid #e5e7eb;
     border-radius: 0px;
     padding: 0px 0px;
@@ -134,7 +134,7 @@ h1 {
   }
 }
 
-.space-padding {
+.row-padding {
   padding: 12px 24px;
 }
 
