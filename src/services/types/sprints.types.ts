@@ -23,6 +23,7 @@ export interface UpdateSprintPayload {
   tasks?: string[];
   dueDate?: Date;
   isCompleted?: boolean;
+  endDate?: Date;
 }
 
 export interface AddTasks {

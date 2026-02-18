@@ -76,6 +76,7 @@ export function MainRouter() {
             <Route path="/" element={<Navigate to="/for-you" replace />} />
             <Route path="/project/:projectId" element={<Dashboard />}>
               <Route index element={<Navigate to="backlog" replace />} />
+
               <Route path="backlog" element={<BacklogView />} />
               <Route path="board" element={<BoardView />} />
               <Route path="list" element={<ListView />} />
