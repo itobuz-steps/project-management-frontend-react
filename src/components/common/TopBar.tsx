@@ -11,6 +11,7 @@ import { useProject } from '../../context/ProjectContext';
 import { PRIORITIES } from '../taskDrawer/constants';
 import SearchBar from '../navbar/SearchBar';
 import { InviteUserContainer } from './InviteUserContainer';
+import { Can } from '../../utils/PermissionHoc';
 // import AvatarGroup from '../AvatarGroup/AvatarGroup';
 
 const views: { label: string; value: ViewMode }[] = [
@@ -70,7 +71,9 @@ function TopBar({
           <h2 className="flex items-center text-lg font-semibold text-gray-900 sm:text-xl">
             {projectName ?? 'No project selected'}
           </h2>
-          <InviteUserContainer />
+          <Can permission="SEND_INVITE">
+            <InviteUserContainer />
+          </Can>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
