@@ -19,6 +19,7 @@ import { createSprintService } from '../../../services/sprints.service';
 import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
 import { getTasks } from '../../../services/taskService';
+import { Skeleton } from 'antd';
 
 function BacklogView() {
   const { projectId } = useParams();
@@ -109,7 +110,26 @@ function BacklogView() {
   }
 
   if (loading) {
-    return <div className="p-4">Loading backlog...</div>;
+    return (
+      <div className="rounded-lg p-4">
+        <div className="flex flex-col gap-3">
+          <Skeleton.Input active={true} size="large" block={true} />
+          <div className="flex flex-col gap-2">
+            <Skeleton.Input active={true} size="default" block={true} />
+            <Skeleton.Input active={true} size="default" block={true} />
+            <Skeleton.Input active={true} size="default" block={true} />
+          </div>
+        </div>
+        <div className="mt-8 flex flex-col gap-3">
+          <Skeleton.Input active={true} size="large" block={true} />
+          <div className="flex flex-col gap-2">
+            <Skeleton.Input active={true} size="default" block={true} />
+            <Skeleton.Input active={true} size="default" block={true} />
+            <Skeleton.Input active={true} size="default" block={true} />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const sprintTaskIds = new Set(sprints.flatMap((s) => s.tasks));

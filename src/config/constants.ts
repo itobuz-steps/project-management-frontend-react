@@ -80,3 +80,16 @@ export const THEME_COLORS: Record<string, string[]> = {
     '#052919',
   ],
 };
+
+export const taskTableColumns = [
+  { label: 'Type', className: 'p-2 text-center' },
+  { label: 'Key', className: 'p-2' },
+  { label: 'Summary', className: 'p-3 px-6' },
+  { label: 'Status', className: 'p-3 px-6' },
+  { label: 'Assignee', className: 'p-3 px-10' },
+  { label: 'Due Date', className: 'p-3 px-6' },
+  { label: 'Labels', className: 'p-3 px-6' },
+  { label: 'Created', className: 'p-3 px-6' },
+  { label: 'Updated', className: 'p-3 px-6' },
+  { label: 'Reporter', className: 'p-3 px-6' },
+];

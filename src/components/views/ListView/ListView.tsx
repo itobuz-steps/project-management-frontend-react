@@ -1,20 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { getTasks } from '../../../services/taskService';
-import { updateTask } from '../../../services/taskService';
-import type {
-  Task,
-  TaskPopulated,
-  TaskStatus,
-} from '../../../services/types/tasks.types';
+import type { TaskPopulated } from '../../../services/types/tasks.types';
 import { useProject } from '../../../context/ProjectContext';
-import { listViewHeaders } from './listView.constants';
 import { TaskRow } from '../../backlog/TaskRow';
+import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
+import { taskTableColumns } from '../../../config/constants';
+import { Skeleton } from 'antd';
 
 function ListView() {
   const { projectId } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const { columns } = useProject();
+
+  const { members, loadingMembers } = useProjectMetaData(projectId);
 
   const [tasks, setTasks] = useState<TaskPopulated[]>([]);
   const [loading, setLoading] = useState(false);
@@ -64,16 +63,10 @@ function ListView() {
     load();
   }, [projectId, searchParams.get('searchInput')]);
 
-  const handleUpdate = (taskId: string, patch: Partial<TaskPopulated>) => {
+  const handleTaskUpdated = (updated: TaskPopulated) => {
     setTasks((prev) =>
-      prev.map((task) => (task._id === taskId ? { ...task, ...patch } : task))
+      prev.map((task) => (task._id === updated._id ? updated : task))
     );
-
-    void updateTask(taskId, patch).catch(() => {
-      setTasks((prev) =>
-        prev.map((task) => (task._id === taskId ? { ...task, ...patch } : task))
-      );
-    });
   };
 
   if (!projectId) {
@@ -91,39 +84,14 @@ function ListView() {
 
   return (
     <div className="no-scrollbar relative mt-2 w-full overflow-x-auto rounded-md border border-gray-200">
-      <table className="min-w-full table-auto text-left text-sm">
-        <thead className="sticky top-0 z-10 border-b bg-gray-100 text-xs text-gray-600 uppercase">
+      <table className="min-w-full table-auto overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
+        <thead className="z-10 bg-[#f8f8f8] text-xs font-semibold text-gray-500 uppercase">
           <tr>
-            <th scope="col" className="p-2 text-center">
-              Type
-            </th>
-            <th scope="col" className="p-2">
-              Key
-            </th>
-            <th scope="col" className="p-2 px-6">
-              Summary
-            </th>
-            <th scope="col" className="p-2 px-6">
-              Status
-            </th>
-            <th scope="col" className="p-2 px-6">
-              Assignee
-            </th>
-            <th scope="col" className="p-2 px-6">
-              Due Date
-            </th>
-            <th scope="col" className="p-2 px-6">
-              Labels
-            </th>
-            <th scope="col" className="p-2 px-6">
-              Created
-            </th>
-            <th scope="col" className="p-2 px-6">
-              Updated
-            </th>
-            <th scope="col" className="p-2 px-6">
-              Reporter
-            </th>
+            {taskTableColumns.map(({ label, className }) => (
+              <th key={label} className={className}>
+                {label}
+              </th>
+            ))}
           </tr>
         </thead>
 
@@ -131,7 +99,12 @@ function ListView() {
           {loading && (
             <tr>
               <td colSpan={11} className="p-4 text-center text-gray-500">
-                Loading tasks...
+                <div className="flex flex-col gap-2">
+                  <Skeleton.Input active={true} size="default" block={true} />
+                  <Skeleton.Input active={true} size="default" block={true} />
+                  <Skeleton.Input active={true} size="default" block={true} />
+                  <Skeleton.Input active={true} size="default" block={true} />
+                </div>
               </td>
             </tr>
           )}
@@ -158,9 +131,11 @@ function ListView() {
               <TaskRow
                 key={task._id}
                 task={task}
-                onPatch={handleUpdate}
                 columns={columns}
                 containerId={projectId}
+                members={members}
+                loadingMembers={loadingMembers}
+                onUpdated={handleTaskUpdated}
               />
             ))}
         </tbody>
