@@ -7,30 +7,47 @@ import { useProject } from '../context/ProjectContext';
 import { setupPushNotifications } from '../utils/setupNotification';
 import { AddTaskModal } from '../utils/addTaskModal';
 import { getAllProjects } from '../services/projectService';
+import { toast } from 'react-toastify';
+import userService from '../services/userService';
+import { useAuthContext } from '../context/AuthContext';
 
 function Dashboard() {
   const { setProject } = useProject();
+  const { setRole } = useAuthContext();
+
   const { projectId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-
   const [projects, setProjects] = useState<Project[]>([]);
   const activeProject = projects.find((p) => p._id === projectId);
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
 
   useEffect(() => {
-    getAllProjects()
-      .then((projects) => {
+    async function fetchProjects() {
+      try {
+        const projects = await getAllProjects();
+        const userInfo = await userService.getUserInfo();
         setProjects(projects);
 
-        const active = projects.find((p) => p._id === projectId);
-
+        const active = projects.find((project) => project._id === projectId);
         setProject(active);
-      })
-      .catch(() => {
+
+        const memberRole = active?.members.find(
+          (member) => member.user === userInfo.result._id
+        )?.role;
+
+        if (!memberRole) {
+          setRole('superadmin');
+        } else {
+          setRole(memberRole);
+        }
+      } catch {
+        toast.error('Failed to load projects');
         setProjects([]);
         setProject(undefined);
-      });
-  }, [projectId, setProject]);
+      }
+    }
+    fetchProjects();
+  }, [projectId, setProject, setRole]);
 
   useEffect(() => {
     setupPushNotifications();

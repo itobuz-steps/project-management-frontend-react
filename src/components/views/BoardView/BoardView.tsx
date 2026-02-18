@@ -36,6 +36,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { createSprintService } from '../../../services/sprints.service';
 import { TaskCard } from './TaskCard';
+import { Can } from '../../../utils/PermissionHoc';
 
 function ColumnDropZone({ id, children }: { id: string; children: ReactNode }) {
   const { setNodeRef } = useDroppable({
@@ -348,16 +349,18 @@ function BoardView() {
                     {tasksByColumn[col]?.length ?? 0}
                   </span>
                 </div>
-                <button
-                  type="button"
-                  aria-label="Add column"
-                  className="rounded p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
-                  onClick={() => {
-                    openAddColumnModal(col);
-                  }}
-                >
-                  <Plus size={16} />
-                </button>
+                <Can permission="ADD_COLUMN">
+                  <button
+                    type="button"
+                    aria-label="Add column"
+                    className="rounded p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+                    onClick={() => {
+                      openAddColumnModal(col);
+                    }}
+                  >
+                    <Plus size={16} />
+                  </button>
+                </Can>
               </div>
 
               <ColumnDropZone id={col}>
