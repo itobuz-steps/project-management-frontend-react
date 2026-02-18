@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Empty, Button, Upload } from 'antd';
+import { Button, Upload } from 'antd';
 import type { UploadProps } from 'antd';
 import { PlusOutlined, DownOutlined, RightOutlined } from '@ant-design/icons';
 import type { AttachmentsTabProps } from './attachment.type';
 import { useTaskAttachments } from '../../hooks/useTaskAttachments';
 import { AttachmentItem } from '../attachment/AttachmentItem';
+import { DataLoader } from '../ui/DataLoader';
 
 export function AttachmentsTab({ task, onUpdated }: AttachmentsTabProps) {
   const [expanded, setExpanded] = useState(true);
@@ -23,7 +24,6 @@ export function AttachmentsTab({ task, onUpdated }: AttachmentsTabProps) {
 
   return (
     <div className="my-4">
-      {/* Header */}
       <div
         className="flex cursor-pointer items-center justify-between text-base font-semibold text-gray-900"
         onClick={() => setExpanded((dropdown) => !dropdown)}
@@ -43,12 +43,13 @@ export function AttachmentsTab({ task, onUpdated }: AttachmentsTabProps) {
         </div>
       </div>
 
-      {/* Body */}
       {expanded && (
         <div className="mt-1 ml-4">
-          {!attachments.length ? (
-            <Empty description="No attachments yet" />
-          ) : (
+          <DataLoader
+            loading={saving}
+            isEmpty={!attachments.length}
+            emptyText="No attachments yet"
+          >
             <div className="space-y-2">
               {attachments.map((attachment) => (
                 <AttachmentItem
@@ -62,7 +63,7 @@ export function AttachmentsTab({ task, onUpdated }: AttachmentsTabProps) {
                 />
               ))}
             </div>
-          )}
+          </DataLoader>
         </div>
       )}
     </div>

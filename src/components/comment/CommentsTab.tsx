@@ -1,4 +1,3 @@
-import { Empty, Spin } from 'antd';
 import { useEffect, useState } from 'react';
 import { CommentItem } from './CommentItem';
 import type { CommentsTabProps } from './comment.type';
@@ -6,6 +5,7 @@ import { TextEditor } from '../textEditor/TextEditor';
 import { COMMENT_TEMPLATES } from '../taskModal/constants';
 import { useTaskComments } from '../../hooks/useTaskComments';
 import { useCommentComposer } from '../../hooks/useCommentComposer';
+import { DataLoader } from '../ui/DataLoader';
 
 export function CommentsTab({ taskId }: CommentsTabProps) {
   const [isComposerOpen, setIsComposerOpen] = useState(false);
@@ -17,7 +17,7 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'm' && !isComposerOpen) {
+      if (e.key === 'M' && !isComposerOpen) {
         setIsComposerOpen(true);
       }
     };
@@ -69,7 +69,7 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
                 </div>
 
                 <div className="mt-2 text-xs text-gray-400">
-                  <strong>Pro tip:</strong> press <kbd>M</kbd> to comment
+                  <strong>Pro tip:</strong> press <kbd>'M'</kbd> to comment
                 </div>
               </>
             ) : (
@@ -91,19 +91,22 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
       </div>
 
       {/* Comments */}
-      {loading && <Spin />}
-
-      {!loading && !comments.length && <Empty description="No comments yet" />}
-
-      {!loading &&
-        comments.map((comment) => (
-          <CommentItem
-            key={comment._id}
-            comment={comment}
-            onDelete={removeComment}
-            onUpdate={updateComment}
-          />
-        ))}
+      <DataLoader
+        loading={loading}
+        isEmpty={!comments.length}
+        emptyText="No comments yet"
+      >
+        <div className="space-y-1">
+          {comments.map((comment) => (
+            <CommentItem
+              key={comment._id}
+              comment={comment}
+              onDelete={removeComment}
+              onUpdate={updateComment}
+            />
+          ))}
+        </div>
+      </DataLoader>
     </>
   );
 }

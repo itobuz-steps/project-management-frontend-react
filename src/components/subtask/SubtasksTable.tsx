@@ -1,6 +1,6 @@
 import { Table } from 'antd';
 import type { SubtasksTableProps } from './subtask.types';
-import { DataState } from '../ui/DataState';
+import { DataLoader } from '../ui/DataLoader';
 
 export function SubtasksTable({
   loading,
@@ -8,7 +8,7 @@ export function SubtasksTable({
   columns,
 }: SubtasksTableProps) {
   return (
-    <DataState
+    <DataLoader
       loading={loading}
       isEmpty={!subtasks.length}
       emptyText="No subtasks"
@@ -25,6 +25,6 @@ export function SubtasksTable({
           styles={{ content: { padding: 0 } }}
         />
       </div>
-    </DataState>
+    </DataLoader>
   );
 }

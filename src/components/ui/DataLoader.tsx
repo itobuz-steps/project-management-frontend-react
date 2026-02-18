@@ -1,19 +1,12 @@
 import { Empty, Spin } from 'antd';
-import type { ReactNode } from 'react';
+import type { DataLoaderProps } from './ui.types';
 
-type DataStateProps = {
-  loading: boolean;
-  isEmpty: boolean;
-  emptyText?: string;
-  children: ReactNode;
-};
-
-export function DataState({
+export function DataLoader({
   loading,
   isEmpty,
   emptyText = 'No data',
   children,
-}: DataStateProps) {
+}: DataLoaderProps) {
   if (loading) {
     return (
       <div className="py-6 text-center">

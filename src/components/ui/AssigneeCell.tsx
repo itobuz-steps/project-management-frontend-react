@@ -44,7 +44,7 @@ export function AssigneeCell({
 
         const optimistic: TaskPopulated = {
           ...task,
-          assignee: selectedUser as unknown as User,
+          assignee: selectedUser as User,
         };
 
         onUpdated(optimistic);

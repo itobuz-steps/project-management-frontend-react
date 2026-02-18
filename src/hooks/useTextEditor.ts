@@ -11,6 +11,7 @@ import TableRow from '@tiptap/extension-table-row';
 import TableHeader from '@tiptap/extension-table-header';
 import TableCell from '@tiptap/extension-table-cell';
 import Emoji from '@tiptap/extension-emoji';
+import { Markdown } from 'tiptap-markdown';
 
 export function useTextEditor({
   content,
@@ -47,12 +48,13 @@ export function useTextEditor({
       Placeholder.configure({
         placeholder: 'Add a description…',
       }),
+      Markdown,
     ],
     content,
     editable: !disabled,
     autofocus: true,
     onUpdate({ editor }) {
-      onChange(editor.getHTML());
+      onChange(editor.storage.markdown.getMarkdown());
     },
   });
 }

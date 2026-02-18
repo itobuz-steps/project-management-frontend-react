@@ -1,29 +1,33 @@
 import { useEffect, useMemo, useState } from 'react';
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
-import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TextEditor } from '../textEditor/TextEditor';
-import { useTaskPatch } from '../../hooks/useTaskPatch';
+import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 import type { TaskDescriptionProps } from './taskModal.types';
+import ReactMarkdown from 'react-markdown';
 
-export function TaskDescription({ task, onPatch }: TaskDescriptionProps) {
+export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(task.description || '');
   const [saving, setSaving] = useState(false);
 
-  const { patchTask } = useTaskPatch<TaskPopulated>(
-    task._id,
-    onPatch ?? (() => {})
-  );
+  const { update } = useTaskUpdate(task._id, onUpdated ?? (() => {}));
 
   useEffect(() => {
     setValue(task.description || '');
   }, [task.description]);
 
-  const previewText = useMemo(
-    () => value?.replace(/<[^>]+>/g, '').slice(0, 140),
-    [value]
-  );
+  const previewText = useMemo(() => {
+    if (!value) {
+      return '';
+    }
+
+    return value
+      .replace(/[`*_>#~\-![\]()]/g, '')
+      .replace(/\n+/g, ' ')
+      .trim()
+      .slice(0, 140);
+  }, [value]);
 
   const save = async () => {
     if (value === task.description) {
@@ -34,7 +38,7 @@ export function TaskDescription({ task, onPatch }: TaskDescriptionProps) {
     setSaving(true);
 
     try {
-      await patchTask({ description: value }, 'Failed to update description');
+      await update({ description: value }, 'Failed to update description');
     } finally {
       setSaving(false);
       closeEditor();
@@ -81,11 +85,7 @@ export function TaskDescription({ task, onPatch }: TaskDescriptionProps) {
               onClick={openEditor}
             >
               {task.description ? (
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: task.description,
-                  }}
-                />
+                <ReactMarkdown>{task.description}</ReactMarkdown>
               ) : (
                 <span className="text-gray-400">Add a description…</span>
               )}
@@ -106,7 +106,7 @@ export function TaskDescription({ task, onPatch }: TaskDescriptionProps) {
       {/* Collapsed preview */}
       {!expanded && (
         <div
-          className="mt-1 ml-5 cursor-pointer text-sm text-gray-500 hover:text-gray-700"
+          className="mt-1 ml-5 line-clamp-2 cursor-pointer text-sm text-gray-500 hover:text-gray-700"
           onClick={openEditor}
         >
           {previewText ? (

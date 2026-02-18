@@ -6,6 +6,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { TextEditor } from '../textEditor/TextEditor';
 import { Link } from 'react-router-dom';
 import { useCommentEditor } from '../../hooks/useCommentEditor';
+import ReactMarkdown from 'react-markdown';
 
 const { Text } = Typography;
 
@@ -63,13 +64,9 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
 
             {/* Body */}
             {!editor.isEditing ? (
-              <div
-                className="prose prose-sm max-w-none cursor-text rounded px-1 py-0.5 hover:bg-gray-100"
-                onClick={() => editor.setIsEditing(true)}
-                dangerouslySetInnerHTML={{
-                  __html: comment.message,
-                }}
-              />
+              <div onClick={() => editor.setIsEditing(true)}>
+                <ReactMarkdown>{comment.message}</ReactMarkdown>
+              </div>
             ) : (
               <TextEditor
                 comment

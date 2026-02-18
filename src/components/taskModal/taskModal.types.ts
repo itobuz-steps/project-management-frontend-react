@@ -23,7 +23,7 @@ export type HeaderProps = {
 
 export type TaskDescriptionProps = {
   task: TaskPopulated;
-  onPatch?: (id: string, patch: Partial<TaskPopulated>) => void;
+  onUpdated?: (updated: TaskPopulated) => void;
 };
 
 export type TaskDetailsProps = {

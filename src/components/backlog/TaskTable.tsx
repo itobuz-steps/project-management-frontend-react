@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -26,7 +26,7 @@ export function TaskTable({
   const [open, setOpen] = useState(true);
   const [localTasks, setLocalTasks] = useState(tasks);
   const { project } = useProject();
-  
+
   const { members, loadingMembers } = useProjectMeta(project?._id);
 
   const { dueDateRef, startSprint, completeSprint, createSprint } =
@@ -37,19 +37,9 @@ export function TaskTable({
     data: { containerId },
   });
 
-  useEffect(() => {
-    setLocalTasks(tasks);
-  }, [tasks]);
-
   const handleTaskUpdated = (updated: TaskPopulated) => {
     setLocalTasks((prev) =>
       prev.map((task) => (task._id === updated._id ? updated : task))
-    );
-  };
-
-  const patchTaskInState = (id: string, patch: Partial<TaskPopulated>) => {
-    setLocalTasks((prev) =>
-      prev.map((task) => (task._id === id ? { ...task, ...patch } : task))
     );
   };
 
@@ -131,7 +121,6 @@ export function TaskTable({
                       task={task}
                       containerId={containerId}
                       columns={columns}
-                      onPatch={patchTaskInState}
                       members={members}
                       loadingMembers={loadingMembers}
                       onUpdated={handleTaskUpdated}

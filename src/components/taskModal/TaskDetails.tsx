@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { Button, Select, Tag, DatePicker, Collapse } from 'antd';
-import type { TaskPopulated } from '../../services/types/tasks.types';
+import { Button, Select, Tag, Collapse } from 'antd';
 import { SidebarRow } from '../ui/SidebarRow';
 import { UserCell } from '../ui/UserCell';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { InputNumber, Dropdown, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import {
   PRIORITIES,
   PRIORITY_COLORS,
@@ -15,16 +13,15 @@ import {
 } from './constants';
 import { AssigneeCell } from '../ui/AssigneeCell';
 import type { EditingField, TaskDetailsProps } from './taskModal.types';
-import { useTaskPatch } from '../../hooks/useTaskPatch';
+import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 import { useProjectMeta } from '../../hooks/useProjectMeta';
+import { DueDateCell } from '../ui/DueDateCell';
 
 export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
   const [editing, setEditing] = useState<EditingField>(null);
   const [editingLabels, setEditingLabels] = useState(false);
 
-  const { patchTask } = useTaskPatch<TaskPopulated>(task._id, (_, patch) =>
-    onUpdated({ ...task, ...patch })
-  );
+  const { update } = useTaskUpdate(task._id, onUpdated);
 
   const { members, loadingMembers } = useProjectMeta(task.projectId as string);
 
@@ -84,7 +81,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                     onBlur={() => setEditingLabels(false)}
                     onChange={(tags) => {
                       setEditingLabels(false);
-                      patchTask({ tags }, 'Failed to update labels');
+                      update({ tags }, 'Failed to update labels');
                     }}
                   />
                 )}
@@ -113,11 +110,11 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                     onBlur={() => setEditing(null)}
                     onChange={(priority) => {
                       setEditing(null);
-                      patchTask({ priority }, 'Failed to update priority');
+                      update({ priority }, 'Failed to update priority');
                     }}
-                    options={PRIORITIES.map((p) => ({
-                      value: p,
-                      label: <span className="capitalize">{p}</span>,
+                    options={PRIORITIES.map((priority) => ({
+                      value: priority,
+                      label: <span className="capitalize">{priority}</span>,
                     }))}
                   />
                 )}
@@ -142,7 +139,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                     onBlur={() => setEditing(null)}
                     onChange={(type) => {
                       setEditing(null);
-                      patchTask({ type }, 'Failed to update type');
+                      update({ type }, 'Failed to update type');
                     }}
                     options={TASK_TYPES.map((type) => ({
                       value: type,
@@ -166,7 +163,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                     value={task.storyPoint}
                     placeholder="—"
                     onChange={(value) =>
-                      patchTask(
+                      update(
                         { storyPoint: value ?? undefined },
                         'Failed to update story points'
                       )
@@ -179,7 +176,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                         key: points,
                         label: points,
                         onClick: () =>
-                          patchTask(
+                          update(
                             { storyPoint: points },
                             'Failed to update story points'
                           ),
@@ -193,21 +190,10 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
 
               {/* Due Date */}
               <SidebarRow label="Due Date">
-                <DatePicker
-                  size="small"
-                  className="w-full"
-                  format="YYYY-MM-DD"
-                  value={task.dueDate ? dayjs(task.dueDate) : null}
-                  status={
-                    task.dueDate && dayjs(task.dueDate).isBefore(dayjs(), 'day')
-                      ? 'error'
-                      : undefined
-                  }
-                  onChange={(date) =>
-                    patchTask(
-                      { dueDate: date?.toISOString() },
-                      'Failed to update due date'
-                    )
+                <DueDateCell
+                  dueDate={task.dueDate}
+                  onChange={(dueDate) =>
+                    update({ dueDate }, 'Failed to update due date')
                   }
                 />
               </SidebarRow>

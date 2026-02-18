@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { TaskPopulated, User } from '../../services/types/tasks.types';
 
 export type AssigneeCellType = {
@@ -39,4 +40,11 @@ export type TaskTitleCellType = {
 export type UserCellType = {
   user?: User;
   emptyText: string;
+};
+
+export type DataLoaderProps = {
+  loading: boolean;
+  isEmpty: boolean;
+  emptyText?: string;
+  children: ReactNode;
 };

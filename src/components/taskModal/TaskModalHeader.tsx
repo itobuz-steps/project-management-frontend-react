@@ -1,7 +1,6 @@
 import { Button, Input, type InputRef } from 'antd';
 import { ArrowsAltOutlined, CloseOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from 'react';
-import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { SidebarRow } from '../ui/SidebarRow';
 import { StatusSelect } from '../ui/StatusSelect';
@@ -9,7 +8,7 @@ import { Link } from 'react-router-dom';
 import type { HeaderProps } from './taskModal.types';
 import { useParentTask } from '../../hooks/useParentTask';
 import { useProjectMeta } from '../../hooks/useProjectMeta';
-import { useTaskPatch } from '../../hooks/useTaskPatch';
+import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 
 export function TaskModalHeader({
   task,
@@ -22,16 +21,10 @@ export function TaskModalHeader({
 
   const inputRef = useRef<InputRef>(null);
 
-  const parentTask = useParentTask(task.parentTask as string | undefined);
-  const { columns } = useProjectMeta(task.projectId as string | undefined);
+  const parentTask = useParentTask(task.parentTask);
+  const { columns } = useProjectMeta(task.projectId as string);
 
-  const { patchTask } = useTaskPatch<TaskPopulated>(task._id, (_, patch) =>
-    onUpdated({ ...task, ...patch })
-  );
-
-  useEffect(() => {
-    setValue(task.title);
-  }, [task.title]);
+  const { update } = useTaskUpdate(task._id, onUpdated);
 
   useEffect(() => {
     if (editing) {
@@ -46,7 +39,7 @@ export function TaskModalHeader({
       return;
     }
 
-    await patchTask({ title: value }, 'Failed to update title');
+    await update({ title: value }, 'Failed to update title');
 
     setEditing(false);
   };
@@ -102,7 +95,10 @@ export function TaskModalHeader({
           {!editing ? (
             <h1
               className="cursor-pointer rounded px-1 text-2xl font-semibold hover:bg-gray-100"
-              onClick={() => setEditing(true)}
+              onClick={() => {
+                setValue(task.title);
+                setEditing(true);
+              }}
             >
               {task.title}
             </h1>
@@ -136,7 +132,7 @@ export function TaskModalHeader({
               value={task.status}
               columns={columns}
               onChange={(status) =>
-                patchTask({ status }, 'Failed to update status')
+                update({ status }, 'Failed to update status')
               }
             />
           </SidebarRow>

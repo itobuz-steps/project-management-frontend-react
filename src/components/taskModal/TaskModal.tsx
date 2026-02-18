@@ -1,9 +1,10 @@
 import type { TaskModalProps } from './taskModal.types';
-import { Modal, Spin } from 'antd';
+import { Modal } from 'antd';
 import { TaskView } from './TaskView';
 import { TaskModalHeader } from './TaskModalHeader';
 import { useIsMobile } from '../../utils/isMobile';
 import { useTask } from '../../hooks/useTask';
+import { DataLoader } from '../ui/DataLoader';
 
 export default function TaskModal({ taskId, onClose }: TaskModalProps) {
   const isMobile = useIsMobile(768);
@@ -37,20 +38,20 @@ export default function TaskModal({ taskId, onClose }: TaskModalProps) {
         )
       }
     >
-      {loading && (
-        <div className="flex justify-center py-20">
-          <Spin size="large" />
-        </div>
-      )}
-
-      {!loading && task && (
-        <TaskView
-          task={task}
-          loading={loading}
-          isMobile={isMobile}
-          onUpdated={setTask}
-        />
-      )}
+      <DataLoader
+        loading={loading}
+        isEmpty={!loading && !task}
+        emptyText="Task not found"
+      >
+        {task && (
+          <TaskView
+            task={task}
+            loading={loading}
+            isMobile={isMobile}
+            onUpdated={setTask}
+          />
+        )}
+      </DataLoader>
     </Modal>
   );
 }

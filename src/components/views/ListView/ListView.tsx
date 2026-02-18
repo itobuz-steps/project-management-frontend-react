@@ -5,7 +5,7 @@ import type { TaskPopulated } from '../../../services/types/tasks.types';
 import { useProject } from '../../../context/ProjectContext';
 import { TaskRow } from '../../backlog/TaskRow';
 import { useProjectMeta } from '../../../hooks/useProjectMeta';
-import { listViewHeaders } from './listView.constants';
+import { taskTableColumns } from '../../../config/constants';
 
 function ListView() {
   const { projectId } = useParams();
@@ -86,9 +86,9 @@ function ListView() {
       <table className="min-w-full table-auto overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
         <thead className="z-10 bg-[#f8f8f8] text-xs font-semibold text-gray-500 uppercase">
           <tr>
-            {listViewHeaders.map((header) => (
-              <th key={header.key} className="p-3">
-                {header.label}
+            {taskTableColumns.map(({ label, className }) => (
+              <th key={label} className={className}>
+                {label}
               </th>
             ))}
           </tr>

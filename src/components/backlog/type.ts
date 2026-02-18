@@ -14,7 +14,6 @@ export interface TaskRowProps {
   task: TaskPopulated;
   containerId: string;
   columns: string[];
-  onPatch: (id: string, patch: Partial<TaskPopulated>) => void;
   members: User[];
   loadingMembers: boolean;
   onUpdated: (t: TaskPopulated) => void;

@@ -61,7 +61,7 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
     <Collapse
       ghost
       activeKey={open ? ['1'] : []}
-      onChange={() => setOpen((o) => !o)}
+      onChange={() => setOpen((open) => !open)}
       items={[
         {
           key: '1',

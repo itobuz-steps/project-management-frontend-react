@@ -171,7 +171,7 @@ export function TextEditor({
       {/* Editor */}
       <EditorContent
         editor={editor}
-        className="prose prose-sm max-w-none p-3 text-gray-800 focus:outline-none"
+        className="prose prose-sm max-w-none p-3 text-gray-800 [&_.ProseMirror_.task-list]:list-none [&_.ProseMirror_.task-list_li]:flex [&_.ProseMirror_.task-list_li]:items-start [&_.ProseMirror_.task-list_li>div]:flex-1 [&_.ProseMirror_.task-list_li>label]:mt-0.5 [&_.ProseMirror_.task-list_li>label]:mr-2 [&_.ProseMirror_li]:ml-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ul]:list-disc"
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
             onCancel();

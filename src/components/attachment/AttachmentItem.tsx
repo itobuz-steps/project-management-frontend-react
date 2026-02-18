@@ -1,17 +1,11 @@
 import { config } from '../../config/config';
 import { Typography, Button } from 'antd';
-import type { TaskAttachment } from '../../services/types/tasks.types';
 import { DeleteOutlined } from '@ant-design/icons';
+import type { AttachmentsItemProps } from './attachment.type';
 
 const { Link, Text } = Typography;
 
-export function AttachmentItem({
-  attachment,
-  onRemove,
-}: {
-  attachment: TaskAttachment;
-  onRemove: () => void;
-}) {
+export function AttachmentItem({ attachment, onRemove }: AttachmentsItemProps) {
   const isFile = attachment instanceof File;
   const name = isFile ? attachment.name : attachment;
 

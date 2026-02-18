@@ -1,0 +1,38 @@
+@layer components {
+  .editor-prose {
+    @apply prose prose-sm max-w-none p-3 text-gray-800;
+  }
+
+  .editor-prose .ProseMirror ul {
+    @apply list-disc;
+  }
+
+  .editor-prose .ProseMirror ol {
+    @apply list-decimal;
+  }
+
+  .editor-prose .ProseMirror li {
+    @apply ml-6;
+  }
+
+  .editor-prose .ProseMirror .task-list {
+    @apply list-none;
+  }
+
+  .editor-prose .ProseMirror .task-list li {
+    @apply flex items-start;
+  }
+
+  .editor-prose .ProseMirror .task-list li > label {
+    @apply mt-0.5 mr-2;
+  }
+
+  .editor-prose .ProseMirror .task-list li > div {
+    @apply flex-1;
+  }
+}
+
+.prose .ProseMirror:focus {
+  outline: none;
+  box-shadow: none;
+}

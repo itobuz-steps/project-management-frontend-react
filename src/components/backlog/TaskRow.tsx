@@ -7,7 +7,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { config } from '../../config/config';
 import { AssigneeCell } from '../ui/AssigneeCell';
 import type { TaskRowProps } from './type';
-import { useTaskPatch } from '../../hooks/useTaskPatch';
+import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 import { TaskKeyCell } from '../ui/TaskKeyCell';
 import { TaskTitleCell } from '../ui/TaskTitleCell';
 import { DueDateCell } from '../ui/DueDateCell';
@@ -16,7 +16,6 @@ export function TaskRow({
   task,
   containerId,
   columns,
-  onPatch,
   members,
   loadingMembers,
   onUpdated,
@@ -33,7 +32,7 @@ export function TaskRow({
     data: { type: 'task', containerId },
   });
 
-  const { patchTask } = useTaskPatch<typeof task>(task._id, onPatch);
+  const { update } = useTaskUpdate(task._id, onUpdated);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -69,9 +68,7 @@ export function TaskRow({
         <StatusSelect
           value={task.status}
           columns={columns}
-          onChange={(status) =>
-            patchTask({ status }, 'Failed to update status')
-          }
+          onChange={(status) => update({ status }, 'Failed to update status')}
         />
       </td>
       <td className="w-[200px] p-3 px-10 whitespace-nowrap">
@@ -82,13 +79,14 @@ export function TaskRow({
           onUpdated={onUpdated}
         />
       </td>
-
-      <DueDateCell
-        dueDate={task.dueDate}
-        onChange={(dueDate) =>
-          patchTask({ dueDate }, 'Failed to update due date')
-        }
-      />
+      <td className="p-3 px-6 whitespace-nowrap">
+        <DueDateCell
+          dueDate={task.dueDate}
+          onChange={(dueDate) =>
+            update({ dueDate }, 'Failed to update due date')
+          }
+        />
+      </td>
 
       <td className="p-3 px-6 whitespace-nowrap">
         <div className="flex gap-1">
