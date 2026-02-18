@@ -14,13 +14,12 @@ export const Can = ({ permission, children }: CanProps) => {
   return <>{children}</>;
 };
 
-export const CanAny = ({
-  permissions,
-  children,
-}: {
+type CanAnyProps = {
   permissions: Permission[];
   children: React.ReactNode;
-}) => {
+};
+
+export const CanAny = ({ permissions, children }: CanAnyProps) => {
   const { canAny } = usePermissions();
 
   if (!canAny(permissions)) return null;
@@ -28,13 +27,12 @@ export const CanAny = ({
   return <>{children}</>;
 };
 
-export const CanAll = ({
-  permissions,
-  children,
-}: {
+type CanAllProps = {
   permissions: Permission[];
   children: React.ReactNode;
-}) => {
+};
+
+export const CanAll = ({ permissions, children }: CanAllProps) => {
   const { canAll } = usePermissions();
 
   if (!canAll(permissions)) return null;
