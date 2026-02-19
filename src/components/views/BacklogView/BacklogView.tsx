@@ -49,6 +49,8 @@ function BacklogView() {
     return true;
   };
 
+  const searchInput = searchParams.get('searchInput');
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 6 },
@@ -67,6 +69,10 @@ function BacklogView() {
 
   useEffect(() => {
     if (!projectId) {
+      return;
+    }
+
+    if (!type) {
       return;
     }
 
@@ -91,10 +97,8 @@ function BacklogView() {
       }
     }
 
-    if (projectId) {
-      loadData(projectId);
-    }
-  }, [projectId, type, searchParams.get('searchInput')]);
+    loadData(projectId);
+  }, [type, searchInput, projectId]);
 
   if (!projectId) {
     return (
