@@ -6,6 +6,7 @@ import { AxiosError } from 'axios';
 import { InviteUserForm } from './InviteUserForm';
 import { InviteUserButton } from './InviteUserButton';
 import { X } from 'lucide-react';
+import { Can } from '../../utils/PermissionHoc';
 
 export function InviteUserContainer() {
   const [formOpen, setFormOpen] = useState(false);
@@ -25,12 +26,19 @@ export function InviteUserContainer() {
     }
   }
 
-  return formOpen ? (
-    <div className="flex items-center">
-      <InviteUserForm submitHandler={handleFinish} />
-      <X className="-ml-2 cursor-pointer" onClick={() => setFormOpen(false)} />
-    </div>
-  ) : (
-    <InviteUserButton onClick={() => setFormOpen(true)} />
+  return (
+    <Can permission="SEND_INVITE">
+      {formOpen ? (
+        <div className="flex items-center">
+          <InviteUserForm submitHandler={handleFinish} />
+          <X
+            className="-ml-2 cursor-pointer"
+            onClick={() => setFormOpen(false)}
+          />
+        </div>
+      ) : (
+        <InviteUserButton onClick={() => setFormOpen(true)} />
+      )}
+    </Can>
   );
 }
