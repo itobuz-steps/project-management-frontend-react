@@ -5,6 +5,7 @@ import type {
   Task,
   TaskPopulated,
   TaskResponse,
+  TaskStats,
 } from '../services/types/tasks.types';
 import { attachInterceptor } from '../utils/attachInterceptor';
 import { mapObjectToFormData } from '../utils/mapObjectToFormdata';
@@ -99,4 +100,9 @@ export async function getTaskActivities(taskId: string): Promise<Activity[]> {
   });
 
   return res.data.activities;
+}
+
+export async function getTaskStats() {
+  const res = await api.get<{ result: TaskStats }>('/stats');
+  return res.data.result;
 }

@@ -1,4 +1,5 @@
 import { ProjectContainer } from '../components/forYou/ProjectContainer';
+import { StatsContainer } from '../components/forYou/StatsContainer';
 import { TaskContainer } from '../components/forYou/TaskContainer';
 
 export function ForYouPage() {
@@ -13,6 +14,7 @@ export function ForYouPage() {
             For You
           </h1>
         </div>
+        <StatsContainer />
         <ProjectContainer />
         <TaskContainer />
       </div>

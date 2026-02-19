@@ -81,6 +81,16 @@ export const THEME_COLORS: Record<string, string[]> = {
   ],
 };
 
+export const GRAY_SHADES = [
+  '#d1d5db',
+  '#9ca3af',
+  '#6b7280',
+  '#4b5563',
+  '#374151',
+  '#1f2937',
+  '#111827',
+];
+
 export const taskTableColumns = [
   { label: 'Type', className: 'p-2 text-center' },
   { label: 'Key', className: 'p-2' },
