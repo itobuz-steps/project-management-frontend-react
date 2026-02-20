@@ -1,8 +1,8 @@
-// hooks/useCommentEditor.ts
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { message } from 'antd';
 import { commentsApi } from '../services/commentService';
 import type { Comment } from '../services/types/comments.types';
+import type { JSONContent } from '@tiptap/react';
 
 export function useCommentEditor(
   comment: Comment,
@@ -10,9 +10,33 @@ export function useCommentEditor(
   onDelete: (id: string) => void
 ) {
   const [isEditing, setIsEditing] = useState(false);
-  const [content, setContent] = useState(comment.message);
+  const [content, setContent] = useState<string>(comment.message);
   const [attachments, setAttachments] = useState<File[]>([]);
+  const [editorJson, setEditorJson] = useState<JSONContent | null>(null);
+
   const [messageApi, contextHolder] = message.useMessage();
+
+  useEffect(() => {
+    setContent(comment.message);
+  }, [comment]);
+
+  const extractMentions = () => {
+    if (!editorJson) {
+      return [];
+    }
+
+    const ids = new Set<string>();
+
+    const walk = (node: JSONContent) => {
+      if (node.type === 'mention' && node.attrs?.id) {
+        ids.add(node.attrs.id);
+      }
+      node.content?.forEach(walk);
+    };
+
+    walk(editorJson);
+    return Array.from(ids);
+  };
 
   const reset = () => {
     setIsEditing(false);
@@ -26,10 +50,15 @@ export function useCommentEditor(
       return;
     }
 
+    const mentions = extractMentions();
+
     const updated = await commentsApi.updateComment(
       comment.taskId as string,
       comment._id,
-      { message: content }
+      {
+        message: content,
+        mentions,
+      }
     );
 
     onUpdate({ ...comment, ...updated });
@@ -48,6 +77,8 @@ export function useCommentEditor(
     content,
     attachments,
     contextHolder,
+    editorJson,
+    setEditorJson,
     setIsEditing,
     setContent,
     setAttachments,

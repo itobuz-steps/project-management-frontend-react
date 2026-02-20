@@ -6,14 +6,22 @@ import { COMMENT_TEMPLATES } from '../taskModal/constants';
 import { useTaskComments } from '../../hooks/useTaskComments';
 import { useCommentComposer } from '../../hooks/useCommentComposer';
 import { DataLoader } from '../ui/DataLoader';
+import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 
-export function CommentsTab({ taskId }: CommentsTabProps) {
+export function CommentsTab({ task }: CommentsTabProps) {
   const [isComposerOpen, setIsComposerOpen] = useState(false);
 
   const { comments, loading, addComment, updateComment, removeComment } =
-    useTaskComments(taskId);
+    useTaskComments(task._id);
 
-  const composer = useCommentComposer(taskId);
+  const composer = useCommentComposer(task._id);
+
+  const { members } = useProjectMetaData(task.projectId as string);
+
+  const mentionItems = members.map((member) => ({
+    id: member._id,
+    label: member.name,
+  }));
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -77,6 +85,7 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
                 comment
                 content={composer.content}
                 onChange={composer.setContent}
+                onEditorJsonChange={composer.setEditorJson}
                 onAttachmentsChange={composer.setAttachments}
                 onSave={handleSubmit}
                 onCancel={() => {
@@ -84,6 +93,7 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
                   setIsComposerOpen(false);
                 }}
                 disabled={composer.submitting}
+                mentionItems={mentionItems}
               />
             )}
           </div>
@@ -100,6 +110,7 @@ export function CommentsTab({ taskId }: CommentsTabProps) {
           {comments.map((comment) => (
             <CommentItem
               key={comment._id}
+              task={task}
               comment={comment}
               onDelete={removeComment}
               onUpdate={updateComment}

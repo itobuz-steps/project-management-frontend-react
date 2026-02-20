@@ -1,4 +1,4 @@
-import { useEditor } from '@tiptap/react';
+import { useEditor, ReactRenderer } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
@@ -12,16 +12,85 @@ import TableHeader from '@tiptap/extension-table-header';
 import TableCell from '@tiptap/extension-table-cell';
 import Emoji from '@tiptap/extension-emoji';
 import { Markdown } from 'tiptap-markdown';
+import type { JSONContent } from '@tiptap/react';
+import { MentionList } from '../components/ui/MentionList';
+import type { SuggestionProps } from '@tiptap/suggestion';
+import type { MentionListRef } from '../components/ui/ui.types';
 
 export function useTextEditor({
   content,
   disabled,
   onChange,
+  enableMentions = false,
+  mentionItems = [],
 }: {
   content: string;
   disabled?: boolean;
-  onChange: (value: string) => void;
+  onChange: (value: string, json: JSONContent) => void;
+  enableMentions?: boolean;
+  mentionItems?: { id: string; label: string }[];
 }) {
+  const mentionExtension = enableMentions
+    ? Mention.configure({
+        HTMLAttributes: {
+          class: 'text-blue-600 font-medium',
+        },
+        suggestion: {
+          items: ({ query }) =>
+            mentionItems.filter((item) =>
+              item.label.toLowerCase().includes(query.toLowerCase())
+            ),
+
+          render: () => {
+            let component: ReactRenderer<MentionListRef>;
+            let container: HTMLDivElement;
+
+            return {
+              onStart: (props) => {
+                component = new ReactRenderer(MentionList, {
+                  props,
+                  editor: props.editor,
+                });
+
+                container = document.createElement('div');
+                container.style.position = 'absolute';
+                container.style.zIndex = '1000';
+
+                document.body.appendChild(container);
+                container.appendChild(component.element);
+
+                updatePosition(props);
+              },
+
+              onUpdate(props) {
+                component.updateProps(props);
+                updatePosition(props);
+              },
+
+              onKeyDown(props) {
+                return component.ref?.onKeyDown(props) ?? false;
+              },
+
+              onExit() {
+                component.destroy();
+                container.remove();
+              },
+            };
+
+            function updatePosition(props: SuggestionProps) {
+              const rect = props.clientRect?.();
+              if (!rect) {
+                return;
+              }
+
+              container.style.left = `${rect.left}px`;
+              container.style.top = `${rect.bottom + 4}px`;
+            }
+          },
+        },
+      })
+    : null;
+
   return useEditor({
     extensions: [
       StarterKit.configure({ codeBlock: {} }),
@@ -34,19 +103,9 @@ export function useTextEditor({
       TableRow,
       TableHeader,
       TableCell,
-      Mention.configure({
-        HTMLAttributes: {
-          class: 'text-blue-600 font-medium',
-        },
-        suggestion: {
-          items: ({ query }) =>
-            ['@John', '@Jane', '@Team'].filter((item) =>
-              item.toLowerCase().includes(query.toLowerCase())
-            ),
-        },
-      }),
+      ...(mentionExtension ? [mentionExtension] : []),
       Placeholder.configure({
-        placeholder: 'Add a description…',
+        placeholder: enableMentions ? 'Add a comment…' : 'Add a description…',
       }),
       Markdown,
     ],
@@ -54,7 +113,7 @@ export function useTextEditor({
     editable: !disabled,
     autofocus: true,
     onUpdate({ editor }) {
-      onChange(editor.storage.markdown.getMarkdown());
+      onChange(editor.storage.markdown.getMarkdown(), editor.getJSON());
     },
   });
 }

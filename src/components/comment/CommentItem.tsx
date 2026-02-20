@@ -1,17 +1,49 @@
 import { Avatar, Button, Popconfirm, Space, Typography } from 'antd';
 import { DeleteOutlined, PaperClipOutlined } from '@ant-design/icons';
 import { config } from '../../config/config';
-import type { CommentItemProps } from './comment.type';
+import type { CommentItemProps, MentionSpanProps } from './comment.type';
 import { formatDistanceToNow } from 'date-fns';
 import { TextEditor } from '../textEditor/TextEditor';
 import { Link } from 'react-router-dom';
 import { useCommentEditor } from '../../hooks/useCommentEditor';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import { useProjectMetaData } from '../../hooks/useProjectMetaData';
+import type { Components } from 'react-markdown';
 
 const { Text } = Typography;
 
-export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
+export function CommentItem({
+  task,
+  comment,
+  onDelete,
+  onUpdate,
+}: CommentItemProps) {
   const editor = useCommentEditor(comment, onUpdate, onDelete);
+
+  const { members } = useProjectMetaData(task.projectId as string);
+
+  const mentionItems = members.map((member) => ({
+    id: member._id,
+    label: member.name,
+  }));
+
+  const markdownComponents: Components = {
+    span: (props) => {
+      const spanProps = props as MentionSpanProps;
+
+      if (spanProps['data-type'] === 'mention') {
+        return (
+          <span
+            className="cursor-pointer font-medium text-blue-600"
+            {...spanProps}
+          />
+        );
+      }
+
+      return <span {...spanProps} />;
+    },
+  };
 
   return (
     <>
@@ -65,7 +97,12 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
             {/* Body */}
             {!editor.isEditing ? (
               <div onClick={() => editor.setIsEditing(true)}>
-                <ReactMarkdown>{comment.message}</ReactMarkdown>
+                <ReactMarkdown
+                  rehypePlugins={[rehypeRaw]}
+                  components={markdownComponents}
+                >
+                  {comment.message}
+                </ReactMarkdown>
               </div>
             ) : (
               <TextEditor
@@ -75,6 +112,8 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
                 onAttachmentsChange={editor.setAttachments}
                 onSave={editor.save}
                 onCancel={editor.reset}
+                mentionItems={mentionItems}
+                onEditorJsonChange={editor.setEditorJson}
               />
             )}
           </Space>

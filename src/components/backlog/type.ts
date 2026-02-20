@@ -5,6 +5,7 @@ export interface TaskTableProps {
   sprint?: Sprint;
   setSprints?: React.Dispatch<React.SetStateAction<Sprint[]>>;
   tasks: TaskPopulated[];
+  // setTasks: React.Dispatch<React.SetStateAction<TaskPopulated[]>>;
   columns: string[];
   title?: string;
   containerId: string;

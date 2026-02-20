@@ -16,7 +16,7 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
     {
       key: '1',
       label: 'Comments',
-      children: <CommentsTab taskId={task._id} />,
+      children: <CommentsTab task={task} />,
     },
     {
       key: '2',
