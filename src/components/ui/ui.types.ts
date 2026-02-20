@@ -48,3 +48,17 @@ export type DataLoaderProps = {
   emptyText?: string;
   children: ReactNode;
 };
+
+export type MentionItem = {
+  id: string;
+  label: string;
+};
+
+export type MentionListProps = {
+  items: MentionItem[];
+  command: (item: MentionItem) => void;
+};
+
+export type MentionListRef = {
+  onKeyDown: (props: { event: KeyboardEvent }) => boolean;
+};

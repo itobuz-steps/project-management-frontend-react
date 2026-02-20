@@ -91,11 +91,13 @@ export function TaskModalHeader({
       <div className="h-4" />
 
       {/* Title + status */}
-      <div className="flex justify-between gap-2">
-        <div className="flex items-center">
+      <div
+        className={`flex gap-2 ${drawer ? 'flex-col' : 'flex-col md:flex-row'}`}
+      >
+        <div className="flex min-w-0 flex-1 items-center">
           {!editing ? (
             <h1
-              className="cursor-pointer rounded px-1 text-2xl font-semibold hover:bg-gray-100"
+              className="cursor-pointer rounded px-1 text-2xl font-semibold break-words hover:bg-gray-100"
               onClick={() => {
                 setValue(task.title);
                 setEditing(true);
@@ -109,7 +111,7 @@ export function TaskModalHeader({
               value={value}
               autoSize={{ minRows: 1, maxRows: 3 }}
               bordered={false}
-              className="text-2xl! font-semibold"
+              className="text-2xl! font-semibold break-all"
               onChange={(e) => setValue(e.target.value)}
               onBlur={saveTitle}
               onKeyDown={(e) => {
@@ -126,7 +128,9 @@ export function TaskModalHeader({
           )}
         </div>
 
-        <div className={`${drawer ? 'flex' : 'md:w-[296px] lg:w-[396px]'}`}>
+        <div
+          className={`shrink-0 self-end ${drawer ? 'flex' : 'md:w-[296px] lg:w-[396px]'}`}
+        >
           <SidebarRow>
             <StatusSelect
               className="px-6! py-4!"

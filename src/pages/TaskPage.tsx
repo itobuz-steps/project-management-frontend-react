@@ -36,8 +36,8 @@ export default function TaskPage() {
     <div className="mx-auto w-full p-2 min-[1700px]:max-w-7xl">
       {task && (
         <TaskModalHeader
+          drawer={false}
           task={task}
-          // projectId={projectId!}
           onUpdated={setTask}
           page={true}
         />

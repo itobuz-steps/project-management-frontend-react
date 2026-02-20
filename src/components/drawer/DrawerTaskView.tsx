@@ -61,7 +61,7 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
 
           {/* Tab content */}
           <div className="pt-3 pb-6">
-            {activeTab === 'comments' && <CommentsTab taskId={task._id} />}
+            {activeTab === 'comments' && <CommentsTab task={task} />}
             {activeTab === 'attachments' && <AttachmentsTab task={task} />}
           </div>
         </div>

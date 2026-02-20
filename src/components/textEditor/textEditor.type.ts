@@ -1,4 +1,5 @@
-import type { SelectProps } from "antd";
+import type { SelectProps } from 'antd';
+import type { JSONContent } from '@tiptap/react';
 
 export type TextEditorProps = {
   comment: boolean;
@@ -8,6 +9,8 @@ export type TextEditorProps = {
   onCancel: () => void;
   onAttachmentsChange?: (files: File[]) => void;
   disabled?: boolean;
+  mentionItems?: { id: string; label: string }[];
+  onEditorJsonChange?: (json: JSONContent) => void;
 };
 
 export const headingOptions: SelectProps['options'] = [

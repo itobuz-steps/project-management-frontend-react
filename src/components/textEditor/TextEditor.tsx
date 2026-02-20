@@ -15,12 +15,23 @@ export function TextEditor({
   onCancel,
   onAttachmentsChange,
   disabled,
+  mentionItems,
+  onEditorJsonChange,
 }: TextEditorProps) {
   const [attachments, setAttachments] = useState<{ file: File; url: string }[]>(
     []
   );
 
-  const editor = useTextEditor({ content, disabled, onChange });
+  const editor = useTextEditor({
+    content,
+    disabled,
+    enableMentions: comment,
+    mentionItems,
+    onChange: (markdown, json) => {
+      onChange(markdown);
+      onEditorJsonChange?.(json);
+    },
+  });
 
   if (!editor) {
     return null;
@@ -132,7 +143,7 @@ export function TextEditor({
         <Button
           size="small"
           title="Mentions"
-          className={`${btn} ${comment ? 'block' : 'hidden'}`}
+          className={`${btn} ${comment ? 'block' : 'hidden!'}`}
           onClick={() => editor.chain().focus().insertContent('@').run()}
         >
           @
