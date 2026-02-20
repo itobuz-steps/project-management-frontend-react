@@ -1,23 +1,75 @@
+import { useRef, useEffect } from 'react';
 import { Avatar, Button, Popconfirm, Space, Typography } from 'antd';
 import { DeleteOutlined, PaperClipOutlined } from '@ant-design/icons';
 import { config } from '../../config/config';
-import type { CommentItemProps } from './comment.type';
+import type { CommentItemProps, MentionSpanProps } from './comment.type';
 import { formatDistanceToNow } from 'date-fns';
 import { TextEditor } from '../textEditor/TextEditor';
 import { Link } from 'react-router-dom';
 import { useCommentEditor } from '../../hooks/useCommentEditor';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import { useProjectMetaData } from '../../hooks/useProjectMetaData';
+import type { Components } from 'react-markdown';
 
 const { Text } = Typography;
 
-export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
-  const editor = useCommentEditor(comment, onUpdate, onDelete);
+export function CommentItem({
+  task,
+  comment,
+  onDelete,
+  onUpdate,
+}: CommentItemProps) {
+  const editorRef = useRef<HTMLDivElement | null>(null);
+  const editor = useCommentEditor({ comment, onUpdate, onDelete });
+
+  const { members } = useProjectMetaData(task.projectId as string);
+
+  const mentionItems = members.map((member) => ({
+    id: member._id,
+    label: member.name,
+  }));
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        editor.isEditing &&
+        editorRef.current &&
+        !editorRef.current.contains(event.target as Node)
+      ) {
+        editor.reset();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [editor.isEditing]);
+
+  const markdownComponents: Components = {
+    span: (props) => {
+      const spanProps = props as MentionSpanProps;
+
+      if (spanProps['data-type'] === 'mention') {
+        return (
+          <span
+            className="cursor-pointer font-medium text-blue-600"
+            {...spanProps}
+          />
+        );
+      }
+
+      return <span {...spanProps} />;
+    },
+  };
 
   return (
     <>
       {editor.contextHolder}
 
-      <div className="group flex gap-2 rounded-md px-2 py-2 hover:bg-gray-50">
+      <div
+        className="group flex gap-2 rounded-md px-2 py-2 hover:bg-gray-50"
+        ref={editorRef}
+      >
         <Avatar
           src={
             comment.author.profileImage
@@ -65,7 +117,12 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
             {/* Body */}
             {!editor.isEditing ? (
               <div onClick={() => editor.setIsEditing(true)}>
-                <ReactMarkdown>{comment.message}</ReactMarkdown>
+                <ReactMarkdown
+                  rehypePlugins={[rehypeRaw]}
+                  components={markdownComponents}
+                >
+                  {comment.message}
+                </ReactMarkdown>
               </div>
             ) : (
               <TextEditor
@@ -75,6 +132,8 @@ export function CommentItem({ comment, onDelete, onUpdate }: CommentItemProps) {
                 onAttachmentsChange={editor.setAttachments}
                 onSave={editor.save}
                 onCancel={editor.reset}
+                mentionItems={mentionItems}
+                onEditorJsonChange={editor.setEditorJson}
               />
             )}
           </Space>

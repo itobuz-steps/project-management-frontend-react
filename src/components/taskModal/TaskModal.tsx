@@ -30,6 +30,7 @@ export default function TaskModal({ taskId, onClose }: TaskModalProps) {
       title={
         task && (
           <TaskModalHeader
+            drawer={false}
             task={task}
             onUpdated={setTask}
             onClose={onClose}

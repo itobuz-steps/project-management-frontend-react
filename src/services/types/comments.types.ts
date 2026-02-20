@@ -17,4 +17,5 @@ export interface Comment {
 export interface UpdateCommentPayload {
   message?: string;
   attachment?: string | null;
+  mentions?: string[];
 }
