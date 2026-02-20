@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 import { createSprintService } from '../services/sprints.service';
 import type { Sprint } from '../services/types/sprints.types';
 import { message } from 'antd';
+import { useProject } from '../context/ProjectContext';
 
 export function useSprintActions(
   projectId?: string,
@@ -10,6 +11,7 @@ export function useSprintActions(
 ) {
   const dueDateRef = useRef<HTMLInputElement>(null);
   const sprintService = createSprintService(projectId as string);
+  const { project } = useProject();
 
   const startSprint = async (sprint: Sprint) => {
     if (!dueDateRef.current?.value) {
@@ -55,17 +57,19 @@ export function useSprintActions(
     }
   };
 
-  const createSprint = async () => {
-    if (!projectId) {
-      return;
-    }
-
+  const createSprint = async (storyPoint: number) => {
     try {
-      const sprint = await sprintService.createSprint({ projectId });
-      setSprints?.((prev) => [sprint, ...prev]);
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        message.error(err.response?.data.message || 'Failed to create sprint');
+      const sprint = await sprintService.createSprint({
+        projectId: project?._id || '',
+        storyPoint,
+      });
+
+      setSprints?.((prevSprints) => [sprint, ...prevSprints]);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        message.error(
+          error.response?.data.message || 'Failed to create sprint'
+        );
       }
     }
   };
