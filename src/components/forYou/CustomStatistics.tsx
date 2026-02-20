@@ -1,12 +1,11 @@
 import { Statistic } from 'antd';
 
-export function CustomStatistic({
-  title,
-  value,
-}: {
+interface CustomStatisticProps {
   title: string;
   value: number;
-}) {
+}
+
+export function CustomStatistic({ title, value }: CustomStatisticProps) {
   return (
     <div className="flex-1 rounded-md border-2 border-gray-200 p-4 md:p-4 md:px-8">
       <Statistic
