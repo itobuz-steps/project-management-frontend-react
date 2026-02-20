@@ -1,10 +1,20 @@
-import { type PieConfig, Pie } from '@ant-design/plots';
+import {
+  type ColumnConfig,
+  type PieConfig,
+  Column,
+  Pie,
+} from '@ant-design/plots';
 import { THEME_COLORS, GRAY_SHADES } from '../../config/constants';
 import { useTheme } from '../../hooks/useTheme';
 import type { TaskStats } from '../../services/types/tasks.types';
+import { Grid } from 'antd';
+import { DateTime } from 'luxon';
 
 export function ChartsContainer({ data }: { data: TaskStats | null }) {
   const [theme] = useTheme();
+  const screens = Grid.useBreakpoint();
+  const isSmall = !screens.sm; // < 640px
+  const chartSize = isSmall ? 250 : 300;
 
   const themeColors = THEME_COLORS[theme] ?? THEME_COLORS['indigo'];
   const isBlackTheme = theme === 'custom_2';
@@ -24,7 +34,24 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
     })
   );
 
-  const config = {
+  const completedTaskMap = new Map(
+    (data?.tasksCompletedEachDay ?? []).map((item) => [
+      DateTime.fromISO(item.date).toFormat('dd-MM-yyyy'),
+      item.count,
+    ])
+  );
+
+  const completedTaskByDate = Array.from({ length: 7 }, (_, index) => {
+    const date = DateTime.now().minus({ days: 6 - index });
+    const dateKey = date.toFormat('dd-MM-yyyy');
+
+    return {
+      date: date.toFormat('dd/MM'),
+      count: completedTaskMap.get(dateKey) ?? 0,
+    };
+  });
+
+  const pieConfig = {
     angleField: 'value',
     colorField: 'type',
     label: {
@@ -42,19 +69,53 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
     height: 300,
   } satisfies PieConfig;
 
+  const columnConfig = {
+    xField: 'date',
+    yField: 'count',
+    colorField: 'date',
+    label: {
+      position: 'middle',
+      style: {
+        fill: '#FFFFFF',
+        opacity: 0.6,
+      },
+    },
+    tooltip: (d: { date: string; count: number }) => ({
+      name: d.date,
+      value: d.count,
+    }),
+    scale: {
+      color: { range: primaryColors },
+    },
+    axis: {
+      x: {
+        labelAutoRotate: false,
+      },
+    },
+    legend: false,
+    width: chartSize * 1.5,
+    height: chartSize,
+  } satisfies ColumnConfig;
+
   return (
-    <div className="flex w-full flex-wrap justify-center gap-2 sm:justify-start">
-      <div className="rounded-md border-2 border-dashed border-gray-300 p-2">
+    <div className="flex w-full flex-1 flex-wrap items-center justify-center gap-2 sm:justify-start">
+      <div className="flex w-full flex-1 flex-col items-center rounded-md border-2 border-gray-200 p-2 sm:w-auto">
         <h4 className="text-primary-500 m-2 font-semibold">
           Assigned Task By Project
         </h4>
-        <Pie {...config} data={allAssignedTaskByProject} />
+        <Pie {...pieConfig} data={allAssignedTaskByProject} />
       </div>
-      <div className="rounded-md border-2 border-dashed border-gray-300 p-2">
+      <div className="flex w-full flex-1 flex-col items-center rounded-md border-2 border-gray-200 p-2 sm:w-auto">
         <h4 className="text-primary-500 m-2 font-semibold">
           Completed Task By Project
         </h4>
-        <Pie {...config} data={completedTaskByProject} />
+        <Pie {...pieConfig} data={completedTaskByProject} />
+      </div>
+      <div className="flex w-full flex-1 flex-col items-center rounded-md border-2 border-gray-200 p-2 sm:w-auto lg:col-span-2 lg:p-8 xl:col-span-1 xl:p-2">
+        <h4 className="text-primary-500 m-2 font-semibold">
+          Completed Task By Date (Last 7 Days)
+        </h4>
+        <Column {...columnConfig} data={completedTaskByDate} />
       </div>
     </div>
   );

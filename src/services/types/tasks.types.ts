@@ -68,6 +68,10 @@ export interface TaskStats {
   storyPointsCompletedThisWeek: number;
   allTasksGroupedByProject: { _id: string; tasks: Task[] }[];
   completedTasksGroupedByProject: { _id: string; tasks: Task[] }[];
+  tasksCompletedEachDay: {
+    date: string;
+    count: number;
+  }[];
 }
 
 export interface CreateTaskPayload {

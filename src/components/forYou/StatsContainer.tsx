@@ -33,7 +33,7 @@ export function StatsContainer() {
     <div>Loading...</div>
   ) : (
     <>
-      <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
+      <div className="flex flex-wrap justify-center gap-2 sm:justify-start md:grid md:grid-cols-3">
         <CustomStatistic
           title="Total Task Assigned in Last 7 Days"
           value={data?.totalAssignedTasks || 0}
