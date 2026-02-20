@@ -84,7 +84,7 @@ function ListView() {
 
   return (
     <div className="no-scrollbar relative mt-2 w-full overflow-x-auto rounded-md border border-gray-200">
-      <table className="min-w-full table-auto overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
+      <table className="min-w-full table-fixed overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
         <thead className="z-10 bg-[#f8f8f8] text-xs font-semibold text-gray-500 uppercase">
           <tr>
             {taskTableColumns.map(({ label, className }) => (

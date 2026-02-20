@@ -21,21 +21,25 @@ export function useSubtaskColumns({
   return [
     {
       title: 'Type',
-      width: 50,
+      width: 55,
       render: (_, task) => <TaskTypeIcon type={task.type} />,
     },
     {
       title: 'Summary',
+      ellipsis: true,
       render: (_, task) => (
         <div onClick={() => openTask(task._id)}>
           <Tag color="blue">{task.key}</Tag>{' '}
-          <span className="cursor-pointer hover:underline">{task.title}</span>
+          <span className="cursor-pointer truncate hover:underline">
+            {task.title}
+          </span>
         </div>
       ),
     },
     {
       title: 'Status',
-      width: 70,
+      ellipsis: true,
+      width: 140,
       render: (_, task) => (
         <StatusSelect
           value={task.status}
@@ -50,10 +54,11 @@ export function useSubtaskColumns({
     },
     {
       title: 'Priority',
-      width: 70,
+      width: 80,
+      ellipsis: true,
       render: (_, task) => (
         <Tag
-          className="m-0 capitalize"
+          className="m-0 items-center rounded-2xl capitalize"
           color={
             PRIORITY_COLORS[task.priority as keyof typeof PRIORITY_COLORS] ??
             'green'
@@ -77,7 +82,7 @@ export function useSubtaskColumns({
     },
     {
       title: 'Delete',
-      width: 20,
+      width: 65,
       render: (_, task) => (
         <Button type="text" danger onClick={() => removeSubtask(task._id)}>
           <Trash2 size={14} />
