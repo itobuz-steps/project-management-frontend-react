@@ -16,7 +16,9 @@ export function useCommentComposer(taskId: string) {
   };
 
   const extractMentions = () => {
-    if (!editorJson) return [];
+    if (!editorJson) {
+      return [];
+    }
 
     const ids = new Set<string>();
 

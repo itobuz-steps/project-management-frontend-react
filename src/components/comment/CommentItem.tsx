@@ -19,7 +19,7 @@ export function CommentItem({
   onDelete,
   onUpdate,
 }: CommentItemProps) {
-  const editor = useCommentEditor(comment, onUpdate, onDelete);
+  const editor = useCommentEditor({ comment, onUpdate, onDelete });
 
   const { members } = useProjectMetaData(task.projectId as string);
 

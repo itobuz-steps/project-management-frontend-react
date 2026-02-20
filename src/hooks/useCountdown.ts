@@ -8,7 +8,9 @@ export function useCountdown(
   const [countdown, setCountdown] = useState(initialCount);
 
   useEffect(() => {
-    if (!countdownStarted) return;
+    if (!countdownStarted) {
+      return;
+    }
 
     if (countdown === 0 && callbackfn) {
       callbackfn();

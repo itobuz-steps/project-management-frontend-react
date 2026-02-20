@@ -1,8 +1,7 @@
 import { message } from 'antd';
 import { updateTask } from '../services/taskService';
 import type { TaskPopulated } from '../services/types/tasks.types';
-
-type OnUpdatedFn = (updated: TaskPopulated) => void;
+import type { OnUpdatedFn } from './hooks.types';
 
 export function useTaskUpdate(taskId: string, onUpdated: OnUpdatedFn) {
   const update = async (payload: Partial<TaskPopulated>, errorMsg: string) => {

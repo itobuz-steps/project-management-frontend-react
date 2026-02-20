@@ -12,10 +12,10 @@ import TableHeader from '@tiptap/extension-table-header';
 import TableCell from '@tiptap/extension-table-cell';
 import Emoji from '@tiptap/extension-emoji';
 import { Markdown } from 'tiptap-markdown';
-import type { JSONContent } from '@tiptap/react';
 import { MentionList } from '../components/ui/MentionList';
 import type { SuggestionProps } from '@tiptap/suggestion';
 import type { MentionListRef } from '../components/ui/ui.types';
+import type { UseTextEditorParams } from './hooks.types';
 
 export function useTextEditor({
   content,
@@ -23,13 +23,7 @@ export function useTextEditor({
   onChange,
   enableMentions = false,
   mentionItems = [],
-}: {
-  content: string;
-  disabled?: boolean;
-  onChange: (value: string, json: JSONContent) => void;
-  enableMentions?: boolean;
-  mentionItems?: { id: string; label: string }[];
-}) {
+}: UseTextEditorParams) {
   const mentionExtension = enableMentions
     ? Mention.configure({
         HTMLAttributes: {

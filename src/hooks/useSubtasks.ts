@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import type { TaskPopulated } from "../services/types/tasks.types";
-import getTaskById, { updateTask } from "../services/taskService";
+import { useEffect, useState } from 'react';
+import type { TaskPopulated } from '../services/types/tasks.types';
+import getTaskById, { updateTask } from '../services/taskService';
+import { message } from 'antd';
 
 export function useSubtasks(task: TaskPopulated) {
   const [selectedIds, setSelectedIds] = useState<string[]>(
@@ -10,16 +11,25 @@ export function useSubtasks(task: TaskPopulated) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!selectedIds.length) {
-      setSubtasks([]);
-      return;
+    async function fetchSubtasks() {
+      if (!selectedIds.length) {
+        setSubtasks([]);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const data = await Promise.all(selectedIds.map(getTaskById));
+        setSubtasks(data);
+      } catch {
+        message.error('Failed to get tasks');
+      } finally {
+        setLoading(false);
+      }
     }
 
-    setLoading(true);
-    Promise.all(selectedIds.map(getTaskById))
-      .then(setSubtasks)
-      .finally(() => setLoading(false));
-  }, [selectedIds.join(',')]);
+    fetchSubtasks();
+  }, [selectedIds]);
 
   const updateSubtask = (updated: TaskPopulated) => {
     setSubtasks((prev) =>

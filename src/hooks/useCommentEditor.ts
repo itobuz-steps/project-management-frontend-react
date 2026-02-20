@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { message } from 'antd';
 import { commentsApi } from '../services/commentService';
-import type { Comment } from '../services/types/comments.types';
 import type { JSONContent } from '@tiptap/react';
+import type { UseCommentEditorParams } from './hooks.types';
 
-export function useCommentEditor(
-  comment: Comment,
-  onUpdate: (comment: Comment) => void,
-  onDelete: (id: string) => void
-) {
+export function useCommentEditor({
+  comment,
+  onUpdate,
+  onDelete,
+}: UseCommentEditorParams) {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState<string>(comment.message);
   const [attachments, setAttachments] = useState<File[]>([]);
