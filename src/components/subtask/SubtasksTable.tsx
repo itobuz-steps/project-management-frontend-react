@@ -16,6 +16,7 @@ export function SubtasksTable({
       <div className="rounded-lg border border-gray-200">
         <Table
           className="subtasks-table"
+          tableLayout="fixed"
           columns={columns}
           dataSource={subtasks}
           rowKey="_id"

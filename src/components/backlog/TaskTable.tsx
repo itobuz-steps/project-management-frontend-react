@@ -91,7 +91,7 @@ export function TaskTable({
       {/* Table */}
       {open && (
         <div className="relative mt-2 overflow-x-auto rounded-md border border-gray-200">
-          <table className="min-w-full table-auto text-left text-sm">
+          <table className="min-w-full table-fixed text-left text-sm">
             <thead className="sticky top-0 z-10 border-b bg-gray-100 text-xs text-gray-600 uppercase">
               <tr>
                 {taskTableColumns.map(({ label, className }) => (
