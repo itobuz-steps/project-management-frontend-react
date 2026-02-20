@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { Avatar, Button, Popconfirm, Space, Typography } from 'antd';
 import { DeleteOutlined, PaperClipOutlined } from '@ant-design/icons';
 import { config } from '../../config/config';
@@ -19,6 +20,7 @@ export function CommentItem({
   onDelete,
   onUpdate,
 }: CommentItemProps) {
+  const editorRef = useRef<HTMLDivElement | null>(null);
   const editor = useCommentEditor({ comment, onUpdate, onDelete });
 
   const { members } = useProjectMetaData(task.projectId as string);
@@ -27,6 +29,21 @@ export function CommentItem({
     id: member._id,
     label: member.name,
   }));
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        editor.isEditing &&
+        editorRef.current &&
+        !editorRef.current.contains(event.target as Node)
+      ) {
+        editor.reset();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [editor.isEditing]);
 
   const markdownComponents: Components = {
     span: (props) => {
@@ -49,7 +66,10 @@ export function CommentItem({
     <>
       {editor.contextHolder}
 
-      <div className="group flex gap-2 rounded-md px-2 py-2 hover:bg-gray-50">
+      <div
+        className="group flex gap-2 rounded-md px-2 py-2 hover:bg-gray-50"
+        ref={editorRef}
+      >
         <Avatar
           src={
             comment.author.profileImage

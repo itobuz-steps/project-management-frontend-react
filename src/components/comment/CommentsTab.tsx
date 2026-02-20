@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CommentItem } from './CommentItem';
 import type { CommentsTabProps } from './comment.type';
 import { TextEditor } from '../textEditor/TextEditor';
@@ -10,6 +10,7 @@ import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 
 export function CommentsTab({ task }: CommentsTabProps) {
   const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const composerRef = useRef<HTMLDivElement | null>(null);
 
   const { comments, loading, addComment, updateComment, removeComment } =
     useTaskComments(task._id);
@@ -22,6 +23,22 @@ export function CommentsTab({ task }: CommentsTabProps) {
     id: member._id,
     label: member.name,
   }));
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isComposerOpen &&
+        composerRef.current &&
+        !composerRef.current.contains(event.target as Node)
+      ) {
+        composer.reset();
+        setIsComposerOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isComposerOpen]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -47,7 +64,7 @@ export function CommentsTab({ task }: CommentsTabProps) {
       {composer.contextHolder}
 
       {/* Composer */}
-      <div className="border-b border-gray-200 pb-4">
+      <div className="border-b border-gray-200 pb-4" ref={composerRef}>
         <div className="flex gap-3">
           <img src="/profile.png" className="h-8 w-8 rounded-full" />
 
