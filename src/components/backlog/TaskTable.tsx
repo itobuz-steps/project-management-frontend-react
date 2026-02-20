@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -26,6 +26,10 @@ export function TaskTable({
   const [open, setOpen] = useState(true);
   const [localTasks, setLocalTasks] = useState(tasks);
   const { project } = useProject();
+
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
 
   const { members, loadingMembers } = useProjectMetaData(project?._id);
 
