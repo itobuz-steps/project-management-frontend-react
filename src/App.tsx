@@ -1,16 +1,10 @@
 import { Flip, ToastContainer } from 'react-toastify';
 import { MainRouter } from './components/routers/MainRouter';
-import { useTheme } from './hooks/useTheme';
-import { useEffect } from 'react';
 import './App.scss';
 import { AuthProvider } from './context/AuthProvider';
+import { ThemeProvider } from './context/ThemeProvider';
 
 function App() {
-  const [, setTheme] = useTheme();
-  useEffect(() => {
-    const theme = localStorage.getItem('theme') || 'indigo';
-    setTheme(theme);
-  }, [setTheme]);
   return (
     <>
       <ToastContainer
@@ -27,9 +21,11 @@ function App() {
         transition={Flip}
         limit={3}
       />
-      <AuthProvider>
-        <MainRouter />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <MainRouter />
+        </AuthProvider>
+      </ThemeProvider>
     </>
   );
 }

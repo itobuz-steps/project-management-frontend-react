@@ -24,7 +24,10 @@ import { Skeleton } from 'antd';
 function BacklogView() {
   const { projectId } = useParams();
   const { project, columns } = useProject();
-  const sprintService = createSprintService(project?._id as string);
+  const sprintService = useMemo(
+    () => (projectId ? createSprintService(projectId) : null),
+    [projectId]
+  );
 
   const [searchParams] = useSearchParams();
 
@@ -85,7 +88,9 @@ function BacklogView() {
             projectId,
             searchInput: searchParams.get('searchInput') || '',
           }),
-          type === 'scrum' ? sprintService.getSprints() : Promise.resolve([]),
+          type === 'scrum' && sprintService
+            ? sprintService.getSprints()
+            : Promise.resolve([]),
         ]);
 
         setTasks(tasksRes);
@@ -98,7 +103,7 @@ function BacklogView() {
     }
 
     loadData(projectId);
-  }, [type, searchInput, projectId]);
+  }, [type, searchInput, projectId, sprintService]);
 
   if (!projectId) {
     return (
