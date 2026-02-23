@@ -35,6 +35,7 @@ export type TaskKeyCellType = {
 export type TaskTitleCellType = {
   title: string;
   taskId: string;
+  isCompleted: boolean;
 };
 
 export type UserCellType = {

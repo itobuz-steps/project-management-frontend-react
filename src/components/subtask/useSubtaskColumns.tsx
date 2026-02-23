@@ -27,14 +27,22 @@ export function useSubtaskColumns({
     {
       title: 'Summary',
       ellipsis: true,
-      render: (_, task) => (
-        <div onClick={() => openTask(task._id)}>
-          <Tag color="blue">{task.key}</Tag>{' '}
-          <span className="cursor-pointer truncate hover:underline">
-            {task.title}
-          </span>
-        </div>
-      ),
+      render: (_, task) => {
+        const isDone = task.status === columns[columns.length - 1];
+
+        return (
+          <div onClick={() => openTask(task._id)}>
+            <Tag color="blue">{task.key}</Tag>{' '}
+            <span
+              className={`cursor-pointer truncate hover:underline ${
+                isDone ? 'text-gray-400 line-through' : ''
+              }`}
+            >
+              {task.title}
+            </span>
+          </div>
+        );
+      },
     },
     {
       title: 'Status',

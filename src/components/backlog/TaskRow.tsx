@@ -39,6 +39,8 @@ export function TaskRow({
     transition,
   };
 
+  const isCompleted = task.status === columns[columns.length - 1];
+
   return (
     <tr
       key={task._id}
@@ -62,7 +64,11 @@ export function TaskRow({
         taskKey={task.key as string}
       />
 
-      <TaskTitleCell title={task.title} taskId={task._id} />
+      <TaskTitleCell
+        title={task.title}
+        taskId={task._id}
+        isCompleted={isCompleted}
+      />
 
       <td className="p-3 px-6 whitespace-nowrap">
         <StatusSelect
@@ -116,7 +122,7 @@ export function TaskRow({
       </td>
 
       <td className="p-3 px-6 whitespace-nowrap">
-        <div className="flex items-center">
+        <div className="flex items-center pr-2">
           <img
             className="mr-3 h-6 w-6 rounded-full object-cover"
             src={
