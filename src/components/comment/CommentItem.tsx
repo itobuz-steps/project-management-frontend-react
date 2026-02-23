@@ -97,10 +97,7 @@ export function CommentItem({
 
               <Space className="opacity-0 transition group-hover:opacity-100">
                 {comment.attachment && (
-                  <Link
-                    to={`${config.api_base_url}/uploads/${comment.attachment}`}
-                    target="_blank"
-                  >
+                  <Link to={comment.attachment} target="_blank">
                     <Button type="text" icon={<PaperClipOutlined />} />
                   </Link>
                 )}
