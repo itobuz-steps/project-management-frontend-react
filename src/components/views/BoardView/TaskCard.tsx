@@ -8,6 +8,7 @@ import { Trash } from 'lucide-react';
 import { DeleteTaskModal } from '../../../utils/DeleteTaskModal';
 import { CSS } from '@dnd-kit/utilities';
 import { Link } from 'react-router-dom';
+import { useProject } from '../../../context/ProjectContext';
 
 export function TaskCard({
   task,
@@ -19,6 +20,9 @@ export function TaskCard({
   onOpen: () => void;
 }) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const { columns } = useProject();
+
+  const isCompleted = column === columns[columns.length - 1];
 
   const {
     attributes,
@@ -47,7 +51,9 @@ export function TaskCard({
       <div className="flex cursor-pointer items-start justify-between gap-2">
         <div>
           <p
-            className="mb-4 cursor-pointer text-sm font-medium text-gray-900 hover:underline"
+            className={`mb-4 cursor-pointer text-sm font-medium hover:underline ${
+              isCompleted ? 'text-gray-400 line-through' : 'text-gray-900'
+            }`}
             onClick={() => onOpen()}
           >
             {task.title}

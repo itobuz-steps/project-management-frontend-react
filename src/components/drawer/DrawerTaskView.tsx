@@ -27,7 +27,7 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
 
         {/* Child issues / Subtasks */}
         <div className="mt-5">
-          <SubtasksTab task={task} />
+          {!task.parentTask && <SubtasksTab task={task} />}
         </div>
 
         {/* Divider */}

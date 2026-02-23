@@ -29,9 +29,9 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
     <div className="no-scrollbar flex h-full flex-col overflow-y-auto md:flex-row md:overflow-hidden">
       <div className="flex-1 overflow-visible md:overflow-y-auto md:pr-3">
         {isMobile && <TaskDetails task={task} onUpdated={onUpdated} />}
-
         <TaskDescription task={task} onUpdated={onUpdated} />
-        <SubtasksTab task={task} />
+        {!task.parentTask && <SubtasksTab task={task} />}
+
         <AttachmentsTab task={task} />
         <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
       </div>
