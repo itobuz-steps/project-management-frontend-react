@@ -27,7 +27,7 @@ export default function SearchBar() {
     <div className="search-icon flex items-center justify-between">
       <form
         autoComplete="off"
-        className="search-input-form w-30 rounded-lg bg-white text-black shadow-sm sm:w-50"
+        className="search-input-form w-100 rounded-lg bg-white text-black shadow-sm sm:w-50"
         onSubmit={(e) => e.preventDefault()}
       >
         <div className="relative">
@@ -37,7 +37,7 @@ export default function SearchBar() {
             placeholder="Search tasks..."
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="focus:ring-primary-400 block w-full rounded-lg px-2 py-2 ps-10 text-sm placeholder:text-gray-500 focus:ring-2 focus:ring-offset-1 focus:ring-offset-white focus:outline-none"
+            className="focus:ring-primary-400 block w-full rounded-lg px-2 py-3 ps-10 text-sm placeholder:text-gray-500 focus:ring-2 focus:ring-offset-1 focus:ring-offset-white focus:outline-none"
           />
         </div>
       </form>

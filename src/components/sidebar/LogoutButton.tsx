@@ -12,7 +12,7 @@ export default function LogoutButton({ collapsed }: Props) {
   }
 
   return (
-    <button onClick={handleLogout} className="group my-5 mt-auto">
+    <button onClick={handleLogout} className="group mt-auto">
       <a
         id="logout-btn"
         className="flex cursor-pointer items-center gap-4 overflow-hidden rounded-lg bg-gray-50 p-2 text-red-700 shadow hover:bg-red-200 hover:text-red-800"

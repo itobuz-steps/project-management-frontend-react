@@ -76,37 +76,41 @@ function TopBar({
           </Can>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* LEFT: View Switcher */}
-          <SearchBar />
-          <div className="flex w-full flex-wrap items-center gap-1 rounded-md border border-gray-200 bg-white p-1 inset-shadow-sm/25 inset-shadow-gray-500 sm:w-auto">
-            {views.map((view) => {
-              return (
-                <NavLink
-                  to={view.value}
-                  key={view.value}
-                  onClick={() => navigate(view.value)}
-                  className={({ isActive }) => {
-                    return [
-                      'flex-1 rounded-md px-3 py-2 text-center text-sm font-medium transition sm:flex-none sm:px-3.5',
-                      isActive
-                        ? 'bg-primary-400 text-white shadow-sm'
-                        : 'text-gray-500 hover:text-gray-800',
-                    ].join(' ');
-                  }}
-                >
-                  {view.label}
-                </NavLink>
-              );
-            })}
+          <div className="flex flex-col justify-stretch gap-3 lg:flex-row">
+            <SearchBar />
+            <div className="lg:absolute lg:left-1/2 lg:-translate-x-1/2">
+              <div className="flex w-full flex-wrap items-center gap-1 rounded-md border border-gray-200 bg-white p-1 inset-shadow-sm/25 inset-shadow-gray-500 sm:w-auto">
+                {views.map((view) => {
+                  return (
+                    <NavLink
+                      to={view.value}
+                      key={view.value}
+                      onClick={() => navigate(view.value)}
+                      className={({ isActive }) => {
+                        return [
+                          'flex-1 rounded-md px-3 py-2 text-center text-sm font-medium transition sm:flex-none sm:px-3.5',
+                          isActive
+                            ? 'bg-primary-400 text-white shadow-sm'
+                            : 'text-gray-500 hover:text-gray-800',
+                        ].join(' ');
+                      }}
+                    >
+                      {view.label}
+                    </NavLink>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           {/* RIGHT: Actions */}
-          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+          <div className="flex w-full flex-col flex-wrap items-end gap-3 sm:w-auto lg:flex-row">
             {/* Add Task */}
             <button
               onClick={onAddTask}
-              className="bg-primary-500 hover:bg-primary-600 w-full rounded-md px-3.5 py-2 text-sm font-medium text-white sm:w-auto"
+              className="bg-primary-500 hover:bg-primary-600 w-full rounded-md px-5 py-2.5 text-sm font-medium text-white sm:w-auto"
             >
               Add task
               <Plus className="mb-0.5 ml-1 inline-block h-4 w-4" />
@@ -119,7 +123,7 @@ function TopBar({
                     setIsFiltersOpen((prev) => !prev);
                     onOpenFilters();
                   }}
-                  className="w-full rounded-md border border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 sm:w-auto"
+                  className="w-full rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 sm:w-auto"
                 >
                   Filters
                 </button>
