@@ -12,18 +12,29 @@ const api = axios.create({
 
 attachInterceptor(api);
 
-async function updateUserProfile(
-  username: string,
-  profileImage: File | null
-): Promise<IResponse> {
+async function updateUserProfile(data: {
+  name?: string;
+  profileImage?: File | null;
+  notificationPreferences?: boolean;
+}): Promise<IUserResponse> {
   const formData = new FormData();
-  formData.append('name', username);
 
-  if (profileImage) {
-    formData.append('profileImage', profileImage);
+  if (data.name !== undefined) {
+    formData.append('name', data.name);
   }
 
-  const response = await api.patch<IResponse>('/profile', formData);
+  if (data.profileImage) {
+    formData.append('profileImage', data.profileImage);
+  }
+
+  if (typeof data.notificationPreferences === 'boolean') {
+    formData.append(
+      'notificationPreferences',
+      data.notificationPreferences.toString()
+    );
+  }
+
+  const response = await api.patch<IUserResponse>('/profile', formData);
 
   return response.data;
 }

@@ -37,6 +37,7 @@ export type User = {
   name: string;
   email: string;
   profileImage?: string;
+  notificationPreferences: boolean;
 };
 
 export type TaskAttachment = File | string;
