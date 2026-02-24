@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import type { Sprint } from '../../../services/types/sprints.types';
 import { TaskTable } from '../../backlog/TaskTable';
 import type { Task } from '../../../services/types/tasks.types';
+import SprintModal from '../../sprintModal/SprintModal';
 import {
   DndContext,
   DragOverlay,
@@ -38,6 +39,17 @@ function BacklogView() {
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+  const [completedSprintId, setCompletedSprintId] = useState<string | null>(
+    null
+  );
+
+  const handleSprintCompleted = useCallback((sprintId: string) => {
+    setCompletedSprintId(sprintId);
+  }, []);
+
+  const handleCloseSprintModal = useCallback(() => {
+    setCompletedSprintId(null);
+  }, []);
 
   const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
   const statusFilter = normalize(searchParams.get('status') || '');
@@ -261,6 +273,7 @@ function BacklogView() {
                         tasks={sprintTasks}
                         columns={columns || []}
                         containerId={sprint._id}
+                        onSprintCompleted={handleSprintCompleted}
                       />
                     );
                   })}
@@ -282,6 +295,16 @@ function BacklogView() {
             containerId="backlog"
           />
         </SortableContext>
+
+        {/* Sprint Completion Modal */}
+        {completedSprintId && (
+          <SprintModal
+            visible={!!completedSprintId}
+            onClose={handleCloseSprintModal}
+            sprintId={completedSprintId}
+            projectId={projectId}
+          />
+        )}
 
         {/* DRAG PREVIEW */}
         <DragOverlay>

@@ -22,6 +22,7 @@ export function TaskTable({
   columns,
   title,
   containerId,
+  onSprintCompleted,
 }: TaskTableProps) {
   const [open, setOpen] = useState(true);
   const [localTasks, setLocalTasks] = useState(tasks);
@@ -36,6 +37,10 @@ export function TaskTable({
   const { dueDateRef, startSprint, completeSprint, createSprint } =
     useSprintActions(project?._id, setSprints);
 
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
+
   const { setNodeRef, isOver } = useDroppable({
     id: containerId,
     data: { containerId },
@@ -45,6 +50,12 @@ export function TaskTable({
     setLocalTasks((prev) =>
       prev.map((task) => (task._id === updated._id ? updated : task))
     );
+  };
+
+  const handleCompleteSprint = async () => {
+    if (!sprint) return;
+    await completeSprint(sprint);
+    onSprintCompleted?.(sprint._id);
   };
 
   const sprintStarted = Boolean(sprint?.dueDate);
@@ -78,7 +89,7 @@ export function TaskTable({
               dueDateRef={dueDateRef}
               sprintStarted={!!sprintStarted}
               startSprint={() => startSprint(sprint)}
-              completeSprint={() => completeSprint(sprint)}
+              completeSprint={() => handleCompleteSprint()}
             />
           )}
 
