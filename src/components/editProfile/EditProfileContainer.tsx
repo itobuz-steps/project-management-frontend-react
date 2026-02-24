@@ -9,7 +9,11 @@ export default function EditProfileContainer() {
   const [profileImage, setProfileImage] = useState('/profile.png');
   const [email, setEmail] = useState<string | null>(null);
   const [username, setUsername] = useState('');
-  const [notificationEnabled, setNotificationEnabled] = useState<boolean>(true);
+  const [notifications, setNotifications] = useState({
+    push: true,
+    email: true,
+    inApp: true,
+  });
   const [loadingNotification, setLoadingNotification] = useState(false);
 
   useEffect(() => {
@@ -24,26 +28,39 @@ export default function EditProfileContainer() {
       }
       setEmail(response.result.email);
       setUsername(response.result.name);
-      setNotificationEnabled(response.result.notificationPreferences);
+      setNotifications({
+        push: response.result.notificationPreferences?.push ?? true,
+        email: response.result.notificationPreferences?.email ?? true,
+        inApp: response.result.notificationPreferences?.inApp ?? true,
+      });
     }
 
     fetchUserData();
   }, []);
 
-  const handleNotificationToggle = async (checked: boolean) => {
-    const previous = notificationEnabled;
+  const handleNotificationToggle = async (
+    type: 'push' | 'email' | 'inApp',
+    checked: boolean
+  ) => {
+    const previous = { ...notifications };
+
+    setNotifications((prev) => ({
+      ...prev,
+      [type]: checked,
+    }));
+
     setLoadingNotification(true);
 
     try {
       const response = await userService.updateUserProfile({
-        notificationPreferences: checked,
+        [type]: checked,
       });
 
-      setNotificationEnabled(response.result.notificationPreferences);
+      setNotifications(response.result.notificationPreferences);
 
       message.success('Notification preference updated');
     } catch {
-      setNotificationEnabled(previous);
+      setNotifications(previous);
       message.error('Failed to update notification preference');
     } finally {
       setLoadingNotification(false);
@@ -71,13 +88,38 @@ export default function EditProfileContainer() {
           {email}
         </p>
       )}
-      <div className="mb-4 flex items-center justify-between px-4">
-        <span className="font-medium text-gray-600">Push Notifications</span>
-        <Switch
-          checked={notificationEnabled}
-          loading={loadingNotification}
-          onChange={handleNotificationToggle}
-        />
+      <div className="mb-4 space-y-3 px-4">
+        {/* 🔔 Push */}
+        <div className="flex items-center justify-between">
+          <span className="font-medium text-gray-600">Push Notifications</span>
+          <Switch
+            checked={notifications.push}
+            loading={loadingNotification}
+            onChange={(checked) => handleNotificationToggle('push', checked)}
+          />
+        </div>
+
+        {/* 📧 Email */}
+        <div className="flex items-center justify-between">
+          <span className="font-medium text-gray-600">Email Notifications</span>
+          <Switch
+            checked={notifications.email}
+            loading={loadingNotification}
+            onChange={(checked) => handleNotificationToggle('email', checked)}
+          />
+        </div>
+
+        {/* 🖥️ In-App */}
+        <div className="flex items-center justify-between">
+          <span className="font-medium text-gray-600">
+            In-App Notifications
+          </span>
+          <Switch
+            checked={notifications.inApp}
+            loading={loadingNotification}
+            onChange={(checked) => handleNotificationToggle('inApp', checked)}
+          />
+        </div>
       </div>
       <EditProfileForm
         setSelectedFile={setProfileImage}

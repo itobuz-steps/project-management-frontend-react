@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { config } from '../config/config';
 import { attachInterceptor } from '../utils/attachInterceptor';
-import type { IResponse } from './types/common';
 import type { IUserResponse } from './types/user';
 
 const API_URL = `${config.api_base_url}/auth`;
@@ -15,7 +14,9 @@ attachInterceptor(api);
 async function updateUserProfile(data: {
   name?: string;
   profileImage?: File | null;
-  notificationPreferences?: boolean;
+  push?: boolean;
+  email?: boolean;
+  inApp?: boolean;
 }): Promise<IUserResponse> {
   const formData = new FormData();
 
@@ -27,11 +28,16 @@ async function updateUserProfile(data: {
     formData.append('profileImage', data.profileImage);
   }
 
-  if (typeof data.notificationPreferences === 'boolean') {
-    formData.append(
-      'notificationPreferences',
-      data.notificationPreferences.toString()
-    );
+  if (typeof data.push === 'boolean') {
+    formData.append('push', data.push.toString());
+  }
+
+  if (typeof data.email === 'boolean') {
+    formData.append('email', data.email.toString());
+  }
+
+  if (typeof data.inApp === 'boolean') {
+    formData.append('inApp', data.inApp.toString());
   }
 
   const response = await api.patch<IUserResponse>('/profile', formData);
