@@ -12,7 +12,6 @@ import { PRIORITIES } from '../taskModal/constants';
 import SearchBar from '../navbar/SearchBar';
 import { InviteUserContainer } from './InviteUserContainer';
 import { Can } from '../../utils/PermissionHoc';
-import type { ProjectMember } from '../../types/project.types';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { UserCell } from '../ui/UserCell';
 import { Select } from 'antd';
