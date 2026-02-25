@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react';
 import { message } from 'antd';
 import { updateTask } from '../services/taskService';
-import type { TaskAttachment } from '../services/types/tasks.types';
+import type {
+  TaskAttachment,
+  TaskPopulated,
+} from '../services/types/tasks.types';
 
 export function useTaskAttachments<
   T extends { _id: string; attachments?: TaskAttachment[] },
->(task: T, onUpdated?: (task: T) => void) {
+>(task: T, onUpdated?: (task: Partial<TaskPopulated>) => void) {
   const [saving, setSaving] = useState(false);
 
   const attachments = useMemo<TaskAttachment[]>(() => {
@@ -24,10 +27,23 @@ export function useTaskAttachments<
     errorMsg: string
   ) => {
     setSaving(true);
+
+    const existingAttachments = updated.filter(
+      (attachment): attachment is string => typeof attachment === 'string'
+    );
+
+    const newFiles = updated.filter(
+      (attachment): attachment is File => attachment instanceof File
+    );
+
     onUpdated?.({ ...task, attachments: updated });
 
     try {
-      await updateTask(task._id, { attachments: updated });
+      const updatedTask = await updateTask(task._id, {
+        existingAttachments,
+        attachments: newFiles,
+      });
+      onUpdated?.(updatedTask);
       message.success(successMsg);
     } catch {
       message.error(errorMsg);

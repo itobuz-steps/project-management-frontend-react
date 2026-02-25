@@ -4,6 +4,7 @@ import getTaskById, { updateTask } from '../services/taskService';
 import { message } from 'antd';
 
 export function useSubtasks(task: TaskPopulated) {
+  console.log('useSubtasks', { task });
   const [selectedIds, setSelectedIds] = useState<string[]>(
     (task.subTasks ?? []) as string[]
   );

@@ -6,7 +6,10 @@ import type { OnUpdatedFn } from './hooks.types';
 export function useTaskUpdate(taskId: string, onUpdated: OnUpdatedFn) {
   const update = async (payload: Partial<TaskPopulated>, errorMsg: string) => {
     try {
-      const updatedTask = await updateTask(taskId, payload);
+      const updatedTask = await updateTask(
+        taskId,
+        payload as Partial<TaskPopulated> & { attachments?: File[] }
+      );
       onUpdated(updatedTask);
     } catch {
       message.error(errorMsg);

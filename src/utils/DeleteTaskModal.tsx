@@ -1,11 +1,11 @@
 import { Modal, message } from 'antd';
 import { useState } from 'react';
-import type { Task } from '../services/types/tasks.types';
+import type { TaskPopulated } from '../services/types/tasks.types';
 import { deleteTask } from '../services/taskService';
 
 interface Props {
   open: boolean;
-  task: Task;
+  task: TaskPopulated;
   onClose: () => void;
   onDeleted: (taskId: string) => void;
 }
