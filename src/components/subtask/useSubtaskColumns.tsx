@@ -22,7 +22,11 @@ export function useSubtaskColumns({
     {
       title: 'Type',
       width: 55,
-      render: (_, task) => <TaskTypeIcon type={task.type} />,
+      render: (_, task) => (
+        <div className="flex justify-center">
+          <TaskTypeIcon type={task.type} />
+        </div>
+      ),
     },
     {
       title: 'Summary',
@@ -31,10 +35,13 @@ export function useSubtaskColumns({
         const isDone = task.status === columns[columns.length - 1];
 
         return (
-          <div onClick={() => openTask(task._id)}>
-            <Tag color="blue">{task.key}</Tag>{' '}
+          <div
+            className="flex w-full items-center gap-2"
+            onClick={() => openTask(task._id)}
+          >
+            <Tag color="blue">{task.key}</Tag>
             <span
-              className={`cursor-pointer truncate hover:underline ${
+              className={`block max-w-[200px] truncate hover:underline ${
                 isDone ? 'text-gray-400 line-through' : ''
               }`}
             >

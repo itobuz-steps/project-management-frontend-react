@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { NotificationDropdown } from './NotificationDropdown';
 import notificationService from '../../services/notificationService';
 import type { INotification } from '../../types/notification.types';
+import userService from '../../services/userService';
 
 export default function Notifications() {
   const [open, setOpen] = useState(false);
@@ -10,6 +11,15 @@ export default function Notifications() {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [newNotificationCount, setNewNotificationCount] = useState(0);
+  const [inAppEnabled, setInAppEnabled] = useState(true);
+
+  useEffect(() => {
+    async function fetchUserPreferences() {
+      const res = await userService.getUserInfo();
+      setInAppEnabled(res.result.notificationPreferences?.inApp);
+    }
+    fetchUserPreferences();
+  }, []);
 
   useEffect(() => {
     async function fetchNotifications() {
@@ -34,10 +44,12 @@ export default function Notifications() {
 
       if (type === 'PUSH_NOTIFICATION') {
         setNotifications((prev) => [payload, ...prev]);
-        setNewNotificationCount((prev) => prev + 1);
+
+        setNewNotificationCount((prev) => (inAppEnabled ? prev + 1 : prev));
       }
     };
-  }, []);
+    return () => channel.close();
+  }, [inAppEnabled]);
 
   function loadMore() {
     if (hasMore) {

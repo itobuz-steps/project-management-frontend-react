@@ -32,11 +32,18 @@ export type SubTask = {
   isCompleted?: boolean;
 };
 
+export type NotificationPreferences = {
+  email: boolean;
+  push: boolean;
+  inApp: boolean;
+};
+
 export type User = {
   _id: string;
   name: string;
   email: string;
   profileImage?: string;
+  notificationPreferences: NotificationPreferences;
 };
 
 export type TaskAttachment = File | string;
