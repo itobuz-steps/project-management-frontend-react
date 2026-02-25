@@ -93,6 +93,7 @@ export default function EditProfileContainer() {
         <div className="flex items-center justify-between">
           <span className="font-medium text-gray-600">Push Notifications</span>
           <Switch
+            className="custom-switch"
             checked={notifications.push}
             loading={loadingNotification}
             onChange={(checked) => handleNotificationToggle('push', checked)}
@@ -103,6 +104,7 @@ export default function EditProfileContainer() {
         <div className="flex items-center justify-between">
           <span className="font-medium text-gray-600">Email Notifications</span>
           <Switch
+            className="custom-switch"
             checked={notifications.email}
             loading={loadingNotification}
             onChange={(checked) => handleNotificationToggle('email', checked)}
@@ -115,6 +117,7 @@ export default function EditProfileContainer() {
             In-App Notifications
           </span>
           <Switch
+            className="custom-switch"
             checked={notifications.inApp}
             loading={loadingNotification}
             onChange={(checked) => handleNotificationToggle('inApp', checked)}
