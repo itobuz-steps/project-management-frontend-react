@@ -10,6 +10,7 @@ import type { Tabs, DrawerViewProps } from './drawer.type';
 
 export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
   const [activeTab, setActiveTab] = useState<Tabs>('comments');
+  const isDrawer = true;
 
   return (
     <div
@@ -59,7 +60,13 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
           {/* Tab content */}
           <div className="pt-3 pb-6">
             {activeTab === 'comments' && <CommentsTab task={task} />}
-            {activeTab === 'attachments' && <AttachmentsTab task={task} />}
+            {activeTab === 'attachments' && (
+              <AttachmentsTab
+                isDrawer={isDrawer}
+                task={task}
+                onUpdated={onUpdated}
+              />
+            )}
             {activeTab === 'activity' && <ActivityTab taskId={task._id} />}
           </div>
         </div>

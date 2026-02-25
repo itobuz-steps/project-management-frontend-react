@@ -6,19 +6,23 @@ import type {
   TaskPopulated,
 } from '../services/types/tasks.types';
 
-export function useTaskAttachments<
-  T extends { _id: string; attachments?: TaskAttachment[] },
->(task: T, onUpdated?: (task: Partial<TaskPopulated>) => void) {
+type TaskWithAttachments = {
+  _id: string;
+  attachments?: TaskAttachment[];
+};
+
+export function useTaskAttachments(
+  task: TaskWithAttachments,
+  onUpdated?: (task: TaskPopulated) => void
+) {
   const [saving, setSaving] = useState(false);
 
   const attachments = useMemo<TaskAttachment[]>(() => {
-    if (!task.attachments) {
-      return [];
-    }
-
     return Array.isArray(task.attachments)
       ? task.attachments
-      : Array.from(task.attachments);
+      : task.attachments
+        ? Array.from(task.attachments)
+        : [];
   }, [task.attachments]);
 
   const updateAttachments = async (
@@ -28,26 +32,24 @@ export function useTaskAttachments<
   ) => {
     setSaving(true);
 
-    const existingAttachments = updated.filter(
-      (attachment): attachment is string => typeof attachment === 'string'
-    );
-
-    const newFiles = updated.filter(
-      (attachment): attachment is File => attachment instanceof File
-    );
-
-    onUpdated?.({ ...task, attachments: updated });
-
     try {
+      const existingAttachments = updated.filter(
+        (attachment): attachment is string => typeof attachment === 'string'
+      );
+
+      const newFiles = updated.filter(
+        (attachment): attachment is File => attachment instanceof File
+      );
+
       const updatedTask = await updateTask(task._id, {
         existingAttachments,
         attachments: newFiles,
       });
+
       onUpdated?.(updatedTask);
       message.success(successMsg);
     } catch {
       message.error(errorMsg);
-      onUpdated?.(task);
     } finally {
       setSaving(false);
     }

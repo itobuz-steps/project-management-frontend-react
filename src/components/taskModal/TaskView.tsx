@@ -32,7 +32,7 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
         <TaskDescription task={task} onUpdated={onUpdated} />
         {!task.parentTask && <SubtasksTab task={task} />}
 
-        <AttachmentsTab task={task} />
+        <AttachmentsTab task={task} onUpdated={onUpdated} />
         <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
       </div>
 

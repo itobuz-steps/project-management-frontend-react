@@ -6,16 +6,16 @@ import type { AttachmentsTabProps } from './attachment.type';
 import { useTaskAttachments } from '../../hooks/useTaskAttachments';
 import { AttachmentItem } from '../attachment/AttachmentItem';
 import { DataLoader } from '../ui/DataLoader';
-import type { TaskPopulated } from '../../services/types/tasks.types';
 
-export function AttachmentsTab({ task, onUpdated }: AttachmentsTabProps) {
+export function AttachmentsTab({
+  isDrawer,
+  task,
+  onUpdated,
+}: AttachmentsTabProps) {
   const [expanded, setExpanded] = useState(false);
 
   const { attachments, saving, addAttachment, removeAttachment } =
-    useTaskAttachments(
-      task,
-      onUpdated as (task: Partial<TaskPopulated>) => void
-    );
+    useTaskAttachments(task, onUpdated);
 
   const uploadProps: UploadProps = {
     multiple: true,
@@ -62,6 +62,7 @@ export function AttachmentsTab({ task, onUpdated }: AttachmentsTabProps) {
                       ? `${attachment.name}-${attachment.size}`
                       : attachment
                   }
+                  isDrawer={isDrawer}
                   attachment={attachment}
                   onRemove={() => removeAttachment(attachment)}
                 />
