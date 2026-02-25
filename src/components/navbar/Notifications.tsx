@@ -1,8 +1,10 @@
 import { Bell } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NotificationDropdown } from './NotificationDropdown';
 import notificationService from '../../services/notificationService';
 import type { INotification } from '../../types/notification.types';
+
+const PAGE_SIZE = 10;
 
 export default function Notifications() {
   const [open, setOpen] = useState(false);
@@ -10,12 +12,28 @@ export default function Notifications() {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [newNotificationCount, setNewNotificationCount] = useState(0);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        open &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
 
   useEffect(() => {
     async function fetchNotifications() {
       const notifications = await notificationService.getAllNotification(
         page,
-        5
+        PAGE_SIZE
       );
       console.log(notifications);
       setNotifications((prev) => [...prev, ...notifications.result]);
@@ -75,6 +93,7 @@ export default function Notifications() {
           loadMore={loadMore}
           hasMore={hasMore}
           setOpen={setOpen}
+          ref={dropdownRef}
         />
       )}
     </div>
