@@ -80,6 +80,7 @@ function BoardView() {
 
   const statusFilter = normalize(searchParams.get('status') || '');
   const priorityFilter = normalize(searchParams.get('priority') || '');
+  const assigneeFilter = normalize(searchParams.get('assignee') || '');
 
   const sprintTaskIds = useMemo(() => {
     if (!isScrum) {
@@ -103,7 +104,8 @@ function BoardView() {
   }, [isScrum, sprintTaskIds, tasks]);
 
   const filteredVisibleTasks = useMemo(() => {
-    if (!statusFilter && !priorityFilter) return visibleTasks;
+    if (!statusFilter && !priorityFilter && !assigneeFilter)
+      return visibleTasks;
 
     return visibleTasks.filter((task) => {
       if (statusFilter && normalize(task.status) !== statusFilter) {
@@ -112,9 +114,15 @@ function BoardView() {
       if (priorityFilter && normalize(task.priority) !== priorityFilter) {
         return false;
       }
+      if (
+        assigneeFilter &&
+        normalize(task.assignee?._id || '') !== assigneeFilter
+      ) {
+        return false;
+      }
       return true;
     });
-  }, [priorityFilter, statusFilter, normalize, visibleTasks]);
+  }, [priorityFilter, statusFilter, assigneeFilter, normalize, visibleTasks]);
 
   const tasksByColumn = useMemo(() => {
     const map = columns.reduce<Record<string, Task[]>>((acc, col) => {
