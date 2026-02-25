@@ -68,9 +68,9 @@ function TopBar({
     <>
       <header className="bg-primary-50 flex flex-col gap-2 rounded-lg border border-gray-100 p-2 shadow-sm sm:gap-3 md:p-4">
         <div className="flex items-center justify-between text-center">
-          <h2 className="flex items-center text-lg font-semibold text-gray-900 sm:text-xl">
+          <h1 className="flex items-center text-lg font-semibold text-gray-900 sm:text-xl">
             {projectName ?? 'No project selected'}
-          </h2>
+          </h1>
           <Can permission="SEND_INVITE">
             <InviteUserContainer />
           </Can>

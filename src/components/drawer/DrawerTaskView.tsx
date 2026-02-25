@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { SubtasksTab } from '../subtask/SubtasksTab';
 import { AttachmentsTab } from '../attachment/AttachmentsTab';
 import { CommentsTab } from '../comment/CommentsTab';
+import { ActivityTab } from '../taskModal/ActivityTab';
 import { TaskDescription } from '../taskModal/TaskDescription';
 import { TaskDetails } from '../taskModal/TaskDetails';
 import { tabs } from './tabsConfig';
-import type { ActivityTab, DrawerViewProps } from './drawer.type';
+import type { Tabs, DrawerViewProps } from './drawer.type';
 
 export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
-  const [activeTab, setActiveTab] = useState<ActivityTab>('comments');
+  const [activeTab, setActiveTab] = useState<Tabs>('comments');
 
   return (
     <div
@@ -35,10 +36,6 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
 
         {/* Activity section */}
         <div>
-          <h3 className="mb-3 text-xs font-bold tracking-wider text-[#6B778C] uppercase">
-            Activity
-          </h3>
-
           {/* Tab bar */}
           <div className="flex gap-0 border-b border-[#dfe1e6]">
             {tabs.map((tab) => (
@@ -63,6 +60,7 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
           <div className="pt-3 pb-6">
             {activeTab === 'comments' && <CommentsTab task={task} />}
             {activeTab === 'attachments' && <AttachmentsTab task={task} />}
+            {activeTab === 'activity' && <ActivityTab taskId={task._id} />}
           </div>
         </div>
       </div>

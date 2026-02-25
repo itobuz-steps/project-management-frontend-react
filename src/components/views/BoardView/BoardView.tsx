@@ -82,11 +82,17 @@ function BoardView() {
   const priorityFilter = normalize(searchParams.get('priority') || '');
 
   const sprintTaskIds = useMemo(() => {
-    if (!isScrum) return null;
+    if (!isScrum) {
+      return null;
+    }
 
-    return new Set(
-      sprints.filter((sprint) => !sprint.isCompleted).flatMap((s) => s.tasks)
+    const activeSprint = sprints.find(
+      (sprint) => sprint.dueDate && !sprint.isCompleted
     );
+
+    if (!activeSprint) return new Set<string>();
+
+    return new Set(activeSprint.tasks);
   }, [isScrum, sprints]);
 
   const visibleTasks = useMemo(() => {
