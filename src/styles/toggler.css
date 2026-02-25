@@ -1,0 +1,7 @@
+.custom-switch.ant-switch-checked {
+  background-color: var(--color-primary-500) !important; /* ON color */
+}
+
+.custom-switch.ant-switch {
+  background-color: #d1d5db; /* OFF color */
+}

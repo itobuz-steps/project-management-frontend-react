@@ -67,42 +67,46 @@ function TopBar({
   return (
     <>
       <header className="bg-primary-50 flex flex-col gap-2 rounded-lg border border-gray-100 p-2 shadow-sm sm:gap-3 md:p-4">
-        <div className="flex items-center justify-between text-center">
-          <h2 className="flex items-center text-lg font-semibold text-gray-900 sm:text-xl">
-            {projectName ?? 'No project selected'}
-          </h2>
-          <Can permission="SEND_INVITE">
-            <InviteUserContainer />
-          </Can>
+        <div className="flex flex-col gap-3 text-start sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex">
+            <h2 className="topbar-project-header flex items-center text-lg font-semibold text-gray-900 sm:text-xl">
+              {projectName ?? 'No project selected'}
+            </h2>
+          </div>
+          <div className="flex self-end sm:justify-end">
+            <Can permission="SEND_INVITE">
+              <InviteUserContainer />
+            </Can>
+          </div>
         </div>
 
         <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* LEFT: View Switcher */}
           <div className="flex flex-col justify-stretch gap-3 lg:flex-row">
             <SearchBar />
-            <div className="lg:absolute lg:left-1/2 lg:-translate-x-1/2">
-              <div className="flex w-full flex-wrap items-center gap-1 rounded-md border border-gray-200 bg-white p-1 inset-shadow-sm/25 inset-shadow-gray-500 sm:w-auto">
-                {views.map((view) => {
-                  return (
-                    <NavLink
-                      to={view.value}
-                      key={view.value}
-                      onClick={() => navigate(view.value)}
-                      className={({ isActive }) => {
-                        return [
-                          'flex-1 rounded-md px-3 py-2 text-center text-sm font-medium transition sm:flex-none sm:px-3.5',
-                          isActive
-                            ? 'bg-primary-400 text-white shadow-sm'
-                            : 'text-gray-500 hover:text-gray-800',
-                        ].join(' ');
-                      }}
-                    >
-                      {view.label}
-                    </NavLink>
-                  );
-                })}
-              </div>
+            {/* <div className="lg:absolute lg:left-1/2 lg:-translate-x-1/2"> */}
+            <div className="flex w-full flex-wrap items-center gap-1 rounded-md border border-gray-200 bg-white p-1 inset-shadow-sm/25 inset-shadow-gray-500 sm:w-auto">
+              {views.map((view) => {
+                return (
+                  <NavLink
+                    to={view.value}
+                    key={view.value}
+                    onClick={() => navigate(view.value)}
+                    className={({ isActive }) => {
+                      return [
+                        'w-[80px] flex-1 rounded-md px-3.5 py-2 text-center text-sm font-medium transition sm:flex-none',
+                        isActive
+                          ? 'bg-primary-400 text-white shadow-sm'
+                          : 'text-gray-500 hover:text-gray-800',
+                      ].join(' ');
+                    }}
+                  >
+                    {view.label}
+                  </NavLink>
+                );
+              })}
             </div>
+            {/* </div> */}
           </div>
 
           {/* RIGHT: Actions */}

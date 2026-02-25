@@ -24,9 +24,9 @@ export function ForgotPasswordForm() {
 
   const navigate = useNavigate();
 
-  const submitHandler = (data: IForgotPasswordInput) => {
+  const submitHandler = async (data: IForgotPasswordInput) => {
     try {
-      authService.forgotPassword(data.email, data.otp, data.newPassword);
+      await authService.forgotPassword(data.email, data.otp, data.newPassword);
       toast.success(
         'Password reset successful! Please login with your new password.'
       );

@@ -15,7 +15,7 @@ import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 export function SubtasksTab({ task }: { task: TaskPopulated }) {
   const { projectId } = useParams();
   const [, setSearchParams] = useSearchParams();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const { columns, members, loadingMembers } = useProjectMetaData(
     task.projectId as string
