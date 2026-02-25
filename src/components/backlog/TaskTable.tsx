@@ -90,7 +90,7 @@ export function TaskTable({
             )}
           </div>
         </div>
-        <span className="xs:mr-4 mr-1 ml-auto text-xs text-gray-400">
+        <span className="xs:mr-4 xs:block mr-1 ml-auto hidden text-xs text-gray-400">
           {tasks.length} issue{tasks.length !== 1 && 's'}
         </span>
         <div className="xs:flex-row xs:gap-4 flex flex-col items-center gap-1">
