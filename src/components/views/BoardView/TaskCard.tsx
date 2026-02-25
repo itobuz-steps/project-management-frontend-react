@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Task } from '../../../services/types/tasks.types';
+import type { TaskPopulated } from '../../../services/types/tasks.types';
 import { useSortable } from '@dnd-kit/sortable';
 import { getTypeBorder } from '../../../utils/utils';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
@@ -15,7 +15,7 @@ export function TaskCard({
   column,
   onOpen,
 }: {
-  task: Task;
+  task: TaskPopulated;
   column: string;
   onOpen: () => void;
 }) {

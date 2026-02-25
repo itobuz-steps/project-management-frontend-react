@@ -2,7 +2,6 @@ import axios from 'axios';
 import { config } from '../config/config';
 import type {
   CreateTaskPayload,
-  Task,
   TaskPopulated,
   TaskResponse,
   TaskStats,
@@ -38,9 +37,17 @@ export default async function getTaskById(
 
 export async function updateTask(
   taskId: string,
-  updates: Partial<TaskPopulated> | Partial<Task>
+  updates: {
+    existingAttachments?: string[];
+    attachments?: File[];
+  } & Partial<TaskPopulated>
 ): Promise<TaskPopulated> {
-  const res = await api.patch<TaskResponse>(`/${taskId}`, updates);
+  const formData = mapObjectToFormData(updates);
+
+  const res = await api.patch<{ result: TaskPopulated }>(
+    `/${taskId}`,
+    formData
+  );
 
   return res.data.result;
 }
@@ -75,13 +82,13 @@ export async function getUserTasks(): Promise<TaskPopulated[]> {
 export async function getTasks(params: {
   projectId: string;
   searchInput?: string;
-}): Promise<Task[]> {
+}): Promise<TaskPopulated[]> {
   const queryParams = {
     projectId: params.projectId,
     ...(params.searchInput && { searchQuery: params.searchInput }),
   };
 
-  const res = await api.get<{ result: Task[] }>('', {
+  const res = await api.get<{ result: TaskPopulated[] }>('', {
     params: queryParams,
   });
 

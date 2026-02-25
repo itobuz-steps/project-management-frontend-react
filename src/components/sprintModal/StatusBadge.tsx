@@ -1,5 +1,3 @@
-import React from 'react';
-
 const STATUS_CONFIG: Record<
   string,
   { label: string; dot: string; pill: string }

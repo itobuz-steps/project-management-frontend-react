@@ -27,7 +27,10 @@ import {
 } from '../../../services/projectService';
 import { getTasks } from '../../../services/taskService';
 import { updateTask } from '../../../services/taskService';
-import type { Task, TaskStatus } from '../../../services/types/tasks.types';
+import type {
+  TaskPopulated,
+  TaskStatus,
+} from '../../../services/types/tasks.types';
 import type { Sprint } from '../../../services/types/sprints.types';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../../utils/TaskTypeColor';
@@ -60,7 +63,7 @@ function BoardView() {
   const type = project?.projectType;
   const isScrum = type === 'scrum';
 
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskPopulated[]>([]);
   const [columns, setColumns] = useState<string[]>([]);
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [loading, setLoading] = useState(false);
@@ -111,7 +114,7 @@ function BoardView() {
   }, [priorityFilter, statusFilter, normalize, visibleTasks]);
 
   const tasksByColumn = useMemo(() => {
-    const map = columns.reduce<Record<string, Task[]>>((acc, col) => {
+    const map = columns.reduce<Record<string, TaskPopulated[]>>((acc, col) => {
       acc[col] = [];
       return acc;
     }, {});
@@ -216,7 +219,7 @@ function BoardView() {
 
         const taskPayload = Array.isArray(tasksResp)
           ? tasksResp
-          : ((tasksResp as { result?: Task[] }).result ?? []);
+          : ((tasksResp as { result?: TaskPopulated[] }).result ?? []);
 
         const sprintPayload = Array.isArray(sprintsResp)
           ? sprintsResp
@@ -304,7 +307,7 @@ function BoardView() {
         if (!activeColumn || !overColumn) return;
 
         const isStatusChange = activeColumn !== overColumn;
-        let previousTasks: Task[] | null = null;
+        let previousTasks: TaskPopulated[] | null = null;
 
         setTasks((prev) => {
           previousTasks = prev;

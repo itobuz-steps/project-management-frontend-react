@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
+import type { Project } from '../../types/project.types';
 
 export function TaskItem({ task }: { task: TaskPopulated }) {
   const [, setSearchParams] = useSearchParams();
@@ -23,7 +24,7 @@ export function TaskItem({ task }: { task: TaskPopulated }) {
           </div>
           <div className="flex items-center justify-center gap-3">
             <p className="smaller-text font-medium text-gray-500">
-              {task.projectId.name}
+              {(task.projectId as Project).name}
             </p>
           </div>
         </div>

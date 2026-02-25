@@ -8,7 +8,7 @@ import {
   InputNumber,
   Upload,
 } from 'antd';
-import type { Task, User } from '../services/types/tasks.types';
+import type { TaskPopulated, User } from '../services/types/tasks.types';
 import { useEffect, useState } from 'react';
 import { createTask } from '../services/taskService';
 import { getUsersByProjectId } from '../services/projectService';
@@ -16,9 +16,9 @@ import { useProject } from '../context/ProjectContext';
 
 interface Props {
   open: boolean;
-  task: Partial<Task>;
+  task: Partial<TaskPopulated>;
   onClose: () => void;
-  onCreate: (task: Task) => void;
+  onCreate: (task: TaskPopulated) => void;
 }
 
 export function AddTaskModal({ open, onClose, onCreate }: Props) {

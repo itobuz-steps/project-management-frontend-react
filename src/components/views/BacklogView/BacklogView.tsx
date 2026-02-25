@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import type { Sprint } from '../../../services/types/sprints.types';
 import { TaskTable } from '../../backlog/TaskTable';
-import type { Task } from '../../../services/types/tasks.types';
+import type { TaskPopulated } from '../../../services/types/tasks.types';
 import SprintModal from '../../sprintModal/SprintModal';
 import {
   DndContext,
@@ -35,7 +35,7 @@ function BacklogView() {
   const type = project?.projectType;
   const isScrum = type === 'scrum';
 
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskPopulated[]>([]);
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
@@ -54,7 +54,7 @@ function BacklogView() {
   const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
   const statusFilter = normalize(searchParams.get('status') || '');
   const priorityFilter = normalize(searchParams.get('priority') || '');
-  const matchesFilters = (task: Task) => {
+  const matchesFilters = (task: TaskPopulated) => {
     if (statusFilter && normalize(task.status) !== statusFilter) {
       return false;
     }
@@ -170,6 +170,10 @@ function BacklogView() {
         collisionDetection={closestCorners}
         onDragStart={(event) => setActiveTaskId(String(event.active.id))}
         onDragEnd={({ active, over }) => {
+          if (!sprintService) {
+            return;
+          }
+
           setActiveTaskId(null);
           if (!over) return;
 

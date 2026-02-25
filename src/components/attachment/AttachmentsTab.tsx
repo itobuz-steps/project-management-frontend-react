@@ -6,12 +6,16 @@ import type { AttachmentsTabProps } from './attachment.type';
 import { useTaskAttachments } from '../../hooks/useTaskAttachments';
 import { AttachmentItem } from '../attachment/AttachmentItem';
 import { DataLoader } from '../ui/DataLoader';
+import type { TaskPopulated } from '../../services/types/tasks.types';
 
 export function AttachmentsTab({ task, onUpdated }: AttachmentsTabProps) {
   const [expanded, setExpanded] = useState(false);
 
   const { attachments, saving, addAttachment, removeAttachment } =
-    useTaskAttachments(task, onUpdated);
+    useTaskAttachments(
+      task,
+      onUpdated as (task: Partial<TaskPopulated>) => void
+    );
 
   const uploadProps: UploadProps = {
     multiple: true,
