@@ -42,11 +42,13 @@ export default function Notifications() {
       console.log(event.data.payload);
       console.log('Received message from service worker:', event.data);
 
-      if (type === 'PUSH_NOTIFICATION' && inAppEnabled) {
+      if (type === 'PUSH_NOTIFICATION') {
         setNotifications((prev) => [payload, ...prev]);
-        setNewNotificationCount((prev) => prev + 1);
+
+        setNewNotificationCount((prev) => (inAppEnabled ? prev + 1 : prev));
       }
     };
+    return () => channel.close();
   }, [inAppEnabled]);
 
   function loadMore() {

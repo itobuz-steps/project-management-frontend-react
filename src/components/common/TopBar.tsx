@@ -67,13 +67,17 @@ function TopBar({
   return (
     <>
       <header className="bg-primary-50 flex flex-col gap-2 rounded-lg border border-gray-100 p-2 shadow-sm sm:gap-3 md:p-4">
-        <div className="flex items-center justify-between text-center">
-          <h2 className="flex items-center text-lg font-semibold text-gray-900 sm:text-xl">
-            {projectName ?? 'No project selected'}
-          </h2>
-          <Can permission="SEND_INVITE">
-            <InviteUserContainer />
-          </Can>
+        <div className="flex flex-row items-center justify-between text-start">
+          <div className="flex">
+            <h2 className="flex items-center text-lg font-semibold text-gray-900 sm:text-xl">
+              {projectName ?? 'No project selected'}
+            </h2>
+          </div>
+          <div className="flex">
+            <Can permission="SEND_INVITE">
+              <InviteUserContainer />
+            </Can>
+          </div>
         </div>
 
         <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -90,7 +94,7 @@ function TopBar({
                       onClick={() => navigate(view.value)}
                       className={({ isActive }) => {
                         return [
-                          'flex-1 rounded-md px-3 py-2 text-center text-sm font-medium transition sm:flex-none sm:px-3.5',
+                          'w-[80px] flex-1 rounded-md px-3.5 py-2 text-center text-sm font-medium transition sm:flex-none',
                           isActive
                             ? 'bg-primary-400 text-white shadow-sm'
                             : 'text-gray-500 hover:text-gray-800',
