@@ -2,9 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Spin } from 'antd';
 import Section from './Section';
 import StatPill from './StatPill';
-import { api } from '../../components/api/axios';
 import { config } from '../../config/config';
 import type { TaskPopulated } from '../../services/types/tasks.types';
+import { attachInterceptor } from '../../utils/attachInterceptor';
+import axios from 'axios';
+import { message } from 'antd';
+
+const API_URL = `${config.api_base_url}/tasks`;
+
+const api = axios.create({
+  baseURL: API_URL,
+});
+
+attachInterceptor(api);
 
 interface SprintModalProps {
   visible: boolean;
@@ -25,7 +35,9 @@ const SprintModal = ({
   const [backlogTasks, setBacklogTasks] = useState<TaskPopulated[]>([]);
 
   useEffect(() => {
-    if (visible && sprintId && projectId) fetchSprintData();
+    if (visible && sprintId && projectId) {
+      fetchSprintData();
+    }
   }, [visible, sprintId, projectId]);
 
   const fetchSprintData = async () => {
@@ -43,6 +55,7 @@ const SprintModal = ({
       setPendingTasks(completedResponse.data.result.pending || []);
       setBacklogTasks(backlogResponse.data.result || []);
     } catch (error) {
+      message.error('Failed to fetch sprint data');
       console.error('Error fetching sprint data:', error);
     } finally {
       setLoading(false);

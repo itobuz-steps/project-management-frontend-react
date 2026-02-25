@@ -20,7 +20,7 @@ import { createSprintService } from '../../../services/sprints.service';
 import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
 import { getTasks } from '../../../services/taskService';
-import { Skeleton } from 'antd';
+import { message, Skeleton } from 'antd';
 
 function BacklogView() {
   const { projectId } = useParams();
@@ -109,6 +109,7 @@ function BacklogView() {
         setSprints(sprintsRes.filter((sprint) => !sprint.isCompleted));
       } catch (err) {
         console.error('Failed to load backlog', err);
+        message.error('Failed to load backlog data');
       } finally {
         setLoading(false);
       }
@@ -182,8 +183,12 @@ function BacklogView() {
               ? over.id.replace('container:', '')
               : undefined);
 
-          if (!activeContainer || !overContainer) return;
-          if (activeContainer === overContainer) return;
+          if (!activeContainer || !overContainer) {
+            return;
+          }
+          if (activeContainer === overContainer) {
+            return;
+          }
 
           const taskId = String(active.id);
           const previousSprints = sprints;

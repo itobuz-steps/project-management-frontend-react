@@ -14,6 +14,7 @@ import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../hooks/useSprintActions';
 import { taskTableColumns } from '../../config/constants';
 import { CreateSprintForm } from './CreateSprintForm';
+import { message } from 'antd';
 
 export function TaskTable({
   sprint,
@@ -53,9 +54,18 @@ export function TaskTable({
   };
 
   const handleCompleteSprint = async () => {
-    if (!sprint) return;
-    await completeSprint(sprint);
-    onSprintCompleted?.(sprint._id);
+    if (!sprint) {
+      message.error('No sprint to complete');
+      return;
+    }
+    try {
+      await completeSprint(sprint);
+      onSprintCompleted?.(sprint._id);
+      message.success('Sprint completed successfully');
+    } catch (error) {
+      console.error('Error completing sprint:', error);
+      message.error('Failed to complete sprint');
+    }
   };
 
   const sprintStarted = Boolean(sprint?.dueDate);
