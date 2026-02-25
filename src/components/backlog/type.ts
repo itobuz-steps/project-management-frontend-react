@@ -9,6 +9,7 @@ export interface TaskTableProps {
   columns: string[];
   title?: string;
   containerId: string;
+  onSprintCompleted?: (sprintId: string) => void;
 }
 
 export interface TaskRowProps {
