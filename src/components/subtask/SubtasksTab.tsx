@@ -69,7 +69,10 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
             <SubtasksHeader
               count={selectedIds.length}
               progress={progress}
-              onAdd={() => manage.openModal(selectedIds)}
+              onAdd={() => {
+                manage.openModal(selectedIds);
+                setOpen(true);
+              }}
             />
           ),
           children: (
