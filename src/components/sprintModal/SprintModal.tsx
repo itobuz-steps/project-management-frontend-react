@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal, Spin } from 'antd';
 import Section from './Section';
 import StatPill from './StatPill';

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { getTasks } from '../../services/taskService';
-import type { Task } from '../../services/types/tasks.types';
+import type { TaskPopulated } from '../../services/types/tasks.types';
 
 interface CommandPaletteProps {
   open: boolean;
@@ -24,8 +24,8 @@ export function CommandPalette({
   const projectId = routeProjectId ?? searchParams.get('projectId');
   const type = searchParams.get('type');
 
-  const [recentTasks, setRecentTasks] = useState<Task[]>([]);
-  const [searchResults, setSearchResults] = useState<Task[]>([]);
+  const [recentTasks, setRecentTasks] = useState<TaskPopulated[]>([]);
+  const [searchResults, setSearchResults] = useState<TaskPopulated[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
 

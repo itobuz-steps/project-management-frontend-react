@@ -9,11 +9,13 @@ export function NotificationDropdown({
   loadMore,
   hasMore,
   setOpen,
+  ref,
 }: {
   notifications: INotification[];
   loadMore: () => void;
   hasMore: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  ref: React.Ref<HTMLDivElement>;
 }) {
   const [targetRef, isInView] = useElementInView({ threshold: 1 });
 
@@ -25,11 +27,11 @@ export function NotificationDropdown({
 
   return (
     <div
-      id="notificationDropdownMenu"
-      className="absolute right-0 z-15 mt-2 mr-3 max-h-125 min-w-full flex-col overflow-auto rounded-lg bg-white py-2 shadow-lg max-md:w-55 md:w-85"
+      className="absolute -right-full z-15 max-h-125 min-w-74 flex-col overflow-y-auto rounded-sm border border-gray-200 bg-white px-2 pb-2 shadow-md sm:right-0"
+      ref={ref}
     >
-      <h3 className="px-6 py-2 text-lg font-semibold">Notification</h3>
-
+      <h3 className="p-3 py-2 text-lg font-semibold">Notifications</h3>
+      <hr className="border-gray-100 pb-2" />
       <ul className="w-full">
         {notifications.length === 0 ? (
           <li
@@ -40,11 +42,14 @@ export function NotificationDropdown({
           </li>
         ) : (
           notifications.map((notification) => (
-            <NotificationItem
-              setOpen={setOpen}
-              key={notification._id}
-              data={notification}
-            />
+            <>
+              <NotificationItem
+                setOpen={setOpen}
+                key={notification._id}
+                data={notification}
+              />
+              <hr className="border-gray-50" />
+            </>
           ))
         )}
       </ul>
@@ -54,7 +59,9 @@ export function NotificationDropdown({
         className="flex w-full items-center justify-center p-3 outline-red-500"
         ref={targetRef}
       >
-        {hasMore && <LoaderCircle className="animate-spin text-gray-400" />}
+        {notifications.length !== 0 && hasMore && (
+          <LoaderCircle className="animate-spin text-gray-400" />
+        )}
       </li>
     </div>
   );
