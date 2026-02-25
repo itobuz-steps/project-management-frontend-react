@@ -8,7 +8,7 @@ import { AttachmentItem } from '../attachment/AttachmentItem';
 import { DataLoader } from '../ui/DataLoader';
 
 export function AttachmentsTab({ task, onUpdated }: AttachmentsTabProps) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   const { attachments, saving, addAttachment, removeAttachment } =
     useTaskAttachments(task, onUpdated);

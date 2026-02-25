@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import { TextEditor } from '../textEditor/TextEditor';
 import { useTaskUpdate } from '../../hooks/useTaskUpdate';
@@ -10,12 +10,32 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(task.description || '');
   const [saving, setSaving] = useState(false);
+  const editorRef = useRef<HTMLDivElement | null>(null);
 
   const { update } = useTaskUpdate(task._id, onUpdated ?? (() => {}));
 
   useEffect(() => {
     setValue(task.description || '');
   }, [task.description]);
+
+  useEffect(() => {
+    if (!editing) {
+      return;
+    }
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      if (editorRef.current && !editorRef.current.contains(target)) {
+        cancel();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [editing]);
 
   const save = async () => {
     if (value === task.description) {
@@ -84,14 +104,16 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
               )}
             </div>
           ) : (
-            <TextEditor
-              comment={false}
-              content={value}
-              onChange={setValue}
-              onSave={save}
-              onCancel={cancel}
-              disabled={saving}
-            />
+            <div ref={editorRef}>
+              <TextEditor
+                comment={false}
+                content={value}
+                onChange={setValue}
+                onSave={save}
+                onCancel={cancel}
+                disabled={saving}
+              />
+            </div>
           )}
         </div>
       )}

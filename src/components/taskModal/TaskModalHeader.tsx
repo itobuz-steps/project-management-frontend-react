@@ -129,7 +129,7 @@ export function TaskModalHeader({
         </div>
 
         <div
-          className={`shrink-0 self-end ${drawer ? 'flex' : 'md:w-[296px] lg:w-[396px]'}`}
+          className={`shrink-0 self-end ${drawer ? 'flex' : 'md:w-[296px] lg:w-[396px] 2xl:w-[496px]'}`}
         >
           <SidebarRow>
             <StatusSelect
