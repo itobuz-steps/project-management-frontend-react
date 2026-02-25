@@ -22,9 +22,10 @@ function ListView() {
   const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
   const statusFilter = normalize(searchParams.get('status') || '');
   const priorityFilter = normalize(searchParams.get('priority') || '');
+  const assigneeFilter = normalize(searchParams.get('assignee') || '');
 
   const visibleTasks = useMemo(() => {
-    if (!statusFilter && !priorityFilter) return tasks;
+    if (!statusFilter && !priorityFilter && !assigneeFilter) return tasks;
     return tasks.filter((task) => {
       if (statusFilter && normalize(task.status) !== statusFilter) {
         return false;
@@ -32,9 +33,15 @@ function ListView() {
       if (priorityFilter && normalize(task.priority) !== priorityFilter) {
         return false;
       }
+      if (
+        assigneeFilter &&
+        normalize(task.assignee?._id || '') !== assigneeFilter
+      ) {
+        return false;
+      }
       return true;
     });
-  }, [priorityFilter, statusFilter, tasks]);
+  }, [priorityFilter, statusFilter, assigneeFilter, tasks]);
 
   useEffect(() => {
     if (!projectId) {
@@ -61,7 +68,7 @@ function ListView() {
     };
 
     load();
-  }, [projectId, searchParams.get('searchInput')]);
+  }, [projectId, searchParams]);
 
   const handleTaskUpdated = (updated: TaskPopulated) => {
     setTasks((prev) =>

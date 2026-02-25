@@ -54,11 +54,19 @@ function BacklogView() {
   const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
   const statusFilter = normalize(searchParams.get('status') || '');
   const priorityFilter = normalize(searchParams.get('priority') || '');
+  const assigneeFilter = normalize(searchParams.get('assignee') || '');
+
   const matchesFilters = (task: TaskPopulated) => {
     if (statusFilter && normalize(task.status) !== statusFilter) {
       return false;
     }
     if (priorityFilter && normalize(task.priority) !== priorityFilter) {
+      return false;
+    }
+    if (
+      assigneeFilter &&
+      normalize(task.assignee?._id || '') !== assigneeFilter
+    ) {
       return false;
     }
     return true;
@@ -116,7 +124,16 @@ function BacklogView() {
     }
 
     loadData(projectId);
-  }, [type, searchInput, projectId, sprintService]);
+  }, [
+    type,
+    searchInput,
+    projectId,
+    sprintService,
+    assigneeFilter,
+    priorityFilter,
+    statusFilter,
+    searchParams,
+  ]);
 
   if (!projectId) {
     return (
