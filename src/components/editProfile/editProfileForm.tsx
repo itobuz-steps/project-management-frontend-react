@@ -32,7 +32,10 @@ export function EditProfileForm({
 
   const submitHandler = async (data: IEditProfileInput) => {
     try {
-      await userService.updateUserProfile(data.username, data.profileImage[0]);
+      await userService.updateUserProfile({
+        name: data.username,
+        profileImage: data.profileImage[0],
+      });
       toast.success('Profile updated successfully!');
     } catch (error) {
       if (error instanceof AxiosError) {

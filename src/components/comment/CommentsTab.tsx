@@ -26,11 +26,13 @@ export function CommentsTab({ task }: CommentsTabProps) {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isComposerOpen &&
-        composerRef.current &&
-        !composerRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as HTMLElement;
+
+      const clickedInsideComposer = composerRef.current?.contains(target);
+
+      const clickedMentionDropdown = target.closest('.mention-dropdown');
+
+      if (isComposerOpen && !clickedInsideComposer && !clickedMentionDropdown) {
         composer.reset();
         setIsComposerOpen(false);
       }
