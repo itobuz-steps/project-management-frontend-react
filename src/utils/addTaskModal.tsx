@@ -77,6 +77,7 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
 
       message.success('Task created');
       onCreate(created);
+      form.resetFields();
       onClose();
     } catch (err) {
       console.error(err);
@@ -95,7 +96,7 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
       okButtonProps={{ style: { backgroundColor: 'var(--color-primary-500)' } }}
       confirmLoading={saving}
       destroyOnHidden
-      width={700}
+      width={600}
       styles={{
         mask: {
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -109,8 +110,16 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
         layout="vertical"
         styles={{
           label: {
-            color: 'var(--color-primary-400)',
+            fontSize: '14px',
+            fontWeight: 500,
+            color: 'var(--color-primary-500)',
           },
+        }}
+        initialValues={{
+          type: 'task',
+          priority: 'medium',
+          status: columns?.[0],
+          storyPoint: 0,
         }}
         className="gap-2"
       >
@@ -120,6 +129,9 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
             name="title"
             label="Title"
             rules={[{ required: true }]}
+            style={
+              project?.projectType !== 'scrum' ? { gridColumn: 'span 3' } : {}
+            }
             className="sm:col-span-2"
           >
             <Input
@@ -128,14 +140,16 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
             />
           </Form.Item>
 
-          <Form.Item name="storyPoint" label="Story Point">
-            <InputNumber
-              min={0}
-              defaultValue={1}
-              className="focus:border-primary-500 focus:ring-primary-500"
-              style={{ width: '100%' }}
-            />
-          </Form.Item>
+          {project?.projectType !== 'kanban' && (
+            <Form.Item name="storyPoint" label="Story Point">
+              <InputNumber
+                min={0}
+                defaultValue={1}
+                className="focus:border-primary-500 focus:ring-primary-500"
+                style={{ width: '100%' }}
+              />
+            </Form.Item>
+          )}
         </div>
 
         {/* Description */}
@@ -153,11 +167,10 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
             <Select
               className="focus:border-primary-500 focus:ring-primary-500"
               options={[
-                { value: 'Bug', label: 'Bug' },
-                { value: 'Task', label: 'Task' },
-                { value: 'Story', label: 'Story' },
+                { value: 'bug', label: 'Bug' },
+                { value: 'task', label: 'Task' },
+                { value: 'story', label: 'Story' },
               ]}
-              defaultValue={'Task'}
             />
           </Form.Item>
 
@@ -165,12 +178,11 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
             <Select
               className="focus:border-primary-500 focus:ring-primary-500"
               options={[
-                { value: 'Low', label: 'Low' },
-                { value: 'Medium', label: 'Medium' },
-                { value: 'High', label: 'High' },
-                { value: 'Critical', label: 'Critical' },
+                { value: 'low', label: 'Low' },
+                { value: 'medium', label: 'Medium' },
+                { value: 'high', label: 'High' },
+                { value: 'critical', label: 'Critical' },
               ]}
-              defaultValue={'Medium'}
             />
           </Form.Item>
 
@@ -181,29 +193,12 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
                 label: col,
                 value: col,
               }))}
-              defaultValue={columns[0]}
             />
           </Form.Item>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
-          {/* File Upload */}
-          <Form.Item name="attachments" label="Attachments">
-            <Upload
-              multiple
-              maxCount={5}
-              beforeUpload={() => false}
-              listType="text"
-            >
-              <button
-                type="button"
-                className="hover:border-primary-500 w-full rounded-md border border-dashed border-gray-300 px-4 py-2 transition-colors"
-              >
-                Click to upload files (max 5)
-              </button>
-            </Upload>
-          </Form.Item>
-
+        {/* Tags/  Due Date / Assignee */}
+        <div className="grid grid-cols-3 gap-2">
           <Form.Item name="tags" label="Tags">
             <Select
               mode="tags"
@@ -211,10 +206,6 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
               className="focus:border-primary-500 focus:ring-primary-500"
             />
           </Form.Item>
-        </div>
-
-        {/* Due Date / Assignee */}
-        <div className="grid grid-cols-2 gap-2">
           <Form.Item name="dueDate" label="Due Date">
             <DatePicker
               className="focus:border-primary-500 focus:ring-primary-500"
@@ -233,6 +224,27 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
                 label: member.name || member.email,
               }))}
             />
+          </Form.Item>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          {/* File Upload */}
+          <Form.Item name="attachments" label="Attachments">
+            <Upload
+              multiple
+              maxCount={5}
+              beforeUpload={() => false}
+              listType="text"
+              style={{ width: '200%' }}
+            >
+              <button
+                type="button"
+                className="hover:border-primary-500 rounded-md border border-dashed border-gray-300 px-4 py-2 transition-colors"
+                style={{ width: '100%' }}
+              >
+                Click to upload files (max 5)
+              </button>
+            </Upload>
           </Form.Item>
         </div>
       </Form>
