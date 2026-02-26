@@ -77,9 +77,11 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
 
       message.success('Task created');
       onCreate(created);
+      form.resetFields();
       onClose();
     } catch (err) {
       console.error(err);
+      message.error('Failed to create task. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -94,69 +96,99 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
       okButtonProps={{ style: { backgroundColor: 'var(--color-primary-500)' } }}
       confirmLoading={saving}
       destroyOnHidden
-      width={700}
+      width={600}
       styles={{
         mask: {
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           backdropFilter: 'none',
         },
       }}
+      className="sm:w-full sm:max-w-lg"
     >
       <Form
         form={form}
         layout="vertical"
         styles={{
           label: {
-            color: 'var(--color-primary-400)',
+            fontSize: '14px',
+            fontWeight: 500,
+            color: 'var(--color-primary-500)',
           },
         }}
+        initialValues={{
+          type: 'task',
+          priority: 'medium',
+          status: columns?.[0],
+          storyPoint: 0,
+        }}
+        className="gap-2"
       >
         {/* Title + Story Point */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           <Form.Item
             name="title"
             label="Title"
             rules={[{ required: true }]}
-            className="col-span-2"
+            style={
+              project?.projectType !== 'scrum' ? { gridColumn: 'span 3' } : {}
+            }
+            className="sm:col-span-2"
           >
-            <Input />
+            <Input
+              className="focus:border-primary-500 focus:ring-primary-500"
+              placeholder="e.g. Create task modal"
+            />
           </Form.Item>
 
-          <Form.Item name="storyPoint" label="Story Point">
-            <InputNumber min={0} className="w-full" />
-          </Form.Item>
+          {project?.projectType !== 'kanban' && (
+            <Form.Item name="storyPoint" label="Story Point">
+              <InputNumber
+                min={0}
+                defaultValue={1}
+                className="focus:border-primary-500 focus:ring-primary-500"
+                style={{ width: '100%' }}
+              />
+            </Form.Item>
+          )}
         </div>
 
         {/* Description */}
         <Form.Item name="description" label="Description">
-          <Input.TextArea rows={3} />
+          <Input.TextArea
+            rows={3}
+            placeholder="e.g. Editing create task modal"
+            className="focus:border-primary-500 focus:ring-primary-500"
+          />
         </Form.Item>
 
         {/* Type / Priority / Status */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-2">
           <Form.Item name="type" label="Type">
             <Select
+              className="focus:border-primary-500 focus:ring-primary-500"
               options={[
-                { value: 'Bug', label: 'Bug' },
-                { value: 'Task', label: 'Task' },
-                { value: 'Story', label: 'Story' },
+                { value: 'bug', label: 'Bug' },
+                { value: 'task', label: 'Task' },
+                { value: 'story', label: 'Story' },
               ]}
             />
           </Form.Item>
 
           <Form.Item name="priority" label="Priority">
             <Select
+              className="focus:border-primary-500 focus:ring-primary-500"
               options={[
-                { value: 'Low', label: 'Low' },
-                { value: 'Medium', label: 'Medium' },
-                { value: 'High', label: 'High' },
-                { value: 'Critical', label: 'Critical' },
+                { value: 'low', label: 'Low' },
+                { value: 'medium', label: 'Medium' },
+                { value: 'high', label: 'High' },
+                { value: 'critical', label: 'Critical' },
               ]}
             />
           </Form.Item>
 
           <Form.Item label="Status" name="status">
             <Select
+              className="focus:border-primary-500 focus:ring-primary-500"
               options={columns.map((col) => ({
                 label: col,
                 value: col,
@@ -165,42 +197,54 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
           </Form.Item>
         </div>
 
-        {/* File Upload */}
-        <Form.Item name="attachments" label="Attachments">
-          <Upload
-            multiple
-            maxCount={5}
-            beforeUpload={() => false}
-            listType="text"
-          >
-            <button
-              type="button"
-              className="hover:border-primary-500 rounded-md border border-dashed border-gray-300 px-4 py-2 transition-colors"
-            >
-              Click to upload files (max 5)
-            </button>
-          </Upload>
-        </Form.Item>
-
-        {/* Tags / Due Date / Assignee */}
-        <div className="grid grid-cols-3 gap-4">
+        {/* Tags/  Due Date / Assignee */}
+        <div className="grid grid-cols-3 gap-2">
           <Form.Item name="tags" label="Tags">
-            <Select mode="tags" placeholder="Add tags" />
+            <Select
+              mode="tags"
+              placeholder="Add tags"
+              className="focus:border-primary-500 focus:ring-primary-500"
+            />
           </Form.Item>
-
           <Form.Item name="dueDate" label="Due Date">
-            <DatePicker className="w-full" />
+            <DatePicker
+              className="focus:border-primary-500 focus:ring-primary-500"
+              style={{ width: '100%' }}
+            />
           </Form.Item>
 
           <Form.Item name="assignee" label="Assignee">
             <Select
               placeholder="Select assignee"
               allowClear
+              className="focus:border-primary-500 focus:ring-primary-500"
+              style={{ width: '100%' }}
               options={members.map((member) => ({
                 value: member._id,
                 label: member.name || member.email,
               }))}
             />
+          </Form.Item>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          {/* File Upload */}
+          <Form.Item name="attachments" label="Attachments">
+            <Upload
+              multiple
+              maxCount={5}
+              beforeUpload={() => false}
+              listType="text"
+              style={{ width: '200%' }}
+            >
+              <button
+                type="button"
+                className="hover:border-primary-500 rounded-md border border-dashed border-gray-300 px-4 py-2 transition-colors"
+                style={{ width: '100%' }}
+              >
+                Click to upload files (max 5)
+              </button>
+            </Upload>
           </Form.Item>
         </div>
       </Form>
