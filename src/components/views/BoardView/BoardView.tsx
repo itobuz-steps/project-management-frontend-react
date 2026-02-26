@@ -36,7 +36,7 @@ import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../../utils/TaskTypeColor';
 import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { createSprintService } from '../../../services/sprints.service';
 import { TaskCard } from './TaskCard';
 import { Can } from '../../../utils/PermissionHoc';
@@ -69,12 +69,14 @@ function BoardView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
-  const [isAddColumnOpen, setIsAddColumnOpen] = useState(false);
   const [newColumnName, setNewColumnName] = useState('');
+  const [isAddColumnOpen, setIsAddColumnOpen] = useState(false);
   const [isSavingColumn, setIsSavingColumn] = useState(false);
   const [insertAfterColumn, setInsertAfterColumn] = useState<string | null>(
     null
   );
+  const [isDeleteColumnOpen, setIsDeleteColumnOpen] = useState(false);
+  const [columnToDelete, setColumnToDelete] = useState<string | null>(null);
 
   const normalize = useCallback(
     (value?: string) => (value ?? '').toLowerCase().trim(),
@@ -155,11 +157,14 @@ function BoardView() {
       },
     })
   );
-
   const openAddColumnModal = (columnId: string) => {
     setNewColumnName('');
     setInsertAfterColumn(columnId);
     setIsAddColumnOpen(true);
+  };
+  const openDeleteColumnModal = (columnId: string) => {
+    setColumnToDelete(columnId);
+    setIsDeleteColumnOpen(true);
   };
 
   const handleAddColumn = async () => {
@@ -201,6 +206,62 @@ function BoardView() {
       message.error('Failed to add column.');
     } finally {
       setIsSavingColumn(false);
+    }
+  };
+
+  const handleDeleteColumn = async (columnToDelete: string) => {
+    if (!projectId) {
+      return;
+    }
+    if (columns.length <= 1) {
+      message.error('At least one column must exist.');
+      return;
+    }
+    const targetIndex = columns.findIndex((c) => c === columnToDelete);
+    if (targetIndex === -1) {
+      return;
+    }
+
+    // Move tasks to previous column OR first column
+    const fallbackColumn =
+      targetIndex > 0 ? columns[targetIndex - 1] : columns[1];
+
+    const tasksToMove = tasks.filter(
+      (task) => normalize(task.status) === normalize(columnToDelete)
+    );
+
+    try {
+      setLoading(true);
+
+      //  Update tasks first
+      await Promise.all(
+        tasksToMove.map((task) =>
+          updateTask(task._id, { status: fallbackColumn as TaskStatus })
+        )
+      );
+
+      //  Remove column from project
+      const updatedColumns = columns.filter((c) => c !== columnToDelete);
+
+      const updated = await updateProject(projectId, {
+        columns: updatedColumns,
+      });
+
+      setColumns(updated.columns ?? updatedColumns);
+
+      //  Update local tasks state
+      setTasks((prev) =>
+        prev.map((task) =>
+          normalize(task.status) === normalize(columnToDelete)
+            ? { ...task, status: fallbackColumn as TaskStatus }
+            : task
+        )
+      );
+      message.success('Column deleted.');
+    } catch {
+      message.error('Failed to delete column.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -366,18 +427,31 @@ function BoardView() {
                     {tasksByColumn[col]?.length ?? 0}
                   </span>
                 </div>
-                <Can permission="ADD_COLUMN">
-                  <button
-                    type="button"
-                    aria-label="Add column"
-                    className="rounded p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
-                    onClick={() => {
-                      openAddColumnModal(col);
-                    }}
-                  >
-                    <Plus size={16} />
-                  </button>
-                </Can>
+
+                <div className="flex items-center gap-1">
+                  <Can permission="ADD_COLUMN">
+                    <button
+                      type="button"
+                      aria-label="Add column"
+                      className="rounded p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+                      onClick={() => {
+                        openAddColumnModal(col);
+                      }}
+                    >
+                      <PlusOutlined size={16} />
+                    </button>
+                  </Can>
+                  <Can permission="DELETE_COLUMN">
+                    <button
+                      type="button"
+                      aria-label="Delete column"
+                      className="rounded p-1 text-gray-500 hover:bg-red-100 hover:text-red-600"
+                      onClick={() => openDeleteColumnModal(col)}
+                    >
+                      <DeleteOutlined size={16} />
+                    </button>
+                  </Can>
+                </div>
               </div>
 
               <ColumnDropZone id={col}>
@@ -461,6 +535,10 @@ function BoardView() {
         onOk={handleAddColumn}
         confirmLoading={isSavingColumn}
         destroyOnHidden
+        maskStyle={{
+          backdropFilter: 'none',
+          backgroundColor: 'rgba(0,0,0,0.45)',
+        }}
       >
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium text-gray-700">
@@ -473,6 +551,35 @@ function BoardView() {
             onPressEnter={handleAddColumn}
           />
         </div>
+      </Modal>
+      <Modal
+        open={isDeleteColumnOpen}
+        title="Delete column"
+        onCancel={() => {
+          setIsDeleteColumnOpen(false);
+          setColumnToDelete(null);
+        }}
+        onOk={async () => {
+          if (columnToDelete) {
+            await handleDeleteColumn(columnToDelete);
+          }
+          setIsDeleteColumnOpen(false);
+          setColumnToDelete(null);
+        }}
+        okText="Yes, delete"
+        okType="danger"
+        cancelText="Cancel"
+        destroyOnHidden
+        maskStyle={{
+          backdropFilter: 'none',
+          backgroundColor: 'rgba(0,0,0,0.45)',
+        }}
+      >
+        <p className="text-sm">
+          Are you sure you want to delete the column "
+          <strong>{columnToDelete}</strong>"? All tasks in this column will be
+          moved to the previous column or first column.
+        </p>
       </Modal>
     </DndContext>
   );
