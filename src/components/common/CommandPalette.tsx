@@ -46,19 +46,25 @@ export function CommandPalette({
 
     const fetchRecentTasks = async () => {
       setLoading(true);
-      const tasks = await getTasks({ projectId });
-      if (ignore) return;
+      try {
+        const tasks = await getTasks({ projectId });
+        if (ignore) return;
 
-      const recent = [...tasks]
-        .filter((t) => t.createdAt)
-        .sort(
-          (a, b) =>
-            new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
-        )
-        .slice(0, 5);
+        const recent = [...tasks]
+          .filter((t) => t.createdAt)
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt!).getTime() -
+              new Date(a.createdAt!).getTime()
+          )
+          .slice(0, 5);
 
-      setRecentTasks(recent);
-      setLoading(false);
+        setRecentTasks(recent);
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
     };
 
     fetchRecentTasks();
@@ -77,15 +83,21 @@ export function CommandPalette({
 
     let ignore = false;
 
-    const timer = setTimeout(async () => {
+    const fetchSearchResults = async () => {
       setSearchLoading(true);
-      const tasks = await getTasks({ projectId, searchInput: value.trim() });
-      if (ignore) {
-        return;
+      try {
+        const tasks = await getTasks({ projectId, searchInput: value.trim() });
+        if (!ignore) {
+          setSearchResults(tasks);
+        }
+      } finally {
+        if (!ignore) {
+          setSearchLoading(false);
+        }
       }
-      setSearchResults(tasks);
-      setSearchLoading(false);
-    }, 300);
+    };
+
+    const timer = setTimeout(fetchSearchResults, 300);
 
     return () => {
       ignore = true;
