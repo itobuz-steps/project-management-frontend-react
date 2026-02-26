@@ -48,6 +48,14 @@ export type User = {
 
 export type TaskAttachment = File | string;
 
+export interface TaskReference {
+  _id: string;
+  title: string;
+  key?: string;
+  status: string;
+  type: TaskType;
+}
+
 export interface TaskPopulated {
   _id: string;
   projectId: Project | string;
@@ -61,13 +69,17 @@ export interface TaskPopulated {
   dueDate?: string;
   reporter?: User;
   assignee?: User;
-  parentTask?: string;
+  parentTask?: string | null;
   subTasks?: string[];
   labels?: string[];
   attachments?: TaskAttachment[];
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
+  blocks?: TaskReference[];
+  blockedBy?: TaskReference[];
+  relatesTo?: TaskReference[];
+  duplicates?: TaskReference[];
 }
 export interface TaskStats {
   totalAssignedTasks: number;
