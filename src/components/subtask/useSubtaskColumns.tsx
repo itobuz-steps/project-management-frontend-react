@@ -1,7 +1,6 @@
 import { Button, Tag, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { Trash2 } from 'lucide-react';
-
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { StatusSelect } from '../ui/StatusSelect';

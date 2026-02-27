@@ -1,5 +1,5 @@
 import type { Comment } from '../services/types/comments.types';
-import type { TaskPopulated } from '../services/types/tasks.types';
+import type { TaskAttachment, TaskPopulated } from '../services/types/tasks.types';
 import type { JSONContent } from '@tiptap/react';
 
 export interface UseCommentEditorParams {
@@ -22,3 +22,8 @@ export interface UseTextEditorParams {
   enableMentions?: boolean;
   mentionItems?: MentionItem[];
 }
+
+export type TaskWithAttachments = {
+  _id: string;
+  attachments?: TaskAttachment[];
+};
