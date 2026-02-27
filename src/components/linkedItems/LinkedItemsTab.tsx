@@ -66,55 +66,57 @@ export function LinkedItemsTab({ task, onUpdated }: LinkedItemsTabProps) {
   return (
     <Collapse
       ghost
-      activeKey={collapseOpen ? ['2'] : []}
-      onChange={(keys) => setCollapseOpen(keys.includes('2'))}
-    >
-      <Collapse.Panel
-        key={'2'}
-        header={
-          <div className="flex w-full items-center justify-between">
-            <span className="text-base font-semibold">
-              Linked work items ({linkedRows.length})
-            </span>
+      activeKey={collapseOpen ? ['1'] : []}
+      onChange={(keys) => setCollapseOpen(keys.includes('1'))}
+      items={[
+        {
+          key: '1',
+          label: (
+            <div className="flex w-full items-center justify-between">
+              <span className="text-base font-semibold">
+                Linked work items ({linkedRows.length})
+              </span>
 
-            <Button
-              size="small"
-              icon={<PlusOutlined />}
-              onClick={(e) => {
-                e.stopPropagation();
-                setCollapseOpen(true);
-                setAddOpen((prev) => !prev);
-              }}
-            >
-              Add
-            </Button>
-          </div>
-        }
-      >
-        <div className="space-y-4">
-          <DataLoader
-            loading={false}
-            isEmpty={!hasItems && !addOpen}
-            emptyText="No linked items"
-          >
-            <LinkedItemsTable
-              rows={linkedRows}
-              projectColumns={projectColumns}
-              onRemove={removeLinkedItem}
-              onChange={handleChange}
-            />
-          </DataLoader>
+              <Button
+                size="small"
+                icon={<PlusOutlined />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCollapseOpen(true);
+                  setAddOpen((prev) => !prev);
+                }}
+              >
+                Add
+              </Button>
+            </div>
+          ),
+          children: (
+            <div className="space-y-4">
+              <DataLoader
+                loading={false}
+                isEmpty={!hasItems && !addOpen}
+                emptyText="No linked items"
+              >
+                <LinkedItemsTable
+                  rows={linkedRows}
+                  projectColumns={projectColumns}
+                  onRemove={removeLinkedItem}
+                  onChange={handleChange}
+                />
+              </DataLoader>
 
-          {addOpen && (
-            <LinkedItemsAddPanel
-              task={task}
-              projectTasks={projectTasks}
-              onAdd={addLinkedItem}
-              onClose={() => setAddOpen(false)}
-            />
-          )}
-        </div>
-      </Collapse.Panel>
-    </Collapse>
+              {addOpen && (
+                <LinkedItemsAddPanel
+                  task={task}
+                  projectTasks={projectTasks}
+                  onAdd={addLinkedItem}
+                  onClose={() => setAddOpen(false)}
+                />
+              )}
+            </div>
+          ),
+        },
+      ]}
+    />
   );
 }
