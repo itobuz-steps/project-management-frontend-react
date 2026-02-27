@@ -36,10 +36,22 @@ export function useBoard(
     setIsAddColumnOpen(true);
   }, []);
 
-  const openDeleteColumnModal = useCallback((columnId: string) => {
-    setColumnToDelete(columnId);
-    setIsDeleteColumnOpen(true);
-  }, []);
+  const openDeleteColumnModal = useCallback(
+    (columnId: string) => {
+      const tasksInColumn = tasks.filter((task) => task.status === columnId);
+
+      if (tasksInColumn.length > 0) {
+        message.warning(
+          `Cannot delete. ${tasksInColumn.length} task(s) exist in this column.`
+        );
+        return;
+      }
+
+      setColumnToDelete(columnId);
+      setIsDeleteColumnOpen(true);
+    },
+    [tasks]
+  );
 
   const handleAddColumn = useCallback(async () => {
     const trimmed = newColumnName.trim();
@@ -87,47 +99,20 @@ export function useBoard(
     }
   }, [columns, insertAfterColumn, newColumnName, projectId]);
 
-  const handleDeleteColumn = useCallback(
-    async (columnName: string) => {
-      if (!projectId) return;
+  const handleDeleteColumn = async (columnName: string) => {
+    if (!projectId) return;
 
-      if (columns.length <= 1) {
-        message.error('At least one column must exist.');
-        return;
-      }
-
-      try {
-        setLoading(true);
-
-        const res = await deleteProjectColumn(projectId, columnName);
-
-        if (!res?.result?.columns) {
-          throw new Error('Invalid server response');
-        }
-
-        setColumns(res.result.columns);
-
-        const updatedTasksResp = await getTasks({
-          projectId,
-          searchInput: searchInput || '',
-        });
-
-        const updatedTasks = Array.isArray(updatedTasksResp)
-          ? updatedTasksResp
-          : ((updatedTasksResp as { result?: TaskPopulated[] })?.result ?? []);
-
-        setTasks(updatedTasks);
-
-        message.success(res.message || 'Column deleted successfully');
-      } catch {
-        message.error('Failed to delete column');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [columns.length, projectId, searchInput]
-  );
-
+    try {
+      setLoading(true);
+      const res = await deleteProjectColumn(projectId, columnName);
+      setColumns(res.result.columns);
+      message.success(res.message);
+    } catch {
+      message.error('Failed to delete column');
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     if (!projectId) {
       setColumns([]);
