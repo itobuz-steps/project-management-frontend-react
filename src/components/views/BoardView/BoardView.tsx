@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react';
+import { useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   DndContext,
@@ -12,71 +6,55 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  useDroppable,
   closestCorners,
 } from '@dnd-kit/core';
-import {
-  SortableContext,
-  arrayMove,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { Input, message, Modal, Skeleton } from 'antd';
-import {
-  getProjectById,
-  updateProject,
-} from '../../../services/projectService';
-import { getTasks } from '../../../services/taskService';
+import { arrayMove } from '@dnd-kit/sortable';
+import { Skeleton } from 'antd';
 import { updateTask } from '../../../services/taskService';
 import type {
   TaskPopulated,
   TaskStatus,
 } from '../../../services/types/tasks.types';
-import type { Sprint } from '../../../services/types/sprints.types';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../../utils/TaskTypeColor';
 import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { createSprintService } from '../../../services/sprints.service';
-import { TaskCard } from './TaskCard';
-import { Can } from '../../../utils/PermissionHoc';
-
-function ColumnDropZone({ id, children }: { id: string; children: ReactNode }) {
-  const { setNodeRef } = useDroppable({
-    id: `column:${id}`,
-    data: { type: 'column', column: id },
-  });
-
-  return (
-    <div ref={setNodeRef} className={`min-h-30 rounded-md`}>
-      {children}
-    </div>
-  );
-}
+import useBoard from '../../../hooks/useBoard';
+import Column from './Column';
+import { AddColumnModal, DeleteColumnModal } from './ColumnModals';
 
 function BoardView() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { projectId } = useParams();
   const { project } = useProject();
-  const sprintService = createSprintService(projectId as string);
   const type = project?.projectType;
   const isScrum = type === 'scrum';
 
-  const [tasks, setTasks] = useState<TaskPopulated[]>([]);
-  const [columns, setColumns] = useState<string[]>([]);
-  const [sprints, setSprints] = useState<Sprint[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
-  const [newColumnName, setNewColumnName] = useState('');
-  const [isAddColumnOpen, setIsAddColumnOpen] = useState(false);
-  const [isSavingColumn, setIsSavingColumn] = useState(false);
-  const [insertAfterColumn, setInsertAfterColumn] = useState<string | null>(
-    null
-  );
-  const [isDeleteColumnOpen, setIsDeleteColumnOpen] = useState(false);
-  const [columnToDelete, setColumnToDelete] = useState<string | null>(null);
+  const {
+    tasks,
+    setTasks,
+    columns,
+    sprints,
+    loading,
+    error,
+    activeTaskId,
+    setActiveTaskId,
+    newColumnName,
+    setNewColumnName,
+    isAddColumnOpen,
+    setIsAddColumnOpen,
+    isSavingColumn,
+    isDeleteColumnOpen,
+    setIsDeleteColumnOpen,
+    columnToDelete,
+    setColumnToDelete,
+    openAddColumnModal,
+    openDeleteColumnModal,
+    handleAddColumn,
+    handleDeleteColumn,
+    setError,
+  } = useBoard(projectId, searchParams.get('searchInput') || '', isScrum);
 
   const normalize = useCallback(
     (value?: string) => (value ?? '').toLowerCase().trim(),
@@ -130,25 +108,23 @@ function BoardView() {
   }, [priorityFilter, statusFilter, assigneeFilter, normalize, visibleTasks]);
 
   const tasksByColumn = useMemo(() => {
-    const map = columns.reduce<Record<string, TaskPopulated[]>>((acc, col) => {
-      acc[col] = [];
-      return acc;
-    }, {});
+    const map: Record<string, TaskPopulated[]> = {};
+
+    columns.forEach((col) => {
+      map[col] = [];
+    });
 
     filteredVisibleTasks.forEach((task) => {
-      const match = columns.find(
-        (col) => normalize(col) === normalize(task.status)
-      );
-
-      if (match) {
-        map[match].push(task);
+      if (map[task.status]) {
+        map[task.status].push(task);
       } else if (columns.length > 0) {
+        // fallback to first column
         map[columns[0]].push(task);
       }
     });
 
     return map;
-  }, [columns, normalize, filteredVisibleTasks]);
+  }, [columns, filteredVisibleTasks]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -157,163 +133,7 @@ function BoardView() {
       },
     })
   );
-  const openAddColumnModal = (columnId: string) => {
-    setNewColumnName('');
-    setInsertAfterColumn(columnId);
-    setIsAddColumnOpen(true);
-  };
-  const openDeleteColumnModal = (columnId: string) => {
-    setColumnToDelete(columnId);
-    setIsDeleteColumnOpen(true);
-  };
-
-  const handleAddColumn = async () => {
-    const trimmed = newColumnName.trim();
-    if (!trimmed) {
-      message.error('Column name is required.');
-      return;
-    }
-
-    if (columns.some((col) => normalize(col) === normalize(trimmed))) {
-      message.error('Column already exists.');
-      return;
-    }
-
-    if (!projectId) return;
-
-    try {
-      setIsSavingColumn(true);
-      const insertIndex = insertAfterColumn
-        ? columns.findIndex((col) => col === insertAfterColumn)
-        : -1;
-
-      const nextColumns = [...columns];
-      if (insertIndex >= 0) {
-        nextColumns.splice(insertIndex + 1, 0, trimmed);
-      } else {
-        nextColumns.push(trimmed);
-      }
-
-      const updated = await updateProject(projectId, {
-        columns: nextColumns,
-      });
-
-      const updatedColumns = updated.columns ?? nextColumns;
-      setColumns(updatedColumns);
-      message.success('Column added.');
-      setIsAddColumnOpen(false);
-    } catch {
-      message.error('Failed to add column.');
-    } finally {
-      setIsSavingColumn(false);
-    }
-  };
-
-  const handleDeleteColumn = async (columnToDelete: string) => {
-    if (!projectId) {
-      return;
-    }
-    if (columns.length <= 1) {
-      message.error('At least one column must exist.');
-      return;
-    }
-    const targetIndex = columns.findIndex((c) => c === columnToDelete);
-    if (targetIndex === -1) {
-      return;
-    }
-
-    // Move tasks to previous column OR first column
-    const fallbackColumn =
-      targetIndex > 0 ? columns[targetIndex - 1] : columns[1];
-
-    const tasksToMove = tasks.filter(
-      (task) => normalize(task.status) === normalize(columnToDelete)
-    );
-
-    try {
-      setLoading(true);
-
-      //  Update tasks first
-      await Promise.all(
-        tasksToMove.map((task) =>
-          updateTask(task._id, { status: fallbackColumn as TaskStatus })
-        )
-      );
-
-      //  Remove column from project
-      const updatedColumns = columns.filter((c) => c !== columnToDelete);
-
-      const updated = await updateProject(projectId, {
-        columns: updatedColumns,
-      });
-
-      setColumns(updated.columns ?? updatedColumns);
-
-      //  Update local tasks state
-      setTasks((prev) =>
-        prev.map((task) =>
-          normalize(task.status) === normalize(columnToDelete)
-            ? { ...task, status: fallbackColumn as TaskStatus }
-            : task
-        )
-      );
-      message.success('Column deleted.');
-    } catch {
-      message.error('Failed to delete column.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!projectId) {
-      setColumns([]);
-      setTasks([]);
-      setSprints([]);
-      setLoading(false);
-      setError(null);
-      return;
-    }
-
-    const load = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const [project, tasksResp, sprintsResp] = await Promise.all([
-          getProjectById(projectId),
-          getTasks({
-            projectId,
-            searchInput: searchParams.get('searchInput') || '',
-          }),
-          isScrum
-            ? sprintService.getSprints()
-            : Promise.resolve([] as Sprint[]),
-        ]);
-
-        const projectColumns = project.columns;
-
-        const taskPayload = Array.isArray(tasksResp)
-          ? tasksResp
-          : ((tasksResp as { result?: TaskPopulated[] }).result ?? []);
-
-        const sprintPayload = Array.isArray(sprintsResp)
-          ? sprintsResp
-          : ((sprintsResp as { result?: Sprint[] }).result ?? []);
-
-        setColumns(projectColumns);
-        setTasks(taskPayload);
-        setSprints(sprintPayload);
-      } catch {
-        setError('Failed to load tasks.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isScrum, projectId, searchParams.get('searchInput')]);
+  // hook handles loading/initial load and column add/delete
 
   if (!projectId) {
     return (
@@ -416,85 +236,16 @@ function BoardView() {
     >
       <div className="flex gap-4 overflow-x-auto pb-2 sm:gap-6">
         {columns.map((col) => (
-          <div key={col} className="w-72 shrink-0">
-            <div className="h-full rounded-lg bg-[#f8f8f8] shadow-sm">
-              <div className="sticky top-0 z-10 flex items-center justify-between gap-2 px-4 py-2">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-semibold text-gray-600 uppercase">
-                    {col}
-                  </h2>
-                  <span className="rounded-full bg-gray-300 px-2 py-0.5 text-xs font-semibold text-gray-900">
-                    {tasksByColumn[col]?.length ?? 0}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <Can permission="ADD_COLUMN">
-                    <button
-                      type="button"
-                      aria-label="Add column"
-                      className="rounded p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
-                      onClick={() => {
-                        openAddColumnModal(col);
-                      }}
-                    >
-                      <PlusOutlined size={16} />
-                    </button>
-                  </Can>
-                  <Can permission="DELETE_COLUMN">
-                    <button
-                      type="button"
-                      aria-label="Delete column"
-                      className="rounded p-1 text-gray-500 hover:bg-red-100 hover:text-red-600"
-                      onClick={() => openDeleteColumnModal(col)}
-                    >
-                      <DeleteOutlined size={16} />
-                    </button>
-                  </Can>
-                </div>
-              </div>
-
-              <ColumnDropZone id={col}>
-                <SortableContext
-                  items={(tasksByColumn[col] ?? []).map((task) => task._id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="flex flex-col gap-3 p-3">
-                    {loading && (
-                      <div className="rounded-md border border-dashed border-gray-200 bg-gray-50 p-3 text-sm text-gray-500">
-                        Loading tasks...
-                      </div>
-                    )}
-
-                    {error && (
-                      <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-                        {error}
-                      </div>
-                    )}
-
-                    {!loading && !error && tasksByColumn[col]?.length === 0 && (
-                      <div className="rounded-md border border-dashed border-gray-200 bg-gray-50 p-3 text-sm text-gray-500">
-                        No tasks
-                      </div>
-                    )}
-
-                    {!loading &&
-                      !error &&
-                      tasksByColumn[col]?.map((task) => (
-                        <TaskCard
-                          key={task._id}
-                          task={task}
-                          column={col}
-                          onOpen={() => {
-                            setSearchParams({ taskId: task._id });
-                          }}
-                        />
-                      ))}
-                  </div>
-                </SortableContext>
-              </ColumnDropZone>
-            </div>
-          </div>
+          <Column
+            key={col}
+            col={col}
+            tasks={tasksByColumn[col] ?? []}
+            loading={loading}
+            error={error}
+            onAdd={openAddColumnModal}
+            onDelete={openDeleteColumnModal}
+            onTaskOpen={(taskId: string) => setSearchParams({ taskId })}
+          />
         ))}
       </div>
 
@@ -528,33 +279,18 @@ function BoardView() {
         ) : null}
       </DragOverlay>
 
-      <Modal
+      <AddColumnModal
         open={isAddColumnOpen}
-        title="Add column"
+        value={newColumnName}
+        onChange={(e) => setNewColumnName(e.target.value)}
         onCancel={() => setIsAddColumnOpen(false)}
         onOk={handleAddColumn}
         confirmLoading={isSavingColumn}
-        destroyOnHidden
-        maskStyle={{
-          backdropFilter: 'none',
-          backgroundColor: 'rgba(0,0,0,0.45)',
-        }}
-      >
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">
-            Column name
-          </label>
-          <Input
-            placeholder="e.g. In Review"
-            value={newColumnName}
-            onChange={(event) => setNewColumnName(event.target.value)}
-            onPressEnter={handleAddColumn}
-          />
-        </div>
-      </Modal>
-      <Modal
+      />
+
+      <DeleteColumnModal
         open={isDeleteColumnOpen}
-        title="Delete column"
+        columnName={columnToDelete}
         onCancel={() => {
           setIsDeleteColumnOpen(false);
           setColumnToDelete(null);
@@ -566,21 +302,7 @@ function BoardView() {
           setIsDeleteColumnOpen(false);
           setColumnToDelete(null);
         }}
-        okText="Yes, delete"
-        okType="danger"
-        cancelText="Cancel"
-        destroyOnHidden
-        maskStyle={{
-          backdropFilter: 'none',
-          backgroundColor: 'rgba(0,0,0,0.45)',
-        }}
-      >
-        <p className="text-sm">
-          Are you sure you want to delete the column "
-          <strong>{columnToDelete}</strong>"? All tasks in this column will be
-          moved to the previous column or first column.
-        </p>
-      </Modal>
+      />
     </DndContext>
   );
 }
