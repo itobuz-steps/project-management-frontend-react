@@ -5,11 +5,7 @@ import type {
   TaskAttachment,
   TaskPopulated,
 } from '../services/types/tasks.types';
-
-type TaskWithAttachments = {
-  _id: string;
-  attachments?: TaskAttachment[];
-};
+import type { TaskWithAttachments } from './hooks.types';
 
 export function useTaskAttachments(
   task: TaskWithAttachments,
@@ -41,10 +37,18 @@ export function useTaskAttachments(
         (attachment): attachment is File => attachment instanceof File
       );
 
-      const updatedTask = await updateTask(task._id, {
-        existingAttachments,
-        attachments: newFiles,
-      });
+      let updatedTask: TaskPopulated;
+
+      if (newFiles.length) {
+        updatedTask = await updateTask(task._id, {
+          existingAttachments,
+          attachments: newFiles,
+        });
+      } else {
+        updatedTask = await updateTask(task._id, {
+          existingAttachments,
+        });
+      }
 
       onUpdated?.(updatedTask);
       message.success(successMsg);

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
-import { Collapse, Button, Empty } from 'antd';
-import { Plus } from 'lucide-react';
+import { Collapse, Button } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import type {
   RelationshipKey,
   LinkedRow,
@@ -16,8 +16,10 @@ import type {
   TaskPopulated,
   TaskReference,
 } from '../../services/types/tasks.types';
+import { DataLoader } from '../ui/DataLoader';
 
 export function LinkedItemsTab({ task, onUpdated }: LinkedItemsTabProps) {
+  const [collapseOpen, setCollapseOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
 
   const projectId =
@@ -62,18 +64,23 @@ export function LinkedItemsTab({ task, onUpdated }: LinkedItemsTabProps) {
   const hasItems = linkedRows.length > 0;
 
   return (
-    <Collapse ghost>
+    <Collapse
+      ghost
+      activeKey={collapseOpen ? ['2'] : []}
+      onChange={(keys) => setCollapseOpen(keys.includes('2'))}
+    >
       <Collapse.Panel
-        key="linked"
+        key={'2'}
         header={
           <div className="flex w-full items-center justify-between">
-            <span className="font-semibold">Linked work items</span>
+            <span className="text-base font-semibold">Linked work items</span>
 
             <Button
               size="small"
-              icon={<Plus size={14} />}
+              icon={<PlusOutlined />}
               onClick={(e) => {
                 e.stopPropagation();
+                setCollapseOpen(true);
                 setAddOpen((prev) => !prev);
               }}
             >
@@ -83,14 +90,18 @@ export function LinkedItemsTab({ task, onUpdated }: LinkedItemsTabProps) {
         }
       >
         <div className="space-y-4">
-          <LinkedItemsTable
-            rows={linkedRows}
-            projectColumns={projectColumns}
-            onRemove={removeLinkedItem}
-            onChange={handleChange}
-          />
-
-          {!hasItems && !addOpen && <Empty description="No linked items" />}
+          <DataLoader
+            loading={false}
+            isEmpty={!hasItems && !addOpen}
+            emptyText="No linked items"
+          >
+            <LinkedItemsTable
+              rows={linkedRows}
+              projectColumns={projectColumns}
+              onRemove={removeLinkedItem}
+              onChange={handleChange}
+            />
+          </DataLoader>
 
           {addOpen && (
             <LinkedItemsAddPanel

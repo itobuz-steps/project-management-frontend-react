@@ -1,34 +1,6 @@
-import { Table, Tag, Button } from 'antd';
-import { Trash2 } from 'lucide-react';
-import type { ColumnsType } from 'antd/es/table';
-import type {
-  LinkedItemsTableProps,
-  LinkedRow,
-  StatusCellProps,
-} from './linkedItems.types';
-import { RELATIONSHIP_CONFIG } from './linkedItems.types';
-import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
-import { StatusSelect } from '../ui/StatusSelect';
-import { useTaskUpdate } from '../../hooks/useTaskUpdate';
-
-function StatusCell({ row, projectColumns, onStatusChange }: StatusCellProps) {
-  const { update } = useTaskUpdate(row.item._id, (updatedTask) => {
-    onStatusChange({
-      ...row.item,
-      status: updatedTask.status,
-    });
-  });
-
-  return (
-    <div onClick={(e) => e.stopPropagation()}>
-      <StatusSelect
-        value={row.item.status}
-        columns={projectColumns}
-        onChange={(status) => update({ status }, 'Failed to update status')}
-      />
-    </div>
-  );
-}
+import { Table } from 'antd';
+import type { LinkedItemsTableProps } from './linkedItems.types';
+import { useLinkedItemsColumns } from './useLinkedItemsColumns';
 
 export function LinkedItemsTable({
   rows,
@@ -36,65 +8,28 @@ export function LinkedItemsTable({
   onRemove,
   onChange,
 }: LinkedItemsTableProps) {
-  const columns: ColumnsType<LinkedRow> = [
-    {
-      title: 'Type',
-      width: 60,
-      render: (_, row) => <TaskTypeIcon type={row.item.type} />,
-    },
-    {
-      title: 'Key',
-      width: 90,
-      render: (_, row) => <Tag color="blue">{row.item.key}</Tag>,
-    },
-    {
-      title: 'Summary',
-      render: (_, row) => row.item.title,
-    },
-    {
-      title: 'Relationship',
-      width: 140,
-      render: (_, row) => <Tag>{RELATIONSHIP_CONFIG[row.type].label}</Tag>,
-    },
-    {
-      title: 'Status',
-      width: 150,
-      render: (_, row) => (
-        <StatusCell
-          row={row}
-          projectColumns={projectColumns}
-          onStatusChange={onChange}
-        />
-      ),
-    },
-    {
-      title: '',
-      width: 60,
-      render: (_, row) => (
-        <div onClick={(e) => e.stopPropagation()}>
-          <Button
-            type="text"
-            danger
-            onClick={() => onRemove(row.type, row.item._id)}
-          >
-            <Trash2 size={14} />
-          </Button>
-        </div>
-      ),
-    },
-  ];
+  const columns = useLinkedItemsColumns({
+    projectColumns,
+    onRemove,
+    onChange,
+  });
 
   if (!rows.length) {
     return null;
   }
 
   return (
-    <Table
-      dataSource={rows}
-      columns={columns}
-      rowKey={(row) => `${row.type}-${row.item._id}`}
-      pagination={false}
-      size="small"
-    />
+    <div className="rounded-sm border border-gray-200">
+      <Table
+        dataSource={rows}
+        columns={columns}
+        rowKey={(row) => `${row.type}-${row.item._id}`}
+        pagination={false}
+        size="small"
+        scroll={{ x: 600 }}
+        showHeader={false}
+        styles={{ content: { padding: 0 } }}
+      />
+    </div>
   );
 }

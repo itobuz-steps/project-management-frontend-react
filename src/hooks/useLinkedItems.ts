@@ -40,13 +40,6 @@ export function useLinkedItems(
       const currentIds = normalizeIds(task[type]);
       const updatedIds = [...currentIds, targetId];
 
-      const optimisticTask: TaskPopulated = {
-        ...task,
-        [type]: updatedIds,
-      };
-
-      onUpdated(optimisticTask);
-
       const updatedTask = await updateTask(task._id, {
         [type]: updatedIds,
       });
@@ -65,9 +58,6 @@ export function useLinkedItems(
 
       const currentIds = normalizeIds(task[type]);
       const updatedIds = currentIds.filter((id) => id !== targetId);
-
-      const optimisticTask: TaskPopulated = { ...task, [type]: updatedIds };
-      onUpdated(optimisticTask);
 
       const updatedTask = await updateTask(task._id, {
         [type]: updatedIds,

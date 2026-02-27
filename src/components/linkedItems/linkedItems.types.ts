@@ -45,3 +45,9 @@ export interface StatusCellProps {
   projectColumns: string[];
   onStatusChange: (task: TaskReference) => void;
 }
+
+export interface LinkColumnsProps {
+  projectColumns: string[];
+  onRemove: (type: LinkedRow['type'], id: string) => void;
+  onChange: (task: TaskReference) => void;
+}

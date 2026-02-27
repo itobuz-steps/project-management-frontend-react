@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Select, message } from 'antd';
-import type { TaskPopulated, User } from '../../services/types/tasks.types';
+import type { User } from '../../services/types/tasks.types';
 import { UserCell } from './UserCell';
 import { updateTask } from '../../services/taskService';
 import type { AssigneeCellType } from './ui.types';
@@ -17,7 +17,7 @@ export function AssigneeCell({
   if (!editing) {
     return (
       <div
-        className="flex h-7 cursor-pointer items-center rounded-md hover:bg-gray-100"
+        className="flex h-7 w-[100px] cursor-pointer items-center truncate rounded-md hover:bg-gray-100 lg:w-full"
         onClick={() => {
           setEditing(true);
           loadMembers?.();
@@ -31,7 +31,7 @@ export function AssigneeCell({
   return (
     <Select
       autoFocus
-      className="h-7 w-full"
+      className="h-7 w-[100px] truncate lg:w-full"
       size="small"
       loading={loading}
       value={task.assignee?._id ?? null}
@@ -42,7 +42,7 @@ export function AssigneeCell({
         const selectedUser =
           members.find((member) => member._id === userId) ?? null;
 
-        const optimistic: TaskPopulated = {
+        const optimistic = {
           ...task,
           assignee: selectedUser as User,
         };
