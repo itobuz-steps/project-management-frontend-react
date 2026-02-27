@@ -7,6 +7,7 @@ import { TaskDescription } from '../taskModal/TaskDescription';
 import { TaskDetails } from '../taskModal/TaskDetails';
 import { tabs } from './tabsConfig';
 import type { Tabs, DrawerViewProps } from './drawer.type';
+import { LinkedItemsTab } from '../linkedItems/LinkedItemsTab';
 
 export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
   const [activeTab, setActiveTab] = useState<Tabs>('comments');
@@ -31,6 +32,8 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
         <div className="mt-5">
           {!task.parentTask && <SubtasksTab task={task} />}
         </div>
+
+        <LinkedItemsTab task={task} onUpdated={onUpdated} />
 
         {/* Divider */}
         <div className="my-4 border-t border-[#dfe1e6]" />

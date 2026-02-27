@@ -73,7 +73,9 @@ export function LinkedItemsTab({ task, onUpdated }: LinkedItemsTabProps) {
         key={'2'}
         header={
           <div className="flex w-full items-center justify-between">
-            <span className="text-base font-semibold">Linked work items</span>
+            <span className="text-base font-semibold">
+              Linked work items ({linkedRows.length})
+            </span>
 
             <Button
               size="small"

@@ -31,7 +31,7 @@ export const useLinkedItemsColumns = ({
 
             <Link
               to={`?taskId=${row.item._id}`}
-              className={`block max-w-[200px] truncate text-gray-800! hover:underline! ${isDone ? 'text-gray-400! line-through' : ''} `}
+              className={`block max-w-[200px] truncate hover:underline! ${isDone ? 'text-gray-400! line-through!' : 'text-gray-800!'} `}
             >
               {row.item.title}
             </Link>
@@ -50,7 +50,7 @@ export const useLinkedItemsColumns = ({
       ),
     },
     {
-      width: 60,
+      width: 50,
       render: (_, row) => (
         <div onClick={(e) => e.stopPropagation()}>
           <Button

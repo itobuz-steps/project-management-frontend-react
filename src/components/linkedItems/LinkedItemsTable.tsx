@@ -26,7 +26,7 @@ export function LinkedItemsTable({
         rowKey={(row) => `${row.type}-${row.item._id}`}
         pagination={false}
         size="small"
-        scroll={{ x: 600 }}
+        scroll={{ x: 300 }}
         showHeader={false}
         styles={{ content: { padding: 0 } }}
       />
