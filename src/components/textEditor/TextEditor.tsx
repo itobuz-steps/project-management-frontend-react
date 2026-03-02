@@ -37,17 +37,17 @@ export function TextEditor({
 
   const editorState = useEditorState({
     editor,
-    selector: (ctx) => {
-      const e = ctx.editor;
+    selector: (context) => {
+      const editorContext = context.editor;
 
       return {
-        isBold: e?.isActive('bold') ?? false,
-        isItalic: e?.isActive('italic') ?? false,
-        isBulletList: e?.isActive('bulletList') ?? false,
-        isOrderedList: e?.isActive('orderedList') ?? false,
-        isTaskList: e?.isActive('taskList') ?? false,
-        isCodeBlock: e?.isActive('codeBlock') ?? false,
-        currentHeading: e?.getAttributes('heading')?.level ?? 0,
+        isBold: editorContext?.isActive('bold') ?? false,
+        isItalic: editorContext?.isActive('italic') ?? false,
+        isBulletList: editorContext?.isActive('bulletList') ?? false,
+        isOrderedList: editorContext?.isActive('orderedList') ?? false,
+        isTaskList: editorContext?.isActive('taskList') ?? false,
+        isCodeBlock: editorContext?.isActive('codeBlock') ?? false,
+        currentHeading: editorContext?.getAttributes('heading')?.level ?? 0,
       };
     },
   });
@@ -55,8 +55,6 @@ export function TextEditor({
   if (!editor) {
     return null;
   }
-
-  const btn = 'h-8 min-w-[32px] rounded-md px-2 text-sm font-medium';
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -87,7 +85,7 @@ export function TextEditor({
           size="small"
           title="Bold"
           type="default"
-          className={btn}
+          className="editor-toolbar-btn"
           style={getActiveStyle(editorState.isBold)}
           onClick={() => editor.chain().focus().toggleBold().run()}
         >
@@ -98,7 +96,7 @@ export function TextEditor({
           size="small"
           title="Italic"
           type="default"
-          className={btn}
+          className="editor-toolbar-btn"
           style={getActiveStyle(editorState.isItalic)}
           onClick={() => editor.chain().focus().toggleItalic().run()}
         >
@@ -111,7 +109,7 @@ export function TextEditor({
           size="small"
           title="Bullet List"
           type="default"
-          className={btn}
+          className="editor-toolbar-btn"
           style={getActiveStyle(editorState.isBulletList)}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
@@ -122,7 +120,7 @@ export function TextEditor({
           size="small"
           title="Numbered List"
           type="default"
-          className={btn}
+          className="editor-toolbar-btn"
           style={getActiveStyle(editorState.isOrderedList)}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
         >
@@ -133,7 +131,7 @@ export function TextEditor({
           size="small"
           title="Check Box"
           type="default"
-          className={btn}
+          className="editor-toolbar-btn"
           style={getActiveStyle(editorState.isTaskList)}
           onClick={() => editor.chain().focus().toggleTaskList().run()}
         >
@@ -168,7 +166,7 @@ export function TextEditor({
         <Button
           size="small"
           title="Mentions"
-          className={`${btn} ${comment ? 'block' : 'hidden!'}`}
+          className={`editor-toolbar-btn ${comment ? 'block' : 'hidden!'}`}
           onClick={() => editor.chain().focus().insertContent('@').run()}
         >
           @
@@ -177,7 +175,7 @@ export function TextEditor({
         <Button
           size="small"
           title="Emoji"
-          className={btn}
+          className="editor-toolbar-btn"
           onClick={() => editor.chain().focus().insertContent('😊').run()}
         >
           🙂
@@ -186,7 +184,7 @@ export function TextEditor({
         <Button
           size="small"
           title="3x3 Table"
-          className={btn}
+          className="editor-toolbar-btn"
           onClick={() =>
             editor.chain().focus().insertTable({ rows: 3, cols: 3 }).run()
           }
@@ -198,7 +196,7 @@ export function TextEditor({
           size="small"
           title="Code"
           type="default"
-          className={btn}
+          className="editor-toolbar-btn"
           style={getActiveStyle(editorState.isCodeBlock)}
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         >
