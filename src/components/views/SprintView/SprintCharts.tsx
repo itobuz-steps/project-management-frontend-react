@@ -4,16 +4,7 @@ import {
   getGroupedColumnConfig,
   getStoryPointColumnConfig,
 } from './sprintView.config';
-import type {
-  StatusPieItem,
-  PriorityColumnItem,
-  StoryPointItem,
-} from './sprintView.types';
-
-interface ChartCardProps {
-  title: string;
-  children: React.ReactNode;
-}
+import type { SprintChartsProps, ChartCardProps } from './sprintView.types';
 
 function ChartCard({ title, children }: ChartCardProps) {
   return (
@@ -22,15 +13,6 @@ function ChartCard({ title, children }: ChartCardProps) {
       {children}
     </div>
   );
-}
-
-interface SprintChartsProps {
-  statusPieData: StatusPieItem[];
-  typeBreakdownData: StatusPieItem[];
-  priorityColumnData: PriorityColumnItem[];
-  storyPointData: StoryPointItem[];
-  chartSize: number;
-  colors: string[];
 }
 
 export function SprintCharts({

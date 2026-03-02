@@ -121,16 +121,18 @@ export function useSprintReport(projectId?: string) {
       return [];
     }
 
-    return PRIORITIES.flatMap((p) => [
+    return PRIORITIES.flatMap((priority) => [
       {
-        priority: capitalize(p),
+        priority: capitalize(priority),
         status: 'Completed',
-        count: summary.completed.filter((task) => task.priority === p).length,
+        count: summary.completed.filter((task) => task.priority === priority)
+          .length,
       },
       {
-        priority: capitalize(p),
+        priority: capitalize(priority),
         status: 'Pending',
-        count: summary.pending.filter((task) => task.priority === p).length,
+        count: summary.pending.filter((task) => task.priority === priority)
+          .length,
       },
     ]);
   }, [summary]);

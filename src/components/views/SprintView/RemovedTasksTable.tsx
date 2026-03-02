@@ -1,21 +1,6 @@
 import { Table, Tag } from 'antd';
-import type { TaskPopulated } from '../../../services/types/tasks.types';
-
-interface RemovedTasksTableProps {
-  tasks: TaskPopulated[];
-}
-
-const TYPE_COLOR_MAP: Record<string, string> = {
-  bug: 'red',
-  story: 'green',
-  task: 'blue',
-};
-
-const PRIORITY_COLOR_MAP: Record<string, string> = {
-  high: 'red',
-  medium: 'orange',
-  low: 'green',
-};
+import type { RemovedTasksTableProps } from './sprintView.types';
+import { TYPE_COLOR_MAP, PRIORITY_COLOR_MAP } from './sprintView.types';
 
 const columns = [
   {

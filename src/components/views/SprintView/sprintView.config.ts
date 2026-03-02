@@ -13,9 +13,9 @@ export function getPieConfig(chartSize: number, colors: string[]): PieConfig {
       text: 'value',
       position: 'outside',
     },
-    tooltip: (d: StatusPieItem) => ({
-      name: d.type,
-      value: d.value,
+    tooltip: (data: StatusPieItem) => ({
+      name: data.type,
+      value: data.value,
     }),
     scale: {
       color: { range: colors },
@@ -34,9 +34,9 @@ export function getGroupedColumnConfig(
     yField: 'count',
     colorField: 'status',
     group: true,
-    tooltip: (d: PriorityColumnItem) => ({
-      name: `${d.priority} - ${d.status}`,
-      value: d.count,
+    tooltip: (data: PriorityColumnItem) => ({
+      name: `${data.priority} - ${data.status}`,
+      value: data.count,
     }),
     scale: {
       color: { range: [colors[0], colors[3]] },
@@ -57,9 +57,9 @@ export function getStoryPointColumnConfig(
     xField: 'category',
     yField: 'points',
     colorField: 'category',
-    tooltip: (d: StoryPointItem) => ({
-      name: d.category,
-      value: `${d.points} pts`,
+    tooltip: (data: StoryPointItem) => ({
+      name: data.category,
+      value: `${data.points} pts`,
     }),
     scale: {
       color: { range: colors },

@@ -1,11 +1,5 @@
 import { Select } from 'antd';
-import type { Sprint } from '../../../services/types/sprints.types';
-
-interface SprintSelectorProps {
-  sprints: Sprint[];
-  selectedSprintId: string | null;
-  onSelect: (sprintId: string) => void;
-}
+import type { SprintSelectorProps } from './sprintView.types';
 
 export function SprintSelector({
   sprints,
@@ -21,9 +15,9 @@ export function SprintSelector({
         value={selectedSprintId}
         onChange={onSelect}
         style={{ width: 260 }}
-        options={sprints.map((s) => ({
-          label: s.name || s.key,
-          value: s._id,
+        options={sprints.map((sprint) => ({
+          label: sprint.name || sprint.key,
+          value: sprint._id,
         }))}
       />
     </div>
