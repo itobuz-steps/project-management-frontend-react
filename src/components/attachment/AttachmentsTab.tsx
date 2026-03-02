@@ -21,6 +21,7 @@ export function AttachmentsTab({
     multiple: true,
     showUploadList: false,
     beforeUpload: async (file) => {
+      setExpanded(true);
       addAttachment(file);
       return false;
     },
@@ -34,13 +35,24 @@ export function AttachmentsTab({
       >
         <div className="flex items-center gap-2">
           {expanded ? <DownOutlined /> : <RightOutlined />}
-          <span className="text-base">Attachments</span>
-          <span className="font-bold">({attachments.length})</span>
+          <span className="text-base">Attachments ({attachments.length})</span>
         </div>
 
-        <div onClick={(e) => e.stopPropagation()}>
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            setExpanded(true);
+          }}
+        >
           <Upload {...uploadProps} disabled={saving}>
-            <Button size="small" icon={<PlusOutlined />}>
+            <Button
+              style={{
+                border: 'var(--color-primary-500) solid 1px',
+              }}
+              type="text"
+              size="small"
+              icon={<PlusOutlined />}
+            >
               Add
             </Button>
           </Upload>

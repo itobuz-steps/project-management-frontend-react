@@ -4,6 +4,7 @@ import { TextEditor } from '../textEditor/TextEditor';
 import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 import type { TaskDescriptionProps } from './taskModal.types';
 import ReactMarkdown from 'react-markdown';
+import { Button } from 'antd';
 
 export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
   const [expanded, setExpanded] = useState(false);
@@ -24,9 +25,17 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
     }
 
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
+      const target = event.target as HTMLElement;
 
-      if (editorRef.current && !editorRef.current.contains(target)) {
+      const clickedInsideEditor =
+        editorRef.current && editorRef.current.contains(target);
+
+      const clickedInsideAntdDropdown =
+        target.closest('.ant-select-dropdown') ||
+        target.closest('.ant-picker-dropdown') ||
+        target.closest('.ant-dropdown');
+
+      if (!clickedInsideEditor && !clickedInsideAntdDropdown) {
         cancel();
       }
     };
@@ -45,7 +54,10 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
 
     setSaving(true);
     try {
-      await update({ description: value }, 'Failed to update description');
+      await update(
+        { description: value ?? null },
+        'Failed to update description'
+      );
     } finally {
       setSaving(false);
       closeEditor();
@@ -72,9 +84,6 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
       closeEditor();
     } else {
       setExpanded(true);
-      if (!task.description) {
-        setEditing(true);
-      }
     }
   };
 
@@ -113,6 +122,29 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
                 onCancel={cancel}
                 disabled={saving}
               />
+              <div className="mt-2 flex justify-end gap-2">
+                <Button
+                  style={{
+                    border: 'var(--color-primary-500) solid 1px',
+                  }}
+                  type="text"
+                  onClick={cancel}
+                  disabled={saving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  style={{
+                    backgroundColor: 'var(--color-primary-500)',
+                    color: 'white',
+                  }}
+                  type="primary"
+                  loading={saving}
+                  onClick={save}
+                >
+                  Save
+                </Button>
+              </div>
             </div>
           )}
         </div>
