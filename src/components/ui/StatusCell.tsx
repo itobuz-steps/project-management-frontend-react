@@ -1,8 +1,12 @@
-import { useTaskUpdate } from "../../hooks/useTaskUpdate";
-import type { StatusCellProps } from "../linkedItems/linkedItems.types";
-import { StatusSelect } from "./StatusSelect";
+import { useTaskUpdate } from '../../hooks/useTaskUpdate';
+import type { StatusCellProps } from '../linkedItems/linkedItems.types';
+import { StatusSelect } from './StatusSelect';
 
-export function StatusCell({ row, projectColumns, onStatusChange }: StatusCellProps) {
+export function StatusCell({
+  row,
+  projectColumns,
+  onStatusChange,
+}: StatusCellProps) {
   const { update } = useTaskUpdate(row.item._id, (updatedTask) => {
     onStatusChange({
       ...row.item,

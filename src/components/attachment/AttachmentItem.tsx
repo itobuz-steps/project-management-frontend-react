@@ -18,7 +18,9 @@ export function AttachmentItem({
     <div className="group flex items-center justify-between rounded-md bg-gray-100 px-3 py-2 hover:bg-gray-50">
       <Link href={url} target="_blank">
         <Text>
-          <div className={`${isDrawer ? 'max-w-60' : 'max-w-50 md:max-w-80 lg:max-w-120'} truncate`}>
+          <div
+            className={`${isDrawer ? 'max-w-60' : 'max-w-50 md:max-w-80 lg:max-w-120'} truncate`}
+          >
             {name}
           </div>
         </Text>

@@ -1,4 +1,7 @@
 // src/interfaces/sprint.ts
+
+import type { TaskPopulated } from './tasks.types';
+
 export interface Sprint {
   _id: string;
   name: string;
@@ -29,4 +32,9 @@ export interface UpdateSprintPayload {
 
 export interface AddTasks {
   taskIds?: string[];
+}
+
+export interface SprintCompletionSummary {
+  completed: TaskPopulated[];
+  pending: TaskPopulated[];
 }
