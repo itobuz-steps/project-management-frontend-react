@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { headingOptions, type TextEditorProps } from './textEditor.type';
 import { Link as RouterLink } from 'react-router-dom';
 import { useTextEditor } from '../../hooks/useTextEditor';
+import { useEditorState } from '@tiptap/react';
+import { getActiveStyle } from './editorActiveButton';
 
 export function TextEditor({
   comment,
@@ -33,13 +35,28 @@ export function TextEditor({
     },
   });
 
+  const editorState = useEditorState({
+    editor,
+    selector: (ctx) => {
+      const e = ctx.editor;
+
+      return {
+        isBold: e?.isActive('bold') ?? false,
+        isItalic: e?.isActive('italic') ?? false,
+        isBulletList: e?.isActive('bulletList') ?? false,
+        isOrderedList: e?.isActive('orderedList') ?? false,
+        isTaskList: e?.isActive('taskList') ?? false,
+        isCodeBlock: e?.isActive('codeBlock') ?? false,
+        currentHeading: e?.getAttributes('heading')?.level ?? 0,
+      };
+    },
+  });
+
   if (!editor) {
     return null;
   }
 
-  const btn =
-    'h-8 min-w-[32px] rounded-md px-2 text-sm font-medium text-gray-700 hover:bg-gray-100 active:bg-gray-200';
-  const btnActive = 'bg-gray-200 text-gray-900';
+  const btn = 'h-8 min-w-[32px] rounded-md px-2 text-sm font-medium';
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -69,7 +86,9 @@ export function TextEditor({
         <Button
           size="small"
           title="Bold"
-          className={`${btn} ${editor.isActive('bold') ? btnActive : ''}`}
+          type="default"
+          className={btn}
+          style={getActiveStyle(editorState.isBold)}
           onClick={() => editor.chain().focus().toggleBold().run()}
         >
           B
@@ -78,7 +97,9 @@ export function TextEditor({
         <Button
           size="small"
           title="Italic"
-          className={`${btn} ${editor.isActive('italic') ? btnActive : ''}`}
+          type="default"
+          className={btn}
+          style={getActiveStyle(editorState.isItalic)}
           onClick={() => editor.chain().focus().toggleItalic().run()}
         >
           I
@@ -89,7 +110,9 @@ export function TextEditor({
         <Button
           size="small"
           title="Bullet List"
-          className={`${btn} ${editor.isActive('bulletList') ? btnActive : ''}`}
+          type="default"
+          className={btn}
+          style={getActiveStyle(editorState.isBulletList)}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
           •
@@ -98,9 +121,9 @@ export function TextEditor({
         <Button
           size="small"
           title="Numbered List"
-          className={`${btn} ${
-            editor.isActive('orderedList') ? btnActive : ''
-          }`}
+          type="default"
+          className={btn}
+          style={getActiveStyle(editorState.isOrderedList)}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
         >
           1.
@@ -109,7 +132,9 @@ export function TextEditor({
         <Button
           size="small"
           title="Check Box"
-          className={`${btn} ${editor.isActive('taskList') ? btnActive : ''}`}
+          type="default"
+          className={btn}
+          style={getActiveStyle(editorState.isTaskList)}
           onClick={() => editor.chain().focus().toggleTaskList().run()}
         >
           ☑
@@ -172,7 +197,9 @@ export function TextEditor({
         <Button
           size="small"
           title="Code"
-          className={`${btn} ${editor.isActive('codeBlock') ? btnActive : ''}`}
+          type="default"
+          className={btn}
+          style={getActiveStyle(editorState.isCodeBlock)}
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         >
           {'</>'}
