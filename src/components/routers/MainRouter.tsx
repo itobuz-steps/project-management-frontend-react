@@ -12,6 +12,7 @@ import TaskPage from '../../pages/TaskPage';
 import BacklogView from '../views/BacklogView/BacklogView';
 import BoardView from '../views/BoardView/BoardView';
 import ListView from '../views/ListView/ListView';
+import SprintView from '../views/SprintView/SprintView';
 import { ForYouPage } from '../../pages/ForYouPage';
 import { ProtectedRoute } from '../common/ProtectedRoute';
 import { AuthRedirect } from '../../utils/AuthRedirect';
@@ -80,6 +81,7 @@ export function MainRouter() {
               <Route path="backlog" element={<BacklogView />} />
               <Route path="board" element={<BoardView />} />
               <Route path="list" element={<ListView />} />
+              <Route path="sprints-overview" element={<SprintView />} />
             </Route>
             {/* Task detail page */}
             <Route path="/task/:taskId" element={<TaskPage />} />
