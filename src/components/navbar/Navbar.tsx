@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 export default function Navbar() {
   const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [paletteSearch, setPaletteSearch] = useState('');
 
   const handleSearchClick = () => {
     setCommandPaletteOpen(true);
@@ -26,8 +27,8 @@ export default function Navbar() {
       {isCommandPaletteOpen && (
         <CommandPalette
           open={isCommandPaletteOpen}
-          value=""
-          onChange={(value) => console.log(value)}
+          value={paletteSearch}
+          onChange={(value) => setPaletteSearch(value)}
           onClose={() => setCommandPaletteOpen(false)}
         />
       )}
