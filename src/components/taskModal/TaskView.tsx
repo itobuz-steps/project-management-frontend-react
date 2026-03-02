@@ -38,7 +38,12 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
 
         <LinkedItemsTab task={task} onUpdated={onUpdated} />
 
-        <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+        <Tabs
+          className="custom-tabs"
+          defaultActiveKey="1"
+          items={items}
+          onChange={onChange}
+        />
       </div>
 
       {!isMobile && (

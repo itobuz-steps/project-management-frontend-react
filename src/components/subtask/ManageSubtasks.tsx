@@ -38,7 +38,14 @@ export function ManageSubtasks({
             + Subtask
           </Button>
 
-          <Button size="small" onClick={onClose}>
+          <Button
+            style={{
+              border: 'var(--color-primary-500) solid 1px',
+            }}
+            type="text"
+            size="small"
+            onClick={onClose}
+          >
             ✕
           </Button>
         </div>
@@ -128,7 +135,14 @@ export function ManageSubtasks({
 
       {/* Footer */}
       <div className="mt-2 flex justify-end gap-2 border-t border-gray-200 pt-2">
-        <Button size="small" onClick={onClose}>
+        <Button
+          style={{
+            border: 'var(--color-primary-500) solid 1px',
+          }}
+          type="text"
+          size="small"
+          onClick={onClose}
+        >
           Cancel
         </Button>
 

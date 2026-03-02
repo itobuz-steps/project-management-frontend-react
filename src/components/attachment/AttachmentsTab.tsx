@@ -45,7 +45,14 @@ export function AttachmentsTab({
           }}
         >
           <Upload {...uploadProps} disabled={saving}>
-            <Button size="small" icon={<PlusOutlined />}>
+            <Button
+              style={{
+                border: 'var(--color-primary-500) solid 1px',
+              }}
+              type="text"
+              size="small"
+              icon={<PlusOutlined />}
+            >
               Add
             </Button>
           </Upload>

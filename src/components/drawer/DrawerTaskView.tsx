@@ -48,13 +48,13 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
                 onClick={() => setActiveTab(tab.key)}
                 className={`relative px-3 pt-1 pb-2 text-sm font-medium transition-colors ${
                   activeTab === tab.key
-                    ? 'text-[#0052CC]'
-                    : 'text-[#6B778C] hover:text-[#172B4D]'
+                    ? 'text-[var(--color-primary-900)]'
+                    : 'text-[#383c44] hover:text-[var(--color-primary-900)]'
                 }`}
               >
                 {tab.label}
                 {activeTab === tab.key && (
-                  <span className="absolute right-0 bottom-0 left-0 h-0.5 rounded-full bg-[#0052CC]" />
+                  <span className="absolute right-0 bottom-0 left-0 h-0.5 rounded-full bg-[var(--color-primary-700)]" />
                 )}
               </button>
             ))}
