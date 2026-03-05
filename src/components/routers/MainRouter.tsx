@@ -15,6 +15,7 @@ import ListView from '../views/ListView/ListView';
 import { ForYouPage } from '../../pages/ForYouPage';
 import { ProtectedRoute } from '../common/ProtectedRoute';
 import { AuthRedirect } from '../../utils/AuthRedirect';
+import ProjectSettings from '../../pages/ProjectSettings';
 
 export function MainRouter() {
   return (
@@ -76,7 +77,7 @@ export function MainRouter() {
             <Route path="/" element={<Navigate to="/for-you" replace />} />
             <Route path="/project/:projectId" element={<Dashboard />}>
               <Route index element={<Navigate to="backlog" replace />} />
-
+              <Route path="settings" element={<ProjectSettings />} />
               <Route path="backlog" element={<BacklogView />} />
               <Route path="board" element={<BoardView />} />
               <Route path="list" element={<ListView />} />

@@ -6,6 +6,7 @@ import {
   useNavigate,
   useSearchParams,
 } from 'react-router-dom';
+import { SettingOutlined } from '@ant-design/icons';
 import { useMemo, useState } from 'react';
 import { useProject } from '../../context/ProjectContext';
 import { PRIORITIES } from '../taskModal/constants';
@@ -81,10 +82,18 @@ function TopBar({
             </h2>
           </div>
 
-          <div className="flex self-end sm:justify-end">
+          <div className="flex items-center gap-3 self-end sm:justify-end">
             <Can permission="SEND_INVITE">
               <InviteUserContainer />
             </Can>
+
+            <button
+              onClick={() => navigate('settings')}
+              className="flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-[var(--color-primary-200)]"
+              title="Project Settings"
+            >
+              <SettingOutlined style={{ fontSize: '18px' }} />
+            </button>
           </div>
         </div>
 
