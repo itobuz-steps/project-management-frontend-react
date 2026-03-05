@@ -1,6 +1,10 @@
 import { useRef, useEffect } from 'react';
 import { Avatar, Button, Popconfirm, Space, Typography } from 'antd';
-import { DeleteOutlined, PaperClipOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PaperClipOutlined,
+} from '@ant-design/icons';
 import { config } from '../../config/config';
 import type { CommentItemProps, MentionSpanProps } from './comment.type';
 import { formatDistanceToNow } from 'date-fns';
@@ -32,10 +36,24 @@ export function CommentItem({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      if (!editor.isEditing) return;
+
+      const target = event.target as HTMLElement;
+
+      const clickedInsideEditor =
+        editorRef.current && editorRef.current.contains(target);
+
+      const clickedAntdDropdown =
+        target.closest('.ant-select-dropdown') ||
+        target.closest('.ant-dropdown') ||
+        target.closest('.ant-picker-dropdown');
+
+      const clickedMentionDropdown = target.closest('.mention-dropdown');
+
       if (
-        editor.isEditing &&
-        editorRef.current &&
-        !editorRef.current.contains(event.target as Node)
+        !clickedInsideEditor &&
+        !clickedAntdDropdown &&
+        !clickedMentionDropdown
       ) {
         editor.reset();
       }
@@ -102,9 +120,35 @@ export function CommentItem({
                   </Link>
                 )}
 
+                {!editor.isEditing && (
+                  <Button
+                    type="text"
+                    icon={<EditOutlined />}
+                    onClick={() => {
+                      editor.setIsEditing(true);
+                    }}
+                  />
+                )}
+
                 <Popconfirm
-                  title="Are you sure you want to delete this comment?"
+                  title="Delete comment?"
+                  description="This action cannot be undone."
                   onConfirm={editor.remove}
+                  okText="Delete"
+                  cancelText="Cancel"
+                  icon={null}
+                  okButtonProps={{
+                    style: {
+                      backgroundColor: 'var(--color-primary-500)',
+                      color: 'white',
+                    },
+                  }}
+                  cancelButtonProps={{
+                    style: {
+                      border: 'var(--color-primary-500) solid 1px',
+                    },
+                    type: 'text',
+                  }}
                 >
                   <Button danger type="text" icon={<DeleteOutlined />} />
                 </Popconfirm>
@@ -122,16 +166,42 @@ export function CommentItem({
                 </ReactMarkdown>
               </div>
             ) : (
-              <TextEditor
-                comment
-                content={editor.content}
-                onChange={editor.setContent}
-                onAttachmentsChange={editor.setAttachments}
-                onSave={editor.save}
-                onCancel={editor.reset}
-                mentionItems={mentionItems}
-                onEditorJsonChange={editor.setEditorJson}
-              />
+              <div className="mt-2">
+                <TextEditor
+                  comment
+                  content={editor.content}
+                  onChange={editor.setContent}
+                  onAttachmentsChange={editor.setAttachments}
+                  onSave={editor.save}
+                  onCancel={editor.reset}
+                  mentionItems={mentionItems}
+                  onEditorJsonChange={editor.setEditorJson}
+                />
+
+                {/* Action Buttons */}
+                <div className="mt-2 flex justify-end gap-2">
+                  <Button
+                    style={{
+                      border: 'var(--color-primary-500) solid 1px',
+                    }}
+                    type="text"
+                    onClick={editor.reset}
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    style={{
+                      backgroundColor: 'var(--color-primary-500)',
+                      color: 'white',
+                    }}
+                    type="primary"
+                    onClick={editor.save}
+                  >
+                    Save
+                  </Button>
+                </div>
+              </div>
             )}
           </Space>
         </div>

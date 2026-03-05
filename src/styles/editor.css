@@ -33,12 +33,12 @@
   margin-left: 0;
 }
 
-.editor-prose .ProseMirror .task-list li>label {
+.editor-prose .ProseMirror .task-list li > label {
   margin-top: 0.125rem;
   margin-right: 0.125rem;
 }
 
-.editor-prose .ProseMirror .task-list li>div {
+.editor-prose .ProseMirror .task-list li > div {
   flex: 1;
 }
 
@@ -80,4 +80,8 @@
 .editor-prose p {
   font-size: 1rem;
   font-weight: 400;
+}
+
+.editor-toolbar-btn {
+  @apply h-8 min-w-[32px] rounded-md px-2 text-sm font-medium;
 }
