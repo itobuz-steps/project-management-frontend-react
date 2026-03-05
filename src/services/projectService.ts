@@ -58,3 +58,14 @@ export const getUsersByProjectId = async (
   const res = await api.get<User[]>(`/${projectId}/get-user`);
   return res.data;
 };
+
+export const deleteProjectColumn = async (
+  projectId: string,
+  columnName: string
+) => {
+  const response = await api.delete(
+    `/${projectId}/columns/${encodeURIComponent(columnName)}`
+  );
+
+  return response.data;
+};
