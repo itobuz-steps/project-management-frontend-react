@@ -3,6 +3,7 @@ import type { Activity } from '../../services/types/activity.types';
 import { DateTime } from 'luxon';
 import { useEffect, useState, type JSX } from 'react';
 import { getTaskActivities } from '../../services/taskService';
+import type { TaskPopulated } from '../../services/types/tasks.types';
 
 export function ActivityTab({ taskId }: { taskId: string }) {
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -66,24 +67,30 @@ function mapActivityListToTimelineProp(activities: Activity[]) {
         break;
 
       case 'TASK_UPDATED': {
-        const otherFields = Object.keys(activity.updatedFields);
-        if (otherFields.length) {
-          content = (
-            <>
-              <span className="text-primary-500 font-bold">
-                {activity.byUser.name}
-              </span>{' '}
-              updated{' '}
-              <span className="text-primary-500">
-                {otherFields
-                  .map((field) => field[0].toUpperCase() + field.slice(1))
-                  .join(', ')}
-                .
-              </span>
-            </>
-          );
-          timelineItems.push(createTimelineItem(activity.createdAt, content));
-        }
+        const otherFields: Partial<keyof TaskPopulated> = Object.keys(
+          activity.updatedFields
+        )[0] as Partial<keyof TaskPopulated>;
+        content = (
+          <>
+            <span className="text-primary-500 font-bold">
+              {activity.byUser.name}
+            </span>{' '}
+            updated{' '}
+            <span className="text-primary-500">
+              {otherFields[0].toUpperCase() + otherFields.slice(1)}
+            </span>{' '}
+            from{' '}
+            <span className="text-primary-500">
+              {activity.updatedFields[otherFields]?.from}
+            </span>{' '}
+            to{' '}
+            <span className="text-primary-500">
+              {activity.updatedFields[otherFields]?.to}
+            </span>
+            .
+          </>
+        );
+        timelineItems.push(createTimelineItem(activity.createdAt, content));
         break;
       }
 
