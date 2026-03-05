@@ -7,6 +7,7 @@ import { useTaskComments } from '../../hooks/useTaskComments';
 import { useCommentComposer } from '../../hooks/useCommentComposer';
 import { DataLoader } from '../ui/DataLoader';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
+import { Button } from 'antd';
 
 export function CommentsTab({ task }: CommentsTabProps) {
   const [isComposerOpen, setIsComposerOpen] = useState(false);
@@ -32,7 +33,17 @@ export function CommentsTab({ task }: CommentsTabProps) {
 
       const clickedMentionDropdown = target.closest('.mention-dropdown');
 
-      if (isComposerOpen && !clickedInsideComposer && !clickedMentionDropdown) {
+      const clickedAntdDropdown =
+        target.closest('.ant-select-dropdown') ||
+        target.closest('.ant-dropdown') ||
+        target.closest('.ant-picker-dropdown');
+
+      if (
+        isComposerOpen &&
+        !clickedInsideComposer &&
+        !clickedMentionDropdown &&
+        !clickedAntdDropdown
+      ) {
         composer.reset();
         setIsComposerOpen(false);
       }
@@ -100,20 +111,51 @@ export function CommentsTab({ task }: CommentsTabProps) {
                 </div>
               </>
             ) : (
-              <TextEditor
-                comment
-                content={composer.content}
-                onChange={composer.setContent}
-                onEditorJsonChange={composer.setEditorJson}
-                onAttachmentsChange={composer.setAttachments}
-                onSave={handleSubmit}
-                onCancel={() => {
-                  composer.reset();
-                  setIsComposerOpen(false);
-                }}
-                disabled={composer.submitting}
-                mentionItems={mentionItems}
-              />
+              <div>
+                <TextEditor
+                  comment
+                  content={composer.content}
+                  onChange={composer.setContent}
+                  onEditorJsonChange={composer.setEditorJson}
+                  onAttachmentsChange={composer.setAttachments}
+                  onSave={handleSubmit}
+                  onCancel={() => {
+                    composer.reset();
+                    setIsComposerOpen(false);
+                  }}
+                  disabled={composer.submitting}
+                  mentionItems={mentionItems}
+                />
+
+                <div className="mt-2 flex justify-end gap-2">
+                  <Button
+                    style={{
+                      border: 'var(--color-primary-500) solid 1px',
+                    }}
+                    type="text"
+                    onClick={() => {
+                      composer.reset();
+                      setIsComposerOpen(false);
+                    }}
+                    disabled={composer.submitting}
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    style={{
+                      backgroundColor: 'var(--color-primary-500)',
+                      color: 'white',
+                    }}
+                    type="primary"
+                    loading={composer.submitting}
+                    disabled={!composer.content.trim()}
+                    onClick={handleSubmit}
+                  >
+                    Comment
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
         </div>

@@ -6,6 +6,7 @@ import type { ViewProps } from './taskModal.types';
 import { TaskDetails } from './TaskDetails';
 import { Tabs, type TabsProps } from 'antd';
 import { ActivityTab } from './ActivityTab';
+import { LinkedItemsTab } from '../linkedItems/LinkedItemsTab';
 
 export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
   const onChange = (key: string) => {
@@ -30,10 +31,19 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
       <div className="flex-1 overflow-visible md:overflow-y-auto md:pr-3">
         {isMobile && <TaskDetails task={task} onUpdated={onUpdated} />}
         <TaskDescription task={task} onUpdated={onUpdated} />
+
         {!task.parentTask && <SubtasksTab task={task} />}
 
         <AttachmentsTab task={task} onUpdated={onUpdated} />
-        <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+
+        <LinkedItemsTab task={task} onUpdated={onUpdated} />
+
+        <Tabs
+          className="custom-tabs"
+          defaultActiveKey="1"
+          items={items}
+          onChange={onChange}
+        />
       </div>
 
       {!isMobile && (

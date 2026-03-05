@@ -82,9 +82,24 @@ export function TaskModalHeader({
           }`}
         >
           <Link to={`/task/${task._id}`} target="_blank">
-            <Button size="middle" icon={<ArrowsAltOutlined />} />
+            <Button
+              style={{
+                border: 'var(--color-primary-500) solid 1px',
+              }}
+              type="text"
+              size="middle"
+              icon={<ArrowsAltOutlined />}
+            />
           </Link>
-          <Button size="middle" icon={<CloseOutlined />} onClick={onClose} />
+          <Button
+            style={{
+              border: 'var(--color-primary-500) solid 1px',
+            }}
+            type="text"
+            size="middle"
+            icon={<CloseOutlined />}
+            onClick={onClose}
+          />
         </div>
       </div>
 

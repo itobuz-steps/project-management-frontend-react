@@ -4,7 +4,6 @@ import getTaskById, { updateTask } from '../services/taskService';
 import { message } from 'antd';
 
 export function useSubtasks(task: TaskPopulated) {
-  console.log('useSubtasks', { task });
   const [selectedIds, setSelectedIds] = useState<string[]>(
     (task.subTasks ?? []) as string[]
   );
@@ -52,7 +51,7 @@ export function useSubtasks(task: TaskPopulated) {
     setSubtasks((prev) => prev.filter((task) => task._id !== id));
 
     await updateTask(task._id, { subTasks: updatedIds });
-    await updateTask(id, { parentTask: undefined });
+    await updateTask(id, { parentTask: null });
   };
 
   return {

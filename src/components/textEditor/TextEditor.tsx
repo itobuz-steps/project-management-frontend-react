@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { headingOptions, type TextEditorProps } from './textEditor.type';
 import { Link as RouterLink } from 'react-router-dom';
 import { useTextEditor } from '../../hooks/useTextEditor';
+import { useEditorState } from '@tiptap/react';
+import { getActiveStyle } from './editorActiveButton';
 
 export function TextEditor({
   comment,
@@ -33,13 +35,26 @@ export function TextEditor({
     },
   });
 
+  const editorState = useEditorState({
+    editor,
+    selector: (context) => {
+      const editorContext = context.editor;
+
+      return {
+        isBold: editorContext?.isActive('bold') ?? false,
+        isItalic: editorContext?.isActive('italic') ?? false,
+        isBulletList: editorContext?.isActive('bulletList') ?? false,
+        isOrderedList: editorContext?.isActive('orderedList') ?? false,
+        isTaskList: editorContext?.isActive('taskList') ?? false,
+        isCodeBlock: editorContext?.isActive('codeBlock') ?? false,
+        currentHeading: editorContext?.getAttributes('heading')?.level ?? 0,
+      };
+    },
+  });
+
   if (!editor) {
     return null;
   }
-
-  const btn =
-    'h-8 min-w-[32px] rounded-md px-2 text-sm font-medium text-gray-700 hover:bg-gray-100 active:bg-gray-200';
-  const btnActive = 'bg-gray-200 text-gray-900';
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -69,7 +84,9 @@ export function TextEditor({
         <Button
           size="small"
           title="Bold"
-          className={`${btn} ${editor.isActive('bold') ? btnActive : ''}`}
+          type="default"
+          className="editor-toolbar-btn"
+          style={getActiveStyle(editorState.isBold)}
           onClick={() => editor.chain().focus().toggleBold().run()}
         >
           B
@@ -78,7 +95,9 @@ export function TextEditor({
         <Button
           size="small"
           title="Italic"
-          className={`${btn} ${editor.isActive('italic') ? btnActive : ''}`}
+          type="default"
+          className="editor-toolbar-btn"
+          style={getActiveStyle(editorState.isItalic)}
           onClick={() => editor.chain().focus().toggleItalic().run()}
         >
           I
@@ -89,7 +108,9 @@ export function TextEditor({
         <Button
           size="small"
           title="Bullet List"
-          className={`${btn} ${editor.isActive('bulletList') ? btnActive : ''}`}
+          type="default"
+          className="editor-toolbar-btn"
+          style={getActiveStyle(editorState.isBulletList)}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
           •
@@ -98,9 +119,9 @@ export function TextEditor({
         <Button
           size="small"
           title="Numbered List"
-          className={`${btn} ${
-            editor.isActive('orderedList') ? btnActive : ''
-          }`}
+          type="default"
+          className="editor-toolbar-btn"
+          style={getActiveStyle(editorState.isOrderedList)}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
         >
           1.
@@ -109,7 +130,9 @@ export function TextEditor({
         <Button
           size="small"
           title="Check Box"
-          className={`${btn} ${editor.isActive('taskList') ? btnActive : ''}`}
+          type="default"
+          className="editor-toolbar-btn"
+          style={getActiveStyle(editorState.isTaskList)}
           onClick={() => editor.chain().focus().toggleTaskList().run()}
         >
           ☑
@@ -143,7 +166,7 @@ export function TextEditor({
         <Button
           size="small"
           title="Mentions"
-          className={`${btn} ${comment ? 'block' : 'hidden!'}`}
+          className={`editor-toolbar-btn ${comment ? 'block' : 'hidden!'}`}
           onClick={() => editor.chain().focus().insertContent('@').run()}
         >
           @
@@ -152,7 +175,7 @@ export function TextEditor({
         <Button
           size="small"
           title="Emoji"
-          className={btn}
+          className="editor-toolbar-btn"
           onClick={() => editor.chain().focus().insertContent('😊').run()}
         >
           🙂
@@ -161,7 +184,7 @@ export function TextEditor({
         <Button
           size="small"
           title="3x3 Table"
-          className={btn}
+          className="editor-toolbar-btn"
           onClick={() =>
             editor.chain().focus().insertTable({ rows: 3, cols: 3 }).run()
           }
@@ -172,7 +195,9 @@ export function TextEditor({
         <Button
           size="small"
           title="Code"
-          className={`${btn} ${editor.isActive('codeBlock') ? btnActive : ''}`}
+          type="default"
+          className="editor-toolbar-btn"
+          style={getActiveStyle(editorState.isCodeBlock)}
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         >
           {'</>'}

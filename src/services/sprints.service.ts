@@ -4,7 +4,9 @@ import type {
   Sprint,
   CreateSprintPayload,
   UpdateSprintPayload,
+  SprintCompletionSummary,
 } from './types/sprints.types';
+import type { TaskPopulated } from './types/tasks.types';
 import { config } from '../config/config';
 import { attachInterceptor } from '../utils/attachInterceptor';
 
@@ -61,6 +63,24 @@ export const createSprintService = (projectId: string) => {
       const res = await api.patch<{ result: Sprint }>(
         `/${sprintId}/remove-task`,
         { task: taskId }
+      );
+      return res.data.result;
+    },
+
+    getTasksRemovedDuringSprint: async (
+      sprintId: string
+    ): Promise<TaskPopulated[]> => {
+      const res = await api.get<{ result: TaskPopulated[] }>(
+        `/${sprintId}/moved-to-backlog-tasks`
+      );
+      return res.data.result;
+    },
+
+    getSprintCompletionSummary: async (
+      sprintId: string
+    ): Promise<SprintCompletionSummary> => {
+      const res = await api.get<{ result: SprintCompletionSummary }>(
+        `/${sprintId}/completed-tasks`
       );
       return res.data.result;
     },
