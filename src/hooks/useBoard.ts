@@ -5,7 +5,6 @@ import type { TaskPopulated } from '../services/types/tasks.types';
 import type { Sprint } from '../services/types/sprints.types';
 import { createSprintService } from '../services/sprints.service';
 import { deleteProjectColumn } from '../services/projectService';
-import { message } from 'antd';
 
 export function useBoard(
   projectId?: string,
@@ -19,65 +18,33 @@ export function useBoard(
   const [error, setError] = useState<string | null>(null);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
 
-  const [newColumnName, setNewColumnName] = useState('');
-  const [isAddColumnOpen, setIsAddColumnOpen] = useState(false);
-  const [isSavingColumn, setIsSavingColumn] = useState(false);
-  const [insertAfterColumn, setInsertAfterColumn] = useState<string | null>(
-    null
-  );
-  const [isDeleteColumnOpen, setIsDeleteColumnOpen] = useState(false);
-  const [columnToDelete, setColumnToDelete] = useState<string | null>(null);
-
   const sprintService = createSprintService(projectId as string);
 
-  const openAddColumnModal = useCallback((columnId: string) => {
-    setNewColumnName('');
-    setInsertAfterColumn(columnId);
-    setIsAddColumnOpen(true);
-  }, []);
+  const handleAddColumn = useCallback(
+    async (columnName: string, insertAfter?: string | null) => {
+      const trimmed = columnName.trim();
+      if (!trimmed) {
+        throw new Error('Column name is required');
+      }
 
-  const openDeleteColumnModal = useCallback(
-    (columnId: string) => {
-      const tasksInColumn = tasks.filter((task) => task.status === columnId);
+      if (
+        columns.some(
+          (col) => col.toLowerCase().trim() === trimmed.toLowerCase().trim()
+        )
+      ) {
+        throw new Error('Column already exists');
+      }
 
-      if (tasksInColumn.length > 0) {
-        message.warning(
-          `Cannot delete. ${tasksInColumn.length} task(s) exist in this column.`
-        );
+      if (!projectId) {
         return;
       }
 
-      setColumnToDelete(columnId);
-      setIsDeleteColumnOpen(true);
-    },
-    [tasks]
-  );
-
-  const handleAddColumn = useCallback(async () => {
-    const trimmed = newColumnName.trim();
-    if (!trimmed) {
-      message.error('Column name is required.');
-      return;
-    }
-
-    if (
-      columns.some(
-        (col) => col.toLowerCase().trim() === trimmed.toLowerCase().trim()
-      )
-    ) {
-      message.error('Column already exists.');
-      return;
-    }
-
-    if (!projectId) return;
-
-    try {
-      setIsSavingColumn(true);
-      const insertIndex = insertAfterColumn
-        ? columns.findIndex((col) => col === insertAfterColumn)
+      const insertIndex = insertAfter
+        ? columns.findIndex((col) => col === insertAfter)
         : -1;
 
       const nextColumns = [...columns];
+
       if (insertIndex >= 0) {
         nextColumns.splice(insertIndex + 1, 0, trimmed);
       } else {
@@ -90,28 +57,20 @@ export function useBoard(
 
       const updatedColumns = updated.columns ?? nextColumns;
       setColumns(updatedColumns);
-      message.success('Column added.');
-      setIsAddColumnOpen(false);
-    } catch {
-      message.error('Failed to add column.');
-    } finally {
-      setIsSavingColumn(false);
-    }
-  }, [columns, insertAfterColumn, newColumnName, projectId]);
+
+      return updatedColumns;
+    },
+    [columns, projectId]
+  );
 
   const handleDeleteColumn = async (columnName: string) => {
-    if (!projectId) return;
-
-    try {
-      setLoading(true);
-      const res = await deleteProjectColumn(projectId, columnName);
-      setColumns(res.result.columns);
-      message.success(res.message);
-    } catch {
-      message.error('Failed to delete column');
-    } finally {
-      setLoading(false);
+    if (!projectId) {
+      return;
     }
+
+    const res = await deleteProjectColumn(projectId, columnName);
+    setColumns(res.result.columns);
+    return res;
   };
   useEffect(() => {
     if (!projectId) {
@@ -170,19 +129,6 @@ export function useBoard(
     setError,
     activeTaskId,
     setActiveTaskId,
-    newColumnName,
-    setNewColumnName,
-    isAddColumnOpen,
-    setIsAddColumnOpen,
-    isSavingColumn,
-    insertAfterColumn,
-    setInsertAfterColumn,
-    isDeleteColumnOpen,
-    setIsDeleteColumnOpen,
-    columnToDelete,
-    setColumnToDelete,
-    openAddColumnModal,
-    openDeleteColumnModal,
     handleAddColumn,
     handleDeleteColumn,
   };

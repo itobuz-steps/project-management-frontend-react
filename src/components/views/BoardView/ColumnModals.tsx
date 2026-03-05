@@ -70,8 +70,7 @@ export function DeleteColumnModal({
     >
       <p className="text-sm">
         Are you sure you want to delete the column "
-        <strong>{columnName}</strong>"? All tasks in this column will be moved
-        to the previous column or first column.
+        <strong>{columnName}</strong>"?
       </p>
     </Modal>
   );

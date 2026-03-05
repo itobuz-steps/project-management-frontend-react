@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   DndContext,
@@ -9,7 +9,7 @@ import {
   closestCorners,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { Skeleton } from 'antd';
+import { message, Skeleton } from 'antd';
 import { updateTask } from '../../../services/taskService';
 import type {
   TaskPopulated,
@@ -25,6 +25,15 @@ import { AddColumnModal, DeleteColumnModal } from './ColumnModals';
 
 function BoardView() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [newColumnName, setNewColumnName] = useState('');
+  const [isAddColumnOpen, setIsAddColumnOpen] = useState(false);
+  const [isSavingColumn, setIsSavingColumn] = useState(false);
+  const [insertAfterColumn, setInsertAfterColumn] = useState<string | null>(
+    null
+  );
+
+  const [isDeleteColumnOpen, setIsDeleteColumnOpen] = useState(false);
+  const [columnToDelete, setColumnToDelete] = useState<string | null>(null);
 
   const { projectId } = useParams();
   const { project } = useProject();
@@ -40,17 +49,6 @@ function BoardView() {
     error,
     activeTaskId,
     setActiveTaskId,
-    newColumnName,
-    setNewColumnName,
-    isAddColumnOpen,
-    setIsAddColumnOpen,
-    isSavingColumn,
-    isDeleteColumnOpen,
-    setIsDeleteColumnOpen,
-    columnToDelete,
-    setColumnToDelete,
-    openAddColumnModal,
-    openDeleteColumnModal,
     handleAddColumn,
     handleDeleteColumn,
     setError,
@@ -65,6 +63,55 @@ function BoardView() {
   const priorityFilter = normalize(searchParams.get('priority') || '');
   const assigneeFilter = normalize(searchParams.get('assignee') || '');
 
+  const openAddColumnModal = (columnId: string) => {
+    setNewColumnName('');
+    setInsertAfterColumn(columnId);
+    setIsAddColumnOpen(true);
+  };
+
+  const openDeleteColumnModal = (columnId: string) => {
+    const tasksInColumn = tasks.filter((task) => task.status === columnId);
+
+    if (tasksInColumn.length > 0) {
+      message.warning(
+        `Cannot delete. ${tasksInColumn.length} task(s) exist in this column.`
+      );
+      return;
+    }
+
+    setColumnToDelete(columnId);
+    setIsDeleteColumnOpen(true);
+  };
+
+  const confirmAddColumn = async () => {
+    try {
+      setIsSavingColumn(true);
+
+      await handleAddColumn(newColumnName, insertAfterColumn);
+
+      message.success('Column added');
+      setIsAddColumnOpen(false);
+    } catch {
+      message.error('Failed to add column');
+    } finally {
+      setIsSavingColumn(false);
+    }
+  };
+
+  const confirmDeleteColumn = async () => {
+    if (!columnToDelete) return;
+
+    try {
+      await handleDeleteColumn(columnToDelete);
+      message.success('Column deleted');
+    } catch {
+      message.error('Failed to delete column');
+    } finally {
+      setIsDeleteColumnOpen(false);
+      setColumnToDelete(null);
+    }
+  };
+
   const sprintTaskIds = useMemo(() => {
     if (!isScrum) {
       return null;
@@ -74,21 +121,28 @@ function BoardView() {
       (sprint) => sprint.dueDate && !sprint.isCompleted
     );
 
-    if (!activeSprint) return new Set<string>();
+    if (!activeSprint) {
+      return new Set<string>();
+    }
 
     return new Set(activeSprint.tasks);
   }, [isScrum, sprints]);
 
   const visibleTasks = useMemo(() => {
-    if (!isScrum) return tasks;
-    if (!sprintTaskIds || sprintTaskIds.size === 0) return [];
+    if (!isScrum) {
+      return tasks;
+    }
+    if (!sprintTaskIds || sprintTaskIds.size === 0) {
+      return [];
+    }
 
     return tasks.filter((task) => sprintTaskIds.has(task._id));
   }, [isScrum, sprintTaskIds, tasks]);
 
   const filteredVisibleTasks = useMemo(() => {
-    if (!statusFilter && !priorityFilter && !assigneeFilter)
+    if (!statusFilter && !priorityFilter && !assigneeFilter) {
       return visibleTasks;
+    }
 
     return visibleTasks.filter((task) => {
       if (statusFilter && normalize(task.status) !== statusFilter) {
@@ -189,8 +243,12 @@ function BoardView() {
       onDragEnd={({ active, over }) => {
         setActiveTaskId(null);
 
-        if (!over) return;
-        if (active.id === over.id) return;
+        if (!over) {
+          return;
+        }
+        if (active.id === over.id) {
+          return;
+        }
 
         const activeColumn = active.data.current?.column as string | undefined;
         const overColumn =
@@ -199,7 +257,9 @@ function BoardView() {
             ? over.id.replace('column:', '')
             : undefined);
 
-        if (!activeColumn || !overColumn) return;
+        if (!activeColumn || !overColumn) {
+          return;
+        }
 
         const isStatusChange = activeColumn !== overColumn;
         let previousTasks: TaskPopulated[] | null = null;
@@ -207,7 +267,9 @@ function BoardView() {
         setTasks((prev) => {
           previousTasks = prev;
           const activeIndex = prev.findIndex((task) => task._id === active.id);
-          if (activeIndex === -1) return prev;
+          if (activeIndex === -1) {
+            return prev;
+          }
 
           const updated = [...prev];
           updated[activeIndex] = {
@@ -217,7 +279,9 @@ function BoardView() {
 
           if (!isStatusChange) {
             const overIndex = updated.findIndex((task) => task._id === over.id);
-            if (overIndex === -1) return updated;
+            if (overIndex === -1) {
+              return updated;
+            }
             return arrayMove(updated, activeIndex, overIndex);
           }
 
@@ -228,7 +292,9 @@ function BoardView() {
           void updateTask(String(active.id), {
             status: overColumn as TaskStatus,
           }).catch(() => {
-            if (previousTasks) setTasks(previousTasks);
+            if (previousTasks) {
+              setTasks(previousTasks);
+            }
             setError('Failed to update task status.');
           });
         }
@@ -284,7 +350,7 @@ function BoardView() {
         value={newColumnName}
         onChange={(e) => setNewColumnName(e.target.value)}
         onCancel={() => setIsAddColumnOpen(false)}
-        onOk={handleAddColumn}
+        onOk={confirmAddColumn}
         confirmLoading={isSavingColumn}
       />
 
@@ -295,13 +361,7 @@ function BoardView() {
           setIsDeleteColumnOpen(false);
           setColumnToDelete(null);
         }}
-        onOk={async () => {
-          if (columnToDelete) {
-            await handleDeleteColumn(columnToDelete);
-          }
-          setIsDeleteColumnOpen(false);
-          setColumnToDelete(null);
-        }}
+        onOk={confirmDeleteColumn}
       />
     </DndContext>
   );
