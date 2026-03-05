@@ -23,13 +23,11 @@ export function mapObjectToFormData(obj: Record<string, unknown>): FormData {
     }
 
     if (obj[key] !== undefined) {
-
       if (obj[key] === null) {
         formData.append(key, 'null');
       } else {
         formData.append(key, obj[key] as string | File);
       }
-      
     }
   }
   return formData;

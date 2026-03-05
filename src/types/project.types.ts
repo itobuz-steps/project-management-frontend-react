@@ -33,6 +33,7 @@ export interface Project {
   columns: string[];
   members: ProjectMember[];
   memberLead: string; // user ID
+  defaultAssignee?: string;
   prefix: string;
   lastKey: number;
   sprintCount: number;
