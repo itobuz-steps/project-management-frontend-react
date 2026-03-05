@@ -72,7 +72,7 @@ function BoardView() {
   const openDeleteColumnModal = (columnId: string) => {
     const tasksInColumn = tasks.filter((task) => task.status === columnId);
 
-    if (tasksInColumn.length > 0) {
+    if (tasksInColumn.length) {
       message.warning(
         `Cannot delete. ${tasksInColumn.length} task(s) exist in this column.`
       );
@@ -171,7 +171,7 @@ function BoardView() {
     filteredVisibleTasks.forEach((task) => {
       if (map[task.status]) {
         map[task.status].push(task);
-      } else if (columns.length > 0) {
+      } else if (columns.length) {
         // fallback to first column
         map[columns[0]].push(task);
       }
