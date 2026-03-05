@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { getTasks } from '../../../services/taskService';
-import type { TaskPopulated } from '../../../services/types/tasks.types';
+import type {
+  PaginationMeta,
+  TaskPopulated,
+} from '../../../services/types/tasks.types';
 import { useProject } from '../../../context/ProjectContext';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
 import TaskTable from '../../backlog/TaskTableNew';
@@ -16,36 +19,29 @@ function ListView() {
   const [tasks, setTasks] = useState<TaskPopulated[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [pagination, setPagination] = useState<PaginationMeta>({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
 
-  const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
-  const statusFilter = normalize(searchParams.get('status') || '');
-  const priorityFilter = normalize(searchParams.get('priority') || '');
-  const assigneeFilter = normalize(searchParams.get('assignee') || '');
+  const searchInput = searchParams.get('searchInput') || '';
 
-  const visibleTasks = useMemo(() => {
-    if (!statusFilter && !priorityFilter && !assigneeFilter) return tasks;
-    return tasks.filter((task) => {
-      if (statusFilter && normalize(task.status) !== statusFilter) {
-        return false;
-      }
-      if (priorityFilter && normalize(task.priority) !== priorityFilter) {
-        return false;
-      }
-      if (
-        assigneeFilter &&
-        normalize(task.assignee?._id || '') !== assigneeFilter
-      ) {
-        return false;
-      }
-      return true;
-    });
-  }, [priorityFilter, statusFilter, assigneeFilter, tasks]);
+  useEffect(() => {
+    setPage(1);
+  }, [searchInput, projectId]);
 
   useEffect(() => {
     if (!projectId) {
       setTasks([]);
       setError(null);
       setLoading(false);
+      setPagination((prev) => ({ ...prev, total: 0, totalPages: 0 }));
       return;
     }
 
@@ -55,9 +51,13 @@ function ListView() {
         setError(null);
         const result = await getTasks({
           projectId,
-          searchInput: searchParams.get('searchInput') || '',
+          searchInput,
+
+          page,
+          limit: pageSize,
         });
-        setTasks(result);
+        setTasks(result.data);
+        setPagination(result.pagination);
       } catch {
         setError('Failed to load tasks.');
       } finally {
@@ -66,12 +66,22 @@ function ListView() {
     };
 
     load();
-  }, [projectId, searchParams]);
+  }, [projectId, searchInput, page, pageSize]);
 
   const handleTaskUpdated = (updated: TaskPopulated) => {
     setTasks((prev) =>
       prev.map((task) => (task._id === updated._id ? updated : task))
     );
+  };
+
+  const handlePaginationChange = (nextPage: number, nextPageSize: number) => {
+    if (nextPageSize !== pageSize) {
+      setPage(1);
+      setPageSize(nextPageSize);
+      return;
+    }
+
+    setPage(nextPage);
   };
 
   if (!projectId) {
@@ -90,11 +100,13 @@ function ListView() {
   return (
     <div className="no-scrollbar relative mt-2 w-full overflow-x-auto rounded-md border border-gray-200">
       <TaskTable
-        tasks={visibleTasks}
+        tasks={tasks}
         statusColumns={columns}
         members={members}
         loadingMembers={loadingMembers}
         onTaskUpdated={handleTaskUpdated}
+        pagination={pagination}
+        onPaginationChange={handlePaginationChange}
         loading={loading}
         error={error}
       />

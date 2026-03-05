@@ -2,7 +2,11 @@ import { useCallback, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ConfigProvider, message, Table } from 'antd';
 import type { TableColumnsType } from 'antd';
-import type { TaskPopulated, User } from '../../services/types/tasks.types';
+import type {
+  PaginationMeta,
+  TaskPopulated,
+  User,
+} from '../../services/types/tasks.types';
 import { taskTableColumns, THEME_COLORS } from '../../config/constants';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import dayjs from 'dayjs';
@@ -22,6 +26,8 @@ type TaskTableProps = {
   members: User[];
   loadingMembers: boolean;
   onTaskUpdated: (updated: TaskPopulated) => void;
+  pagination?: PaginationMeta;
+  onPaginationChange?: (page: number, pageSize: number) => void;
   loading?: boolean;
   error?: string | null;
 };
@@ -85,6 +91,8 @@ export function TaskTable({
   members,
   loadingMembers,
   onTaskUpdated,
+  pagination,
+  onPaginationChange,
   loading = false,
   error = null,
 }: TaskTableProps) {
@@ -342,8 +350,6 @@ export function TaskTable({
     updateTaskField,
   ]);
 
-  console.log(THEME_COLORS[theme][4], oklchToHex(THEME_COLORS[theme][4]));
-
   return (
     <ConfigProvider
       theme={{
@@ -362,7 +368,15 @@ export function TaskTable({
         loading={loading}
         showSorterTooltip={{ target: 'sorter-icon' }}
         size="small"
-        pagination={{ placement: ['bottomCenter'], pageSize: 10 }}
+        pagination={{
+          placement: ['bottomCenter'],
+          current: pagination?.page,
+          pageSize: pagination?.limit,
+          total: pagination?.total,
+          showSizeChanger: true,
+          pageSizeOptions: ['10', '20', '50', '100'],
+          onChange: onPaginationChange,
+        }}
         rowClassName={(record) =>
           `whitespace-nowrap text-sm hover:bg-gray-50 ${getPriorityBorder(record.priority)}`
         }
