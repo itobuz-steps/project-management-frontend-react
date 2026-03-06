@@ -21,8 +21,8 @@ attachInterceptor(api);
 export const createProject = async (
   payload: CreateProjectPayload
 ): Promise<Project> => {
-  const res = await api.post<Project>('', payload);
-  return res.data;
+  const res = await api.post<{ result: Project }>('', payload);
+  return res.data.result;
 };
 
 export const getProjectById = async (projectId: string): Promise<Project> => {

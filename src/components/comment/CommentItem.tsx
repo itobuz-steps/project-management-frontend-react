@@ -157,7 +157,7 @@ export function CommentItem({
 
             {/* Body */}
             {!editor.isEditing ? (
-              <div onClick={() => editor.setIsEditing(true)}>
+              <div className="prose" onClick={() => editor.setIsEditing(true)}>
                 <ReactMarkdown
                   rehypePlugins={[rehypeRaw]}
                   components={markdownComponents}
