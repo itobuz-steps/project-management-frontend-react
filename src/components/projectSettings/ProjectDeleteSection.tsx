@@ -24,8 +24,8 @@ function ProjectDeleteSection({ projectId }: ProjectSettingsDeleteProps) {
   return (
     <Card
       style={{
-        marginTop: 32,
-        borderRadius: 16,
+        marginTop: 10,
+        borderRadius: 10,
         border: '1px solid #ffccc7',
       }}
     >

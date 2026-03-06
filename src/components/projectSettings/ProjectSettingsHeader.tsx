@@ -1,47 +1,60 @@
-import { Avatar, Row, Col, Tag, Typography } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { Avatar, Upload, Button, Tag } from 'antd';
+import { UserOutlined, UploadOutlined, CloseOutlined } from '@ant-design/icons';
 import type { ProjectSettingsHeaderProps } from './projectSettings.type';
 
-const { Title, Text } = Typography;
-
-function ProjectSettingsHeader({ project }: ProjectSettingsHeaderProps) {
-  const [iconPreview] = useState<string | null>(project.icon ?? null);
-
+function ProjectSettingsHeader({
+  project,
+  iconFile,
+  iconPreview,
+  setIconFile,
+  setIconPreview,
+}: ProjectSettingsHeaderProps) {
   return (
     <div
       style={{
         background: 'var(--color-primary-100)',
         borderRadius: 16,
-        padding: 24,
-        marginBottom: 4,
+        padding: 32,
+        marginBottom: -20,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 16,
       }}
     >
-      <Row align="middle" gutter={20}>
-        <Col>
-          <Avatar
-            size={80}
-            src={iconPreview ?? undefined}
-            icon={!iconPreview && <UserOutlined />}
-          >
-            {!iconPreview && project.name?.[0]}
-          </Avatar>
-        </Col>
+      <Avatar
+        size={96}
+        src={iconPreview ?? undefined}
+        icon={!iconPreview && <UserOutlined />}
+      >
+        {!iconPreview && project.name?.[0]}
+      </Avatar>
 
-        <Col>
-          <Title level={3} style={{ margin: 0 }}>
-            {project.name}
-          </Title>
+      <Upload
+        beforeUpload={(file) => {
+          setIconFile(file);
+          setIconPreview(URL.createObjectURL(file));
+          return false;
+        }}
+        showUploadList={false}
+      >
+        <Button icon={<UploadOutlined />}>Change Icon</Button>
+      </Upload>
 
-          <Text>Project Key: {project.prefix}</Text>
+      {iconFile && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Tag color="blue">{iconFile.name}</Tag>
 
-          <br />
-
-          <Tag color="gold" style={{ marginTop: 8 }}>
-            {project.projectType?.toUpperCase()}
-          </Tag>
-        </Col>
-      </Row>
+          <Button
+            type="text"
+            icon={<CloseOutlined />}
+            onClick={() => {
+              setIconFile(null);
+              setIconPreview(project.icon ?? null);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

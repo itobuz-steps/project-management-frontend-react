@@ -1,82 +1,58 @@
-import {
-  Card,
-  Form,
-  Input,
-  Select,
-  Button,
-  Upload,
-  Tag,
-  Row,
-  Col,
-  message,
-} from 'antd';
-import { UploadOutlined, CloseOutlined } from '@ant-design/icons';
-import { useState, useEffect } from 'react';
-import { updateProject } from '../../services/projectService';
-import type { Project } from '../../types/project.types';
+import { Card, Form, Input, Select, Button, Row, Col, Tag } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
+import { useEffect } from 'react';
 import { UserCell } from '../../components/ui/UserCell';
-import type { ProjectSettingsFormProps } from './projectSettings.type';
+import { useProjectSettingsForm } from '../../hooks/useProjectSettingsForm';
+import type {
+  ProjectSettingsFormProps,
+  ProjectSettingsFormValues,
+} from './projectSettings.type';
 
 function ProjectSettingsForm({
   project,
   members,
   setProject,
+  iconFile,
+  setIconFile,
+  setIconPreview,
 }: ProjectSettingsFormProps) {
-  const [form] = Form.useForm<Project>();
-  const [loading, setLoading] = useState(false);
-  const [iconFile, setIconFile] = useState<File | null>(null);
-  const [, setIconPreview] = useState<string | null>(null);
+  const [form] = Form.useForm<ProjectSettingsFormValues>();
+
+  const {
+    loading,
+    visibleMembers,
+    selectedUser,
+    selectedRole,
+    setSelectedUser,
+    setSelectedRole,
+    handleSubmit,
+    addMemberRole,
+    removeMember,
+    projectMembers,
+  } = useProjectSettingsForm({
+    project,
+    members,
+    setProject,
+    iconFile,
+    setIconFile,
+    setIconPreview,
+  });
 
   useEffect(() => {
     form.setFieldsValue({
       name: project.name,
       prefix: project.prefix,
       projectType: project.projectType,
-      defaultAssignee: project.defaultAssignee ?? '',
+      defaultAssignee: project.defaultAssignee ?? null,
     });
-
-    setIconPreview(project.icon ?? null);
   }, [project, form]);
-
-  const handleSubmit = async (values: Project) => {
-    try {
-      setLoading(true);
-
-      const formData = new FormData();
-
-      formData.append('name', values.name);
-      formData.append('prefix', values.prefix);
-      formData.append('projectType', values.projectType);
-
-      if (values.defaultAssignee) {
-        formData.append('defaultAssignee', values.defaultAssignee);
-      }
-
-      if (iconFile) {
-        formData.append('icon', iconFile);
-      }
-
-      const updated = await updateProject(project._id, formData);
-
-      setProject(updated);
-
-      setIconFile(null);
-      setIconPreview(updated.icon ?? null);
-
-      message.success('✨ Project updated successfully');
-    } catch {
-      message.error('Update failed');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const spaceOwner = members.find(
     (member) => member._id === project.memberLead
   );
 
   return (
-    <Card style={{ borderRadius: 16 }}>
+    <Card style={{ borderRadius: 10 }}>
       <Form layout="vertical" form={form} onFinish={handleSubmit}>
         <Row gutter={24}>
           <Col xs={24} md={12}>
@@ -100,7 +76,7 @@ function ProjectSettingsForm({
 
             <Form.Item label="Space Owner">
               <div className="flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-1">
-                <UserCell user={spaceOwner} emptyText="Unknown" />{' '}
+                <UserCell user={spaceOwner} emptyText="Unknown" />
               </div>
             </Form.Item>
           </Col>
@@ -128,69 +104,89 @@ function ProjectSettingsForm({
               />
             </Form.Item>
 
-            <Form.Item label="Project Icon">
-              <Upload
-                beforeUpload={(file) => {
-                  setIconFile(file);
-                  setIconPreview(URL.createObjectURL(file));
-                  return false;
-                }}
-                showUploadList={false}
-              >
-                <Button icon={<UploadOutlined />}>Change Icon</Button>
-              </Upload>
+            <Form.Item label="Project Members">
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-2">
+                  <Select
+                    placeholder="Select Member"
+                    style={{ maxWidth: 200 }}
+                    value={selectedUser}
+                    onChange={(userId) => {
+                      setSelectedUser(userId);
 
-              {iconFile && (
-                <div
-                  style={{
-                    marginTop: 10,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    flexWrap: 'wrap',
-                    maxWidth: '100%',
-                  }}
-                >
-                  <Tag
-                    color="blue"
-                    style={{
-                      maxWidth: '85%',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
+                      const existing = projectMembers.find(
+                        (member) => member.user === userId
+                      );
+
+                      setSelectedRole(existing ? existing.role : 'member');
                     }}
-                  >
-                    {iconFile.name}
-                  </Tag>
+                    options={members.map((member) => ({
+                      value: member._id,
+                      label: <UserCell user={member} emptyText="Unknown" />,
+                    }))}
+                  />
+
+                  <Select
+                    style={{ maxWidth: 100 }}
+                    value={selectedRole}
+                    onChange={setSelectedRole}
+                    options={[
+                      { label: 'Admin', value: 'admin' },
+                      { label: 'Member', value: 'member' },
+                    ]}
+                  />
 
                   <Button
-                    type="text"
-                    icon={<CloseOutlined />}
-                    onClick={() => {
-                      setIconFile(null);
-                      setIconPreview(project.icon ?? null);
-                    }}
-                  />
+                    style={{ background: 'var(--color-primary-500)' }}
+                    type="primary"
+                    onClick={addMemberRole}
+                  >
+                    +
+                  </Button>
                 </div>
-              )}
+
+                {visibleMembers.map((member) => {
+                  const user = members.find((user) => user._id === member.user);
+
+                  return (
+                    <div
+                      key={member.user}
+                      className="flex items-center justify-between rounded-lg border px-3 py-1"
+                    >
+                      <UserCell user={user} emptyText="Unknown" />
+
+                      <div className="flex items-center gap-3">
+                        {' '}
+                        <Tag color="yellow">{member.role}</Tag>{' '}
+                        <Button
+                          type="text"
+                          danger
+                          icon={<CloseOutlined />}
+                          onClick={() => removeMember(member.user)}
+                        />{' '}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </Form.Item>
           </Col>
         </Row>
 
-        <Form.Item>
-          <Button
-            htmlType="submit"
-            loading={loading}
-            size="large"
-            style={{
-              borderRadius: 8,
-              background: 'var(--color-primary-500)',
-              borderColor: 'var(--color-primary-500)',
-              color: '#fff',
-            }}
-          >
-            Save Changes
-          </Button>
+        <Form.Item style={{ marginBottom: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              htmlType="submit"
+              loading={loading}
+              style={{
+                background: 'var(--color-primary-500)',
+                borderColor: 'var(--color-primary-500)',
+                color: '#fff',
+              }}
+            >
+              Update Project Details
+            </Button>
+          </div>
         </Form.Item>
       </Form>
     </Card>
