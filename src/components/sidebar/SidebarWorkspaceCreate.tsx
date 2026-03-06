@@ -3,6 +3,7 @@ import { Plus, SendHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { createWorkspace } from '../../services/workspaceService';
+import { message } from 'antd';
 
 type SidebarWorkspaceCreateProps = {
   visible: boolean;
@@ -31,12 +32,12 @@ export default function SidebarWorkspaceCreate({
     } catch (error) {
       console.error('Failed to create workspace:', error);
       if (error instanceof AxiosError) {
-        toast.error(
+        message.error(
           'Workspace creation failed: ' +
             (error.response?.data?.message || error.message)
         );
       } else {
-        toast.error('Workspace creation failed. Please try again.');
+        message.error('Workspace creation failed. Please try again.');
       }
     } finally {
       setIsCreatingWorkspace(false);
