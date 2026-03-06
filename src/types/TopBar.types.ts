@@ -3,7 +3,8 @@ export type ViewMode =
   | 'board'
   | 'list'
   | 'for-you'
-  | 'sprints-overview';
+  | 'sprints-overview'
+  | 'timeline';
 
 export interface ActiveUser {
   id: string;
