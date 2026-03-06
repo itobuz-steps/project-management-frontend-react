@@ -4,6 +4,7 @@ import type { Role } from '../services/types/user';
 export type Permission =
   | 'ADD_COLUMN'
   | 'SEND_INVITE'
+  | 'DELETE_COLUMN'
   | 'CREATE_PROJECT'
   | 'CREATE_WORKSPACE';
 
@@ -12,6 +13,7 @@ const rolePermissions: Record<Role, Permission[]> = {
   admin: ['ADD_COLUMN', 'SEND_INVITE'],
   superadmin: [
     'ADD_COLUMN',
+    'DELETE_COLUMN',
     'SEND_INVITE',
     'CREATE_PROJECT',
     'CREATE_WORKSPACE',
