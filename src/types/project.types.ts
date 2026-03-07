@@ -28,6 +28,7 @@ export type ProjectType = 'kanban' | 'scrum'; // extend if needed
 export interface Project {
   _id: string;
   icon?: string;
+  workspaceId: string;
   name: string;
   projectType: ProjectType;
   columns: string[];
@@ -45,6 +46,7 @@ export interface Project {
 }
 
 export interface CreateProjectPayload {
+  workspaceId: string;
   name: string;
   projectType: ProjectType;
   prefix?: string;
@@ -54,6 +56,7 @@ export interface CreateProjectPayload {
 }
 
 export interface UpdateProjectPayload {
+  workspaceId?: string;
   name?: string;
   prefix?: string;
   projectType?: ProjectType;

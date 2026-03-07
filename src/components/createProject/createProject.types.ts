@@ -13,9 +13,15 @@ export interface TemplateCategory {
 }
 
 export interface CreateProjectFormValues {
+  workspaceId: string;
   name: string;
   projectType: ProjectType;
   columns: string[];
+}
+
+export interface WorkspaceSelectOption {
+  label: string;
+  value: string;
 }
 
 export interface CreateProjectModalProps {
@@ -29,6 +35,7 @@ export interface ProjectFormProps {
   loading: boolean;
   columns: string[];
   onColumnsChange: (columns: string[]) => void;
+  workspaceOptions: WorkspaceSelectOption[];
 }
 
 export interface TemplateSelectorProps {

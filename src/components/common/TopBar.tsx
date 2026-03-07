@@ -17,12 +17,6 @@ import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { UserCell } from '../ui/UserCell';
 import { Select, Tag } from 'antd';
 
-const views: { label: string; value: ViewMode }[] = [
-  { label: 'Backlog', value: 'backlog' },
-  { label: 'Board', value: 'board' },
-  { label: 'List', value: 'list' },
-];
-
 function TopBar({
   onAddTask,
   onOpenFilters,
@@ -33,19 +27,37 @@ function TopBar({
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { project } = useProject(); // Ensure `project` is defined
+  const { project } = useProject();
   const { columns, members, loadingMembers } = useProjectMetaData(project?._id);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<
     'status' | 'priority' | 'assignee' | null
   >(null);
 
+  const type = project?.projectType;
+  const isScrum = type === 'scrum';
+
+  const views: { label: string; value: ViewMode }[] = useMemo(() => {
+    const base: { label: string; value: ViewMode }[] = [
+      { label: 'Backlog', value: 'backlog' },
+      { label: 'Board', value: 'board' },
+      { label: 'List', value: 'list' },
+    ];
+
+    if (isScrum) {
+      base.push({ label: 'Sprints', value: 'sprints-overview' });
+    }
+
+    return base;
+  }, [isScrum]);
+
   const isFilterableView = useMemo(() => {
     const path = location.pathname;
     return (
       path.endsWith('/backlog') ||
       path.endsWith('/board') ||
-      path.endsWith('/list')
+      path.endsWith('/list') ||
+      path.endsWith('/sprints-overview')
     );
   }, [location.pathname]);
 

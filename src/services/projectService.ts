@@ -17,8 +17,8 @@ attachInterceptor(api);
 export const createProject = async (
   payload: CreateProjectPayload
 ): Promise<Project> => {
-  const res = await api.post<Project>('', payload);
-  return res.data;
+  const res = await api.post<{ result: Project }>('', payload);
+  return res.data.result;
 };
 
 export const getProjectById = async (projectId: string): Promise<Project> => {
@@ -58,4 +58,15 @@ export const getUsersByProjectId = async (
 ): Promise<User[]> => {
   const res = await api.get<User[]>(`/${projectId}/get-user`);
   return res.data;
+};
+
+export const deleteProjectColumn = async (
+  projectId: string,
+  columnName: string
+) => {
+  const response = await api.delete(
+    `/${projectId}/columns/${encodeURIComponent(columnName)}`
+  );
+
+  return response.data;
 };
