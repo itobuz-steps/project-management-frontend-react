@@ -40,7 +40,7 @@ export const THEME_COLORS: Record<string, string[]> = {
     'oklch(0.381 0.176 304.987)',
     'oklch(0.291 0.149 302.717)',
   ],
-  custom_1: [
+  brown: [
     '#fbf5f5',
     '#f8ebec',
     '#f0dbdd',
@@ -53,7 +53,7 @@ export const THEME_COLORS: Record<string, string[]> = {
     '#683344',
     '#381922',
   ],
-  custom_2: [
+  black: [
     '#f6f6f6',
     '#e7e7e7',
     '#d1d1d1',
@@ -66,7 +66,7 @@ export const THEME_COLORS: Record<string, string[]> = {
     '#000000',
     '#000000',
   ],
-  custom_3: [
+  green: [
     '#edfcf2',
     '#d4f7de',
     '#adedc3',

@@ -1,4 +1,15 @@
+import type { User } from '../services/types/tasks.types';
 export type ProjectMemberRole = 'admin' | 'member';
+
+export interface ProjectResponse {
+  result: Project;
+  success: boolean;
+}
+
+export interface MemberResponse {
+  result: User[];
+  success: boolean;
+}
 
 export interface ProjectMember {
   _id: string;
@@ -6,16 +17,24 @@ export interface ProjectMember {
   role: ProjectMemberRole;
 }
 
+export interface PopulatedProjectMember {
+  _id: string;
+  user: User;
+  role: ProjectMemberRole;
+}
+
 export type ProjectType = 'kanban' | 'scrum'; // extend if needed
 
 export interface Project {
   _id: string;
+  icon?: string;
   workspaceId: string;
   name: string;
   projectType: ProjectType;
   columns: string[];
   members: ProjectMember[];
   memberLead: string; // user ID
+  defaultAssignee?: string;
   prefix: string;
   lastKey: number;
   sprintCount: number;
@@ -23,19 +42,25 @@ export interface Project {
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
   __v: number;
+  theme: string;
 }
 
 export interface CreateProjectPayload {
   workspaceId: string;
   name: string;
   projectType: ProjectType;
-  columns: string[];
-  tasks: string | string[];
+  prefix?: string;
+  columns?: string[];
+  defaultAssignee?: string;
+  icon?: File;
 }
 
 export interface UpdateProjectPayload {
   workspaceId?: string;
   name?: string;
+  prefix?: string;
   projectType?: ProjectType;
   columns?: string[];
+  defaultAssignee?: string;
+  icon?: File;
 }
