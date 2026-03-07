@@ -1,38 +1,34 @@
 import { useTheme } from '../../hooks/useTheme';
 import { THEME_COLORS } from '../../config/constants';
+import type {
+  ThemeCircleProps,
+  ThemePickerProps,
+} from '../projectSettings/projectSettings.type';
 
-export function ThemePicker() {
-  const [currentTheme, setCurrentTheme] = useTheme();
+export function ThemePicker({ value, onChange }: ThemePickerProps) {
+  const [, setTheme] = useTheme();
+
+  const handleSelect = (theme: string) => {
+    onChange?.(theme);
+    setTheme(theme);
+  };
+
   return (
-    <div className="flex flex-col gap-2">
-      <p className="font-semibold">Select a theme:</p>
-
-      <div className="theme-picker flex w-full justify-between gap-0.5">
-        {Object.entries(THEME_COLORS).map(([theme, values]) => (
-          <ThemeCircle
-            key={theme}
-            theme={theme}
-            value={values[5]}
-            selected={currentTheme === theme}
-            onSelect={() => setCurrentTheme(theme)}
-          />
-        ))}
-      </div>
+    <div className="flex gap-2">
+      {Object.entries(THEME_COLORS).map(([theme, values]) => (
+        <ThemeCircle
+          key={theme}
+          theme={theme}
+          value={values[5]}
+          selected={value === theme}
+          onSelect={handleSelect}
+        />
+      ))}
     </div>
   );
 }
 
-function ThemeCircle({
-  theme,
-  onSelect,
-  value,
-  selected,
-}: {
-  theme: string;
-  onSelect: (theme: string) => void;
-  value: string;
-  selected: boolean;
-}) {
+function ThemeCircle({ theme, onSelect, value, selected }: ThemeCircleProps) {
   console.log({ theme, value, selected });
   return (
     <div

@@ -1,4 +1,5 @@
 import type { Project } from '../../types/project.types';
+import type { Role } from './user';
 
 export type TaskType = 'bug' | 'story' | 'task';
 export type TaskStatus = 'todo' | 'in-progress' | 'done';
@@ -44,6 +45,7 @@ export type User = {
   email: string;
   profileImage?: string;
   notificationPreferences: NotificationPreferences;
+  role: Role;
 };
 
 export type TaskAttachment = File | string;

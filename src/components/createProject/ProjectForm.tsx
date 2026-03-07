@@ -16,6 +16,7 @@ export function ProjectForm({
   loading,
   columns,
   onColumnsChange,
+  workspaceOptions,
 }: ProjectFormProps) {
   const {
     control,
@@ -23,6 +24,7 @@ export function ProjectForm({
     formState: { errors },
   } = useForm<CreateProjectFormValues>({
     defaultValues: {
+      workspaceId: '',
       name: '',
       projectType: 'kanban',
       columns: [],
@@ -42,6 +44,30 @@ export function ProjectForm({
       className="flex h-full flex-col"
     >
       <div className="flex-1 space-y-3">
+        {/* Workspace Field */}
+        <div className="flex flex-col gap-1">
+          <label className="text-primary-500 font-semibold">Workspace</label>
+          <Controller
+            name="workspaceId"
+            control={control}
+            rules={{ required: 'Please select a workspace.' }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={workspaceOptions}
+                size="large"
+                placeholder="Select workspace"
+                status={errors.workspaceId ? 'error' : undefined}
+              />
+            )}
+          />
+          {errors.workspaceId && (
+            <span className="text-xs text-red-500">
+              {errors.workspaceId.message}
+            </span>
+          )}
+        </div>
+
         {/* Name Field */}
         <div className="flex flex-col gap-1">
           <label className="text-primary-500 font-semibold">Name</label>

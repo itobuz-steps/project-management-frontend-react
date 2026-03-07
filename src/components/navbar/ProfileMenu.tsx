@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ThemePicker } from './ThemePicker';
 import { config } from '../../config/config';
 import userService from '../../services/userService';
 
@@ -66,8 +65,6 @@ export default function ProfileMenu() {
           >
             Edit Profile
           </Link>
-
-          <ThemePicker />
         </div>
       )}
     </div>

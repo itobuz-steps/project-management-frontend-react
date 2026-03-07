@@ -1,13 +1,15 @@
 import { Modal, message } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ProjectForm } from './ProjectForm';
 import { TemplateSelector } from './TemplateSelector';
 import { createProject } from '../../services/projectService';
+import { getWorkspaces } from '../../services/workspaceService';
 import type {
   CreateProjectModalProps,
   CreateProjectFormValues,
   Template,
+  WorkspaceSelectOption,
 } from './createProject.types';
 
 export function CreateProjectModal({
@@ -17,8 +19,39 @@ export function CreateProjectModal({
 }: CreateProjectModalProps) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [loadingWorkspaces, setLoadingWorkspaces] = useState(false);
+  const [workspaceOptions, setWorkspaceOptions] = useState<
+    WorkspaceSelectOption[]
+  >([]);
   const [columns, setColumns] = useState<string[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>();
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    async function loadWorkspaces() {
+      try {
+        setLoadingWorkspaces(true);
+        const res = await getWorkspaces();
+        setWorkspaceOptions(
+          (res.result ?? []).map((workspace) => ({
+            label: workspace.workspaceName,
+            value: workspace.workspaceId,
+          }))
+        );
+      } catch (error) {
+        console.error('Failed to load workspaces:', error);
+        message.error('Failed to load workspaces. Please try again.');
+        setWorkspaceOptions([]);
+      } finally {
+        setLoadingWorkspaces(false);
+      }
+    }
+
+    loadWorkspaces();
+  }, [open]);
 
   const handleSelectTemplate = (template: Template) => {
     setSelectedTemplateId(template.id);
@@ -33,11 +66,12 @@ export function CreateProjectModal({
 
     try {
       setLoading(true);
+
       const project = await createProject({
+        workspaceId: values.workspaceId,
         name: values.name,
         projectType: values.projectType,
         columns,
-        tasks: [],
       });
 
       message.success('Project created successfully!');
@@ -79,9 +113,10 @@ export function CreateProjectModal({
         <div className="flex flex-col">
           <ProjectForm
             onSubmit={handleSubmit}
-            loading={loading}
+            loading={loading || loadingWorkspaces}
             columns={columns}
             onColumnsChange={setColumns}
+            workspaceOptions={workspaceOptions}
           />
         </div>
 
