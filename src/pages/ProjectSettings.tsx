@@ -13,6 +13,7 @@ function ProjectSettings() {
   const [iconPreview, setIconPreview] = useState<string | null>(
     project?.icon ?? null
   );
+  const [theme, setTheme] = useState<string>(project?.theme ?? 'indigo');
 
   if (!project) {
     return null;
@@ -26,6 +27,8 @@ function ProjectSettings() {
         iconPreview={iconPreview ?? project.icon ?? null}
         setIconFile={setIconFile}
         setIconPreview={setIconPreview}
+        theme={theme}
+        setTheme={setTheme}
       />
 
       <ProjectSettingsForm
@@ -35,6 +38,7 @@ function ProjectSettings() {
         iconFile={iconFile}
         setIconFile={setIconFile}
         setIconPreview={setIconPreview}
+        theme={theme}
       />
 
       <ProjectDeleteSection projectId={project._id} />

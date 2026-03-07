@@ -9,6 +9,7 @@ export type ProjectSettingsFormProps = {
   iconFile: File | null;
   setIconFile: (file: File | null) => void;
   setIconPreview: (url: string | null) => void;
+  theme: string;
 };
 
 export type ProjectSettingsDeleteProps = {
@@ -23,6 +24,9 @@ export type ProjectSettingsHeaderProps = {
 
   setIconFile: (file: File | null) => void;
   setIconPreview: (url: string | null) => void;
+
+  theme: string;
+  setTheme: (theme: string) => void;
 };
 
 export type ProjectSettingsFormValues = {
@@ -31,6 +35,7 @@ export type ProjectSettingsFormValues = {
   projectType: string;
   defaultAssignee?: string | null;
   memberLead: string;
+  theme: string;
 };
 
 export type EditableProjectMember = {

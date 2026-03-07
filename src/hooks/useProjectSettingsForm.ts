@@ -14,6 +14,7 @@ export function useProjectSettingsForm({
   iconFile,
   setIconFile,
   setIconPreview,
+  theme,
 }: ProjectSettingsFormProps) {
   const [loading, setLoading] = useState(false);
 
@@ -61,6 +62,8 @@ export function useProjectSettingsForm({
       if (iconFile) {
         formData.append('icon', iconFile);
       }
+
+      formData.append('theme', theme);
 
       const updated = await updateProject(project._id, formData);
 

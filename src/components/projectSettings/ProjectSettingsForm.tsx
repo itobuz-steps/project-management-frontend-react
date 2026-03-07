@@ -15,6 +15,7 @@ function ProjectSettingsForm({
   iconFile,
   setIconFile,
   setIconPreview,
+  theme,
 }: ProjectSettingsFormProps) {
   const [form] = Form.useForm<ProjectSettingsFormValues>();
 
@@ -36,6 +37,7 @@ function ProjectSettingsForm({
     iconFile,
     setIconFile,
     setIconPreview,
+    theme,
   });
 
   useEffect(() => {

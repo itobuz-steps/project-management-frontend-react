@@ -1,23 +1,31 @@
 import { useTheme } from '../../hooks/useTheme';
 import { THEME_COLORS } from '../../config/constants';
 
-export function ThemePicker() {
-  const [currentTheme, setCurrentTheme] = useTheme();
-  return (
-    <div className="flex flex-col gap-2">
-      <p className="font-semibold">Select a theme:</p>
+export function ThemePicker({
+  value,
+  onChange,
+}: {
+  value?: string;
+  onChange?: (theme: string) => void;
+}) {
+  const [, setTheme] = useTheme(); // we only need setTheme
 
-      <div className="theme-picker flex w-full justify-between gap-0.5">
-        {Object.entries(THEME_COLORS).map(([theme, values]) => (
-          <ThemeCircle
-            key={theme}
-            theme={theme}
-            value={values[5]}
-            selected={currentTheme === theme}
-            onSelect={() => setCurrentTheme(theme)}
-          />
-        ))}
-      </div>
+  const handleSelect = (theme: string) => {
+    onChange?.(theme); // update form
+    setTheme(theme); // update UI theme
+  };
+
+  return (
+    <div className="flex gap-2">
+      {Object.entries(THEME_COLORS).map(([theme, values]) => (
+        <ThemeCircle
+          key={theme}
+          theme={theme}
+          value={values[5]}
+          selected={value === theme}
+          onSelect={handleSelect}
+        />
+      ))}
     </div>
   );
 }

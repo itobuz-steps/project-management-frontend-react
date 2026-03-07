@@ -1,6 +1,6 @@
 import { usePermissions } from '../../hooks/usePermissions';
 import type { Permission } from '../../utils/permissions';
-import UnauthorizedPage from '../../pages/UnauthorizedPage';
+import { Navigate } from 'react-router-dom';
 
 type Props = {
   permission: Permission;
@@ -11,7 +11,7 @@ export default function PermissionGuard({ permission, children }: Props) {
   const { can } = usePermissions();
 
   if (!can(permission)) {
-    return <UnauthorizedPage />;
+    return <Navigate to="/for-you" replace />;
   }
 
   return <>{children}</>;

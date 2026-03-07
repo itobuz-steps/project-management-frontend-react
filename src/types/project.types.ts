@@ -41,6 +41,7 @@ export interface Project {
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
   __v: number;
+  theme: string;
 }
 
 export interface CreateProjectPayload {

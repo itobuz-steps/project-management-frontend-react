@@ -1,13 +1,15 @@
-import { Avatar, Upload, Button, Tag } from 'antd';
-import { UserOutlined, UploadOutlined, CloseOutlined } from '@ant-design/icons';
+import { Avatar, Upload, Button } from 'antd';
+import { UserOutlined, UploadOutlined } from '@ant-design/icons';
 import type { ProjectSettingsHeaderProps } from './projectSettings.type';
+import { ThemePicker } from '../navbar/ThemePicker';
 
 function ProjectSettingsHeader({
   project,
-  iconFile,
   iconPreview,
   setIconFile,
   setIconPreview,
+  theme,
+  setTheme,
 }: ProjectSettingsHeaderProps) {
   return (
     <div
@@ -41,20 +43,8 @@ function ProjectSettingsHeader({
         <Button icon={<UploadOutlined />}>Change Icon</Button>
       </Upload>
 
-      {iconFile && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Tag color="blue">{iconFile.name}</Tag>
-
-          <Button
-            type="text"
-            icon={<CloseOutlined />}
-            onClick={() => {
-              setIconFile(null);
-              setIconPreview(project.icon ?? null);
-            }}
-          />
-        </div>
-      )}
+      {/* Theme Picker */}
+      <ThemePicker value={theme} onChange={setTheme} />
     </div>
   );
 }
