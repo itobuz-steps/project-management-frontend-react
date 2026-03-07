@@ -72,7 +72,6 @@ export function CreateProjectModal({
         name: values.name,
         projectType: values.projectType,
         columns,
-        tasks: [],
       });
 
       message.success('Project created successfully!');

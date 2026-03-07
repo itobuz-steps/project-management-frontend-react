@@ -51,9 +51,10 @@ export function useBoard(
         nextColumns.push(trimmed);
       }
 
-      const updated = await updateProject(projectId, {
-        columns: nextColumns,
-      });
+      const formData = new FormData();
+      nextColumns.forEach((col) => formData.append('columns[]', col));
+
+      const updated = await updateProject(projectId, formData);
 
       const updatedColumns = updated.columns ?? nextColumns;
       setColumns(updatedColumns);
