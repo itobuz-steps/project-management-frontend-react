@@ -46,6 +46,7 @@ function TopBar({
 
     if (isScrum) {
       base.push({ label: 'Sprints', value: 'sprints-overview' });
+      base.push({ label: 'Timeline', value: 'timeline' });
     }
 
     return base;
@@ -57,7 +58,8 @@ function TopBar({
       path.endsWith('/backlog') ||
       path.endsWith('/board') ||
       path.endsWith('/list') ||
-      path.endsWith('/sprints-overview')
+      path.endsWith('/sprints-overview') ||
+      path.endsWith('/timeline')
     );
   }, [location.pathname]);
 
@@ -145,7 +147,7 @@ function TopBar({
                   onClick={() => navigate(view.value)}
                   className={({ isActive }) =>
                     [
-                      'w-20 flex-1 rounded-md px-3.5 py-2 text-center text-sm font-medium transition sm:flex-none',
+                      'w-max flex-1 rounded-md px-3.5 py-2 text-center text-sm font-medium transition sm:flex-none',
                       isActive
                         ? 'bg-primary-400 text-white shadow-sm'
                         : 'text-gray-500 hover:text-gray-800',

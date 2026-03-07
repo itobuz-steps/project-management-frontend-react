@@ -8,6 +8,7 @@ export interface Sprint {
   key: string;
   tasks: string[];
   dueDate: Date;
+  endDate?: Date;
   isCompleted: boolean;
   projectId: string;
   createdAt?: string;
