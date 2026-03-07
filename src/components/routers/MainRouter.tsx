@@ -16,6 +16,8 @@ import SprintView from '../views/SprintView/SprintView';
 import { ForYouPage } from '../../pages/ForYouPage';
 import { ProtectedRoute } from '../common/ProtectedRoute';
 import { AuthRedirect } from '../../utils/AuthRedirect';
+import ProjectSettings from '../../pages/ProjectSettings';
+import PermissionGuard from './PermissionGuard';
 
 export function MainRouter() {
   return (
@@ -77,7 +79,14 @@ export function MainRouter() {
             <Route path="/" element={<Navigate to="/for-you" replace />} />
             <Route path="/project/:projectId" element={<Dashboard />}>
               <Route index element={<Navigate to="backlog" replace />} />
-
+              <Route
+                path="settings"
+                element={
+                  <PermissionGuard permission="PROJECT_SETTINGS">
+                    <ProjectSettings />
+                  </PermissionGuard>
+                }
+              />
               <Route path="backlog" element={<BacklogView />} />
               <Route path="board" element={<BoardView />} />
               <Route path="list" element={<ListView />} />

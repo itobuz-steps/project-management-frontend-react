@@ -6,6 +6,7 @@ import {
   useNavigate,
   useSearchParams,
 } from 'react-router-dom';
+import { SettingOutlined } from '@ant-design/icons';
 import { useMemo, useState } from 'react';
 import { useProject } from '../../context/ProjectContext';
 import { PRIORITIES } from '../taskModal/constants';
@@ -14,7 +15,7 @@ import { InviteUserContainer } from './InviteUserContainer';
 import { Can } from '../../utils/PermissionHoc';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { UserCell } from '../ui/UserCell';
-import { Select } from 'antd';
+import { Select, Tag } from 'antd';
 
 function TopBar({
   onAddTask,
@@ -87,15 +88,45 @@ function TopBar({
       <header className="bg-primary-50 flex flex-col gap-2 rounded-lg border border-gray-100 p-2 shadow-sm sm:gap-3 md:p-4">
         {/* TOP ROW */}
         <div className="flex flex-col gap-3 text-start sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex">
+          <div className="flex items-center gap-2">
+            {project?.icon && (
+              <img
+                src={project.icon}
+                alt="project icon"
+                className="h-6 w-6 rounded object-cover"
+              />
+            )}
+
             <h2 className="topbar-project-header flex items-center text-lg font-semibold text-gray-900 sm:text-xl">
               {projectName ?? 'No project selected'}
             </h2>
+
+            {project?.projectType && (
+              <Tag
+                style={{
+                  backgroundColor: 'var(--color-primary-400)',
+                  color: '#fff',
+                  textTransform: 'capitalize',
+                }}
+              >
+                {project.projectType}
+              </Tag>
+            )}
           </div>
 
-          <div className="flex self-end sm:justify-end">
+          <div className="flex items-center gap-3 self-end sm:justify-end">
             <Can permission="SEND_INVITE">
               <InviteUserContainer />
+            </Can>
+
+            <Can permission="PROJECT_SETTINGS">
+              <button
+                onClick={() => navigate('settings')}
+                className="flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-[var(--color-primary-200)]"
+                title="Project Settings"
+              >
+                <SettingOutlined style={{ fontSize: '18px' }} />
+              </button>
             </Can>
           </div>
         </div>
