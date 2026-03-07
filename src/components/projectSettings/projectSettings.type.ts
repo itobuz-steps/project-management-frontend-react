@@ -42,3 +42,15 @@ export type EditableProjectMember = {
   user: string;
   role: ProjectMemberRole;
 };
+
+export type ThemePickerProps = {
+  value?: string;
+  onChange?: (theme: string) => void;
+};
+
+export type ThemeCircleProps = {
+  theme: string;
+  onSelect: (theme: string) => void;
+  value: string;
+  selected: boolean;
+};

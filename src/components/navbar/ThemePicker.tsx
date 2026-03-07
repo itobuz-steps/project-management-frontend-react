@@ -1,18 +1,16 @@
 import { useTheme } from '../../hooks/useTheme';
 import { THEME_COLORS } from '../../config/constants';
+import type {
+  ThemeCircleProps,
+  ThemePickerProps,
+} from '../projectSettings/projectSettings.type';
 
-export function ThemePicker({
-  value,
-  onChange,
-}: {
-  value?: string;
-  onChange?: (theme: string) => void;
-}) {
-  const [, setTheme] = useTheme(); // we only need setTheme
+export function ThemePicker({ value, onChange }: ThemePickerProps) {
+  const [, setTheme] = useTheme();
 
   const handleSelect = (theme: string) => {
-    onChange?.(theme); // update form
-    setTheme(theme); // update UI theme
+    onChange?.(theme);
+    setTheme(theme);
   };
 
   return (
@@ -30,17 +28,7 @@ export function ThemePicker({
   );
 }
 
-function ThemeCircle({
-  theme,
-  onSelect,
-  value,
-  selected,
-}: {
-  theme: string;
-  onSelect: (theme: string) => void;
-  value: string;
-  selected: boolean;
-}) {
+function ThemeCircle({ theme, onSelect, value, selected }: ThemeCircleProps) {
   console.log({ theme, value, selected });
   return (
     <div
