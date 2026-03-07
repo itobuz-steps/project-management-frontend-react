@@ -29,28 +29,37 @@ function ProjectDeleteSection({ projectId }: ProjectSettingsDeleteProps) {
         border: '1px solid #ffccc7',
       }}
     >
-      <Title level={5} style={{ color: '#cf1322' }}>
-        Delete Project
-      </Title>
-
-      <Text type="danger">
-        Deleting this project will permanently remove all tasks and sprints.
-      </Text>
-
-      <br />
-
-      <Popconfirm
-        title="Delete this project?"
-        description="This action cannot be undone."
-        okText="Delete"
-        cancelText="Cancel"
-        okButtonProps={{ danger: true }}
-        onConfirm={handleDelete}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          gap: 2,
+        }}
       >
-        <Button danger icon={<DeleteOutlined />} style={{ marginTop: 16 }}>
-          Delete Project
-        </Button>
-      </Popconfirm>
+        <div>
+          <Title level={5} style={{ color: '#cf1322', marginBottom: 4 }}>
+            Delete Project
+          </Title>
+
+          <Text type="danger">
+            Deleting this project will permanently remove all tasks and sprints.
+          </Text>
+        </div>
+
+        <Popconfirm
+          title="Delete this project?"
+          description="This action cannot be undone."
+          okText="Delete"
+          cancelText="Cancel"
+          okButtonProps={{ danger: true }}
+          onConfirm={handleDelete}
+        >
+          <Button danger icon={<DeleteOutlined />}>
+            Delete Project
+          </Button>
+        </Popconfirm>
+      </div>
     </Card>
   );
 }

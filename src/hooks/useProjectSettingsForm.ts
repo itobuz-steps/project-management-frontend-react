@@ -47,6 +47,8 @@ export function useProjectSettingsForm({
 
       formData.append('projectType', values.projectType);
 
+      formData.append('memberLead', values.memberLead);
+
       if (values.defaultAssignee) {
         formData.append('defaultAssignee', values.defaultAssignee);
       }

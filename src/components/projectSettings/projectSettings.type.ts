@@ -30,6 +30,7 @@ export type ProjectSettingsFormValues = {
   prefix?: string | null;
   projectType: string;
   defaultAssignee?: string | null;
+  memberLead: string;
 };
 
 export type EditableProjectMember = {

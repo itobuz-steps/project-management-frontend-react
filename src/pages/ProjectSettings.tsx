@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useProject } from '../context/ProjectContext';
 import { useProjectMetaData } from '../hooks/useProjectMetaData';
 import ProjectSettingsHeader from '../components/projectSettings/ProjectSettingsHeader';
@@ -14,12 +14,6 @@ function ProjectSettings() {
     project?.icon ?? null
   );
 
-  useEffect(() => {
-    if (project?.icon) {
-      setIconPreview(project.icon);
-    }
-  }, [project]);
-
   if (!project) {
     return null;
   }
@@ -29,7 +23,7 @@ function ProjectSettings() {
       <ProjectSettingsHeader
         project={project}
         iconFile={iconFile}
-        iconPreview={iconPreview}
+        iconPreview={iconPreview ?? project.icon ?? null}
         setIconFile={setIconFile}
         setIconPreview={setIconPreview}
       />

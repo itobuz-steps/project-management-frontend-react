@@ -43,13 +43,10 @@ function ProjectSettingsForm({
       name: project.name,
       prefix: project.prefix,
       projectType: project.projectType,
-      defaultAssignee: project.defaultAssignee ?? null,
+      memberLead: project.memberLead,
+      defaultAssignee: project.defaultAssignee ?? undefined,
     });
   }, [project, form]);
-
-  const spaceOwner = members.find(
-    (member) => member._id === project.memberLead
-  );
 
   return (
     <Card style={{ borderRadius: 10 }}>
@@ -74,10 +71,21 @@ function ProjectSettingsForm({
               />
             </Form.Item>
 
-            <Form.Item label="Space Owner">
-              <div className="flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-1">
-                <UserCell user={spaceOwner} emptyText="Unknown" />
-              </div>
+            <Form.Item label="Project Owner" name="memberLead">
+              <Select
+                options={projectMembers
+                  .filter((member) => member.role === 'admin')
+                  .map((member) => {
+                    const user = members.find(
+                      (user) => user._id === member.user
+                    );
+
+                    return {
+                      value: member.user,
+                      label: <UserCell user={user} emptyText="Unknown" />,
+                    };
+                  })}
+              />
             </Form.Item>
           </Col>
 
@@ -91,25 +99,19 @@ function ProjectSettingsForm({
                 allowClear
                 placeholder="Unassigned"
                 size="large"
-                options={[
-                  {
-                    value: '',
-                    label: <UserCell user={undefined} emptyText="Unassigned" />,
-                  },
-                  ...members.map((member) => ({
-                    value: member._id,
-                    label: <UserCell user={member} emptyText="Unassigned" />,
-                  })),
-                ]}
+                options={members.map((member) => ({
+                  value: member._id,
+                  label: <UserCell user={member} emptyText="Unknown" />,
+                }))}
               />
             </Form.Item>
 
             <Form.Item label="Project Members">
               <div className="flex flex-col gap-3">
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 sm:flex-nowrap">
                   <Select
                     placeholder="Select Member"
-                    style={{ maxWidth: 200 }}
+                    style={{ maxWidth: 190 }}
                     value={selectedUser}
                     onChange={(userId) => {
                       setSelectedUser(userId);
@@ -137,7 +139,10 @@ function ProjectSettingsForm({
                   />
 
                   <Button
-                    style={{ background: 'var(--color-primary-500)' }}
+                    style={{
+                      background: 'var(--color-primary-500)',
+                      padding: '10px',
+                    }}
                     type="primary"
                     onClick={addMemberRole}
                   >

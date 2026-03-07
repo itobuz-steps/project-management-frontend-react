@@ -87,13 +87,15 @@ function TopBar({
               <InviteUserContainer />
             </Can>
 
-            <button
-              onClick={() => navigate('settings')}
-              className="flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-[var(--color-primary-200)]"
-              title="Project Settings"
-            >
-              <SettingOutlined style={{ fontSize: '18px' }} />
-            </button>
+            <Can permission="PROJECT_SETTINGS">
+              <button
+                onClick={() => navigate('settings')}
+                className="flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-[var(--color-primary-200)]"
+                title="Project Settings"
+              >
+                <SettingOutlined style={{ fontSize: '18px' }} />
+              </button>
+            </Can>
           </div>
         </div>
 
