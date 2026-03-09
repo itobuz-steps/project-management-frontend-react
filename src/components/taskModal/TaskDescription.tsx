@@ -107,7 +107,9 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
               onClick={openEditor}
             >
               {task.description ? (
-                <ReactMarkdown>{task.description}</ReactMarkdown>
+                <div className="prose">
+                  <ReactMarkdown>{task.description}</ReactMarkdown>
+                </div>
               ) : (
                 <span className="text-gray-400">Add a description…</span>
               )}

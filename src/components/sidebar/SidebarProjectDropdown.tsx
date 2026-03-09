@@ -1,28 +1,35 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { Project } from '../../types/project.types';
-import { getAllProjects } from '../../services/projectService';
+import { getWorkspaces, type Workspace } from '../../services/workspaceService';
+import SidebarWorkspaceItem from './SidebarWorkspaceItem';
 
-function SidebarProjectsDropdown({ collapsed }: { collapsed: boolean }) {
-  const [projects, setProjects] = useState<Project[]>([]);
+type SidebarProjectsDropdownProps = {
+  collapsed: boolean;
+  refreshKey?: number;
+};
+
+function SidebarProjectsDropdown({
+  collapsed,
+  refreshKey = 0,
+}: SidebarProjectsDropdownProps) {
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const navigate = useNavigate();
 
   const { projectId: activeProjectId } = useParams();
 
   useEffect(() => {
-    async function loadProjects() {
+    async function loadWorkspaces() {
       try {
-        const res = await getAllProjects();
-        console.log(res);
-        setProjects(res);
+        const res = await getWorkspaces();
+        setWorkspaces(res.result ?? []);
       } catch (err) {
         console.error(err);
-        setProjects([]);
+        setWorkspaces([]);
       }
     }
 
-    loadProjects();
-  }, []);
+    loadWorkspaces();
+  }, [refreshKey]);
 
   function handleProjectClick(projectId: string) {
     navigate(`/project/${projectId}`);
@@ -30,17 +37,20 @@ function SidebarProjectsDropdown({ collapsed }: { collapsed: boolean }) {
 
   return (
     <>
-      {projects.map((project) => (
-        <li
-          key={project._id}
-          onClick={() => handleProjectClick(project._id)}
-          className={`hover:bg-primary-100 cursor-pointer truncate rounded px-2 py-1 text-sm whitespace-nowrap transition-all duration-300 ease-in-out ${
-            activeProjectId === project._id ? 'bg-primary-200 font-medium' : ''
-          } ${collapsed ? '-translate-x-2 opacity-0' : 'translate-x-0 opacity-100'}`}
-        >
-          {project.name}
-        </li>
+      {workspaces.map((workspace) => (
+        <SidebarWorkspaceItem
+          key={workspace.workspaceId}
+          workspace={workspace}
+          collapsed={collapsed}
+          activeProjectId={activeProjectId}
+          onProjectClick={handleProjectClick}
+        />
       ))}
+      {!workspaces.length && !collapsed && (
+        <li className="rounded-md border border-dashed border-slate-300 bg-white/70 px-2 py-2 text-xs font-medium tracking-wide text-slate-500">
+          No workspaces yet
+        </li>
+      )}
     </>
   );
 }

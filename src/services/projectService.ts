@@ -1,14 +1,10 @@
-// src/services/project.service.ts
 import axios from 'axios';
 import { config } from '../config/config';
 import type { Project } from '../types/project.types';
 import type { User } from './types/tasks.types';
-import type {
-  CreateProjectPayload,
-  UpdateProjectPayload,
-} from '../types/project.types';
+import type { CreateProjectPayload } from '../types/project.types';
 import { attachInterceptor } from '../utils/attachInterceptor';
-import type { MemberResponse, ProjectResponse } from './types/project.types';
+import type { MemberResponse, ProjectResponse } from '../types/project.types';
 
 const API_URL = `${config.api_base_url}/project`;
 
@@ -21,8 +17,8 @@ attachInterceptor(api);
 export const createProject = async (
   payload: CreateProjectPayload
 ): Promise<Project> => {
-  const res = await api.post<Project>('', payload);
-  return res.data;
+  const res = await api.post<{ result: Project }>('', payload);
+  return res.data.result;
 };
 
 export const getProjectById = async (projectId: string): Promise<Project> => {
@@ -37,10 +33,15 @@ export const getAllProjects = async (): Promise<Project[]> => {
 
 export const updateProject = async (
   projectId: string,
-  payload: UpdateProjectPayload
+  payload: FormData
 ): Promise<Project> => {
-  const res = await api.put<Project>(`/${projectId}`, payload);
-  return res.data;
+  const res = await api.put<ProjectResponse>(`/${projectId}`, payload, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return res.data.result;
 };
 
 export const deleteProject = async (projectId: string): Promise<void> => {
@@ -57,4 +58,15 @@ export const getUsersByProjectId = async (
 ): Promise<User[]> => {
   const res = await api.get<User[]>(`/${projectId}/get-user`);
   return res.data;
+};
+
+export const deleteProjectColumn = async (
+  projectId: string,
+  columnName: string
+) => {
+  const response = await api.delete(
+    `/${projectId}/columns/${encodeURIComponent(columnName)}`
+  );
+
+  return response.data;
 };

@@ -67,30 +67,42 @@ function mapActivityListToTimelineProp(activities: Activity[]) {
         break;
 
       case 'TASK_UPDATED': {
-        const otherFields: Partial<keyof TaskPopulated> = Object.keys(
+        const otherField = Object.keys(
           activity.updatedFields
-        )[0] as Partial<keyof TaskPopulated>;
-        content = (
-          <>
-            <span className="text-primary-500 font-bold">
-              {activity.byUser.name}
-            </span>{' '}
-            updated{' '}
-            <span className="text-primary-500">
-              {otherFields[0].toUpperCase() + otherFields.slice(1)}
-            </span>{' '}
-            from{' '}
-            <span className="text-primary-500">
-              {activity.updatedFields[otherFields]?.from}
-            </span>{' '}
-            to{' '}
-            <span className="text-primary-500">
-              {activity.updatedFields[otherFields]?.to}
-            </span>
-            .
-          </>
-        );
-        timelineItems.push(createTimelineItem(activity.createdAt, content));
+        )[0] as keyof TaskPopulated;
+        if (otherField && activity.updatedFields[otherField]) {
+          const fromValue = activity.updatedFields[otherField].from;
+          const toValue = activity.updatedFields[otherField].to;
+          content = (
+            <>
+              <span className="text-primary-500 font-bold">
+                {activity.byUser.name}
+              </span>{' '}
+              updated{' '}
+              <span className="text-primary-600 font-medium">{otherField}</span>{' '}
+              from{' '}
+              <span
+                className="text-primary-500"
+                title={activity.updatedFields[otherField].from}
+              >
+                {fromValue.length > 20
+                  ? fromValue.substring(0, 20) + '...'
+                  : fromValue}
+              </span>{' '}
+              to{' '}
+              <span
+                className="text-primary-500"
+                title={activity.updatedFields[otherField].to}
+              >
+                {toValue.length > 20
+                  ? toValue.substring(0, 20) + '...'
+                  : toValue}
+              </span>
+              .
+            </>
+          );
+          timelineItems.push(createTimelineItem(activity.createdAt, content));
+        }
         break;
       }
 

@@ -35,9 +35,9 @@ function Dashboard() {
           (member) => member.user === userInfo.result._id
         )?.role;
 
-        if (!memberRole) {
+        if (userInfo.result.role === 'superadmin') {
           setRole('superadmin');
-        } else {
+        } else if (memberRole) {
           setRole(memberRole);
         }
       } catch {

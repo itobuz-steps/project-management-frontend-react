@@ -11,6 +11,9 @@ export type SidebarGroupProps = {
   action?: ReactNode;
   children: ReactNode;
   collapsed: boolean;
+  collapsible?: boolean;
+  expanded?: boolean;
+  onToggle?: () => void;
 };
 
 export type SidebarItemProps = {
