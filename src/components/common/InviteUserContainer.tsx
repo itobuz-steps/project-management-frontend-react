@@ -2,7 +2,6 @@ import { message } from 'antd';
 import { useState } from 'react';
 import { sendInvite } from '../../services/inviteService';
 import { useProject } from '../../context/ProjectContext';
-import { AxiosError } from 'axios';
 import { InviteUserForm } from './InviteUserForm';
 import { InviteUserButton } from './InviteUserButton';
 import { X } from 'lucide-react';
@@ -13,17 +12,48 @@ export function InviteUserContainer() {
   const { project } = useProject();
 
   async function handleFinish(values: { email: string }) {
-    if (!project) return;
-    try {
-      await sendInvite(values.email, project._id);
-      message.success('Invite sent successfully');
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        message.error(error.response?.data?.message || 'Failed to send invite');
-      }
-    } finally {
-      setFormOpen(false);
+    if (!project) {
+      return;
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const emails = values.email
+      .split(',')
+      .map((email) => email.trim())
+      .filter(Boolean);
+
+    const invalidEmails: string[] = [];
+    const successEmails: string[] = [];
+    const failedEmails: string[] = [];
+
+    for (const email of emails) {
+      if (!emailRegex.test(email)) {
+        invalidEmails.push(email);
+        continue;
+      }
+
+      try {
+        await sendInvite(email, project._id);
+        successEmails.push(email);
+      } catch {
+        failedEmails.push(email);
+      }
+    }
+
+    if (successEmails.length) {
+      message.success(`Invites sent to: ${successEmails.join(', ')}`);
+    }
+
+    if (invalidEmails.length) {
+      message.warning(`Invalid emails: ${invalidEmails.join(', ')}`);
+    }
+
+    if (failedEmails.length) {
+      message.error(`Failed invites: ${failedEmails.join(', ')}`);
+    }
+
+    setFormOpen(false);
   }
 
   return (
