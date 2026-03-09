@@ -10,7 +10,6 @@ export function InviteUserForm({ submitHandler }: InviteUserFormProps) {
     <Form layout="inline" style={{ paddingBlock: 0 }} onFinish={submitHandler}>
       <Form.Item name="email">
         <Input
-          type="email"
           placeholder="Enter email address"
           style={{
             paddingBlock: '4px',
