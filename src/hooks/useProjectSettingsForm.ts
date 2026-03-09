@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { message } from 'antd';
+import { message, type FormInstance } from 'antd';
 import { updateProject } from '../services/projectService';
 import type {
   EditableProjectMember,
@@ -34,11 +34,21 @@ export function useProjectSettingsForm({
     setVisibleMembers([]);
   }, [project]);
 
-  const handleSubmit = async (values: ProjectSettingsFormValues) => {
+  const handleSubmit = async (
+    values: ProjectSettingsFormValues,
+    form: FormInstance
+  ) => {
     try {
       setLoading(true);
 
       const formData = new FormData();
+
+      const removeList = values.removeMembers ?? [];
+
+      const filteredMembers = projectMembers.filter(
+        (member) =>
+          !(removeList.includes(member.user) && member.role === 'member')
+      );
 
       formData.append('name', values.name);
 
@@ -52,7 +62,7 @@ export function useProjectSettingsForm({
 
       formData.append('defaultAssignee', values.defaultAssignee ?? 'null');
 
-      projectMembers.forEach((member, index) => {
+      filteredMembers.forEach((member, index) => {
         formData.append(`members[${index}][user]`, member.user);
         formData.append(`members[${index}][role]`, member.role);
       });
@@ -67,6 +77,7 @@ export function useProjectSettingsForm({
 
       setProject(updated);
 
+      form.resetFields(['removeMembers']);
       setIconFile(null);
       setIconPreview(updated.icon ?? null);
 
