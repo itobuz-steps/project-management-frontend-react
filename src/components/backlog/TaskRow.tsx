@@ -77,7 +77,7 @@ export function TaskRow({
           onChange={(status) => update({ status }, 'Failed to update status')}
         />
       </td>
-      <td className="w-[180px] max-w-[180px] truncate p-3 px-6">
+      <td className="w-[200px] max-w-[200px] truncate p-3 px-6">
         <AssigneeCell
           task={task}
           members={members}

@@ -61,8 +61,6 @@ export function LinkedItemsTab({ task, onUpdated }: LinkedItemsTabProps) {
     onUpdated(updatedTask);
   };
 
-  const hasItems = linkedRows.length > 0;
-
   return (
     <Collapse
       ghost
@@ -98,7 +96,7 @@ export function LinkedItemsTab({ task, onUpdated }: LinkedItemsTabProps) {
             <div className="space-y-4">
               <DataLoader
                 loading={false}
-                isEmpty={!hasItems && !addOpen}
+                isEmpty={!linkedRows.length && !addOpen}
                 emptyText="No linked items"
               >
                 <LinkedItemsTable

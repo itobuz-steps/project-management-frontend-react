@@ -5,6 +5,7 @@ import type { Role } from '../services/types/user';
 type AuthContextType = {
   role: Role;
   setRole: (role: Role) => void;
+  userId: string | null;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);

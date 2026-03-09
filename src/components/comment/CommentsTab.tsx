@@ -23,6 +23,7 @@ export function CommentsTab({ task }: CommentsTabProps) {
   const mentionItems = members.map((member) => ({
     id: member._id,
     label: member.name,
+    avatar: member.profileImage,
   }));
 
   useEffect(() => {

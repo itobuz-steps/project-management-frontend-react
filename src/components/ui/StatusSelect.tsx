@@ -45,6 +45,7 @@ export function StatusSelect({
       <Button
         style={{
           backgroundColor: 'var(--color-primary-500)',
+          border: 'var(--color-primary-900)',
           color: 'white',
         }}
         size="small"
