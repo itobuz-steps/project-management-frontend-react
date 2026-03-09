@@ -36,6 +36,7 @@ export type ProjectSettingsFormValues = {
   defaultAssignee?: string | null;
   memberLead: string;
   theme: string;
+  removeMembers?: string[];
 };
 
 export type EditableProjectMember = {
