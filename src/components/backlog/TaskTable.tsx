@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Pencil } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
@@ -15,6 +15,7 @@ import { useSprintActions } from '../../hooks/useSprintActions';
 import { taskTableColumns } from '../../config/constants';
 import { CreateSprintForm } from './CreateSprintForm';
 import { message } from 'antd';
+import { format } from 'date-fns';
 
 export function TaskTable({
   sprint,
@@ -27,6 +28,7 @@ export function TaskTable({
 }: TaskTableProps) {
   const [open, setOpen] = useState(true);
   const [localTasks, setLocalTasks] = useState(tasks);
+  const [editingDueDate, setEditingDueDate] = useState(false);
   const { project } = useProject();
 
   useEffect(() => {
@@ -83,11 +85,28 @@ export function TaskTable({
           />
           <div className="xs:flex-row xs:items-center xs:gap-2 flex flex-col items-start gap-1">
             <span className="font-semibold">{title || sprint?.key}</span>
-            {sprint?.dueDate && (
-              <span className="bg-primary-50 text-primary-600 rounded-full py-0.5 text-xs font-medium">
-                Due {new Date(sprint.dueDate).toLocaleDateString()}
-              </span>
-            )}
+            {sprint?.dueDate &&
+              (editingDueDate ? (
+                <input
+                  ref={dueDateRef}
+                  type="date"
+                  defaultValue={format(new Date(sprint.dueDate), 'dd-MM-yyyy')}
+                  className="rounded border px-2 py-1 text-xs"
+                  autoFocus
+                  onBlur={async () => {
+                    await startSprint(sprint);
+                    setEditingDueDate(false);
+                  }}
+                />
+              ) : (
+                <span
+                  onClick={() => setEditingDueDate(true)}
+                  className="group bg-primary-50 text-primary-600 hover:bg-primary-100 relative inline-flex cursor-pointer items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                >
+                  Due {format(new Date(sprint.dueDate), 'MMM d')}
+                  <Pencil className="absolute -right-4 h-3 w-3 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
+                </span>
+              ))}
           </div>
         </div>
         <span className="xs:mr-4 xs:block mr-1 ml-auto hidden text-xs text-gray-400">
