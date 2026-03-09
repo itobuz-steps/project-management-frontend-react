@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ConfigProvider, message, Table } from 'antd';
 import type { TableColumnsType } from 'antd';
+import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import type {
   PaginationMeta,
   TaskPopulated,
@@ -27,16 +28,39 @@ type TaskTableProps = {
   loadingMembers: boolean;
   onTaskUpdated: (updated: TaskPopulated) => void;
   pagination?: PaginationMeta;
-  onPaginationChange?: (page: number, pageSize: number) => void;
+  filters?: TaskTableFilters;
+  sorting?: TaskTableSort;
+  onTableChange?: (params: TaskTableChangeParams) => void;
   loading?: boolean;
   error?: string | null;
+};
+
+export type TaskTableFilters = {
+  type?: string | null;
+  status?: string | null;
+  assignee?: string | null;
+  reporter?: string | null;
+  tags?: string[];
+};
+
+export type TaskTableSortOrder = 'ascend' | 'descend' | null;
+
+export type TaskTableSort = {
+  field?: string | null;
+  order?: TaskTableSortOrder;
+};
+
+export type TaskTableChangeParams = {
+  page: number;
+  pageSize: number;
+  filters: TaskTableFilters;
+  sorting: TaskTableSort;
 };
 
 type InlineEditablePayload = Partial<Pick<TaskPopulated, 'status' | 'dueDate'>>;
 
 const DEFAULT_STATUSES = ['todo', 'in-progress', 'done'];
 
-const asDate = (value?: string) => new Date(value ?? 0).getTime();
 const formatDate = (value?: string) =>
   value ? dayjs(value).format('DD-MM-YYYY') : '-';
 
@@ -44,6 +68,24 @@ const unique = (values: string[]) => [...new Set(values.filter(Boolean))];
 
 const toFilters = (values: string[]) =>
   unique(values).map((value) => ({ text: value, value }));
+
+const asSingleFilter = (value?: FilterValue | null): string | null => {
+  if (!Array.isArray(value) || !value.length || value[0] == null) {
+    return null;
+  }
+
+  return String(value[0]);
+};
+
+const asMultiFilter = (value?: FilterValue | null): string[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map((item) => String(item)).filter(Boolean);
+};
+
+const typeFilters = toFilters(['bug', 'story', 'task']);
 
 const buildColumnClassMap = () => {
   const classMap: Record<string, string> = {};
@@ -92,7 +134,9 @@ export function TaskTable({
   loadingMembers,
   onTaskUpdated,
   pagination,
-  onPaginationChange,
+  filters,
+  sorting,
+  onTableChange,
   loading = false,
   error = null,
 }: TaskTableProps) {
@@ -123,14 +167,55 @@ export function TaskTable({
   );
 
   const columns: TableColumnsType<TaskPopulated> = useMemo(() => {
-    const typeFilters = toFilters(tasks.map((task) => task.type));
-    const statusFilters = toFilters(tasks.map((task) => task.status));
-    const assigneeFilters = toFilters(
-      tasks.map((task) => task.assignee?.name ?? 'Unassigned')
-    );
+    const statusFilters = toFilters(statuses);
+    const assigneeFilters = toFilters([
+      ...members.map((member) => member.name),
+      'Unassigned',
+    ]);
+    const assigneeFilterValueMap: Record<string, string> = {
+      Unassigned: 'unassigned',
+    };
+    members.forEach((member) => {
+      assigneeFilterValueMap[member.name] = member._id;
+    });
+
+    const reporterFilters = toFilters([
+      ...members.map((member) => member.name),
+      'Unknown',
+    ]);
+    const reporterFilterValueMap: Record<string, string> = {
+      Unknown: 'unknown',
+    };
+    members.forEach((member) => {
+      reporterFilterValueMap[member.name] = member._id;
+    });
+
     const tagFilters = toFilters(tasks.flatMap((task) => task.tags ?? []));
-    const reporterFilters = toFilters(
-      tasks.map((task) => task.reporter?.name ?? 'Unknown')
+
+    const sortOrderFor = (field: string): 'ascend' | 'descend' | undefined => {
+      if (sorting?.field !== field || !sorting.order) {
+        return undefined;
+      }
+
+      return sorting.order;
+    };
+
+    const toSelectFilterOptions = (
+      options: { text: string; value: string }[],
+      valueMap: Record<string, string>
+    ) =>
+      options.map((option) => ({
+        text: option.text,
+        value: valueMap[option.value] ?? option.value,
+      }));
+
+    const assigneeSelectFilters = toSelectFilterOptions(
+      assigneeFilters,
+      assigneeFilterValueMap
+    );
+    const reporterSelectFilters = toSelectFilterOptions(
+      reporterFilters,
+      reporterFilterValueMap
     );
 
     return [
@@ -139,8 +224,10 @@ export function TaskTable({
         dataIndex: 'type',
         key: 'type',
         filters: typeFilters,
-        onFilter: (value, record) => record.type === value,
-        sorter: (a, b) => a.type.localeCompare(b.type),
+        filteredValue: filters?.type ? [filters.type] : null,
+        filterMultiple: false,
+        sorter: true,
+        sortOrder: sortOrderFor('type'),
         onHeaderCell: () => ({
           className: headerClass('Type'),
         }),
@@ -155,7 +242,8 @@ export function TaskTable({
         title: 'Key',
         dataIndex: 'key',
         key: 'key',
-        sorter: (a, b) => (a.key ?? '').localeCompare(b.key ?? ''),
+        sorter: true,
+        sortOrder: sortOrderFor('key'),
         onHeaderCell: () => ({
           className: headerClass('Key'),
         }),
@@ -177,7 +265,8 @@ export function TaskTable({
         title: 'Summary',
         dataIndex: 'title',
         key: 'title',
-        sorter: (a, b) => a.title.localeCompare(b.title),
+        sorter: true,
+        sortOrder: sortOrderFor('title'),
         onHeaderCell: () => ({
           className: headerClass('Summary'),
         }),
@@ -196,8 +285,10 @@ export function TaskTable({
         dataIndex: 'status',
         key: 'status',
         filters: statusFilters,
-        onFilter: (value, record) => record.status === value,
-        sorter: (a, b) => a.status.localeCompare(b.status),
+        filteredValue: filters?.status ? [filters.status] : null,
+        filterMultiple: false,
+        sorter: true,
+        sortOrder: sortOrderFor('status'),
         onHeaderCell: () => ({
           className: headerClass('Status'),
         }),
@@ -215,11 +306,9 @@ export function TaskTable({
       {
         title: 'Assignee',
         key: 'assignee',
-        filters: assigneeFilters,
-        onFilter: (value, record) =>
-          (record.assignee?.name ?? 'Unassigned') === value,
-        sorter: (a, b) =>
-          (a.assignee?.name ?? '').localeCompare(b.assignee?.name ?? ''),
+        filters: assigneeSelectFilters,
+        filteredValue: filters?.assignee ? [filters.assignee] : null,
+        filterMultiple: false,
         onHeaderCell: () => ({
           className: headerClass('Assignee'),
         }),
@@ -239,7 +328,8 @@ export function TaskTable({
         title: 'Due Date',
         dataIndex: 'dueDate',
         key: 'dueDate',
-        sorter: (a, b) => asDate(a.dueDate) - asDate(b.dueDate),
+        sorter: true,
+        sortOrder: sortOrderFor('dueDate'),
         onHeaderCell: () => ({
           className: headerClass('Due Date'),
         }),
@@ -264,9 +354,9 @@ export function TaskTable({
         dataIndex: 'labels',
         key: 'tags',
         filters: tagFilters,
-        onFilter: (value, record) => {
-          return (record.tags ?? []).includes(value as string);
-        },
+        filteredValue:
+          filters?.tags && filters.tags.length > 0 ? filters.tags : null,
+        filterMultiple: true,
         onHeaderCell: () => ({
           className: headerClass('Tags'),
         }),
@@ -299,7 +389,8 @@ export function TaskTable({
         title: 'Created',
         dataIndex: 'createdAt',
         key: 'createdAt',
-        sorter: (a, b) => asDate(a.createdAt) - asDate(b.createdAt),
+        sorter: true,
+        sortOrder: sortOrderFor('createdAt'),
         onHeaderCell: () => ({
           className: headerClass('Created'),
         }),
@@ -312,7 +403,8 @@ export function TaskTable({
         title: 'Updated',
         dataIndex: 'updatedAt',
         key: 'updatedAt',
-        sorter: (a, b) => asDate(a.updatedAt) - asDate(b.updatedAt),
+        sorter: true,
+        sortOrder: sortOrderFor('updatedAt'),
         onHeaderCell: () => ({
           className: headerClass('Updated'),
         }),
@@ -324,11 +416,9 @@ export function TaskTable({
       {
         title: 'Reporter',
         key: 'reporter',
-        filters: reporterFilters,
-        onFilter: (value, record) =>
-          (record.reporter?.name ?? 'Unknown') === value,
-        sorter: (a, b) =>
-          (a.reporter?.name ?? '').localeCompare(b.reporter?.name ?? ''),
+        filters: reporterSelectFilters,
+        filteredValue: filters?.reporter ? [filters.reporter] : null,
+        filterMultiple: false,
         onHeaderCell: () => ({
           className: headerClass('Reporter'),
         }),
@@ -343,8 +433,10 @@ export function TaskTable({
   }, [
     tasks,
     statuses,
-    setSearchParams,
     members,
+    filters,
+    sorting,
+    setSearchParams,
     loadingMembers,
     onTaskUpdated,
     updateTaskField,
@@ -368,6 +460,30 @@ export function TaskTable({
         loading={loading}
         showSorterTooltip={{ target: 'sorter-icon' }}
         size="small"
+        onChange={(nextPagination, nextFilters, nextSorter) => {
+          const sorter = Array.isArray(nextSorter)
+            ? nextSorter[0]
+            : (nextSorter as SorterResult<TaskPopulated>);
+
+          onTableChange?.({
+            page: nextPagination.current ?? 1,
+            pageSize: nextPagination.pageSize ?? pagination?.limit ?? 10,
+            filters: {
+              type: asSingleFilter(nextFilters.type),
+              status: asSingleFilter(nextFilters.status),
+              assignee: asSingleFilter(nextFilters.assignee),
+              reporter: asSingleFilter(nextFilters.reporter),
+              tags: asMultiFilter(nextFilters.tags),
+            },
+            sorting: {
+              field:
+                typeof sorter?.field === 'string'
+                  ? sorter.field
+                  : (sorter?.columnKey as string | null),
+              order: sorter?.order ?? null,
+            },
+          });
+        }}
         pagination={{
           placement: ['bottomCenter'],
           current: pagination?.page,
@@ -375,7 +491,6 @@ export function TaskTable({
           total: pagination?.total,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50', '100'],
-          onChange: onPaginationChange,
         }}
         rowClassName={(record) =>
           `whitespace-nowrap text-sm hover:bg-gray-50 ${getPriorityBorder(record.priority)}`

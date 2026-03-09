@@ -7,8 +7,32 @@ import type {
 } from '../../../services/types/tasks.types';
 import { useProject } from '../../../context/ProjectContext';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
-import TaskTable from '../../backlog/TaskTableNew';
+import TaskTable, {
+  type TaskTableChangeParams,
+  type TaskTableFilters,
+  type TaskTableSort,
+} from '../../backlog/TaskTableNew';
 import './style.scss';
+
+const EMPTY_TABLE_FILTERS: TaskTableFilters = {
+  type: null,
+  status: null,
+  assignee: null,
+  reporter: null,
+  tags: [],
+};
+
+const toServerSortOrder = (order?: TaskTableSort['order']) => {
+  if (order === 'ascend') {
+    return 'asc';
+  }
+
+  if (order === 'descend') {
+    return 'desc';
+  }
+
+  return undefined;
+};
 
 function ListView() {
   const { projectId } = useParams();
@@ -21,6 +45,12 @@ function ListView() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [tableFilters, setTableFilters] =
+    useState<TaskTableFilters>(EMPTY_TABLE_FILTERS);
+  const [sorting, setSorting] = useState<TaskTableSort>({
+    field: null,
+    order: null,
+  });
   const [pagination, setPagination] = useState<PaginationMeta>({
     page: 1,
     limit: 10,
@@ -52,7 +82,16 @@ function ListView() {
         const result = await getTasks({
           projectId,
           searchInput,
-
+          type: tableFilters.type || undefined,
+          status: tableFilters.status || undefined,
+          assignee: tableFilters.assignee || undefined,
+          reporter: tableFilters.reporter || undefined,
+          tags:
+            tableFilters.tags && tableFilters.tags.length > 0
+              ? tableFilters.tags
+              : undefined,
+          sortBy: sorting.field || undefined,
+          sortOrder: toServerSortOrder(sorting.order),
           page,
           limit: pageSize,
         });
@@ -66,7 +105,7 @@ function ListView() {
     };
 
     load();
-  }, [projectId, searchInput, page, pageSize]);
+  }, [projectId, searchInput, tableFilters, sorting, page, pageSize]);
 
   const handleTaskUpdated = (updated: TaskPopulated) => {
     setTasks((prev) =>
@@ -74,10 +113,27 @@ function ListView() {
     );
   };
 
-  const handlePaginationChange = (nextPage: number, nextPageSize: number) => {
-    if (nextPageSize !== pageSize) {
+  const handleTableChange = ({
+    page: nextPage,
+    pageSize: nextPageSize,
+    filters,
+    sorting: nextSorting,
+  }: TaskTableChangeParams) => {
+    const shouldResetPageSize = nextPageSize !== pageSize;
+    const shouldResetForFilters =
+      JSON.stringify(filters) !== JSON.stringify(tableFilters);
+    const shouldResetForSorting =
+      nextSorting.field !== sorting.field ||
+      nextSorting.order !== sorting.order;
+
+    setTableFilters(filters);
+    setSorting(nextSorting);
+
+    if (shouldResetPageSize || shouldResetForFilters || shouldResetForSorting) {
       setPage(1);
-      setPageSize(nextPageSize);
+      if (shouldResetPageSize) {
+        setPageSize(nextPageSize);
+      }
       return;
     }
 
@@ -106,7 +162,9 @@ function ListView() {
         loadingMembers={loadingMembers}
         onTaskUpdated={handleTaskUpdated}
         pagination={pagination}
-        onPaginationChange={handlePaginationChange}
+        filters={tableFilters}
+        sorting={sorting}
+        onTableChange={handleTableChange}
         loading={loading}
         error={error}
       />

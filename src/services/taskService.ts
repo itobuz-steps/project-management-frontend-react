@@ -23,9 +23,14 @@ const LEGACY_FETCH_LIMIT = 1000;
 type GetTasksBaseParams = {
   projectId: string;
   searchInput?: string;
+  type?: string;
   status?: string;
   priority?: string;
   assignee?: string;
+  reporter?: string;
+  tags?: string[];
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc' | 'ascend' | 'descend';
 };
 
 type GetTasksPaginatedParams = GetTasksBaseParams & {
@@ -132,14 +137,27 @@ export async function getTasks(
   const shouldPaginate =
     typeof params.page === 'number' && typeof params.limit === 'number';
 
+  const normalizedSortOrder =
+    params.sortOrder === 'ascend'
+      ? 'asc'
+      : params.sortOrder === 'descend'
+        ? 'desc'
+        : params.sortOrder;
+
   const queryParams = {
     projectId: params.projectId,
     page: shouldPaginate ? params.page : 1,
     limit: shouldPaginate ? params.limit : LEGACY_FETCH_LIMIT,
     ...(params.searchInput && { searchQuery: params.searchInput }),
+    ...(params.type && { type: params.type }),
     ...(params.status && { status: params.status }),
     ...(params.priority && { priority: params.priority }),
     ...(params.assignee && { assignee: params.assignee }),
+    ...(params.reporter && { reporter: params.reporter }),
+    ...(params.tags &&
+      params.tags.length > 0 && { tags: params.tags.join(',') }),
+    ...(params.sortBy && { sortBy: params.sortBy }),
+    ...(normalizedSortOrder && { sortOrder: normalizedSortOrder }),
   };
 
   const res = await api.get<{
