@@ -4,6 +4,7 @@ import { updateTask } from '../services/taskService';
 import type {
   TaskAttachment,
   TaskPopulated,
+  BackendAttachment,
 } from '../services/types/tasks.types';
 import type { TaskWithAttachments } from './hooks.types';
 
@@ -29,8 +30,21 @@ export function useTaskAttachments(
     setSaving(true);
 
     try {
-      const existingAttachments = updated.filter(
-        (attachment): attachment is string => typeof attachment === 'string'
+      const existingAttachments: string[] = updated.reduce<string[]>(
+        (acc, attachment) => {
+          if (typeof attachment === 'string') {
+            acc.push(attachment);
+          } else if (
+            attachment &&
+            typeof attachment === 'object' &&
+            (attachment as BackendAttachment).key
+          ) {
+            acc.push((attachment as BackendAttachment).key);
+          }
+
+          return acc;
+        },
+        []
       );
 
       const newFiles = updated.filter(
