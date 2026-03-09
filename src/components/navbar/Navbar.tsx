@@ -1,5 +1,4 @@
 import Notifications from './Notifications';
-import ProfileMenu from './ProfileMenu';
 import { CommandPalette } from '../common/CommandPalette';
 import { SearchOutlined } from '@ant-design/icons';
 import { useState } from 'react';
@@ -21,7 +20,6 @@ export default function Navbar() {
             style={{ fontSize: '1.75rem' }}
           />
           <Notifications />
-          <ProfileMenu />
         </div>
       </nav>
       {isCommandPaletteOpen && (

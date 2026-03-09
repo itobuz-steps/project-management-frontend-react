@@ -48,12 +48,19 @@ function SidebarWorkspaceItem({
           <li
             key={project._id}
             onClick={() => onProjectClick(project._id)}
-            className={`hover:border-primary-200 hover:bg-primary-50 hover:text-primary-900 cursor-pointer truncate rounded-md border px-2 py-1.5 text-sm font-semibold whitespace-nowrap text-slate-800 transition-all duration-200 ease-in-out ${
+            className={`hover:border-primary-200 hover:bg-primary-50 hover:text-primary-900 flex cursor-pointer items-center gap-2 truncate rounded-md border px-2 py-1.5 text-sm font-semibold whitespace-nowrap text-slate-800 transition-all duration-200 ease-in-out ${
               activeProjectId === project._id
                 ? 'border-primary-200 bg-primary-100 text-primary-900 shadow-sm'
                 : 'border-transparent'
             }`}
           >
+            {project.icon && (
+              <img
+                src={project.icon}
+                alt={project.name}
+                className="h-4 w-4 object-cover"
+              />
+            )}
             {project.name}
           </li>
         ))}

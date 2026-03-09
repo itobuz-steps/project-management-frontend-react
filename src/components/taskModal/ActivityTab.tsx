@@ -3,6 +3,7 @@ import type { Activity } from '../../services/types/activity.types';
 import { DateTime } from 'luxon';
 import { useEffect, useState, type JSX } from 'react';
 import { getTaskActivities } from '../../services/taskService';
+import type { TaskPopulated } from '../../services/types/tasks.types';
 
 export function ActivityTab({ taskId }: { taskId: string }) {
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -66,20 +67,38 @@ function mapActivityListToTimelineProp(activities: Activity[]) {
         break;
 
       case 'TASK_UPDATED': {
-        const otherFields = Object.keys(activity.updatedFields);
-        if (otherFields.length) {
+        const otherField = Object.keys(
+          activity.updatedFields
+        )[0] as keyof TaskPopulated;
+        if (otherField && activity.updatedFields[otherField]) {
+          const fromValue = activity.updatedFields[otherField].from;
+          const toValue = activity.updatedFields[otherField].to;
           content = (
             <>
               <span className="text-primary-500 font-bold">
                 {activity.byUser.name}
               </span>{' '}
               updated{' '}
-              <span className="text-primary-500">
-                {otherFields
-                  .map((field) => field[0].toUpperCase() + field.slice(1))
-                  .join(', ')}
-                .
+              <span className="text-primary-600 font-medium">{otherField}</span>{' '}
+              from{' '}
+              <span
+                className="text-primary-500"
+                title={activity.updatedFields[otherField].from}
+              >
+                {fromValue.length > 20
+                  ? fromValue.substring(0, 20) + '...'
+                  : fromValue}
+              </span>{' '}
+              to{' '}
+              <span
+                className="text-primary-500"
+                title={activity.updatedFields[otherField].to}
+              >
+                {toValue.length > 20
+                  ? toValue.substring(0, 20) + '...'
+                  : toValue}
               </span>
+              .
             </>
           );
           timelineItems.push(createTimelineItem(activity.createdAt, content));
