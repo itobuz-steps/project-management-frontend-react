@@ -43,8 +43,11 @@ export function useProjectSettingsForm({
 
       const formData = new FormData();
 
+      const removeList = values.removeMembers ?? [];
+
       const filteredMembers = projectMembers.filter(
-        (member) => !values.removeMembers?.includes(member.user)
+        (member) =>
+          !(removeList.includes(member.user) && member.role === 'member')
       );
 
       formData.append('name', values.name);

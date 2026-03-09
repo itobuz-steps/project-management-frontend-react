@@ -186,19 +186,23 @@ function ProjectSettingsForm({
               />
             </Form.Item>
 
-            <Form.Item label="Remove Members" name="removeMembers">
+            <Form.Item label="Remove Project Members" name="removeMembers">
               <Select
                 mode="multiple"
                 allowClear
                 placeholder="Select members to remove"
-                options={projectMembers.map((member) => {
-                  const user = members.find((user) => user._id === member.user);
+                options={projectMembers
+                  .filter((member) => member.role === 'member')
+                  .map((member) => {
+                    const user = members.find(
+                      (user) => user._id === member.user
+                    );
 
-                  return {
-                    value: member.user,
-                    label: <UserCell user={user} emptyText="Unknown" />,
-                  };
-                })}
+                    return {
+                      value: member.user,
+                      label: <UserCell user={user} emptyText="Unknown" />,
+                    };
+                  })}
               />
             </Form.Item>
           </Col>
