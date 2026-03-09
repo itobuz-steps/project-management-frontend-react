@@ -74,10 +74,27 @@ export function useSprintActions(
     }
   };
 
+  const deleteSprint = async (sprint: Sprint) => {
+    try {
+      await sprintService.deleteSprint(sprint._id);
+
+      setSprints?.((prev) =>
+        prev.filter((existingSprint) => existingSprint._id !== sprint._id)
+      );
+
+      message.success('Sprint deleted successfully');
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        message.error(err.response?.data.message || 'Failed to delete sprint');
+      }
+    }
+  };
+
   return {
     dueDateRef,
     startSprint,
     completeSprint,
     createSprint,
+    deleteSprint,
   };
 }
