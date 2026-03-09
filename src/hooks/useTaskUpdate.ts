@@ -11,6 +11,7 @@ export function useTaskUpdate(taskId: string, onUpdated: OnUpdatedFn) {
         payload as Partial<TaskPopulated> & { attachments?: File[] }
       );
       onUpdated(updatedTask);
+      message.success('Task Updated');
     } catch {
       message.error(errorMsg);
     }

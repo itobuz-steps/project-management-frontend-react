@@ -15,7 +15,11 @@ export function SidebarRow({ label, children }: SidebarRowType) {
         </div>
       )}
 
-      <div className="inline-flex w-fit rounded px-2 py-1 leading-6 hover:bg-gray-100">
+      <div
+        className={`inline-flex w-fit rounded px-2 py-1 leading-6 ${
+          hasLabel ? 'hover:bg-gray-100' : ''
+        }`}
+      >
         {children}
       </div>
     </div>

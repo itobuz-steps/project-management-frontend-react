@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { EditProfileForm } from './editProfileForm';
 import { Link } from 'react-router-dom';
 import userService from '../../services/userService';
-import { config } from '../../config/config';
 
 export default function EditProfileContainer() {
   const [profileImage, setProfileImage] = useState('/profile.png');
@@ -22,9 +21,7 @@ export default function EditProfileContainer() {
       console.log(response);
 
       if (response.result.profileImage) {
-        setProfileImage(
-          `${config.api_base_url}/uploads/` + response.result.profileImage
-        );
+        setProfileImage(response.result.profileImage);
       }
       setEmail(response.result.email);
       setUsername(response.result.name);

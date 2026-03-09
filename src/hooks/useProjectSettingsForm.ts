@@ -50,9 +50,7 @@ export function useProjectSettingsForm({
 
       formData.append('memberLead', values.memberLead);
 
-      if (values.defaultAssignee) {
-        formData.append('defaultAssignee', values.defaultAssignee);
-      }
+      formData.append('defaultAssignee', values.defaultAssignee ?? 'null');
 
       projectMembers.forEach((member, index) => {
         formData.append(`members[${index}][user]`, member.user);
@@ -72,7 +70,7 @@ export function useProjectSettingsForm({
       setIconFile(null);
       setIconPreview(updated.icon ?? null);
 
-      message.success('✨ Project updated successfully');
+      message.success('Project updated successfully');
     } catch {
       message.error('Update failed');
     } finally {

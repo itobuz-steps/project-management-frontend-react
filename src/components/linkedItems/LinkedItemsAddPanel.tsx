@@ -5,6 +5,7 @@ import type {
   RelationshipKey,
 } from './linkedItems.types';
 import { RELATIONSHIP_CONFIG } from './linkedItems.types';
+import { DataLoader } from '../ui/DataLoader';
 
 export function LinkedItemsAddPanel({
   task,
@@ -83,8 +84,12 @@ export function LinkedItemsAddPanel({
 
           {dropdownOpen && (
             <div className="absolute right-0 left-0 z-50 mt-1 max-h-60 overflow-y-auto rounded-md border bg-white shadow-lg">
-              {filteredTasks.length > 0 ? (
-                filteredTasks.map((linkedTask) => (
+              <DataLoader
+                loading={false}
+                isEmpty={!filteredTasks.length}
+                emptyText="No results"
+              >
+                {filteredTasks.map((linkedTask) => (
                   <div
                     key={linkedTask._id}
                     className="flex cursor-pointer items-center gap-2 px-3 py-2 hover:bg-gray-100"
@@ -98,12 +103,8 @@ export function LinkedItemsAddPanel({
                     <Tag color="blue">{linkedTask.key}</Tag>
                     <span className="truncate">{linkedTask.title}</span>
                   </div>
-                ))
-              ) : (
-                <div className="px-3 py-2 text-sm text-gray-400">
-                  No results
-                </div>
-              )}
+                ))}
+              </DataLoader>
             </div>
           )}
         </div>
