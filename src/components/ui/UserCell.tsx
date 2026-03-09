@@ -8,9 +8,12 @@ export function UserCell({ user, emptyText }: UserCellType) {
 
   return (
     <div className="flex items-center gap-2 truncate">
-      <Avatar size="small" className="h-6 w-6 shrink-0" src={user.profileImage}>
-        {user.name?.[0]}
-      </Avatar>
+      <Avatar
+        size="small"
+        className="h-6 w-6 shrink-0"
+        src={user.profileImage ? user.profileImage : '/profile.png'}
+      />
+
       <span className="truncate">{user.name}</span>
     </div>
   );
