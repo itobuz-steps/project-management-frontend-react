@@ -9,7 +9,6 @@ import { StatusSelect } from '../../ui/StatusSelect';
 import { AssigneeCell } from '../../ui/AssigneeCell';
 import { DueDateCell } from '../../ui/DueDateCell';
 import { updateTask } from '../../../services/taskService';
-import { UserWithAvatar } from '../UserWithAvatar';
 import type {
   InlineEditablePayload,
   TaskTableFilters,
@@ -24,6 +23,7 @@ import {
   toSelectFilterOptions,
   TYPE_FILTERS,
 } from './taskTable.utils';
+import { UserCell } from '../../ui/UserCell';
 
 type UseTaskTableColumnsParams = {
   tasks: TaskPopulated[];
@@ -340,7 +340,7 @@ function reporterColumn(
     onHeaderCell: () => ({ className: headerClass('Reporter') }),
     onCell: () => ({ className: bodyClass('Reporter', 'whitespace-nowrap') }),
     render: (_, record) => (
-      <UserWithAvatar user={record.reporter} fallback="Unknown" />
+      <UserCell user={record.reporter} emptyText="Unknown" />
     ),
   };
 }
