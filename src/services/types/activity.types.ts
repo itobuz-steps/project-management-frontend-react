@@ -1,4 +1,4 @@
-import type { Task, TaskPopulated, User } from './tasks.types';
+import type { TaskPopulated, User } from './tasks.types';
 
 export type ActivityAction =
   | 'TASK_CREATED'
@@ -16,7 +16,7 @@ interface BaseActivity {
 
 export interface CreatedActivity extends BaseActivity {
   action: 'TASK_CREATED';
-  task: Task;
+  task: TaskPopulated;
 }
 
 export interface UpdatedActivity extends BaseActivity {
@@ -25,7 +25,7 @@ export interface UpdatedActivity extends BaseActivity {
     | 'STATUS_CHANGED'
     | 'COMMENT_ADDED'
     | 'ASSIGNEE_CHANGED';
-  task: Task;
+  task: TaskPopulated;
   updatedFields: Partial<
     Record<keyof TaskPopulated, { from: string; to: string } | null>
   >;
@@ -33,7 +33,7 @@ export interface UpdatedActivity extends BaseActivity {
 
 export interface DeletedActivity extends BaseActivity {
   action: 'TASK_DELETED';
-  task: Task;
+  task: TaskPopulated;
 }
 
 export type Activity = CreatedActivity | UpdatedActivity | DeletedActivity;

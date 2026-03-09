@@ -85,8 +85,8 @@ function mapActivityListToTimelineProp(activities: Activity[]) {
                 className="text-primary-500"
                 title={activity.updatedFields[otherField].from}
               >
-                {fromValue.length > 20
-                  ? fromValue.substring(0, 20) + '...'
+                {fromValue.length > 40
+                  ? fromValue.substring(0, 40) + '...'
                   : fromValue}
               </span>{' '}
               to{' '}
@@ -94,8 +94,8 @@ function mapActivityListToTimelineProp(activities: Activity[]) {
                 className="text-primary-500"
                 title={activity.updatedFields[otherField].to}
               >
-                {toValue.length > 20
-                  ? toValue.substring(0, 20) + '...'
+                {toValue.length > 40
+                  ? toValue.substring(0, 40) + '...'
                   : toValue}
               </span>
               .

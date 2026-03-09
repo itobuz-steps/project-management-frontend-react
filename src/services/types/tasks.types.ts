@@ -118,3 +118,17 @@ export interface UpdateTaskPayload extends Partial<CreateTaskPayload> {
 export interface TaskResponse {
   result: TaskPopulated;
 }
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface PaginatedTasksResponse {
+  data: TaskPopulated[];
+  pagination: PaginationMeta;
+}

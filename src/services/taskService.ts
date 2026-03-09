@@ -2,6 +2,7 @@ import axios from 'axios';
 import { config } from '../config/config';
 import type {
   CreateTaskPayload,
+  PaginatedTasksResponse,
   TaskPopulated,
   TaskResponse,
   TaskStats,
@@ -15,6 +16,32 @@ const API_URL = `${config.api_base_url}/tasks`;
 const api = axios.create({
   baseURL: API_URL,
 });
+
+//TODO: Remove it after implementing pagination in board and backlog views
+const LEGACY_FETCH_LIMIT = 1000;
+
+type GetTasksBaseParams = {
+  projectId: string;
+  searchInput?: string;
+  type?: string;
+  status?: string;
+  priority?: string;
+  assignee?: string;
+  reporter?: string;
+  tags?: string[];
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc' | 'ascend' | 'descend';
+};
+
+type GetTasksPaginatedParams = GetTasksBaseParams & {
+  page: number;
+  limit: number;
+};
+
+type GetTasksListParams = GetTasksBaseParams & {
+  page?: number;
+  limit?: number;
+};
 
 attachInterceptor(api);
 
@@ -53,21 +80,34 @@ export async function updateTask(
 }
 
 export async function getAllTasks(): Promise<TaskPopulated[]> {
-  const res = await api.get<{ result: TaskPopulated[] }>('');
+  const res = await api.get<{
+    result: TaskPopulated[] | PaginatedTasksResponse;
+  }>('', {
+    params: {
+      page: 1,
+      limit: LEGACY_FETCH_LIMIT,
+    },
+  });
 
-  return res.data.result;
+  return extractTasks(res.data.result);
 }
 
 export async function getTaskByProjectId(
   projectId: string,
   filter: string | null = '',
   searchInput: string | null = ''
-) {
-  const response = await api.get(
-    `?projectId=${projectId}&sortBy=${filter}&searchQuery=${searchInput}`
-  );
+): Promise<TaskPopulated[]> {
+  const response = await api.get('', {
+    params: {
+      projectId,
+      sortBy: filter || undefined,
+      searchQuery: searchInput || undefined,
+      page: 1,
+      limit: LEGACY_FETCH_LIMIT,
+    },
+  });
 
-  return response.data.result;
+  return extractTasks(response.data.result);
 }
 
 export async function deleteTask(taskId: string): Promise<void> {
@@ -75,24 +115,94 @@ export async function deleteTask(taskId: string): Promise<void> {
 }
 
 export async function getUserTasks(): Promise<TaskPopulated[]> {
-  const res = await api.get<{ result: TaskPopulated[] }>(`/me`);
-  return res.data.result;
+  const res = await api.get<{
+    result: TaskPopulated[] | PaginatedTasksResponse;
+  }>(`/me`, {
+    params: {
+      page: 1,
+      limit: LEGACY_FETCH_LIMIT,
+    },
+  });
+
+  return extractTasks(res.data.result);
 }
 
-export async function getTasks(params: {
-  projectId: string;
-  searchInput?: string;
-}): Promise<TaskPopulated[]> {
+export function getTasks(
+  params: GetTasksPaginatedParams
+): Promise<PaginatedTasksResponse>;
+export function getTasks(params: GetTasksListParams): Promise<TaskPopulated[]>;
+export async function getTasks(
+  params: GetTasksPaginatedParams | GetTasksListParams
+): Promise<TaskPopulated[] | PaginatedTasksResponse> {
+  const shouldPaginate =
+    typeof params.page === 'number' && typeof params.limit === 'number';
+
+  const normalizedSortOrder =
+    params.sortOrder === 'ascend'
+      ? 'asc'
+      : params.sortOrder === 'descend'
+        ? 'desc'
+        : params.sortOrder;
+
   const queryParams = {
     projectId: params.projectId,
+    page: shouldPaginate ? params.page : 1,
+    limit: shouldPaginate ? params.limit : LEGACY_FETCH_LIMIT,
     ...(params.searchInput && { searchQuery: params.searchInput }),
+    ...(params.type && { type: params.type }),
+    ...(params.status && { status: params.status }),
+    ...(params.priority && { priority: params.priority }),
+    ...(params.assignee && { assignee: params.assignee }),
+    ...(params.reporter && { reporter: params.reporter }),
+    ...(params.tags &&
+      params.tags.length > 0 && { tags: params.tags.join(',') }),
+    ...(params.sortBy && { sortBy: params.sortBy }),
+    ...(normalizedSortOrder && { sortOrder: normalizedSortOrder }),
   };
 
-  const res = await api.get<{ result: TaskPopulated[] }>('', {
+  const res = await api.get<{
+    result: TaskPopulated[] | PaginatedTasksResponse;
+  }>('', {
     params: queryParams,
   });
 
-  return res.data.result;
+  if (shouldPaginate) {
+    return extractPaginatedTasks(
+      res.data.result,
+      params.page as number,
+      params.limit as number
+    );
+  }
+
+  return extractTasks(res.data.result);
+}
+
+function extractTasks(
+  result: TaskPopulated[] | PaginatedTasksResponse
+): TaskPopulated[] {
+  return Array.isArray(result) ? result : result.data;
+}
+
+function extractPaginatedTasks(
+  result: TaskPopulated[] | PaginatedTasksResponse,
+  page: number,
+  limit: number
+): PaginatedTasksResponse {
+  if (Array.isArray(result)) {
+    return {
+      data: result,
+      pagination: {
+        page,
+        limit,
+        total: result.length,
+        totalPages: result.length ? Math.ceil(result.length / limit) : 0,
+        hasNextPage: false,
+        hasPrevPage: page > 1,
+      },
+    };
+  }
+
+  return result;
 }
 
 export async function getTaskActivities(taskId: string): Promise<Activity[]> {
