@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import { List } from 'antd';
+import { Avatar, List } from 'antd';
 import type { MentionItem, MentionListProps, MentionListRef } from './ui.types';
 
 export const MentionList = forwardRef<MentionListRef, MentionListProps>(
@@ -44,7 +44,10 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
               onMouseEnter={() => setSelectedIndex(index)}
               onClick={() => command(item)}
             >
-              {item.label}
+              <div className="flex items-center gap-2">
+                <Avatar size={20} src={item.avatar || '/profile.png'} />
+                <span>{item.label}</span>
+              </div>
             </List.Item>
           )}
         />

@@ -53,6 +53,7 @@ export type DataLoaderProps = {
 export type MentionItem = {
   id: string;
   label: string;
+  avatar?: string;
 };
 
 export type MentionListProps = {

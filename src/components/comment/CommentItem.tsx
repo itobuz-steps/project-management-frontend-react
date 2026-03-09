@@ -5,7 +5,6 @@ import {
   EditOutlined,
   PaperClipOutlined,
 } from '@ant-design/icons';
-import { config } from '../../config/config';
 import type { CommentItemProps, MentionSpanProps } from './comment.type';
 import { formatDistanceToNow } from 'date-fns';
 import { TextEditor } from '../textEditor/TextEditor';
@@ -32,6 +31,7 @@ export function CommentItem({
   const mentionItems = members.map((member) => ({
     id: member._id,
     label: member.name,
+    avatar: member.profileImage,
   }));
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export function CommentItem({
         <Avatar
           src={
             comment.author.profileImage
-              ? `${config.api_base_url}/uploads/${comment.author.profileImage}`
+              ? `${comment.author.profileImage}`
               : '/profile.png'
           }
         >
