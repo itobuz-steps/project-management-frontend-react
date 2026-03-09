@@ -1,6 +1,6 @@
 import type { FilterValue } from 'antd/es/table/interface';
 import dayjs from 'dayjs';
-import { taskTableColumns } from '../../config/constants';
+import { taskTableColumns } from '../../../config/constants';
 
 export const DEFAULT_STATUSES = ['todo', 'in-progress', 'done'];
 

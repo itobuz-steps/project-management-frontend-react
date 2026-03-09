@@ -2,14 +2,14 @@ import { useCallback, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { message } from 'antd';
 import type { TableColumnsType } from 'antd';
-import type { TaskPopulated, User } from '../../services/types/tasks.types';
-import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
-import { TaskTypeColor } from '../../utils/TaskTypeColor';
-import { StatusSelect } from '../ui/StatusSelect';
-import { AssigneeCell } from '../ui/AssigneeCell';
-import { DueDateCell } from '../ui/DueDateCell';
-import { updateTask } from '../../services/taskService';
-import { UserWithAvatar } from './UserWithAvatar';
+import type { TaskPopulated, User } from '../../../services/types/tasks.types';
+import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
+import { TaskTypeColor } from '../../../utils/TaskTypeColor';
+import { StatusSelect } from '../../ui/StatusSelect';
+import { AssigneeCell } from '../../ui/AssigneeCell';
+import { DueDateCell } from '../../ui/DueDateCell';
+import { updateTask } from '../../../services/taskService';
+import { UserWithAvatar } from '../UserWithAvatar';
 import type {
   InlineEditablePayload,
   TaskTableFilters,
@@ -288,7 +288,7 @@ function tagsColumn(
     onCell: () => ({ className: bodyClass('Tags', 'whitespace-nowrap') }),
     render: (_, record) => (
       <div className="flex gap-1">
-        {record.tags && record.tags.length > 0 ? (
+        {record.tags && record.tags.length ? (
           <>
             {record.tags.slice(0, 3).map((tag) => (
               <span
@@ -362,7 +362,7 @@ function getFilteredValue(
     case 'reporter':
       return filters.reporter ? [filters.reporter] : null;
     case 'tags':
-      return filters.tags && filters.tags.length > 0 ? filters.tags : null;
+      return filters.tags && filters.tags.length ? filters.tags : null;
     default:
       return null;
   }

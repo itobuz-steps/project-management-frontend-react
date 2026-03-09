@@ -2,7 +2,7 @@ import type {
   PaginationMeta,
   TaskPopulated,
   User,
-} from '../../services/types/tasks.types';
+} from '../../../services/types/tasks.types';
 
 export type TaskTableFilters = {
   type?: string | null;

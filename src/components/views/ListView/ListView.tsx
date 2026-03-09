@@ -11,7 +11,7 @@ import TaskTable, {
   type TaskTableChangeParams,
   type TaskTableFilters,
   type TaskTableSort,
-} from '../../backlog/TaskTableNew';
+} from '../../backlog/TaskTable/TaskTableNew';
 import './style.scss';
 
 const EMPTY_TABLE_FILTERS: TaskTableFilters = {
@@ -87,7 +87,7 @@ function ListView() {
           assignee: tableFilters.assignee || undefined,
           reporter: tableFilters.reporter || undefined,
           tags:
-            tableFilters.tags && tableFilters.tags.length > 0
+            tableFilters.tags && tableFilters.tags.length
               ? tableFilters.tags
               : undefined,
           sortBy: sorting.field || undefined,

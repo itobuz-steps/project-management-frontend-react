@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { ConfigProvider, Table } from 'antd';
 import type { SorterResult } from 'antd/es/table/interface';
-import type { TaskPopulated } from '../../services/types/tasks.types';
-import { THEME_COLORS } from '../../config/constants';
-import { getPriorityBorder } from '../../utils/utils';
-import { useTheme } from '../../hooks/useTheme';
-import { oklchToHex } from '../../utils/oklchToHex';
+import type { TaskPopulated } from '../../../services/types/tasks.types';
+import { THEME_COLORS } from '../../../config/constants';
+import { getPriorityBorder } from '../../../utils/utils';
+import { useTheme } from '../../../hooks/useTheme';
+import { oklchToHex } from '../../../utils/oklchToHex';
 import { useTaskTableColumns } from './useTaskTableColumns';
 import {
   asSingleFilter,
@@ -35,7 +35,7 @@ export function TaskTable({
   error = null,
 }: TaskTableProps) {
   const statuses = useMemo(
-    () => (statusColumns.length > 0 ? statusColumns : DEFAULT_STATUSES),
+    () => (statusColumns.length ? statusColumns : DEFAULT_STATUSES),
     [statusColumns]
   );
   const [theme] = useTheme();
