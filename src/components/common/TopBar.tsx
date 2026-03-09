@@ -57,7 +57,6 @@ function TopBar({
     return (
       path.endsWith('/backlog') ||
       path.endsWith('/board') ||
-      path.endsWith('/list') ||
       path.endsWith('/sprints-overview') ||
       path.endsWith('/timeline')
     );
