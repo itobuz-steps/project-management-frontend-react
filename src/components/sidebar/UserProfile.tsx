@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { config } from '../../config/config';
 import userService from '../../services/userService';
 import { message } from 'antd';
 import { ChevronDown, ChevronRight, Edit3 } from 'lucide-react';
@@ -28,7 +27,7 @@ export function UserProfile({ collapsed, mobileOpen }: UserProfileProps) {
         if (name) setUserName(name);
         if (email) setUserEmail(email);
         if (profileImage) {
-          setUserImage(`${config.api_base_url}/uploads/${profileImage}`);
+          setUserImage(profileImage);
         }
       } catch {
         message.error('Failed to load user info');
