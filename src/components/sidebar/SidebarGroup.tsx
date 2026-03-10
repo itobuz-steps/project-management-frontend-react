@@ -16,7 +16,7 @@ export default function SidebarGroup({
 
   return (
     <li className="relative" id={id}>
-      <div className="group hover:border-primary-200 hover:bg-primary-50/90 flex items-center justify-between rounded-xl border border-slate-200/80 bg-white/90 px-2.5 py-2 shadow-sm backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <div className="group hover:border-primary-200 hover:bg-primary-50/90 flex items-center justify-between rounded-xl bg-white/90 px-2.5 py-2 shadow-sm backdrop-blur transition-all duration-200">
         <button
           type="button"
           onClick={collapsible ? onToggle : undefined}
