@@ -52,7 +52,18 @@ function ProjectDeleteSection({ projectId }: ProjectSettingsDeleteProps) {
           description="This action cannot be undone."
           okText="Delete"
           cancelText="Cancel"
-          okButtonProps={{ danger: true }}
+          okButtonProps={{
+            style: {
+              backgroundColor: 'red',
+              color: 'white',
+            },
+          }}
+          cancelButtonProps={{
+            style: {
+              border: 'var(--color-primary-500) solid 1px',
+            },
+            type: 'text',
+          }}
           onConfirm={handleDelete}
         >
           <Button danger icon={<DeleteOutlined />}>

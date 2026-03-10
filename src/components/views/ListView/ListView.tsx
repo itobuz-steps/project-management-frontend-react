@@ -1,53 +1,77 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { getTasks } from '../../../services/taskService';
-import type { TaskPopulated } from '../../../services/types/tasks.types';
+import type {
+  PaginationMeta,
+  TaskPopulated,
+} from '../../../services/types/tasks.types';
 import { useProject } from '../../../context/ProjectContext';
-import { TaskRow } from '../../backlog/TaskRow';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
-import { taskTableColumns } from '../../../config/constants';
-import { Skeleton } from 'antd';
+import TaskTable, {
+  type TaskTableChangeParams,
+  type TaskTableFilters,
+  type TaskTableSort,
+} from '../../backlog/TaskTable/TaskTableNew';
+import './style.scss';
+
+const EMPTY_TABLE_FILTERS: TaskTableFilters = {
+  type: null,
+  status: null,
+  assignee: null,
+  reporter: null,
+  tags: [],
+};
+
+const toServerSortOrder = (order?: TaskTableSort['order']) => {
+  if (order === 'ascend') {
+    return 'asc';
+  }
+
+  if (order === 'descend') {
+    return 'desc';
+  }
+
+  return undefined;
+};
 
 function ListView() {
   const { projectId } = useParams();
   const [searchParams] = useSearchParams();
   const { columns } = useProject();
-
   const { members, loadingMembers } = useProjectMetaData(projectId);
 
   const [tasks, setTasks] = useState<TaskPopulated[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [tableFilters, setTableFilters] =
+    useState<TaskTableFilters>(EMPTY_TABLE_FILTERS);
+  const [sorting, setSorting] = useState<TaskTableSort>({
+    field: null,
+    order: null,
+  });
+  const [pagination, setPagination] = useState<PaginationMeta>({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
 
-  const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
-  const statusFilter = normalize(searchParams.get('status') || '');
-  const priorityFilter = normalize(searchParams.get('priority') || '');
-  const assigneeFilter = normalize(searchParams.get('assignee') || '');
+  const searchInput = searchParams.get('searchInput') || '';
 
-  const visibleTasks = useMemo(() => {
-    if (!statusFilter && !priorityFilter && !assigneeFilter) return tasks;
-    return tasks.filter((task) => {
-      if (statusFilter && normalize(task.status) !== statusFilter) {
-        return false;
-      }
-      if (priorityFilter && normalize(task.priority) !== priorityFilter) {
-        return false;
-      }
-      if (
-        assigneeFilter &&
-        normalize(task.assignee?._id || '') !== assigneeFilter
-      ) {
-        return false;
-      }
-      return true;
-    });
-  }, [priorityFilter, statusFilter, assigneeFilter, tasks]);
+  useEffect(() => {
+    setPage(1);
+  }, [searchInput, projectId]);
 
   useEffect(() => {
     if (!projectId) {
       setTasks([]);
       setError(null);
       setLoading(false);
+      setPagination((prev) => ({ ...prev, total: 0, totalPages: 0 }));
       return;
     }
 
@@ -57,9 +81,22 @@ function ListView() {
         setError(null);
         const result = await getTasks({
           projectId,
-          searchInput: searchParams.get('searchInput') || '',
+          searchInput,
+          type: tableFilters.type || undefined,
+          status: tableFilters.status || undefined,
+          assignee: tableFilters.assignee || undefined,
+          reporter: tableFilters.reporter || undefined,
+          tags:
+            tableFilters.tags && tableFilters.tags.length
+              ? tableFilters.tags
+              : undefined,
+          sortBy: sorting.field || undefined,
+          sortOrder: toServerSortOrder(sorting.order),
+          page,
+          limit: pageSize,
         });
-        setTasks(result);
+        setTasks(result.data);
+        setPagination(result.pagination);
       } catch {
         setError('Failed to load tasks.');
       } finally {
@@ -68,12 +105,39 @@ function ListView() {
     };
 
     load();
-  }, [projectId, searchParams]);
+  }, [projectId, searchInput, tableFilters, sorting, page, pageSize]);
 
   const handleTaskUpdated = (updated: TaskPopulated) => {
     setTasks((prev) =>
       prev.map((task) => (task._id === updated._id ? updated : task))
     );
+  };
+
+  const handleTableChange = ({
+    page: nextPage,
+    pageSize: nextPageSize,
+    filters,
+    sorting: nextSorting,
+  }: TaskTableChangeParams) => {
+    const shouldResetPageSize = nextPageSize !== pageSize;
+    const shouldResetForFilters =
+      JSON.stringify(filters) !== JSON.stringify(tableFilters);
+    const shouldResetForSorting =
+      nextSorting.field !== sorting.field ||
+      nextSorting.order !== sorting.order;
+
+    setTableFilters(filters);
+    setSorting(nextSorting);
+
+    if (shouldResetPageSize || shouldResetForFilters || shouldResetForSorting) {
+      setPage(1);
+      if (shouldResetPageSize) {
+        setPageSize(nextPageSize);
+      }
+      return;
+    }
+
+    setPage(nextPage);
   };
 
   if (!projectId) {
@@ -91,62 +155,19 @@ function ListView() {
 
   return (
     <div className="no-scrollbar relative mt-2 w-full overflow-x-auto rounded-md border border-gray-200">
-      <table className="min-w-full table-fixed overflow-x-auto rounded-lg bg-white p-4 text-left text-sm shadow-sm">
-        <thead className="z-10 bg-[#f8f8f8] text-xs font-semibold text-gray-500 uppercase">
-          <tr>
-            {taskTableColumns.map(({ label, className }) => (
-              <th key={label} className={className}>
-                {label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-
-        <tbody className="divide-y whitespace-nowrap">
-          {loading && (
-            <tr>
-              <td colSpan={11} className="p-4 text-center text-gray-500">
-                <div className="flex flex-col gap-2">
-                  <Skeleton.Input active={true} size="default" block={true} />
-                  <Skeleton.Input active={true} size="default" block={true} />
-                  <Skeleton.Input active={true} size="default" block={true} />
-                  <Skeleton.Input active={true} size="default" block={true} />
-                </div>
-              </td>
-            </tr>
-          )}
-
-          {error && !loading && (
-            <tr>
-              <td colSpan={11} className="p-4 text-center text-red-600">
-                {error}
-              </td>
-            </tr>
-          )}
-
-          {!loading && !error && visibleTasks.length === 0 && (
-            <tr>
-              <td colSpan={11} className="p-4 text-center text-gray-500">
-                No tasks available
-              </td>
-            </tr>
-          )}
-
-          {!loading &&
-            !error &&
-            visibleTasks.map((task) => (
-              <TaskRow
-                key={task._id}
-                task={task}
-                columns={columns}
-                containerId={projectId}
-                members={members}
-                loadingMembers={loadingMembers}
-                onUpdated={handleTaskUpdated}
-              />
-            ))}
-        </tbody>
-      </table>
+      <TaskTable
+        tasks={tasks}
+        statusColumns={columns}
+        members={members}
+        loadingMembers={loadingMembers}
+        onTaskUpdated={handleTaskUpdated}
+        pagination={pagination}
+        filters={tableFilters}
+        sorting={sorting}
+        onTableChange={handleTableChange}
+        loading={loading}
+        error={error}
+      />
     </div>
   );
 }

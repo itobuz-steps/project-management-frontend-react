@@ -4,6 +4,7 @@ import type { User } from '../../services/types/tasks.types';
 import { UserCell } from './UserCell';
 import { updateTask } from '../../services/taskService';
 import type { AssigneeCellType } from './ui.types';
+import { useAuthContext } from '../../context/AuthContext';
 
 export function AssigneeCell({
   task,
@@ -13,17 +14,55 @@ export function AssigneeCell({
   loadMembers,
 }: AssigneeCellType) {
   const [editing, setEditing] = useState(false);
+  const { userId } = useAuthContext();
 
   if (!editing) {
     return (
-      <div
-        className="flex h-7 w-[100px] cursor-pointer items-center truncate rounded-md hover:bg-gray-100 lg:w-full"
-        onClick={() => {
-          setEditing(true);
-          loadMembers?.();
-        }}
-      >
-        <UserCell user={task.assignee} emptyText="Unassigned" />
+      <div className="flex h-7 w-[100px] items-center gap-1 truncate rounded-md px-1 hover:bg-gray-100 lg:w-full">
+        <div
+          className="cursor-pointer truncate"
+          onClick={() => {
+            setEditing(true);
+            loadMembers?.();
+          }}
+        >
+          <UserCell user={task.assignee} emptyText="Unassigned" />
+        </div>
+
+        {!task.assignee && userId && (
+          <>
+            <span className="text-gray-300">·</span>
+
+            <button
+              className="text-primary-600 text-xs hover:underline"
+              onClick={async (e) => {
+                e.stopPropagation();
+
+                const selectedUser =
+                  members.find((member) => member._id === userId) ?? null;
+
+                const optimistic = {
+                  ...task,
+                  assignee: selectedUser as User,
+                };
+
+                onUpdated(optimistic);
+
+                try {
+                  await updateTask(task._id, {
+                    assignee: userId as unknown as User,
+                  });
+
+                  message.success('Assigned to you');
+                } catch {
+                  message.error('Failed to assign task');
+                }
+              }}
+            >
+              Assign me
+            </button>
+          </>
+        )}
       </div>
     );
   }
@@ -52,8 +91,9 @@ export function AssigneeCell({
 
         try {
           await updateTask(task._id, {
-            assignee: (userId as unknown as User) ?? undefined,
+            assignee: (userId as unknown as User) ?? null,
           });
+          message.success('Task Updated');
         } catch {
           message.error('Failed to update assignee');
         }

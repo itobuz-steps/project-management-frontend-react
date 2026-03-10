@@ -57,7 +57,6 @@ function TopBar({
     return (
       path.endsWith('/backlog') ||
       path.endsWith('/board') ||
-      path.endsWith('/list') ||
       path.endsWith('/sprints-overview') ||
       path.endsWith('/timeline')
     );
@@ -116,7 +115,7 @@ function TopBar({
             )}
           </div>
 
-          <div className="flex items-center gap-3 self-end sm:justify-end">
+          <div className="flex items-center gap-1 self-end sm:justify-end">
             <Can permission="SEND_INVITE">
               <InviteUserContainer />
             </Can>

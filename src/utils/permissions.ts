@@ -6,11 +6,12 @@ export type Permission =
   | 'DELETE_COLUMN'
   | 'CREATE_PROJECT'
   | 'CREATE_WORKSPACE'
-  | 'PROJECT_SETTINGS';
+  | 'PROJECT_SETTINGS'
+  | 'DELETE_SPRINT';
 
 const rolePermissions: Record<Role, Permission[]> = {
   member: [],
-  admin: ['ADD_COLUMN', 'SEND_INVITE', 'PROJECT_SETTINGS'],
+  admin: ['ADD_COLUMN', 'SEND_INVITE', 'PROJECT_SETTINGS', 'DELETE_SPRINT'],
   superadmin: [
     'ADD_COLUMN',
     'DELETE_COLUMN',
@@ -18,6 +19,7 @@ const rolePermissions: Record<Role, Permission[]> = {
     'CREATE_PROJECT',
     'CREATE_WORKSPACE',
     'PROJECT_SETTINGS',
+    'DELETE_SPRINT',
   ],
 };
 
