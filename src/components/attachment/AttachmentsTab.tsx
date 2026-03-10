@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { Button, Upload } from 'antd';
+import { message } from 'antd';
 import type { UploadProps } from 'antd';
+import type { BackendAttachment } from '../../services/types/tasks.types';
 import { PlusOutlined, DownOutlined, RightOutlined } from '@ant-design/icons';
 import type { AttachmentsTabProps } from './attachment.type';
+import { allowedTypes, allowedExtensions } from './attachment.type';
 import { useTaskAttachments } from '../../hooks/useTaskAttachments';
 import { AttachmentItem } from '../attachment/AttachmentItem';
 import { DataLoader } from '../ui/DataLoader';
@@ -18,11 +21,21 @@ export function AttachmentsTab({
     useTaskAttachments(task, onUpdated);
 
   const uploadProps: UploadProps = {
-    multiple: true,
+    multiple: false,
     showUploadList: false,
-    beforeUpload: async (file) => {
+    beforeUpload: (file) => {
       setExpanded(true);
-      addAttachment(file);
+
+      const f = file as File;
+      const type = f.type || '';
+      const ext = f.name.split('.').pop()?.toLowerCase() || '';
+
+      if (!allowedTypes.includes(type) && !allowedExtensions.includes(ext)) {
+        message.error(`File type not allowed: ${f.name}`);
+        return false;
+      }
+
+      addAttachment(f);
       return false;
     },
   };
@@ -72,7 +85,9 @@ export function AttachmentsTab({
                   key={
                     attachment instanceof File
                       ? `${attachment.name}-${attachment.size}`
-                      : attachment
+                      : typeof attachment === 'string'
+                        ? attachment
+                        : (attachment as BackendAttachment).key
                   }
                   isDrawer={isDrawer}
                   attachment={attachment}
