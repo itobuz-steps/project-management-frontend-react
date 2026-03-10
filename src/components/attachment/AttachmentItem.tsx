@@ -54,7 +54,7 @@ export function AttachmentItem({
         <img
           src={url}
           alt={name}
-          className="h-10 w-10 rounded border object-cover"
+          className="hover: h-10 w-10 transform rounded border object-cover hover:scale-150"
         />
       );
     }
