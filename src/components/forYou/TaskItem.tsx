@@ -2,36 +2,139 @@ import { useSearchParams } from 'react-router-dom';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import type { Project } from '../../types/project.types';
+import { Clock3, Link2 } from 'lucide-react';
+
+function toTitleCase(value: string) {
+  return value
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
+
+function getPriorityBadgeClass(priority: string) {
+  const normalized = priority.trim().toLowerCase();
+
+  if (normalized === 'high') {
+    return 'bg-violet-200 text-violet-950';
+  }
+
+  if (normalized === 'medium') {
+    return 'bg-orange-100 text-orange-900';
+  }
+
+  return 'bg-emerald-100 text-emerald-900';
+}
+
+function getDaysLeftText(dueDate?: string) {
+  if (!dueDate) {
+    return 'No due date';
+  }
+
+  const due = new Date(dueDate);
+  if (Number.isNaN(due.getTime())) {
+    return 'No due date';
+  }
+
+  const oneDay = 1000 * 60 * 60 * 24;
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startDue = new Date(due.getFullYear(), due.getMonth(), due.getDate());
+  const diffDays = Math.ceil(
+    (startDue.getTime() - startToday.getTime()) / oneDay
+  );
+
+  if (diffDays < 0) {
+    return `${Math.abs(diffDays)} day${Math.abs(diffDays) === 1 ? '' : 's'} overdue`;
+  }
+
+  if (diffDays === 0) {
+    return 'Due today';
+  }
+
+  return `${diffDays} day${diffDays === 1 ? '' : 's'} left`;
+}
+
+function getProgressPercent(status: string) {
+  const normalized = status.trim().toLowerCase();
+
+  if (normalized.includes('done') || normalized.includes('complete')) {
+    return 100;
+  }
+
+  return 0;
+}
 
 export function TaskItem({ task }: { task: TaskPopulated }) {
   const [, setSearchParams] = useSearchParams();
+  const projectName =
+    typeof task.projectId === 'string'
+      ? 'Project'
+      : ((task.projectId as Project).name ?? 'Project');
+
+  console.log(task.projectId);
+  const linksCount =
+    (task.blocks?.length ?? 0) +
+    (task.blockedBy?.length ?? 0) +
+    (task.relatesTo?.length ?? 0) +
+    (task.duplicates?.length ?? 0);
+
+  const priorityLabel = toTitleCase(task.priority || 'low');
+  const daysLeft = getDaysLeftText(task.dueDate);
+  const progressPercent = getProgressPercent(task.status || 'todo');
 
   return (
     <li
       onClick={() => setSearchParams({ taskId: task._id }, { replace: true })}
-      className="hover:bg-primary-50 flex items-center justify-between rounded-sm border border-gray-100 bg-white p-2 shadow-sm hover:cursor-pointer"
+      className="group flex items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-neutral-50 px-3 py-2 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-colors hover:cursor-pointer hover:border-gray-300"
     >
-      <div className="flex items-center justify-start gap-2">
-        <div className="flex items-center justify-center">
-          <TaskTypeIcon type={task.type} />
+      <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
+        <div className="mb-1 min-w-0">
+          <p className="truncate text-lg leading-7 font-semibold text-gray-900 sm:text-xl">
+            {task.title}
+          </p>
+          <p className="mt-1 text-xs! text-gray-500">{projectName}</p>
         </div>
-        <div className="flex flex-col items-start justify-center">
-          <div className="flex gap-2">
-            <p className="smaller-text bg-primary-500 m-auto w-max rounded-sm px-1 text-center font-semibold text-nowrap text-white">
-              {task.key}
-            </p>
-            <p className="font-semibold">{task.title}</p>
-          </div>
-          <div className="flex items-center justify-center gap-3">
-            <p className="smaller-text font-medium text-gray-500">
-              {(task.projectId as Project).name}
-            </p>
-          </div>
+
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-gray-700">
+            <Link2 size={14} />
+            {linksCount}
+          </span>
+
+          <span
+            className={`rounded-md px-3 py-1 text-sm font-semibold ${getPriorityBadgeClass(task.priority || 'low')}`}
+          >
+            {priorityLabel}
+          </span>
+
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700">
+            <Clock3 size={14} />
+            {daysLeft}
+          </span>
         </div>
       </div>
-      <p className="smaller-text flex gap-2 font-medium">
-        {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-      </p>
+
+      <div className="hidden items-center gap-4 md:flex">
+        <TaskTypeIcon type={task.type} />
+
+        <div className="flex min-w-[132px] items-center gap-3">
+          <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+            <div
+              className="h-full rounded-full bg-black"
+              style={{ width: `${Math.max(progressPercent, 4)}%` }}
+            />
+            <span
+              className="absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border border-white bg-black"
+              style={{ left: `calc(${Math.max(progressPercent, 4)}% - 5px)` }}
+            />
+          </div>
+
+          <span className="w-8 text-right text-sm font-semibold text-slate-600">
+            {progressPercent}%
+          </span>
+        </div>
+      </div>
     </li>
   );
 }
