@@ -22,7 +22,7 @@ export interface Task {
   subTasks?: string[];
   labels?: string[];
   tags?: string[];
-  attachments?: FileList | File[];
+  attachments?: FileList | File[] | BackendAttachment[] | string[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -48,7 +48,15 @@ export type User = {
   role: Role;
 };
 
-export type TaskAttachment = File | string;
+export type BackendAttachment = {
+  key: string;
+  url: string;
+  name: string;
+  mimeType: string;
+  size: number;
+};
+
+export type TaskAttachment = File | string | BackendAttachment;
 
 export interface TaskReference {
   _id: string;
