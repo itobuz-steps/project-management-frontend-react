@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import dayjs from 'dayjs';
 import type { TaskPopulated } from '../../../services/types/tasks.types';
 import { useSortable } from '@dnd-kit/sortable';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
@@ -25,11 +26,7 @@ export function TaskCard({
   const isCompleted = column === columns[columns.length - 1];
 
   const dueDateText = task.dueDate
-    ? new Date(task.dueDate).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      })
+    ? dayjs(task.dueDate).format('DD MMM YYYY')
     : 'No due date';
 
   const priorityLabel =
@@ -137,8 +134,8 @@ export function TaskCard({
 
         <span
           className={
-            'inline-flex items-center gap-1 rounded-sm px-3 py-1 text-xs font-semibold text-indigo-700 ' +
-            `text-${PRIORITY_COLORS[task.priority || 'low']}-400` +
+            'inline-flex items-center gap-1 rounded-sm px-3 py-1 text-xs font-semibold ' +
+            `text-${PRIORITY_COLORS[task.priority || 'low']}-700` +
             ` bg-${PRIORITY_COLORS[task.priority || 'low']}-50`
           }
         >
