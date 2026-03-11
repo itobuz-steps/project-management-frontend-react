@@ -20,6 +20,21 @@ export function useBoard(
 
   const sprintService = createSprintService(projectId as string);
 
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const updated = (event as CustomEvent<TaskPopulated>).detail;
+      if (!updated) {
+        return;
+      }
+      setTasks((prev) =>
+        prev.map((task) => (task._id === updated._id ? updated : task))
+      );
+    };
+    window.addEventListener('task-updated', handler as EventListener);
+    return () =>
+      window.removeEventListener('task-updated', handler as EventListener);
+  }, []);
+
   const handleAddColumn = useCallback(
     async (columnName: string, insertAfter?: string | null) => {
       const trimmed = columnName.trim();

@@ -11,6 +11,10 @@ export function useTaskUpdate(taskId: string, onUpdated: OnUpdatedFn) {
         payload as Partial<TaskPopulated> & { attachments?: File[] }
       );
       onUpdated(updatedTask);
+      // notify other parts of the app about this task update (e.g., backlog list)
+      const event = new CustomEvent('task-updated', { detail: updatedTask });
+      window.dispatchEvent(event);
+
       message.success('Task Updated');
     } catch {
       message.error(errorMsg);

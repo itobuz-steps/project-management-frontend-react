@@ -36,6 +36,25 @@ export function TaskTable({
     setLocalTasks(tasks);
   }, [tasks]);
 
+  // Listen for global task updates (e.g., from TaskDrawer) and update localTasks
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const custom = event as CustomEvent;
+      const updated = custom.detail as TaskPopulated;
+      if (!updated) {
+        return;
+      }
+
+      setLocalTasks((prev) =>
+        prev.map((task) => (task._id === updated._id ? updated : task))
+      );
+    };
+
+    window.addEventListener('task-updated', handler as EventListener);
+    return () =>
+      window.removeEventListener('task-updated', handler as EventListener);
+  }, []);
+
   const { members, loadingMembers } = useProjectMetaData(project?._id);
 
   const {
