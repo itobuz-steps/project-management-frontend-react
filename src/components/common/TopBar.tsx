@@ -1,4 +1,4 @@
-import { Plus, FunnelX } from 'lucide-react';
+import { Plus, FunnelX, Users } from 'lucide-react';
 import type { ViewMode, TopBarProps } from '../../types/TopBar.types';
 import {
   NavLink,
@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom';
 import { SettingOutlined } from '@ant-design/icons';
 import { useMemo, useState } from 'react';
+import { ProjectMembersModal } from './ProjectMembersModal';
 import { useProject } from '../../context/ProjectContext';
 import { PRIORITIES } from '../taskModal/constants';
 import SearchBar from '../navbar/SearchBar';
@@ -33,6 +34,7 @@ function TopBar({
   const [activeFilter, setActiveFilter] = useState<
     'status' | 'priority' | 'assignee' | null
   >(null);
+  const [isMembersOpen, setIsMembersOpen] = useState(false);
 
   const type = project?.projectType;
   const isScrum = type === 'scrum';
@@ -120,10 +122,18 @@ function TopBar({
               <InviteUserContainer />
             </Can>
 
+            <button
+              onClick={() => setIsMembersOpen(true)}
+              className="flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-(--color-primary-200)"
+              title="View Members"
+            >
+              <Users className="h-4.5 w-4.5" />
+            </button>
+
             <Can permission="PROJECT_SETTINGS">
               <button
                 onClick={() => navigate('settings')}
-                className="flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-[var(--color-primary-200)]"
+                className="flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-(--color-primary-200)"
                 title="Project Settings"
               >
                 <SettingOutlined style={{ fontSize: '18px' }} />
@@ -292,6 +302,10 @@ function TopBar({
           </div>
         </div>
       </header>
+      <ProjectMembersModal
+        open={isMembersOpen}
+        onClose={() => setIsMembersOpen(false)}
+      />
     </>
   );
 }

@@ -141,6 +141,20 @@ export function useProjectSettingsForm({
     setSelectedRole('member');
   };
 
+  const changeMemberRole = (userId: string, role: ProjectMemberRole) => {
+    setProjectMembers((prev) =>
+      prev.map((member) =>
+        member.user === userId ? { ...member, role } : member
+      )
+    );
+
+    setVisibleMembers((prev) =>
+      prev.map((member) =>
+        member.user === userId ? { ...member, role } : member
+      )
+    );
+  };
+
   const removeMember = (userId: string) => {
     setProjectMembers((prev) =>
       prev.filter((member) => member.user !== userId)
@@ -160,6 +174,7 @@ export function useProjectSettingsForm({
     setSelectedRole,
     handleSubmit,
     addMemberRole,
+    changeMemberRole,
     removeMember,
   };
 }
