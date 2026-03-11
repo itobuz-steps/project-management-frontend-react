@@ -96,8 +96,8 @@ export function TaskItem({ task }: { task: TaskPopulated }) {
           <p className="mt-1 text-xs! text-gray-500">{projectName}</p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 text-sm">
-          <span className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-gray-700">
+        <div className="flex flex-wrap items-center justify-end gap-3 text-sm">
+          <span className="hidden items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-gray-700 sm:inline-flex">
             <Link2 size={14} />
             {linksCount}
           </span>
@@ -121,16 +121,16 @@ export function TaskItem({ task }: { task: TaskPopulated }) {
         <div className="flex min-w-[132px] items-center gap-3">
           <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
             <div
-              className="h-full rounded-full bg-black"
+              className="hidden h-full rounded-full bg-black sm:block"
               style={{ width: `${Math.max(progressPercent, 4)}%` }}
             />
             <span
-              className="absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border border-white bg-black"
+              className="absolute top-1/2 hidden h-2.5 w-2.5 -translate-y-1/2 rounded-full border border-white bg-black sm:inline"
               style={{ left: `calc(${Math.max(progressPercent, 4)}% - 5px)` }}
             />
           </div>
 
-          <span className="w-8 text-right text-sm font-semibold text-slate-600">
+          <span className="hidden w-8 text-right text-sm font-semibold text-slate-600 sm:inline">
             {progressPercent}%
           </span>
         </div>

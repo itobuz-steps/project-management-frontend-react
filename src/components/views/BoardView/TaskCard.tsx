@@ -65,7 +65,7 @@ export function TaskCard({
       {...attributes}
       {...listeners}
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="group flex items-start justify-between gap-2">
         <span className="mt-2 flex items-center gap-1 text-xs text-gray-500">
           <TaskTypeIcon type={task.type} />
           <Link
@@ -88,7 +88,7 @@ export function TaskCard({
             setIsDeleteOpen(true);
           }}
         >
-          <Trash size={16} />
+          <Trash size={16} className="hidden group-hover:block" />
         </button>
       </div>
 
