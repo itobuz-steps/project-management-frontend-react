@@ -24,6 +24,7 @@ import {
   TYPE_FILTERS,
 } from './taskTable.utils';
 import { UserCell } from '../../ui/UserCell';
+import { usePermissions } from '../../../hooks/usePermissions';
 
 type UseTaskTableColumnsParams = {
   tasks: TaskPopulated[];
@@ -45,6 +46,9 @@ export function useTaskTableColumns({
   onTaskUpdated,
 }: UseTaskTableColumnsParams) {
   const [, setSearchParams] = useSearchParams();
+
+  const { can } = usePermissions();
+  const canChangeReporter = can('REPORTER_CHANGE');
 
   const updateTaskField = useCallback(
     async (
@@ -100,7 +104,13 @@ export function useTaskTableColumns({
       tagsColumn(tagFilters),
       dateColumn('Created', 'createdAt', sortOrderFor),
       dateColumn('Updated', 'updatedAt', sortOrderFor),
-      reporterColumn(reporterSelectFilters),
+      reporterColumn(
+        reporterSelectFilters,
+        members,
+        loadingMembers,
+        onTaskUpdated,
+        canChangeReporter
+      ),
     ].map((col) => ({
       ...col,
       filteredValue: getFilteredValue(col.key as string, filters),
@@ -115,6 +125,7 @@ export function useTaskTableColumns({
     loadingMembers,
     onTaskUpdated,
     updateTaskField,
+    canChangeReporter,
   ]);
 
   return columns;
@@ -235,7 +246,10 @@ function assigneeColumn(
     filterMultiple: false,
     onHeaderCell: () => ({ className: headerClass('Assignee') }),
     onCell: () => ({
-      className: bodyClass('Assignee', 'whitespace-nowrap px-6 py-3'),
+      className: bodyClass(
+        'Assignee',
+        'whitespace-nowrap px-6 py-3 w-[150px] max-w-[150px] truncate'
+      ),
     }),
     render: (_, record) => (
       <AssigneeCell
@@ -330,7 +344,11 @@ function dateColumn(
 }
 
 function reporterColumn(
-  reporterSelectFilters: { text: string; value: string }[]
+  reporterSelectFilters: { text: string; value: string }[],
+  members: User[],
+  loadingMembers: boolean,
+  onTaskUpdated: (updated: TaskPopulated) => void,
+  canChangeReporter: boolean
 ): TableColumnsType<TaskPopulated>[number] {
   return {
     title: 'Reporter',
@@ -338,10 +356,23 @@ function reporterColumn(
     filters: reporterSelectFilters,
     filterMultiple: false,
     onHeaderCell: () => ({ className: headerClass('Reporter') }),
-    onCell: () => ({ className: bodyClass('Reporter', 'whitespace-nowrap') }),
-    render: (_, record) => (
-      <UserCell user={record.reporter} emptyText="Unknown" />
-    ),
+    onCell: () => ({
+      className: bodyClass(
+        'Reporter',
+        'whitespace-nowrap w-[150px] max-w-[150px] truncate '
+      ),
+    }),
+    render: (_, record) =>
+      canChangeReporter ? (
+        <AssigneeCell
+          task={record}
+          members={members}
+          loading={loadingMembers}
+          onUpdated={onTaskUpdated}
+        />
+      ) : (
+        <UserCell user={record.reporter} emptyText="Unknown" />
+      ),
   };
 }
 

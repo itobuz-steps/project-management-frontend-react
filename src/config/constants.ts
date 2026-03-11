@@ -171,5 +171,5 @@ export const taskTableColumns = [
   { label: 'Labels', className: 'p-3 px-6' },
   { label: 'Created', className: 'p-3 px-6' },
   { label: 'Updated', className: 'p-3 px-6' },
-  { label: 'Reporter', className: 'p-3 px-6' },
+  { label: 'Reporter', className: 'p-3 px-6 truncate w-[200px]' },
 ];
