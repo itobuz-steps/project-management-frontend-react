@@ -3,7 +3,6 @@ import LogoutButton from './LogoutButton';
 import {
   FolderKanban,
   Plus,
-  Menu,
   X,
   Home,
   ChevronsLeft,
@@ -23,6 +22,17 @@ export default function Sidebar() {
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   const [workspaceRefreshKey, setWorkspaceRefreshKey] = useState(0);
   const [workspacesExpanded, setWorkspacesExpanded] = useState(true);
+
+  const handleWorkspaceToggle = () => {
+    // In collapsed desktop mode, clicking the workspace icon should open sidebar and keep workspaces visible.
+    if (collapsed && !mobileOpen) {
+      setCollapsed(false);
+      setWorkspacesExpanded(true);
+      return;
+    }
+
+    setWorkspacesExpanded((prev) => !prev);
+  };
 
   // Close mobile sidebar on route change or escape key
   useEffect(() => {
@@ -50,10 +60,10 @@ export default function Sidebar() {
       {/* Mobile menu button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed top-4 left-4 z-50 rounded-xl border border-slate-200 bg-white/95 p-2.5 text-slate-700 shadow-lg backdrop-blur md:hidden"
+        className="absolute top-10 -left-1 z-10 rounded-full border border-slate-200 bg-white p-1.5 text-slate-600 shadow-sm transition-colors hover:bg-slate-100 md:hidden"
         aria-label="Open sidebar"
       >
-        <Menu size={24} />
+        {!mobileOpen ? <ChevronsRight size={18} /> : <ChevronsLeft size={18} />}
       </button>
 
       {/* Mobile overlay */}
@@ -75,7 +85,7 @@ export default function Sidebar() {
         <button
           type="button"
           onClick={() => setCollapsed((prev) => !prev)}
-          className="absolute top-7 -right-3 z-10 hidden rounded-full border border-slate-200 bg-white p-1.5 text-slate-600 shadow-sm transition-colors hover:bg-slate-100 md:inline-flex"
+          className="absolute top-7 -right-5 z-10 hidden rounded-full border border-slate-200 bg-white p-1.5 text-slate-600 shadow-sm transition-colors hover:bg-slate-100 md:inline-flex"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? <ChevronsRight size={18} /> : <ChevronsLeft size={18} />}
@@ -84,7 +94,7 @@ export default function Sidebar() {
         {/* Mobile close button */}
         <button
           onClick={() => setMobileOpen(false)}
-          className="absolute top-4 right-4 rounded-lg p-1 text-slate-600 transition-colors hover:bg-slate-200/70 md:hidden"
+          className="absolute top-4 right-4 rounded-lg bg-slate-50 p-1 text-slate-600 transition-colors hover:bg-slate-200/70 md:hidden"
           aria-label="Close sidebar"
         >
           <X size={24} />
@@ -96,25 +106,24 @@ export default function Sidebar() {
           }`}
         >
           <UserProfile collapsed={collapsed} mobileOpen={mobileOpen} />
-          <ul className="flex flex-col gap-3 font-semibold">
+          <ul className="flex flex-col gap-2 font-semibold">
             {/* FOR YOU */}
             <li>
               <NavLink
                 to="/for-you"
                 className={({ isActive }) =>
-                  `group flex items-center gap-3 rounded-xl border px-2.5 py-2.5 transition-all duration-200 ${
+                  `group flex items-center gap-3 rounded-lg border px-2.5 py-2.5 ${
                     isActive
-                      ? 'border-primary-900 bg-primary-900 text-white shadow-sm'
-                      : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-white/80 hover:shadow-sm'
+                      ? 'border-primary-900 bg-primary-900 text-white'
+                      : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-white/80 hover:shadow-xs'
                   } `
                 }
               >
                 <Home
-                  size={20}
-                  className={`shrink-0 transition-colors group-hover:text-slate-900 ${collapsed && 'ml-0.5'}`}
+                  className={`size-4 shrink-0 transition-colors ${collapsed && 'ml-0.5'}`}
                 />
                 <span
-                  className={`truncate text-[15px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${
+                  className={`truncate text-[14px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${
                     collapsed && !mobileOpen
                       ? '-translate-x-2 opacity-0'
                       : 'translate-x-0 opacity-100'
@@ -129,11 +138,11 @@ export default function Sidebar() {
             <SidebarGroup
               id="projectsMenu"
               label="Workspaces"
-              icon={<FolderKanban size={20} className="shrink-0" />}
+              icon={<FolderKanban className="size-4 shrink-0" />}
               collapsed={collapsed && !mobileOpen}
               collapsible
               expanded={workspacesExpanded}
-              onToggle={() => setWorkspacesExpanded((prev) => !prev)}
+              onToggle={handleWorkspaceToggle}
               action={
                 <Can permission="CREATE_PROJECT">
                   <button
@@ -143,14 +152,14 @@ export default function Sidebar() {
                     title="Add project"
                     onClick={() => setProjectModalOpen(true)}
                   >
-                    <Plus size={18} />
+                    <Plus className="size-4" />
                   </button>
                 </Can>
               }
             >
               <ul
                 id="projectsDropdown"
-                className={`mt-3 ml-5 flex flex-col gap-3 border-l border-slate-300/80 pl-3 transition-all duration-300 ${
+                className={`ml-5 flex flex-col gap-3 border-l border-slate-300/80 pl-3 transition-all duration-300 ${
                   collapsed && !mobileOpen
                     ? 'h-0 overflow-hidden opacity-0'
                     : !workspacesExpanded

@@ -16,11 +16,11 @@ export default function SidebarGroup({
 
   return (
     <li className="relative" id={id}>
-      <div className="group hover:border-primary-200 hover:bg-primary-50/90 flex items-center justify-between rounded-xl bg-white/90 px-2.5 py-2 shadow-sm backdrop-blur transition-all duration-200">
+      <div className="group hover:border-primary-200 flex items-center justify-between rounded-lg px-2.5 py-2 transition-all duration-200 hover:bg-white hover:shadow-xs">
         <button
           type="button"
           onClick={collapsible ? onToggle : undefined}
-          className={`flex min-w-0 items-center gap-4 overflow-hidden text-left ${
+          className={`ml-1 flex min-w-0 flex-1 items-center gap-4 overflow-hidden text-left ${
             collapsible ? 'cursor-pointer' : 'cursor-default'
           }`}
           aria-expanded={collapsible ? isExpanded : undefined}
@@ -30,7 +30,7 @@ export default function SidebarGroup({
             {icon}
           </span>
           <span
-            className={`group-hover:text-primary-900 text-[15px] font-semibold tracking-wide whitespace-nowrap text-slate-800 transition-all duration-300 ease-in-out ${
+            className={`group-hover:text-primary-900 text-[14px] font-semibold tracking-wide whitespace-nowrap text-slate-800 transition-all duration-300 ease-in-out ${
               collapsed
                 ? 'w-0 -translate-x-2 opacity-0'
                 : 'w-auto translate-x-0 opacity-100'
