@@ -22,7 +22,7 @@ export const TaskMentionList = forwardRef<
         setSelectedIndex(
           (prev) => (prev + props.items.length - 1) % props.items.length
         );
-        
+
         return true;
       }
 

@@ -17,29 +17,9 @@
   margin-left: 1.5rem;
 }
 
-.editor-prose .ProseMirror li {
+.editor-prose .ProseMirror ul li,
+.editor-prose .ProseMirror ol li {
   margin-left: 0.15rem;
-}
-
-.editor-prose .ProseMirror .task-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.editor-prose .ProseMirror .task-list li {
-  display: flex;
-  align-items: flex-start;
-  margin-left: 0;
-}
-
-.editor-prose .ProseMirror .task-list li > label {
-  margin-top: 0.125rem;
-  margin-right: 0.125rem;
-}
-
-.editor-prose .ProseMirror .task-list li > div {
-  flex: 1;
 }
 
 .prose .ProseMirror:focus {
@@ -84,4 +64,92 @@
 
 .editor-toolbar-btn {
   @apply h-8 min-w-[32px] rounded-md px-2 text-sm font-medium;
+}
+
+.editor-prose .ProseMirror p,
+.editor-prose .ProseMirror ul,
+.editor-prose .ProseMirror ol,
+.editor-prose .ProseMirror li {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.editor-prose .ProseMirror pre {
+  background: #fffffe;
+  border: 1px solid #f1e7b8;
+  border-radius: 6px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  color: black;
+}
+
+.editor-prose .ProseMirror code {
+  background: #fffffe;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+  color: black;
+}
+
+.editor-prose .ProseMirror h1,
+.editor-prose .ProseMirror h2,
+.editor-prose .ProseMirror h3,
+.editor-prose .ProseMirror h4,
+.editor-prose .ProseMirror h5,
+.editor-prose .ProseMirror h6,
+.editor-prose .ProseMirror pre {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.editor-prose .ProseMirror .task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.editor-prose .ProseMirror ul[data-type='taskList'] {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.editor-prose .ProseMirror li[data-checked] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 0;
+}
+
+.editor-prose .ProseMirror li[data-checked] > label {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.editor-prose .ProseMirror li[data-checked] > label span {
+  display: none;
+}
+
+.editor-prose .ProseMirror li[data-checked] > div {
+  flex: 1;
+}
+
+.editor-prose .ProseMirror li[data-checked] p {
+  margin: 0;
+}
+
+.prose pre code {
+  color: black !important;
+}
+
+.prose pre {
+  background: #ffffed !important;
+}
+
+.editor-prose .ProseMirror li[data-type='taskItem'] {
+  margin-left: 0 !important;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
 }
