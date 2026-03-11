@@ -13,9 +13,19 @@ import TableCell from '@tiptap/extension-table-cell';
 import Emoji from '@tiptap/extension-emoji';
 import { Markdown } from 'tiptap-markdown';
 import { MentionList } from '../components/ui/MentionList';
-import type { SuggestionProps } from '@tiptap/suggestion';
-import type { MentionListRef } from '../components/ui/ui.types';
+import {
+  type SuggestionKeyDownProps,
+  type SuggestionProps,
+} from '@tiptap/suggestion';
+import type {
+  MentionListRef,
+  TaskMentionListRef,
+} from '../components/ui/ui.types';
 import type { UseTextEditorParams } from './hooks.types';
+import { TaskLink } from '../utils/TaskLink';
+import { TaskMentionList } from '../components/ui/TaskMentionList';
+import type { TaskItem as TaskItemType } from '../components/textEditor/textEditor.type';
+import type { Range, Editor } from '@tiptap/core';
 
 export function useTextEditor({
   content,
@@ -23,6 +33,7 @@ export function useTextEditor({
   onChange,
   enableMentions = false,
   mentionItems = [],
+  taskItems = [],
 }: UseTextEditorParams) {
   const mentionExtension = enableMentions
     ? Mention.configure({
@@ -85,6 +96,88 @@ export function useTextEditor({
       })
     : null;
 
+  const taskSuggestion = {
+    char: '/',
+
+    items: ({ query }: { query: string }) => {
+      return taskItems.filter((task) =>
+        task.label.toLowerCase().includes(query.toLowerCase())
+      );
+    },
+
+    command: ({
+      editor,
+      range,
+      props,
+    }: {
+      editor: Editor;
+      range: Range;
+      props: TaskItemType;
+    }) => {
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .insertContent([
+          {
+            type: 'taskLink',
+            attrs: props,
+          },
+          {
+            type: 'text',
+            text: ' ',
+          },
+        ])
+        .run();
+    },
+
+    render: () => {
+      let component: ReactRenderer<TaskMentionListRef>;
+      let container: HTMLDivElement;
+
+      return {
+        onStart: (props: SuggestionProps) => {
+          component = new ReactRenderer(TaskMentionList, {
+            props,
+            editor: props.editor,
+          });
+
+          container = document.createElement('div');
+          container.style.position = 'absolute';
+          container.style.zIndex = '1000';
+
+          document.body.appendChild(container);
+          container.appendChild(component.element);
+
+          updatePosition(props);
+        },
+
+        onUpdate(props: SuggestionProps) {
+          component.updateProps(props);
+          updatePosition(props);
+        },
+        onKeyDown(props: SuggestionKeyDownProps) {
+          return component.ref?.onKeyDown(props) ?? false;
+        },
+
+        onExit() {
+          component.destroy();
+          container.remove();
+        },
+      };
+
+      function updatePosition(props: SuggestionProps) {
+        const rect = props.clientRect?.();
+        if (!rect) {
+          return;
+        }
+
+        container.style.left = `${rect.left}px`;
+        container.style.top = `${rect.bottom + 4}px`;
+      }
+    },
+  };
+
   return useEditor({
     extensions: [
       StarterKit.configure({ codeBlock: {} }),
@@ -98,6 +191,9 @@ export function useTextEditor({
       TableHeader,
       TableCell,
       ...(mentionExtension ? [mentionExtension] : []),
+      TaskLink.configure({
+        suggestion: taskSuggestion,
+      }),
       Placeholder.configure({
         placeholder: enableMentions ? 'Add a comment…' : 'Add a description…',
       }),

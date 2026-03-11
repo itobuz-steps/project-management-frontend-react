@@ -8,10 +8,12 @@ import { useCommentComposer } from '../../hooks/useCommentComposer';
 import { DataLoader } from '../ui/DataLoader';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { Button } from 'antd';
+import { useProjectTasks } from '../../hooks/useProjectTasks';
 
 export function CommentsTab({ task }: CommentsTabProps) {
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const composerRef = useRef<HTMLDivElement | null>(null);
+  const { tasks: projectTasks } = useProjectTasks(task.projectId as string);
 
   const { comments, loading, addComment, updateComment, removeComment } =
     useTaskComments(task._id);
@@ -126,6 +128,11 @@ export function CommentsTab({ task }: CommentsTabProps) {
                   }}
                   disabled={composer.submitting}
                   mentionItems={mentionItems}
+                  taskItems={projectTasks.map((task) => ({
+                    id: task._id,
+                    label: task.title,
+                    type: task.type,
+                  }))}
                 />
 
                 <div className="mt-2 flex justify-end gap-2">

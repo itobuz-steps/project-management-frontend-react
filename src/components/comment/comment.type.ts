@@ -14,4 +14,6 @@ export interface CommentItemProps {
 
 export type MentionSpanProps = React.HTMLAttributes<HTMLSpanElement> & {
   'data-type'?: string;
+  'data-id'?: string;
+  'data-task-id'?: string;
 };

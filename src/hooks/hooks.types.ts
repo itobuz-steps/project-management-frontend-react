@@ -1,3 +1,4 @@
+import type { TaskItem } from '../components/textEditor/textEditor.type';
 import type { Comment } from '../services/types/comments.types';
 import type {
   TaskAttachment,
@@ -24,6 +25,7 @@ export interface UseTextEditorParams {
   onChange: (value: string, json: JSONContent) => void;
   enableMentions?: boolean;
   mentionItems?: MentionItem[];
+  taskItems?: TaskItem[];
 }
 
 export type TaskWithAttachments = {
