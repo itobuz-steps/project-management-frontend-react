@@ -22,7 +22,7 @@ export const useLinkedItemsColumns = ({
         const isDone =
           row.item.status === projectColumns[projectColumns.length - 1];
         return (
-          <div className="flex items-start gap-3">
+          <div className="flex items-center gap-3">
             <TaskTypeIcon type={row.item.type} />
 
             <Tag color="blue" className="w-fit">

@@ -55,7 +55,7 @@ function TopBar({
   }, [location.pathname]);
 
   const statusOptions = useMemo(() => {
-    if (columns && columns.length > 0) {
+    if (columns && columns.length) {
       return columns;
     }
 
@@ -64,12 +64,13 @@ function TopBar({
 
   const updateFilterParam = (
     key: 'status' | 'priority' | 'assignee',
-    value: string
+    value: string | string[]
   ) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (value) {
-        next.set(key, value);
+      const joined = Array.isArray(value) ? value.join(',') : value;
+      if (joined) {
+        next.set(key, joined);
       } else {
         next.delete(key);
       }
@@ -101,6 +102,13 @@ function TopBar({
     [views]
   );
 
+  const getFilterValues = (key: 'status' | 'priority' | 'assignee') => {
+    const raw = searchParams.get(key);
+    if (!raw) {
+      return [];
+    }
+    return raw.split(',').filter(Boolean);
+  };
   return (
     <>
       <header className="flex flex-col gap-2 sm:gap-3">
@@ -169,19 +177,19 @@ function TopBar({
                     {activeFilter === 'status' && (
                       <div className="mt-2">
                         <Select
-                          value={searchParams.get('status') || ''}
+                          mode="multiple"
+                          allowClear
+                          placeholder="All"
+                          value={getFilterValues('status')}
                           onChange={(value) =>
-                            updateFilterParam('status', value || '')
+                            updateFilterParam('status', value)
                           }
-                          className="focus:border-primary-500 w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700 shadow-sm focus:outline-none"
-                        >
-                          <option value="">All</option>
-                          {statusOptions.map((status) => (
-                            <option key={status} value={status}>
-                              {status}
-                            </option>
-                          ))}
-                        </Select>
+                          className="w-full"
+                          options={statusOptions.map((status) => ({
+                            value: status,
+                            label: status,
+                          }))}
+                        />
                       </div>
                     )}
 
@@ -189,19 +197,19 @@ function TopBar({
                     {activeFilter === 'priority' && (
                       <div className="mt-2">
                         <Select
-                          value={searchParams.get('priority') || ''}
+                          mode="multiple"
+                          allowClear
+                          placeholder="All"
+                          value={getFilterValues('priority')}
                           onChange={(value) =>
-                            updateFilterParam('priority', value || '')
+                            updateFilterParam('priority', value)
                           }
-                          className="focus:border-primary-500 w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700 shadow-sm focus:outline-none"
-                        >
-                          <option value="">All</option>
-                          {PRIORITIES.map((priority) => (
-                            <option key={priority} value={priority}>
-                              {priority}
-                            </option>
-                          ))}
-                        </Select>
+                          className="w-full"
+                          options={PRIORITIES.map((priority) => ({
+                            value: priority,
+                            label: priority,
+                          }))}
+                        />
                       </div>
                     )}
 
@@ -209,14 +217,15 @@ function TopBar({
                     {activeFilter === 'assignee' && (
                       <div className="mt-2">
                         <Select
-                          className="focus:border-primary-500 w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-700 shadow-sm focus:outline-none"
-                          loading={loadingMembers}
-                          placeholder="All"
+                          mode="multiple"
                           allowClear
-                          value={searchParams.get('assignee') || undefined}
+                          placeholder="All"
+                          loading={loadingMembers}
+                          value={getFilterValues('assignee')}
                           onChange={(value) =>
-                            updateFilterParam('assignee', value || '')
+                            updateFilterParam('assignee', value)
                           }
+                          className="w-full"
                           options={members.map((member) => ({
                             value: member._id,
                             label: (

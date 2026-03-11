@@ -52,20 +52,35 @@ function BacklogView() {
   }, []);
 
   const normalize = (value?: string) => (value ?? '').toLowerCase().trim();
-  const statusFilter = normalize(searchParams.get('status') || '');
-  const priorityFilter = normalize(searchParams.get('priority') || '');
-  const assigneeFilter = normalize(searchParams.get('assignee') || '');
+  const statusFilters = (searchParams.get('status') || '')
+    .split(',')
+    .filter(Boolean)
+    .map(normalize);
+  const priorityFilters = (searchParams.get('priority') || '')
+    .split(',')
+    .filter(Boolean)
+    .map(normalize);
+  const assigneeFilters = (searchParams.get('assignee') || '')
+    .split(',')
+    .filter(Boolean)
+    .map(normalize);
 
   const matchesFilters = (task: TaskPopulated) => {
-    if (statusFilter && normalize(task.status) !== statusFilter) {
-      return false;
-    }
-    if (priorityFilter && normalize(task.priority) !== priorityFilter) {
+    if (
+      statusFilters.length &&
+      !statusFilters.includes(normalize(task.status))
+    ) {
       return false;
     }
     if (
-      assigneeFilter &&
-      normalize(task.assignee?._id || '') !== assigneeFilter
+      priorityFilters.length &&
+      !priorityFilters.includes(normalize(task.priority))
+    ) {
+      return false;
+    }
+    if (
+      assigneeFilters.length &&
+      !assigneeFilters.includes(normalize(task.assignee?._id || ''))
     ) {
       return false;
     }
@@ -124,16 +139,7 @@ function BacklogView() {
     }
 
     loadData(projectId);
-  }, [
-    type,
-    searchInput,
-    projectId,
-    sprintService,
-    assigneeFilter,
-    priorityFilter,
-    statusFilter,
-    searchParams,
-  ]);
+  }, [type, searchInput, projectId, sprintService, searchParams]);
 
   if (!projectId) {
     return (
