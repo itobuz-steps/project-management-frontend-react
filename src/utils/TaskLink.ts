@@ -10,7 +10,7 @@ export const TaskLink = Node.create({
   addOptions() {
     return {
       suggestion: {
-        char: '#',
+        char: '/',
       },
     };
   },
@@ -37,7 +37,7 @@ export const TaskLink = Node.create({
         'data-task-id': node.attrs.id,
         class: 'text-purple-600 font-medium cursor-pointer',
       }),
-      `#${node.attrs.label}`,
+      `${node.attrs.label}`,
     ];
   },
 

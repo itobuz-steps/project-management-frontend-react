@@ -97,7 +97,7 @@ export function useTextEditor({
     : null;
 
   const taskSuggestion = {
-    char: '#',
+    char: '/',
 
     items: ({ query }: { query: string }) => {
       return taskItems.filter((task) =>
