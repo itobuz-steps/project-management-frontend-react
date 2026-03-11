@@ -3,6 +3,17 @@ import { MainRouter } from './components/routers/MainRouter';
 import './App.scss';
 import { AuthProvider } from './context/AuthProvider';
 import { ThemeProvider } from './context/ThemeProvider';
+import { ConfigProvider } from 'antd';
+import { useTheme } from './hooks/useTheme';
+import { getAntdTheme } from './config/antdTheme';
+
+function AntdThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme] = useTheme();
+
+  return (
+    <ConfigProvider theme={getAntdTheme(theme)}>{children}</ConfigProvider>
+  );
+}
 
 function App() {
   return (
@@ -22,9 +33,11 @@ function App() {
         limit={3}
       />
       <ThemeProvider>
-        <AuthProvider>
-          <MainRouter />
-        </AuthProvider>
+        <AntdThemeProvider>
+          <AuthProvider>
+            <MainRouter />
+          </AuthProvider>
+        </AntdThemeProvider>
       </ThemeProvider>
     </>
   );

@@ -7,6 +7,7 @@ import type {
 } from '../../../services/types/tasks.types';
 import { useProject } from '../../../context/ProjectContext';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
+import { FilterX, LayoutPanelTop } from 'lucide-react';
 import TaskTable, {
   type TaskTableChangeParams,
   type TaskTableFilters,
@@ -21,6 +22,8 @@ const EMPTY_TABLE_FILTERS: TaskTableFilters = {
   reporter: null,
   tags: [],
 };
+
+const TABLE_LAYOUT_STORAGE_PREFIX = 'task-table-new-column-order';
 
 const toServerSortOrder = (order?: TaskTableSort['order']) => {
   if (order === 'ascend') {
@@ -59,6 +62,7 @@ function ListView() {
     hasNextPage: false,
     hasPrevPage: false,
   });
+  const [tableRenderKey, setTableRenderKey] = useState(0);
 
   const searchInput = searchParams.get('searchInput') || '';
 
@@ -140,6 +144,28 @@ function ListView() {
     setPage(nextPage);
   };
 
+  const hasActiveFilters =
+    Boolean(tableFilters.type) ||
+    Boolean(tableFilters.status) ||
+    Boolean(tableFilters.assignee) ||
+    Boolean(tableFilters.reporter) ||
+    Boolean(tableFilters.tags?.length) ||
+    Boolean(sorting.field) ||
+    Boolean(sorting.order);
+
+  const handleResetFilters = () => {
+    setTableFilters(EMPTY_TABLE_FILTERS);
+    setSorting({ field: null, order: null });
+    setPage(1);
+  };
+
+  const handleResetTableLayout = () => {
+    localStorage.removeItem(
+      `${TABLE_LAYOUT_STORAGE_PREFIX}:${projectId ?? 'global'}`
+    );
+    setTableRenderKey((prev) => prev + 1);
+  };
+
   if (!projectId) {
     return (
       <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500">
@@ -154,20 +180,45 @@ function ListView() {
   }
 
   return (
-    <div className="no-scrollbar relative mt-2 w-full overflow-x-auto rounded-md border border-gray-200">
-      <TaskTable
-        tasks={tasks}
-        statusColumns={columns}
-        members={members}
-        loadingMembers={loadingMembers}
-        onTaskUpdated={handleTaskUpdated}
-        pagination={pagination}
-        filters={tableFilters}
-        sorting={sorting}
-        onTableChange={handleTableChange}
-        loading={loading}
-        error={error}
-      />
+    <div className="mt-2 w-full">
+      <div className="no-scrollbar relative w-full overflow-x-auto rounded-md border border-gray-200">
+        <div className="flex items-center justify-end gap-2 border-b border-gray-200 bg-gray-50 px-2 py-1">
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            disabled={!hasActiveFilters}
+            aria-label="Reset filters"
+            title="Reset filters"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <FilterX size={14} />
+          </button>
+          <button
+            type="button"
+            onClick={handleResetTableLayout}
+            aria-label="Reset table layout"
+            title="Reset table layout"
+            className="border-primary-500 text-primary-600 hover:bg-primary-500 inline-flex h-7 w-7 items-center justify-center rounded-md border transition hover:text-white"
+          >
+            <LayoutPanelTop size={14} />
+          </button>
+        </div>
+
+        <TaskTable
+          key={tableRenderKey}
+          tasks={tasks}
+          statusColumns={columns}
+          members={members}
+          loadingMembers={loadingMembers}
+          onTaskUpdated={handleTaskUpdated}
+          pagination={pagination}
+          filters={tableFilters}
+          sorting={sorting}
+          onTableChange={handleTableChange}
+          loading={loading}
+          error={error}
+        />
+      </div>
     </div>
   );
 }

@@ -28,7 +28,7 @@ export function Column({
   onTaskOpen,
 }: ColumnProps) {
   return (
-    <div key={col} className="group w-72 shrink-0">
+    <div key={col} className="group w-80 shrink-0">
       <div className="h-full rounded-lg bg-[#f8f8f8] shadow-sm">
         <div className="sticky top-0 z-10 flex items-center justify-between gap-2 px-4 py-2">
           <div className="flex items-center gap-2">

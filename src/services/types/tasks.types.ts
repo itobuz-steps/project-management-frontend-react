@@ -75,7 +75,7 @@ export interface TaskPopulated {
   type: TaskType;
   key?: string;
   status: string;
-  priority: string;
+  priority: TaskPriority;
   dueDate?: string;
   reporter?: User;
   assignee?: User;

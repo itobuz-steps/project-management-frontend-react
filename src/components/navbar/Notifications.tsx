@@ -79,14 +79,14 @@ export default function Notifications() {
     <div className="relative mx-auto w-max">
       <button
         type="button"
-        className="flex h-12 w-12 items-center justify-center border-none outline-none"
+        className="flex items-center justify-center border-none outline-none"
         onClick={() => {
           setNewNotificationCount(0);
           setOpen(!open);
         }}
       >
         <span className="relative inline-flex">
-          <Bell className="h-8 w-8 stroke-black max-md:size-6" />
+          <Bell className="size-6 stroke-black max-md:size-6" />
 
           {newNotificationCount > 0 && !open && (
             <span
