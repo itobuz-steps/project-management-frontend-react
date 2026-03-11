@@ -34,7 +34,7 @@ taskTableColumns.forEach(({ label, className }) => {
 });
 
 export const headerClass = (label: string) =>
-  `bg-gray-100 text-xs font-semibold text-gray-600 uppercase ${columnClassMap[label] ?? ''}`;
+  `bg-gray-100 text-[11px] leading-[1.2] font-semibold text-gray-600 uppercase ${columnClassMap[label] ?? ''}`;
 
 export const bodyClass = (label: string, extra = '') => {
   const base = columnClassMap[label] ?? '';

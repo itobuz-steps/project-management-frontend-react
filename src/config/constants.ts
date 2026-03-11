@@ -167,7 +167,7 @@ export const taskTableColumns = [
   { label: 'Summary', className: 'p-3 px-6' },
   { label: 'Status', className: 'p-3 px-6' },
   { label: 'Assignee', className: 'p-3 px-6 truncate w-[200px]' },
-  { label: 'Due Date', className: 'p-3 px-6' },
+  { label: 'Due Date', className: 'p-3 px-6 min-w-[150px]' },
   { label: 'Labels', className: 'p-3 px-6' },
   { label: 'Created', className: 'p-3 px-6' },
   { label: 'Updated', className: 'p-3 px-6' },
