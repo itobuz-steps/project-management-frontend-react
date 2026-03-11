@@ -3,13 +3,16 @@ import { CommandPalette } from '../common/CommandPalette';
 import { SearchOutlined, SettingOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { Tag } from 'antd';
+import { Users } from 'lucide-react';
 import { Can } from '../../utils/PermissionHoc';
 import { InviteUserContainer } from '../common/InviteUserContainer';
+import { ProjectMembersModal } from '../common/ProjectMembersModal';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../../context/ProjectContext';
 
 export default function Navbar() {
   const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [isMembersOpen, setIsMembersOpen] = useState(false);
   const [paletteSearch, setPaletteSearch] = useState('');
   const navigate = useNavigate();
   const { project } = useProject();
@@ -20,6 +23,10 @@ export default function Navbar() {
 
   const handleSearchClick = () => {
     setCommandPaletteOpen(true);
+  };
+
+  const handleMemberModalClose = () => {
+    setIsMembersOpen(false);
   };
 
   return (
@@ -65,6 +72,21 @@ export default function Navbar() {
               </Can>
             </div>
           )}
+
+          {project && !projectInfoHidden && (
+            <button
+              onClick={() => setIsMembersOpen(true)}
+              title="View Members"
+              className="flex items-center justify-center text-gray-900 hover:text-gray-900"
+            >
+              <Users className="h-6 w-6" />
+            </button>
+          )}
+
+          <ProjectMembersModal
+            open={isMembersOpen}
+            onClose={handleMemberModalClose}
+          />
 
           <SearchOutlined
             onClick={handleSearchClick}
