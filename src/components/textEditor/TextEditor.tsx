@@ -19,6 +19,7 @@ export function TextEditor({
   disabled,
   mentionItems,
   onEditorJsonChange,
+  taskItems,
 }: TextEditorProps) {
   const [attachments, setAttachments] = useState<{ file: File; url: string }[]>(
     []
@@ -29,6 +30,7 @@ export function TextEditor({
     disabled,
     enableMentions: comment,
     mentionItems,
+    taskItems,
     onChange: (markdown, json) => {
       onChange(markdown);
       onEditorJsonChange?.(json);

@@ -1,5 +1,6 @@
 import type { SelectProps } from 'antd';
 import type { JSONContent } from '@tiptap/react';
+import type { TaskType } from '../../services/types/tasks.types';
 
 export type TextEditorProps = {
   comment: boolean;
@@ -11,6 +12,7 @@ export type TextEditorProps = {
   disabled?: boolean;
   mentionItems?: { id: string; label: string }[];
   onEditorJsonChange?: (json: JSONContent) => void;
+  taskItems?: TaskItem[];
 };
 
 export const headingOptions: SelectProps['options'] = [
@@ -20,3 +22,9 @@ export const headingOptions: SelectProps['options'] = [
     value: l,
   })),
 ];
+
+export interface TaskItem {
+  id: string;
+  label: string;
+  type: TaskType;
+}
