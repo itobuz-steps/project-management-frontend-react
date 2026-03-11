@@ -60,15 +60,27 @@ function BoardView() {
   );
 
   const statusFilters = useMemo(
-    () => (searchParams.get('status') || '').split(',').filter(Boolean).map(normalize),
+    () =>
+      (searchParams.get('status') || '')
+        .split(',')
+        .filter(Boolean)
+        .map(normalize),
     [searchParams, normalize]
   );
   const priorityFilters = useMemo(
-    () => (searchParams.get('priority') || '').split(',').filter(Boolean).map(normalize),
+    () =>
+      (searchParams.get('priority') || '')
+        .split(',')
+        .filter(Boolean)
+        .map(normalize),
     [searchParams, normalize]
   );
   const assigneeFilters = useMemo(
-    () => (searchParams.get('assignee') || '').split(',').filter(Boolean).map(normalize),
+    () =>
+      (searchParams.get('assignee') || '')
+        .split(',')
+        .filter(Boolean)
+        .map(normalize),
     [searchParams, normalize]
   );
 
@@ -149,15 +161,25 @@ function BoardView() {
   }, [isScrum, sprintTaskIds, tasks]);
 
   const filteredVisibleTasks = useMemo(() => {
-    if (!statusFilters.length && !priorityFilters.length && !assigneeFilters.length) {
+    if (
+      !statusFilters.length &&
+      !priorityFilters.length &&
+      !assigneeFilters.length
+    ) {
       return visibleTasks;
     }
 
     return visibleTasks.filter((task) => {
-      if (statusFilters.length && !statusFilters.includes(normalize(task.status))) {
+      if (
+        statusFilters.length &&
+        !statusFilters.includes(normalize(task.status))
+      ) {
         return false;
       }
-      if (priorityFilters.length && !priorityFilters.includes(normalize(task.priority))) {
+      if (
+        priorityFilters.length &&
+        !priorityFilters.includes(normalize(task.priority))
+      ) {
         return false;
       }
       if (
@@ -168,7 +190,13 @@ function BoardView() {
       }
       return true;
     });
-  }, [priorityFilters, statusFilters, assigneeFilters, normalize, visibleTasks]);
+  }, [
+    priorityFilters,
+    statusFilters,
+    assigneeFilters,
+    normalize,
+    visibleTasks,
+  ]);
 
   const tasksByColumn = useMemo(() => {
     const map: Record<string, TaskPopulated[]> = {};
