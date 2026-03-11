@@ -19,6 +19,7 @@ export function TextEditor({
   disabled,
   mentionItems,
   onEditorJsonChange,
+  taskItems,
 }: TextEditorProps) {
   const [attachments, setAttachments] = useState<{ file: File; url: string }[]>(
     []
@@ -29,6 +30,7 @@ export function TextEditor({
     disabled,
     enableMentions: comment,
     mentionItems,
+    taskItems,
     onChange: (markdown, json) => {
       onChange(markdown);
       onEditorJsonChange?.(json);
@@ -174,6 +176,15 @@ export function TextEditor({
 
         <Button
           size="small"
+          title="Task Link"
+          className={`editor-toolbar-btn ${comment ? 'block' : 'hidden!'}`}
+          onClick={() => editor.chain().focus().insertContent('/').run()}
+        >
+          /
+        </Button>
+
+        <Button
+          size="small"
           title="Emoji"
           className="editor-toolbar-btn"
           onClick={() => editor.chain().focus().insertContent('😊').run()}
@@ -217,6 +228,14 @@ export function TextEditor({
           }
         }}
       />
+
+      {comment && (
+        <div className="px-4 pt-2 text-xs text-gray-400">
+          Tip: Type <span className="font-medium text-gray-600">@</span> to
+          mention a user and{' '}
+          <span className="font-medium text-gray-600">/</span> to link a task.
+        </div>
+      )}
 
       {/* Attachments below editor */}
       <div className="mt-2 flex flex-col gap-1 px-4">

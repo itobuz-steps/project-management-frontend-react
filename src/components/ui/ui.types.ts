@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 import type { TaskPopulated, User } from '../../services/types/tasks.types';
+import type { SuggestionKeyDownProps } from '@tiptap/suggestion';
+import type { TaskItem } from '../textEditor/textEditor.type';
 
 export type AssigneeCellType = {
   task: TaskPopulated;
@@ -63,4 +65,13 @@ export type MentionListProps = {
 
 export type MentionListRef = {
   onKeyDown: (props: { event: KeyboardEvent }) => boolean;
+};
+
+export type TaskMentionListRef = {
+  onKeyDown: (props: SuggestionKeyDownProps) => boolean;
+};
+
+export type TaskMentionListProps = {
+  items: TaskItem[];
+  command: (item: TaskItem) => void;
 };

@@ -14,6 +14,7 @@ import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import type { Components } from 'react-markdown';
+import { useProjectTasks } from '../../hooks/useProjectTasks';
 
 const { Text } = Typography;
 
@@ -27,6 +28,7 @@ export function CommentItem({
   const editor = useCommentEditor({ comment, onUpdate, onDelete });
 
   const { members } = useProjectMetaData(task.projectId as string);
+  const { tasks: projectTasks } = useProjectTasks(task.projectId as string);
 
   const mentionItems = members.map((member) => ({
     id: member._id,
@@ -73,6 +75,18 @@ export function CommentItem({
             className="cursor-pointer font-medium text-blue-600"
             {...spanProps}
           />
+        );
+      }
+
+      if (spanProps['data-task-id']) {
+        const taskId = spanProps['data-task-id'];
+        return (
+          <Link
+            to={`?taskId=${taskId}`}
+            className="cursor-pointer font-medium text-purple-600 hover:underline"
+          >
+            {spanProps.children}
+          </Link>
         );
       }
 
@@ -157,7 +171,7 @@ export function CommentItem({
 
             {/* Body */}
             {!editor.isEditing ? (
-              <div className="prose" onClick={() => editor.setIsEditing(true)}>
+              <div className="prose">
                 <ReactMarkdown
                   rehypePlugins={[rehypeRaw]}
                   components={markdownComponents}
@@ -176,6 +190,11 @@ export function CommentItem({
                   onCancel={editor.reset}
                   mentionItems={mentionItems}
                   onEditorJsonChange={editor.setEditorJson}
+                  taskItems={projectTasks.map((task) => ({
+                    id: task._id,
+                    label: task.title,
+                    type: task.type,
+                  }))}
                 />
 
                 {/* Action Buttons */}

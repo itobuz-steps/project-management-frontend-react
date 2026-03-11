@@ -2,6 +2,7 @@ import { Plus, FunnelX } from 'lucide-react';
 import type { ViewMode, TopBarProps } from '../../types/TopBar.types';
 import { NavLink, useLocation, useSearchParams } from 'react-router-dom';
 import { useMemo, useState } from 'react';
+import { ProjectMembersModal } from './ProjectMembersModal';
 import { useProject } from '../../context/ProjectContext';
 import { PRIORITIES } from '../taskModal/constants';
 import SearchBar from '../navbar/SearchBar';
@@ -23,6 +24,7 @@ function TopBar({
   const [activeFilter, setActiveFilter] = useState<
     'status' | 'priority' | 'assignee' | null
   >(null);
+  const [isMembersOpen, setIsMembersOpen] = useState(false);
 
   const type = project?.projectType;
   const isScrum = type === 'scrum';
@@ -245,6 +247,10 @@ function TopBar({
           <Tabs activeKey={activeView} items={tabItems} />
         </div>
       </header>
+      <ProjectMembersModal
+        open={isMembersOpen}
+        onClose={() => setIsMembersOpen(false)}
+      />
     </>
   );
 }
