@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
 import { toast } from 'react-toastify';
 import { Input } from '../common/Input';
+import { usePasswordToggle } from '../../utils/passwordToggle';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface ISignupInput {
   username: string;
@@ -19,6 +21,7 @@ export function SignupForm() {
   } = useForm<ISignupInput>();
 
   const navigate = useNavigate();
+  const { inputType, icon, togglePassword } = usePasswordToggle();
 
   const submitHandler = async (data: ISignupInput) => {
     try {
@@ -42,27 +45,38 @@ export function SignupForm() {
       <Input
         {...register('username', { required: true })}
         type="text"
-        placeholder="Username"
+        placeholder="Enter Username"
         required
         className={`${errors.username ? 'border-red-400' : ''}`}
       />
       <Input
         {...register('email', { required: true })}
         type="email"
-        placeholder="Email"
+        placeholder="Enter Email"
         required
       />
-      <Input
-        {...register('password', {
-          required: true,
-          minLength: 8,
-          pattern:
-            /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/,
-        })}
-        type="password"
-        placeholder="Password"
-        required
-      />
+      <div className="relative w-full">
+        <Input
+          {...register('password', {
+            required: true,
+            minLength: 8,
+            pattern:
+              /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/,
+          })}
+          type={inputType}
+          placeholder="Enter Password"
+          required
+          className="pr-10"
+        />
+
+        <button
+          type="button"
+          onClick={togglePassword}
+          className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500"
+        >
+          {icon === 'eye' ? <Eye size={18} /> : <EyeOff size={18} />}
+        </button>
+      </div>
       <div className="mr-auto max-w-xs flex-col text-start text-red-400">
         {errors.username?.type === 'required' && <p>Username is required</p>}
         {errors.email?.type === 'required' && <p>Email is required</p>}

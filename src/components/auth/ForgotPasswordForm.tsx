@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import authService from '../../services/authService';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
+import { usePasswordToggle } from '../../utils/passwordToggle';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface IForgotPasswordInput {
   email: string;
@@ -21,7 +23,7 @@ export function ForgotPasswordForm() {
     handleSubmit,
     formState: { errors },
   } = useForm<IForgotPasswordInput>();
-
+  const { inputType, icon, togglePassword } = usePasswordToggle();
   const navigate = useNavigate();
 
   const submitHandler = async (data: IForgotPasswordInput) => {
@@ -55,7 +57,7 @@ export function ForgotPasswordForm() {
       if (error instanceof AxiosError) {
         toast.error(
           'Failed to send otp: ' +
-            (error.response?.data?.error || error.message)
+            (error.response?.data?.message || error.message)
         );
       }
     }
@@ -95,18 +97,30 @@ export function ForgotPasswordForm() {
         />
       </div>
       <div className="new-password flex w-full flex-col items-center">
-        <Input
-          id="password-input"
-          type="password"
-          placeholder="Enter new password"
-          {...register('newPassword', {
-            required: true,
-            minLength: 8,
-            pattern:
-              /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/,
-            disabled: !otpSent,
-          })}
-        />
+        <div className="relative w-full">
+          <Input
+            id="password-input"
+            type={inputType}
+            placeholder="Enter new password"
+            className="pr-10"
+            {...register('newPassword', {
+              required: true,
+              minLength: 8,
+              pattern:
+                /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/,
+              disabled: !otpSent,
+            })}
+          />
+
+          <button
+            type="button"
+            onClick={togglePassword}
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500"
+            disabled={!otpSent}
+          >
+            {icon === 'eye' ? <Eye size={18} /> : <EyeOff size={18} />}
+          </button>
+        </div>
       </div>
       <div className="mr-auto max-w-xs flex-col text-start text-red-400">
         {errors.email && <p>Email is invalid</p>}
