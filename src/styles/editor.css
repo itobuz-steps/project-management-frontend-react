@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 .editor-prose {
-  font-family: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  font-family:
+    'Montserrat', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   font-size: 0.875rem;
   line-height: 1.625;
   max-width: none;
