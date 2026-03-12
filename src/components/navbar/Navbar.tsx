@@ -111,7 +111,7 @@ export default function Navbar() {
         {/* Icon row — desktop only */}
         <div className="hidden items-center gap-3 sm:flex sm:justify-end sm:gap-4">
           {project && !projectInfoHidden && (
-            <div className="flex items-center gap-1 sm:justify-end">
+            <div className="flex items-center justify-center rounded-md p-2 text-gray-900 transition-colors hover:bg-gray-200">
               <Can permission="SEND_INVITE">
                 <InviteUserContainer />
               </Can>
@@ -121,8 +121,7 @@ export default function Navbar() {
           {project && !projectInfoHidden && (
             <button
               onClick={() => setIsMembersOpen(true)}
-              title="View Members"
-              className="flex items-center justify-center text-gray-900 hover:text-gray-900"
+              className="flex items-center justify-center rounded-md p-2 text-gray-900 transition-colors hover:bg-gray-200"
             >
               <Users className="h-6 w-6" />
             </button>
@@ -133,16 +132,28 @@ export default function Navbar() {
             onClose={handleMemberModalClose}
           />
 
-          <SearchOutlined
+          <button
             onClick={handleSearchClick}
-            style={{ fontSize: '1.5rem' }}
-          />
-          <Notifications />
+            className="rounded-md p-2 transition-colors hover:bg-gray-200"
+            aria-label="Search"
+          >
+            <SearchOutlined style={{ fontSize: '1.5rem' }} />
+          </button>
+
+          <div className="rounded-md p-2 transition-colors hover:bg-gray-200">
+            <Notifications />
+          </div>
+
           {!projectInfoHidden && (
-            <SettingOutlined
-              onClick={() => navigate(`project/${project?._id}/settings`)}
-              style={{ fontSize: '1.5rem' }}
-            />
+            <Can permission="PROJECT_SETTINGS">
+              <button
+                onClick={() => navigate(`project/${project?._id}/settings`)}
+                className="rounded-md p-2 transition-colors hover:bg-gray-200"
+                aria-label="Settings"
+              >
+                <SettingOutlined style={{ fontSize: '1.5rem' }} />
+              </button>
+            </Can>
           )}
         </div>
       </nav>
