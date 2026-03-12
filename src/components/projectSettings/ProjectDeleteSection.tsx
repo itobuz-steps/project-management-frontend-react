@@ -29,14 +29,7 @@ function ProjectDeleteSection({ projectId }: ProjectSettingsDeleteProps) {
         border: '1px solid #ffccc7',
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
-          gap: 2,
-        }}
-      >
+      <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-end">
         <div>
           <Title level={5} style={{ color: '#cf1322', marginBottom: 4 }}>
             Delete Project
@@ -66,7 +59,7 @@ function ProjectDeleteSection({ projectId }: ProjectSettingsDeleteProps) {
           }}
           onConfirm={handleDelete}
         >
-          <Button danger icon={<DeleteOutlined />}>
+          <Button danger icon={<DeleteOutlined />} style={{ alignSelf: 'end' }}>
             Delete Project
           </Button>
         </Popconfirm>
