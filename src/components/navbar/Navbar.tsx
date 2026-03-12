@@ -4,8 +4,9 @@ import {
   SearchOutlined,
   SettingOutlined,
   MenuOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Tag } from 'antd';
 import { Users, Bell } from 'lucide-react';
 import { Can } from '../../utils/PermissionHoc';
@@ -32,10 +33,29 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
 
   const handleMemberModalClose = () => {
     setIsMembersOpen(false);
   };
+
+  // Close on outside click
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target as Node) &&
+        hamburgerRef.current &&
+        !hamburgerRef.current.contains(e.target as Node)
+      ) {
+        setMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [mobileMenuOpen]);
 
   return (
     <div className="header border border-gray-50 bg-gray-100">
@@ -72,13 +92,20 @@ export default function Navbar() {
             )}
           </div>
         </div>
+
         {/* Hamburger — mobile only */}
         <button
+          ref={hamburgerRef}
           className="flex items-center justify-center p-1 text-gray-900 sm:hidden"
-          aria-label="Toggle menu"
-          onClick={() => setMobileMenuOpen((o) => !o)}
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileMenuOpen}
+          onClick={() => setMobileMenuOpen((open) => !open)}
         >
-          <MenuOutlined style={{ fontSize: '1.2rem' }} />
+          {mobileMenuOpen ? (
+            <CloseOutlined style={{ fontSize: '1.2rem' }} />
+          ) : (
+            <MenuOutlined style={{ fontSize: '1.2rem' }} />
+          )}
         </button>
 
         {/* Icon row — desktop only */}
@@ -119,76 +146,99 @@ export default function Navbar() {
           )}
         </div>
       </nav>
-      {/* Mobile collapsible panel */}
+
+      {/* Floating mobile menu */}
       {mobileMenuOpen && (
-        <div className="flex flex-col gap-4 border-t border-gray-200 bg-gray-100 px-4 py-3 sm:hidden">
-          {/* Invite — close panel then open modal */}
+        <div
+          ref={menuRef}
+          className="fixed top-14 right-5 z-100 flex w-max flex-col rounded-lg border border-gray-200 bg-white p-2 shadow-lg sm:hidden"
+        >
           {project && !projectInfoHidden && (
             <Can permission="SEND_INVITE">
               <button
+                className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800"
                 onClick={() => {
                   setMobileMenuOpen(false);
                   setInviteOpen(true);
                 }}
-                className="flex items-center gap-2 text-gray-900"
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.background = '#f9fafb')
+                }
+                onMouseOut={(e) => (e.currentTarget.style.background = 'none')}
               >
-                <Users className="h-5 w-5" />
-                <span className="text-sm">Invite Users</span>
+                <Users size={16} />
+                Invite Users
               </button>
             </Can>
           )}
 
-          {/* Notifications — close panel then open dropdown */}
           <button
+            className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800"
             onClick={() => {
               setMobileMenuOpen(false);
               setNotifOpen(true);
             }}
-            className="flex items-center gap-2 text-gray-900"
+            onMouseOver={(e) => (e.currentTarget.style.background = '#f9fafb')}
+            onMouseOut={(e) => (e.currentTarget.style.background = 'none')}
           >
-            <Bell className="h-5 w-5" />
-            <span className="text-sm">Notifications</span>
+            <Bell size={16} />
+            Notifications
           </button>
 
-          {/* Members — close panel first */}
           {project && !projectInfoHidden && (
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
                 setIsMembersOpen(true);
               }}
-              className="flex items-center gap-2 text-gray-900"
+              className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800"
+              onMouseOver={(e) =>
+                (e.currentTarget.style.background = '#f9fafb')
+              }
+              onMouseOut={(e) => (e.currentTarget.style.background = 'none')}
             >
-              <Users className="h-5 w-5" />
-              <span className="text-sm">Members</span>
+              <Users size={16} />
+              Members
             </button>
           )}
 
-          {/* Search — close panel first */}
           <button
+            className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800"
             onClick={() => {
               setMobileMenuOpen(false);
               handleSearchClick();
             }}
-            className="flex items-center gap-2 text-gray-900"
+            onMouseOver={(e) => (e.currentTarget.style.background = '#f9fafb')}
+            onMouseOut={(e) => (e.currentTarget.style.background = 'none')}
           >
-            <SearchOutlined style={{ fontSize: '1.2rem' }} />
-            <span className="text-sm">Search</span>
+            <SearchOutlined style={{ fontSize: '1rem' }} />
+            Search
           </button>
 
-          {/* Settings — close panel first */}
           {!projectInfoHidden && (
             <Can permission="PROJECT_SETTINGS">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  navigate(`project/${project?._id}/settings`);
-                }}
-                className="flex items-center gap-2 text-gray-900"
-              >
-                <SettingOutlined style={{ fontSize: '1.2rem' }} />
-                <span className="text-sm">Settings</span>
-              </button>
+              <>
+                {/* Divider before settings */}
+                <div
+                  style={{ height: 1, background: '#f3f4f6', margin: '4px 0' }}
+                />
+                <button
+                  className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigate(`project/${project?._id}/settings`);
+                  }}
+                  onMouseOver={(e) =>
+                    (e.currentTarget.style.background = '#f9fafb')
+                  }
+                  onMouseOut={(e) =>
+                    (e.currentTarget.style.background = 'none')
+                  }
+                >
+                  <SettingOutlined style={{ fontSize: '1rem' }} />
+                  Settings
+                </button>
+              </>
             </Can>
           )}
         </div>
