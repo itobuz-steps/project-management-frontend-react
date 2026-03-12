@@ -7,8 +7,29 @@ import userService from '../../services/userService';
 
 const PAGE_SIZE = 10;
 
-export default function Notifications() {
-  const [open, setOpen] = useState(false);
+interface NotificationsProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export default function Notifications({
+  open: externalOpen,
+  onOpenChange,
+}: NotificationsProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = externalOpen !== undefined;
+  const open = isControlled ? externalOpen! : internalOpen;
+  const setOpen: React.Dispatch<React.SetStateAction<boolean>> = (value) => {
+    const next =
+      typeof value === 'function'
+        ? (value as (prev: boolean) => boolean)(open)
+        : value;
+    if (isControlled) {
+      onOpenChange?.(next);
+    } else {
+      setInternalOpen(next);
+    }
+  };
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -77,27 +98,29 @@ export default function Notifications() {
 
   return (
     <div className="relative mx-auto w-max">
-      <button
-        type="button"
-        className="flex items-center justify-center border-none outline-none"
-        onClick={() => {
-          setNewNotificationCount(0);
-          setOpen(!open);
-        }}
-      >
-        <span className="relative inline-flex">
-          <Bell className="size-6 stroke-black max-md:size-6" />
+      {!isControlled && (
+        <button
+          type="button"
+          className="flex items-center justify-center border-none outline-none"
+          onClick={() => {
+            setNewNotificationCount(0);
+            setOpen(!open);
+          }}
+        >
+          <span className="relative inline-flex">
+            <Bell className="size-6 stroke-black max-md:size-6" />
 
-          {newNotificationCount > 0 && !open && (
-            <span
-              id="notificationBadge"
-              className="absolute -top-1 -right-0.5 flex min-h-3 min-w-3 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-semibold text-white"
-            >
-              {newNotificationCount}
-            </span>
-          )}
-        </span>
-      </button>
+            {newNotificationCount > 0 && !open && (
+              <span
+                id="notificationBadge"
+                className="absolute -top-1 -right-0.5 flex min-h-3 min-w-3 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-semibold text-white"
+              >
+                {newNotificationCount}
+              </span>
+            )}
+          </span>
+        </button>
+      )}
 
       {open && (
         <NotificationDropdown

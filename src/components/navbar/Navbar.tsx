@@ -1,9 +1,13 @@
 import Notifications from './Notifications';
 import { CommandPalette } from '../common/CommandPalette';
-import { SearchOutlined, SettingOutlined } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  SettingOutlined,
+  MenuOutlined,
+} from '@ant-design/icons';
 import { useState } from 'react';
 import { Tag } from 'antd';
-import { Users } from 'lucide-react';
+import { Users, Bell } from 'lucide-react';
 import { Can } from '../../utils/PermissionHoc';
 import { InviteUserContainer } from '../common/InviteUserContainer';
 import { ProjectMembersModal } from '../common/ProjectMembersModal';
@@ -24,6 +28,10 @@ export default function Navbar() {
   const handleSearchClick = () => {
     setCommandPaletteOpen(true);
   };
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
 
   const handleMemberModalClose = () => {
     setIsMembersOpen(false);
@@ -64,7 +72,17 @@ export default function Navbar() {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3 sm:justify-end sm:gap-4">
+        {/* Hamburger — mobile only */}
+        <button
+          className="flex items-center justify-center p-1 text-gray-900 sm:hidden"
+          aria-label="Toggle menu"
+          onClick={() => setMobileMenuOpen((o) => !o)}
+        >
+          <MenuOutlined style={{ fontSize: '1.2rem' }} />
+        </button>
+
+        {/* Icon row — desktop only */}
+        <div className="hidden items-center gap-3 sm:flex sm:justify-end sm:gap-4">
           {project && !projectInfoHidden && (
             <div className="flex items-center gap-1 sm:justify-end">
               <Can permission="SEND_INVITE">
@@ -101,6 +119,89 @@ export default function Navbar() {
           )}
         </div>
       </nav>
+      {/* Mobile collapsible panel */}
+      {mobileMenuOpen && (
+        <div className="flex flex-col gap-4 border-t border-gray-200 bg-gray-100 px-4 py-3 sm:hidden">
+          {/* Invite — close panel then open modal */}
+          {project && !projectInfoHidden && (
+            <Can permission="SEND_INVITE">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setInviteOpen(true);
+                }}
+                className="flex items-center gap-2 text-gray-900"
+              >
+                <Users className="h-5 w-5" />
+                <span className="text-sm">Invite Users</span>
+              </button>
+            </Can>
+          )}
+
+          {/* Notifications — close panel then open dropdown */}
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false);
+              setNotifOpen(true);
+            }}
+            className="flex items-center gap-2 text-gray-900"
+          >
+            <Bell className="h-5 w-5" />
+            <span className="text-sm">Notifications</span>
+          </button>
+
+          {/* Members — close panel first */}
+          {project && !projectInfoHidden && (
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setIsMembersOpen(true);
+              }}
+              className="flex items-center gap-2 text-gray-900"
+            >
+              <Users className="h-5 w-5" />
+              <span className="text-sm">Members</span>
+            </button>
+          )}
+
+          {/* Search — close panel first */}
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false);
+              handleSearchClick();
+            }}
+            className="flex items-center gap-2 text-gray-900"
+          >
+            <SearchOutlined style={{ fontSize: '1.2rem' }} />
+            <span className="text-sm">Search</span>
+          </button>
+
+          {/* Settings — close panel first */}
+          {!projectInfoHidden && (
+            <Can permission="PROJECT_SETTINGS">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigate(`project/${project?._id}/settings`);
+                }}
+                className="flex items-center gap-2 text-gray-900"
+              >
+                <SettingOutlined style={{ fontSize: '1.2rem' }} />
+                <span className="text-sm">Settings</span>
+              </button>
+            </Can>
+          )}
+        </div>
+      )}
+
+      {/* Always-mounted controlled instances for mobile triggers */}
+      <InviteUserContainer open={inviteOpen} onOpenChange={setInviteOpen} />
+      {notifOpen && (
+        <div className="fixed top-14 right-2 z-50 sm:hidden">
+          <Notifications open={notifOpen} onOpenChange={setNotifOpen} />
+        </div>
+      )}
+
       {isCommandPaletteOpen && (
         <CommandPalette
           open={isCommandPaletteOpen}

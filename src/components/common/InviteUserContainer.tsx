@@ -1,24 +1,45 @@
-import { message } from 'antd';
+import { message, Modal } from 'antd';
 import { useState } from 'react';
 import { sendInvite } from '../../services/inviteService';
 import { useProject } from '../../context/ProjectContext';
 import { InviteUserForm } from './InviteUserForm';
 import { InviteUserButton } from './InviteUserButton';
-import { X } from 'lucide-react';
 import { Can } from '../../utils/PermissionHoc';
 
-export function InviteUserContainer() {
-  const [formOpen, setFormOpen] = useState(false);
+interface InviteUserContainerProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function InviteUserContainer({
+  open: externalOpen,
+  onOpenChange,
+}: InviteUserContainerProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = externalOpen !== undefined;
+  const formOpen = isControlled ? externalOpen! : internalOpen;
+  const setFormOpen = (value: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(value);
+    } else {
+      setInternalOpen(value);
+    }
+  };
   const { project } = useProject();
 
-  async function handleFinish(values: { email: string }) {
+  async function handleFinish(values: { email: string | string[] }) {
     if (!project) {
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const emails = values.email
+    const rawEmail = values.email;
+    const emailString = Array.isArray(rawEmail)
+      ? rawEmail.join(',')
+      : rawEmail || '';
+
+    const emails = emailString
       .split(',')
       .map((email) => email.trim())
       .filter(Boolean);
@@ -58,17 +79,28 @@ export function InviteUserContainer() {
 
   return (
     <Can permission="SEND_INVITE">
-      {formOpen ? (
-        <div className="flex items-center">
-          <InviteUserForm submitHandler={handleFinish} />
-          <X
-            className="-ml-2 cursor-pointer"
-            onClick={() => setFormOpen(false)}
+      <>
+        {!isControlled && (
+          <InviteUserButton onClick={() => setFormOpen(true)} />
+        )}
+
+        <Modal
+          title="Invite users"
+          open={formOpen}
+          onCancel={() => setFormOpen(false)}
+          footer={null}
+          destroyOnClose
+          maskStyle={{
+            backdropFilter: 'none',
+            backgroundColor: 'rgba(0,0,0,0.45)',
+          }}
+        >
+          <InviteUserForm
+            submitHandler={handleFinish}
+            onCancel={() => setFormOpen(false)}
           />
-        </div>
-      ) : (
-        <InviteUserButton onClick={() => setFormOpen(true)} />
-      )}
+        </Modal>
+      </>
     </Can>
   );
 }
