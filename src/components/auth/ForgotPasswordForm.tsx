@@ -9,6 +9,7 @@ import { usePasswordToggle } from '../../utils/passwordToggle';
 import { Eye, EyeOff } from 'lucide-react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { forgotPasswordSchema } from '../../schemas/authSchema';
+import { formErrorHandler } from '../../utils/formErrorHandler';
 
 interface IForgotPasswordInput {
   email: string;
@@ -32,14 +33,10 @@ export function ForgotPasswordForm() {
     return () => clearInterval(timer);
   }, [cooldown]);
 
-  const {
-    register,
-    getValues,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<IForgotPasswordInput>({
-    resolver: yupResolver(forgotPasswordSchema),
-  });
+  const { register, getValues, handleSubmit, trigger } =
+    useForm<IForgotPasswordInput>({
+      resolver: yupResolver(forgotPasswordSchema),
+    });
   const { inputType, icon, togglePassword } = usePasswordToggle();
   const navigate = useNavigate();
 
@@ -61,12 +58,13 @@ export function ForgotPasswordForm() {
   };
 
   const sendOtpHandler = async () => {
-    try {
-      if (errors.email) {
-        toast.error('Please enter a valid email to send OTP.');
-        return;
-      }
+    const isValid = await trigger('email');
 
+    if (!isValid) {
+      return;
+    }
+
+    try {
       await authService.sendOtp(getValues('email'));
       setOtpSent(true);
       setCooldown(60);
@@ -83,7 +81,7 @@ export function ForgotPasswordForm() {
 
   return (
     <form
-      onSubmit={handleSubmit(submitHandler)}
+      onSubmit={handleSubmit(submitHandler, formErrorHandler)}
       className="forgot-form xs:min-w-75 flex flex-col items-center gap-3"
     >
       <div className="email xs:grid-cols-[3fr_1fr] xs:grid-rows-none mt-4 grid w-full grid-rows-[1fr_1fr] items-center gap-2">
@@ -92,6 +90,7 @@ export function ForgotPasswordForm() {
           type="email"
           placeholder="Enter your email"
           {...register('email')}
+          required
         />
         <button
           onClick={sendOtpHandler}
@@ -131,11 +130,7 @@ export function ForgotPasswordForm() {
           </button>
         </div>
       </div>
-      <div className="mr-auto max-w-xs flex-col text-start text-red-400">
-        {errors.email && <p>{errors.email.message}</p>}
-        {errors.otp && <p>{errors.otp.message}</p>}
-        {errors.newPassword && <p>{errors.newPassword.message}</p>}
-      </div>
+
       <button
         className="reset-button bg-primary-500 hover:bg-primary-600 mt-5 w-full cursor-pointer rounded-lg py-3 font-semibold text-white transition-all duration-300"
         type="submit"

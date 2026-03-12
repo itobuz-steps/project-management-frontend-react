@@ -6,6 +6,9 @@ import { toast } from 'react-toastify';
 import { Input } from '../common/Input';
 import { usePasswordToggle } from '../../utils/passwordToggle';
 import { Eye, EyeOff } from 'lucide-react';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { loginSchema } from '../../schemas/authSchema';
+import { formErrorHandler } from '../../utils/formErrorHandler';
 
 interface ILoginInput {
   email: string;
@@ -13,7 +16,10 @@ interface ILoginInput {
 }
 
 export function LoginForm() {
-  const { register, handleSubmit } = useForm<ILoginInput>();
+  const { register, handleSubmit } = useForm<ILoginInput>({
+    resolver: yupResolver(loginSchema),
+  });
+
   const { inputType, icon, togglePassword } = usePasswordToggle();
   const location = useLocation();
   const navigate = useNavigate();
@@ -39,18 +45,18 @@ export function LoginForm() {
 
   return (
     <form
-      onSubmit={handleSubmit(submitHandler)}
+      onSubmit={handleSubmit(submitHandler, formErrorHandler)}
       className="login-form xs:min-w-75 flex flex-col items-center gap-4"
     >
       <Input
-        {...register('email', { required: true })}
+        {...register('email')}
         type="email"
         placeholder="Enter Email"
         required
       />
       <div className="relative w-full">
         <Input
-          {...register('password', { required: true, minLength: 6 })}
+          {...register('password')}
           type={inputType}
           placeholder="Enter Password"
           className="pr-10"
