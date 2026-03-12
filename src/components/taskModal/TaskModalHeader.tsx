@@ -19,7 +19,6 @@ export function TaskModalHeader({
 }: HeaderProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(task.title);
-
   const inputRef = useRef<InputRef>(null);
 
   const parentTask = useParentTask(task.parentTask);
