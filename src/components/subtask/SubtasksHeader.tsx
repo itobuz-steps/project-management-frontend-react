@@ -18,10 +18,7 @@ export function SubtasksHeader({
           percent={progress}
           size="small"
           showInfo
-          strokeColor={{
-            '0%': '#3b82f6', // blue
-            '100%': '#22c55e', // green
-          }}
+          strokeColor="var(--color-primary-500)"
         />
       </div>
 

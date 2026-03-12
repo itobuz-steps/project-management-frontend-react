@@ -4,6 +4,11 @@ import authService from '../../services/authService';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { Input } from '../common/Input';
+import { usePasswordToggle } from '../../utils/passwordToggle';
+import { Eye, EyeOff } from 'lucide-react';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { loginSchema } from '../../schemas/authSchema';
+import { formErrorHandler } from '../../utils/formErrorHandler';
 
 interface ILoginInput {
   email: string;
@@ -11,8 +16,11 @@ interface ILoginInput {
 }
 
 export function LoginForm() {
-  const { register, handleSubmit } = useForm<ILoginInput>();
+  const { register, handleSubmit } = useForm<ILoginInput>({
+    resolver: yupResolver(loginSchema),
+  });
 
+  const { inputType, icon, togglePassword } = usePasswordToggle();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -37,20 +45,26 @@ export function LoginForm() {
 
   return (
     <form
-      onSubmit={handleSubmit(submitHandler)}
+      onSubmit={handleSubmit(submitHandler, formErrorHandler)}
       className="login-form xs:min-w-75 flex flex-col items-center gap-4"
     >
-      <Input
-        {...register('email', { required: true })}
-        type="email"
-        placeholder="Email"
-        required
-      />
-      <Input
-        {...register('password', { required: true, minLength: 6 })}
-        type="password"
-        placeholder="Password"
-      />
+      <Input {...register('email')} type="email" placeholder="Enter Email" />
+      <div className="relative w-full">
+        <Input
+          {...register('password')}
+          type={inputType}
+          placeholder="Enter Password"
+          className="pr-10"
+        />
+
+        <button
+          type="button"
+          onClick={togglePassword}
+          className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500"
+        >
+          {icon === 'eye' ? <Eye size={18} /> : <EyeOff size={18} />}
+        </button>
+      </div>
       <Link
         to={'/forgot-password'}
         className="text-primary-300 hover:text-primary-400 font-semibold text-nowrap transition-colors duration-300"

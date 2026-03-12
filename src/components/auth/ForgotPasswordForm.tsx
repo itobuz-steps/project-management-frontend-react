@@ -1,10 +1,15 @@
 import { Link, useNavigate } from 'react-router';
 import { Input } from '../common/Input';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import authService from '../../services/authService';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
+import { usePasswordToggle } from '../../utils/passwordToggle';
+import { Eye, EyeOff } from 'lucide-react';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { forgotPasswordSchema } from '../../schemas/authSchema';
+import { formErrorHandler } from '../../utils/formErrorHandler';
 
 interface IForgotPasswordInput {
   email: string;
@@ -14,14 +19,25 @@ interface IForgotPasswordInput {
 
 export function ForgotPasswordForm() {
   const [otpSent, setOtpSent] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
 
-  const {
-    register,
-    getValues,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<IForgotPasswordInput>();
+  useEffect(() => {
+    if (cooldown === 0) {
+      return;
+    }
 
+    const timer = setInterval(() => {
+      setCooldown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
+  const { register, getValues, handleSubmit, trigger } =
+    useForm<IForgotPasswordInput>({
+      resolver: yupResolver(forgotPasswordSchema),
+    });
+  const { inputType, icon, togglePassword } = usePasswordToggle();
   const navigate = useNavigate();
 
   const submitHandler = async (data: IForgotPasswordInput) => {
@@ -42,20 +58,22 @@ export function ForgotPasswordForm() {
   };
 
   const sendOtpHandler = async () => {
-    try {
-      if (errors.email) {
-        toast.error('Please enter a valid email to send OTP.');
-        return;
-      }
+    const isValid = await trigger('email');
 
+    if (!isValid) {
+      return;
+    }
+
+    try {
       await authService.sendOtp(getValues('email'));
       setOtpSent(true);
-      toast.success('OTP resent successfully!');
+      setCooldown(60);
+      toast.success('OTP sent successfully!');
     } catch (error) {
       if (error instanceof AxiosError) {
         toast.error(
           'Failed to send otp: ' +
-            (error.response?.data?.error || error.message)
+            (error.response?.data?.message || error.message)
         );
       }
     }
@@ -63,7 +81,7 @@ export function ForgotPasswordForm() {
 
   return (
     <form
-      onSubmit={handleSubmit(submitHandler)}
+      onSubmit={handleSubmit(submitHandler, formErrorHandler)}
       className="forgot-form xs:min-w-75 flex flex-col items-center gap-3"
     >
       <div className="email xs:grid-cols-[3fr_1fr] xs:grid-rows-none mt-4 grid w-full grid-rows-[1fr_1fr] items-center gap-2">
@@ -71,11 +89,12 @@ export function ForgotPasswordForm() {
           id="email-input"
           type="email"
           placeholder="Enter your email"
-          {...register('email', { required: true })}
+          {...register('email')}
         />
         <button
           onClick={sendOtpHandler}
-          className="send bg-primary-500 hover:bg-primary-600 text-small h-full w-full cursor-pointer rounded-lg px-1 font-semibold text-white transition-all duration-300"
+          disabled={cooldown > 0}
+          className="send bg-primary-500 hover:bg-primary-600 text-small h-full w-full cursor-pointer rounded-lg px-1 font-semibold text-white transition-all duration-300 disabled:cursor-not-allowed disabled:bg-gray-300"
           type="button"
         >
           Send OTP
@@ -86,42 +105,31 @@ export function ForgotPasswordForm() {
           id="otp-input"
           type="text"
           placeholder="Enter OTP"
-          {...register('otp', {
-            required: true,
-            minLength: 6,
-            maxLength: 6,
-            disabled: !otpSent,
-          })}
+          disabled={!otpSent}
+          {...register('otp')}
         />
       </div>
       <div className="new-password flex w-full flex-col items-center">
-        <Input
-          id="password-input"
-          type="password"
-          placeholder="Enter new password"
-          {...register('newPassword', {
-            required: true,
-            minLength: 8,
-            pattern:
-              /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/,
-            disabled: !otpSent,
-          })}
-        />
+        <div className="relative w-full">
+          <Input
+            id="password-input"
+            type={inputType}
+            placeholder="Enter new password"
+            className="pr-10"
+            disabled={!otpSent}
+            {...register('newPassword')}
+          />
+          <button
+            type="button"
+            onClick={togglePassword}
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500"
+            disabled={!otpSent}
+          >
+            {icon === 'eye' ? <Eye size={18} /> : <EyeOff size={18} />}
+          </button>
+        </div>
       </div>
-      <div className="mr-auto max-w-xs flex-col text-start text-red-400">
-        {errors.email && <p>Email is invalid</p>}
-        {errors.newPassword?.type === 'required' && <p>Password is required</p>}
-        {errors.newPassword?.type === 'minLength' && (
-          <p>Password must be at least 8 characters</p>
-        )}
-        {errors.newPassword?.type === 'pattern' && (
-          <p>
-            Password must include at least one uppercase letter, one number, and
-            one special character
-          </p>
-        )}
-        {errors.otp && <p>OTP is invalid</p>}{' '}
-      </div>
+
       <button
         className="reset-button bg-primary-500 hover:bg-primary-600 mt-5 w-full cursor-pointer rounded-lg py-3 font-semibold text-white transition-all duration-300"
         type="submit"
