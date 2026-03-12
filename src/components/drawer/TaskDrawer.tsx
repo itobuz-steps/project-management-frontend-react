@@ -6,11 +6,21 @@ import { useIsMobile } from '../../utils/isMobile';
 import { TaskModalHeader } from '../taskModal/TaskModalHeader';
 import { DrawerTaskView } from './DrawerTaskView';
 import type { TaskModalProps } from '../taskModal/taskModal.types';
+import { useResizableDrawer } from '../../hooks/useResizableDrawer.ts';
+
+const MIN_DRAWER_WIDTH = 360;
+const MAX_DRAWER_WIDTH = 520;
 
 export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
   const [task, setTask] = useState<TaskPopulated | null>(null);
   const [loading, setLoading] = useState(false);
   const isMobile = useIsMobile(768);
+  const { drawerWidth, startResizing } = useResizableDrawer({
+    initialWidth: 420,
+    minWidth: MIN_DRAWER_WIDTH,
+    maxWidth: MAX_DRAWER_WIDTH,
+    enabled: !isMobile,
+  });
 
   useEffect(() => {
     if (!taskId) {
@@ -43,44 +53,49 @@ export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex" aria-hidden={false}>
-      <div className="flex-1" onClick={onClose} />
+    <aside
+      className="relative h-full shrink-0 overflow-hidden border-l border-gray-200 bg-white shadow-xl"
+      style={{ width: isMobile ? '100%' : `${drawerWidth}px` }}
+      aria-hidden={false}
+    >
+      {!isMobile && (
+        <button
+          type="button"
+          aria-label="Resize task drawer"
+          onMouseDown={startResizing}
+          className="hover:bg-primary-300 absolute top-0 bottom-0 left-0 z-10 w-1.5 cursor-col-resize border-r border-transparent hover:border-gray-300"
+        />
+      )}
 
-      <aside
-        className={`h-full overflow-hidden bg-white shadow-xl ${
-          isMobile ? 'w-full' : 'w-96'
-        }`}
-      >
-        <div className="flex h-full flex-col">
-          <div className="p-3">
-            {task && (
-              <TaskModalHeader
-                task={task}
-                onUpdated={setTask}
-                onClose={onClose}
-                page={false}
-                drawer={true}
-              />
-            )}
-          </div>
-
-          <div className="h-full overflow-auto">
-            {loading && (
-              <div className="flex justify-center py-20">
-                <Spin size="large" />
-              </div>
-            )}
-
-            {!loading && task && (
-              <DrawerTaskView
-                task={task}
-                isMobile={isMobile}
-                onUpdated={(task) => setTask(task)}
-              />
-            )}
-          </div>
+      <div className="flex h-full flex-col">
+        <div className="p-3">
+          {task && (
+            <TaskModalHeader
+              task={task}
+              onUpdated={setTask}
+              onClose={onClose}
+              page={false}
+              drawer={true}
+            />
+          )}
         </div>
-      </aside>
-    </div>
+
+        <div className="h-full overflow-auto">
+          {loading && (
+            <div className="flex justify-center py-20">
+              <Spin size="large" />
+            </div>
+          )}
+
+          {!loading && task && (
+            <DrawerTaskView
+              task={task}
+              isMobile={isMobile}
+              onUpdated={(task) => setTask(task)}
+            />
+          )}
+        </div>
+      </div>
+    </aside>
   );
 }
