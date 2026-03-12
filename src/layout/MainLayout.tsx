@@ -9,12 +9,11 @@ import { useSearchParams } from 'react-router-dom';
 import TaskModal from '../components/taskModal/TaskModal';
 
 export default function MainLayout() {
-  // const [collapsed, setCollapsed] = useState(false);
-  // const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
-  // const [openTaskId, setOpenTaskId] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [open, setOpen] = useState(false);
   const [paletteSearch, setPaletteSearch] = useState('');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false);
 
   // Cmd + K / Ctrl + K
   useEffect(() => {
@@ -32,10 +31,44 @@ export default function MainLayout() {
 
   const location = useLocation();
   const isBacklog = location.pathname.includes('/backlog');
+  const isTaskDrawerOpen = Boolean(taskId && isBacklog);
+
+  const closeTaskPanel = () => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete('taskId');
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    if (!isTaskDrawerOpen) {
+      return;
+    }
+
+    const handleSidebarClose = () => {
+      setSidebarCollapsed(true);
+      setSidebarMobileOpen(false);
+    };
+
+    handleSidebarClose();
+  }, [isTaskDrawerOpen]);
+
+  const handleSidebarOpen = () => {
+    if (isTaskDrawerOpen) {
+      closeTaskPanel();
+    }
+  };
 
   return (
     <div className="relative flex h-screen w-full overflow-hidden">
-      <Sidebar />
+      <Sidebar
+        collapsed={sidebarCollapsed}
+        onCollapsedChange={setSidebarCollapsed}
+        mobileOpen={sidebarMobileOpen}
+        onMobileOpenChange={setSidebarMobileOpen}
+        onSidebarOpen={handleSidebarOpen}
+      />
       <div className="flex w-full flex-1 flex-col overflow-x-auto pl-0 md:pl-0">
         <Navbar />
         <main className="flex-1 overflow-y-auto rounded-lg p-2 md:p-4">
@@ -45,27 +78,9 @@ export default function MainLayout() {
 
       {taskId ? (
         isBacklog ? (
-          <TaskDrawer
-            taskId={taskId}
-            onClose={() =>
-              setSearchParams((prev) => {
-                const next = new URLSearchParams(prev);
-                next.delete('taskId');
-                return next;
-              })
-            }
-          />
+          <TaskDrawer taskId={taskId} onClose={closeTaskPanel} />
         ) : (
-          <TaskModal
-            taskId={taskId}
-            onClose={() =>
-              setSearchParams((prev) => {
-                const next = new URLSearchParams(prev);
-                next.delete('taskId');
-                return next;
-              })
-            }
-          />
+          <TaskModal taskId={taskId} onClose={closeTaskPanel} />
         )
       ) : null}
       <CommandPalette

@@ -16,9 +16,21 @@ import { CreateProjectModal } from '../createProject';
 import { Can } from '../../utils/PermissionHoc';
 import { UserProfile } from './UserProfile';
 
-export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(true);
-  const [mobileOpen, setMobileOpen] = useState(false);
+type SidebarProps = {
+  collapsed: boolean;
+  onCollapsedChange: (value: boolean) => void;
+  mobileOpen: boolean;
+  onMobileOpenChange: (value: boolean) => void;
+  onSidebarOpen?: () => void;
+};
+
+export default function Sidebar({
+  collapsed,
+  onCollapsedChange,
+  mobileOpen,
+  onMobileOpenChange,
+  onSidebarOpen,
+}: SidebarProps) {
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   const [workspaceRefreshKey, setWorkspaceRefreshKey] = useState(0);
   const [workspacesExpanded, setWorkspacesExpanded] = useState(true);
@@ -26,7 +38,8 @@ export default function Sidebar() {
   const handleWorkspaceToggle = () => {
     // In collapsed desktop mode, clicking the workspace icon should open sidebar and keep workspaces visible.
     if (collapsed && !mobileOpen) {
-      setCollapsed(false);
+      onSidebarOpen?.();
+      onCollapsedChange(false);
       setWorkspacesExpanded(true);
       return;
     }
@@ -37,11 +50,11 @@ export default function Sidebar() {
   // Close mobile sidebar on route change or escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMobileOpen(false);
+      if (e.key === 'Escape') onMobileOpenChange(false);
     };
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
-  }, []);
+  }, [onMobileOpenChange]);
 
   // Prevent body scroll when mobile sidebar is open
   useEffect(() => {
@@ -59,7 +72,10 @@ export default function Sidebar() {
     <>
       {/* Mobile menu button */}
       <button
-        onClick={() => setMobileOpen(true)}
+        onClick={() => {
+          onSidebarOpen?.();
+          onMobileOpenChange(true);
+        }}
         className="absolute top-10 -left-1 z-10 rounded-full border border-slate-200 bg-white p-1.5 text-slate-600 shadow-sm transition-colors hover:bg-slate-100 md:hidden"
         aria-label="Open sidebar"
       >
@@ -71,7 +87,7 @@ export default function Sidebar() {
         className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 md:hidden ${
           mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
-        onClick={() => setMobileOpen(false)}
+        onClick={() => onMobileOpenChange(false)}
       />
 
       {/* Sidebar */}
@@ -84,7 +100,13 @@ export default function Sidebar() {
         {/* Desktop collapse/expand button */}
         <button
           type="button"
-          onClick={() => setCollapsed((prev) => !prev)}
+          onClick={() => {
+            const nextCollapsed = !collapsed;
+            if (!nextCollapsed) {
+              onSidebarOpen?.();
+            }
+            onCollapsedChange(nextCollapsed);
+          }}
           className="absolute top-7 -right-5 z-10 hidden rounded-full border border-slate-200 bg-white p-1.5 text-slate-600 shadow-sm transition-colors hover:bg-slate-100 md:inline-flex"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
@@ -93,7 +115,7 @@ export default function Sidebar() {
 
         {/* Mobile close button */}
         <button
-          onClick={() => setMobileOpen(false)}
+          onClick={() => onMobileOpenChange(false)}
           className="absolute top-4 right-4 rounded-lg bg-slate-50 p-1 text-slate-600 transition-colors hover:bg-slate-200/70 md:hidden"
           aria-label="Close sidebar"
         >
