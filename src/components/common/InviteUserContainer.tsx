@@ -6,8 +6,25 @@ import { InviteUserForm } from './InviteUserForm';
 import { InviteUserButton } from './InviteUserButton';
 import { Can } from '../../utils/PermissionHoc';
 
-export function InviteUserContainer() {
-  const [formOpen, setFormOpen] = useState(false);
+interface InviteUserContainerProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function InviteUserContainer({
+  open: externalOpen,
+  onOpenChange,
+}: InviteUserContainerProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = externalOpen !== undefined;
+  const formOpen = isControlled ? externalOpen! : internalOpen;
+  const setFormOpen = (value: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(value);
+    } else {
+      setInternalOpen(value);
+    }
+  };
   const { project } = useProject();
 
   async function handleFinish(values: { email: string | string[] }) {
@@ -63,7 +80,9 @@ export function InviteUserContainer() {
   return (
     <Can permission="SEND_INVITE">
       <>
-        <InviteUserButton onClick={() => setFormOpen(true)} />
+        {!isControlled && (
+          <InviteUserButton onClick={() => setFormOpen(true)} />
+        )}
 
         <Modal
           title="Invite users"
