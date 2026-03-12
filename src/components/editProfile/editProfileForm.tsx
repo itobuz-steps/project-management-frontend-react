@@ -4,6 +4,7 @@ import userService from '../../services/userService';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { useEffect } from 'react';
+import { formErrorHandler } from '../../utils/formErrorHandler';
 
 interface IEditProfileInput {
   username: string;
@@ -17,12 +18,7 @@ export function EditProfileForm({
   setSelectedFile: React.Dispatch<React.SetStateAction<string>>;
   initialUsername?: string;
 }) {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<IEditProfileInput>();
+  const { register, handleSubmit, setValue } = useForm<IEditProfileInput>();
 
   useEffect(() => {
     if (initialUsername) {
@@ -49,7 +45,7 @@ export function EditProfileForm({
 
   return (
     <form
-      onSubmit={handleSubmit(submitHandler)}
+      onSubmit={handleSubmit(submitHandler, formErrorHandler)}
       id="edit-profile-form"
       encType="multipart/form-data"
       className="m-5 flex flex-col items-center justify-center gap-4"
@@ -64,7 +60,7 @@ export function EditProfileForm({
         <Input
           type="text"
           placeholder="Username"
-          {...register('username', { required: true })}
+          {...register('username', { required: 'Username is required' })}
         />
       </div>
       <div className="align-center flex w-full flex-col justify-center">
@@ -92,12 +88,7 @@ export function EditProfileForm({
       >
         max 500KB
       </label>
-      {errors.username && (
-        <p className="text-sm text-red-500">Username is invalid.</p>
-      )}
-      {errors.profileImage && (
-        <p className="text-sm text-red-500">Profile image is invalid.</p>
-      )}
+
       <button
         type="submit"
         className="btn btn-primary bg-primary-500 hover:bg-primary-600 w-full rounded-lg py-2 font-medium text-white transition-all duration-300"
