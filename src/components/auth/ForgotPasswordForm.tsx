@@ -90,7 +90,6 @@ export function ForgotPasswordForm() {
           type="email"
           placeholder="Enter your email"
           {...register('email')}
-          required
         />
         <button
           onClick={sendOtpHandler}

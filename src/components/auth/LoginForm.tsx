@@ -48,12 +48,7 @@ export function LoginForm() {
       onSubmit={handleSubmit(submitHandler, formErrorHandler)}
       className="login-form xs:min-w-75 flex flex-col items-center gap-4"
     >
-      <Input
-        {...register('email')}
-        type="email"
-        placeholder="Enter Email"
-        required
-      />
+      <Input {...register('email')} type="email" placeholder="Enter Email" />
       <div className="relative w-full">
         <Input
           {...register('password')}

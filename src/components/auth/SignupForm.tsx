@@ -47,20 +47,13 @@ export function SignupForm() {
         {...register('username')}
         type="text"
         placeholder="Enter Username"
-        required
       />
-      <Input
-        {...register('email', { required: true })}
-        type="email"
-        placeholder="Enter Email"
-        required
-      />
+      <Input {...register('email')} type="email" placeholder="Enter Email" />
       <div className="relative w-full">
         <Input
           {...register('password')}
           type={inputType}
           placeholder="Enter Password"
-          required
           className="pr-10"
         />
 
