@@ -139,7 +139,7 @@ function BacklogView() {
     }
 
     loadData(projectId);
-  }, [type, searchInput, projectId, sprintService, searchParams]);
+  }, [type, searchInput, projectId, sprintService]);
 
   if (!projectId) {
     return (

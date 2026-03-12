@@ -41,7 +41,12 @@ export function useSubtasks(task: TaskPopulated) {
     setSubtasks((prev) =>
       prev.map((task) => (task._id === id ? { ...task, status } : task))
     );
-    await updateTask(id, { status });
+    try {
+      await updateTask(id, { status });
+      message.success('Subtask status updated.');
+    } catch {
+      message.error('Failed to update subtask status.');
+    }
   };
 
   const removeSubtask = async (id: string) => {
@@ -50,8 +55,14 @@ export function useSubtasks(task: TaskPopulated) {
     setSelectedIds(updatedIds);
     setSubtasks((prev) => prev.filter((task) => task._id !== id));
 
-    await updateTask(task._id, { subTasks: updatedIds });
-    await updateTask(id, { parentTask: null });
+    try {
+      await Promise.all([
+        updateTask(task._id, { subTasks: updatedIds }),
+        updateTask(id, { parentTask: null }),
+      ]);
+    } catch {
+      message.error('Failed to remove task');
+    }
   };
 
   return {

@@ -16,8 +16,10 @@ import type { EditingField, TaskDetailsProps } from './taskModal.types';
 import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { DueDateCell } from '../ui/DueDateCell';
+import { usePermissions } from '../../hooks/usePermissions';
 
 export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
+  const { can } = usePermissions();
   const [editing, setEditing] = useState<EditingField>(null);
   const [editingLabels, setEditingLabels] = useState(false);
 
@@ -202,7 +204,16 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
 
               <div className="pb-3">
                 <SidebarRow label="Reporter">
-                  <UserCell user={task.reporter} emptyText="—" />
+                  {can('REPORTER_CHANGE') ? (
+                    <AssigneeCell
+                      task={task}
+                      members={members}
+                      loading={loadingMembers}
+                      onUpdated={onUpdated}
+                    />
+                  ) : (
+                    <UserCell user={task.reporter} emptyText="—" />
+                  )}
                 </SidebarRow>
               </div>
             </div>

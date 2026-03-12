@@ -7,11 +7,12 @@ export function useParentTask(parentTaskId?: string | null) {
   const [parentTask, setParentTask] = useState<TaskPopulated | null>(null);
 
   useEffect(() => {
-    if (!parentTaskId) {
-      return;
-    }
-
     async function load() {
+      if (!parentTaskId) {
+        setParentTask(null);
+        return;
+      }
+
       try {
         const task = await getTaskById(parentTaskId as string);
         setParentTask(task);

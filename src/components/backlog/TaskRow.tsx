@@ -4,13 +4,14 @@ import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { getPriorityBorder } from '../../utils/utils';
 import dayjs from 'dayjs';
 import { useSortable } from '@dnd-kit/sortable';
-import { config } from '../../config/config';
 import { AssigneeCell } from '../ui/AssigneeCell';
 import type { TaskRowProps } from './type';
 import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 import { TaskKeyCell } from '../ui/TaskKeyCell';
 import { TaskTitleCell } from '../ui/TaskTitleCell';
 import { DueDateCell } from '../ui/DueDateCell';
+import { UserCell } from '../ui/UserCell';
+import { usePermissions } from '../../hooks/usePermissions';
 
 export function TaskRow({
   task,
@@ -38,6 +39,7 @@ export function TaskRow({
     transform: CSS.Transform.toString(transform),
     transition,
   };
+  const { can } = usePermissions();
 
   const isCompleted = task.status === columns[columns.length - 1];
 
@@ -121,18 +123,17 @@ export function TaskRow({
         {task.updatedAt && dayjs(task.updatedAt).format('DD-MM-YYYY')}
       </td>
 
-      <td className="p-3 px-6 whitespace-nowrap">
-        <div className="flex items-center pr-2">
-          <img
-            className="mr-3 h-6 w-6 rounded-full object-cover"
-            src={
-              task.reporter?.profileImage
-                ? `${config.api_base_url}/uploads/${task.reporter.profileImage}`
-                : '/profile.png'
-            }
+      <td className="w-[200px] max-w-[200px] truncate p-3 px-6 whitespace-nowrap">
+        {can('REPORTER_CHANGE') ? (
+          <AssigneeCell
+            task={task}
+            members={members}
+            loading={loadingMembers}
+            onUpdated={onUpdated}
           />
-          {task.reporter?.name ?? 'Unknown'}
-        </div>
+        ) : (
+          <UserCell user={task.reporter} emptyText="Unknown" />
+        )}
       </td>
     </tr>
   );

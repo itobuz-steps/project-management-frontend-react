@@ -180,30 +180,30 @@ function ListView() {
   }
 
   return (
-    <div className="mt-2 w-full">
-      <div className="no-scrollbar relative w-full overflow-x-auto rounded-md border border-gray-200">
-        <div className="flex items-center justify-end gap-2 border-b border-gray-200 bg-gray-50 px-2 py-1">
-          <button
-            type="button"
-            onClick={handleResetFilters}
-            disabled={!hasActiveFilters}
-            aria-label="Reset filters"
-            title="Reset filters"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <FilterX size={14} />
-          </button>
-          <button
-            type="button"
-            onClick={handleResetTableLayout}
-            aria-label="Reset table layout"
-            title="Reset table layout"
-            className="border-primary-500 text-primary-600 hover:bg-primary-500 inline-flex h-7 w-7 items-center justify-center rounded-md border transition hover:text-white"
-          >
-            <LayoutPanelTop size={14} />
-          </button>
-        </div>
+    <div className="relative mt-2 w-full rounded-md border border-gray-200">
+      <div className="sticky top-0 z-10 flex items-center justify-end gap-2 border-b border-gray-200 bg-gray-50 px-2 py-1">
+        <button
+          type="button"
+          onClick={handleResetFilters}
+          disabled={!hasActiveFilters}
+          aria-label="Reset filters"
+          title="Reset filters"
+          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <FilterX size={14} />
+        </button>
+        <button
+          type="button"
+          onClick={handleResetTableLayout}
+          aria-label="Reset table layout"
+          title="Reset table layout"
+          className="border-primary-500 text-primary-600 hover:bg-primary-500 inline-flex h-7 w-7 items-center justify-center rounded-md border transition hover:text-white"
+        >
+          <LayoutPanelTop size={14} />
+        </button>
+      </div>
 
+      <div className="no-scrollbar max-h-[600px] overflow-auto border border-gray-200">
         <TaskTable
           key={tableRenderKey}
           tasks={tasks}
