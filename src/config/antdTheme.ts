@@ -53,6 +53,7 @@ export function getAntdTheme(themeName: string): ThemeConfig {
         itemActiveColor: primaryColor,
         inkBarColor: primaryColor,
         padding: 0,
+        margin: 0,
       },
     },
   };

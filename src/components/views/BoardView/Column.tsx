@@ -11,6 +11,7 @@ import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 interface ColumnProps {
   col: string;
   tasks: TaskPopulated[];
+  compactMode: boolean;
   loading: boolean;
   error: string | null;
   onAdd: (col: string) => void;
@@ -21,6 +22,7 @@ interface ColumnProps {
 export function Column({
   col,
   tasks,
+  compactMode,
   loading,
   error,
   onAdd,
@@ -95,6 +97,7 @@ export function Column({
                     key={task._id}
                     task={task}
                     column={col}
+                    compactMode={compactMode}
                     onOpen={() => onTaskOpen(task._id)}
                   />
                 ))}
