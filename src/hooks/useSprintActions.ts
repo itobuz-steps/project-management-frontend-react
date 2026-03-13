@@ -10,23 +10,37 @@ export function useSprintActions(
   setSprints?: React.Dispatch<React.SetStateAction<Sprint[]>>
 ) {
   const dueDateRef = useRef<HTMLInputElement>(null);
+
   const sprintService = createSprintService(projectId as string);
   const { project } = useProject();
 
   const startSprint = async (sprint: Sprint) => {
     if (!dueDateRef.current?.value) {
+      message.warning('Please select a due date');
       return;
     }
 
     try {
       const dueDate = new Date(dueDateRef.current.value);
+      const startDate = new Date();
 
-      await sprintService.updateSprint(sprint._id, { dueDate });
+      await sprintService.updateSprint(sprint._id, {
+        startDate,
+        dueDate,
+        isStarted: true,
+      });
       message.success('Sprint Updated');
 
       setSprints?.((prev) =>
-        prev.map((newSprint) =>
-          newSprint._id === sprint._id ? { ...newSprint, dueDate } : newSprint
+        prev.map((existingSprint) =>
+          existingSprint._id === sprint._id
+            ? {
+                ...existingSprint,
+                startDate,
+                dueDate,
+                isStarted: true,
+              }
+            : existingSprint
         )
       );
     } catch (err) {

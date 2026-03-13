@@ -9,6 +9,8 @@ export interface Sprint {
   tasks: string[];
   dueDate: Date;
   endDate?: Date;
+  startDate?: Date;
+  isStarted: boolean;
   isCompleted: boolean;
   projectId: string;
   createdAt?: string;
@@ -19,6 +21,8 @@ export interface Sprint {
 export interface CreateSprintPayload {
   tasks?: string[];
   dueDate?: string;
+  startDate?: string;
+  isStarted?: boolean;
   isCompleted?: boolean;
   projectId: string;
   storyPoint: number;
@@ -27,6 +31,8 @@ export interface CreateSprintPayload {
 export interface UpdateSprintPayload {
   tasks?: string[];
   dueDate?: Date;
+  startDate?: Date;
+  isStarted?: boolean;
   isCompleted?: boolean;
   endDate?: Date;
 }
