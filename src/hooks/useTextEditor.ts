@@ -26,6 +26,7 @@ import { TaskLink } from '../utils/TaskLink';
 import { TaskMentionList } from '../components/ui/TaskMentionList';
 import type { TaskItem as TaskItemType } from '../components/textEditor/textEditor.type';
 import type { Range, Editor } from '@tiptap/core';
+import { positionDropdown } from '../utils/utils';
 
 export function useTextEditor({
   content,
@@ -88,8 +89,7 @@ export function useTextEditor({
                 return;
               }
 
-              container.style.left = `${rect.left}px`;
-              container.style.top = `${rect.bottom + 4}px`;
+              positionDropdown(container, rect);
             }
           },
         },
@@ -172,8 +172,7 @@ export function useTextEditor({
           return;
         }
 
-        container.style.left = `${rect.left}px`;
-        container.style.top = `${rect.bottom + 4}px`;
+        positionDropdown(container, rect);
       }
     },
   };
