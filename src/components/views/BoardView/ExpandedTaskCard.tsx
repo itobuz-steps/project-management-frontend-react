@@ -3,10 +3,11 @@ import dayjs from 'dayjs';
 import type { MouseEvent } from 'react';
 import { Tooltip } from 'antd';
 import { CalendarDays, Flag, Link2, SquareCheckBig, Trash } from 'lucide-react';
-import type { TaskPopulated } from '../../../services/types/tasks.types';
+import type { TaskPopulated, User } from '../../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../../utils/TaskTypeColor';
 import { PRIORITY_COLORS } from '../../taskModal/constants';
+import { AssigneeCell } from '../../ui/AssigneeCell';
 
 interface ExpandedTaskCardProps {
   task: TaskPopulated;
@@ -15,6 +16,9 @@ interface ExpandedTaskCardProps {
   subtasksTotal: number;
   priorityLabel: string;
   onDeleteClick: (event: MouseEvent<HTMLButtonElement>) => void;
+  onUpdated: (task: TaskPopulated) => void;
+  members: User[];
+  loadingMembers: boolean;
 }
 
 export function ExpandedTaskCard({
@@ -24,6 +28,9 @@ export function ExpandedTaskCard({
   subtasksTotal,
   priorityLabel,
   onDeleteClick,
+  onUpdated,
+  members,
+  loadingMembers,
 }: ExpandedTaskCardProps) {
   const dueDateText = task.dueDate
     ? dayjs(task.dueDate).format('DD MMM YYYY')
@@ -31,7 +38,7 @@ export function ExpandedTaskCard({
 
   return (
     <>
-      <div className="group flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-2">
         <span className="mt-2 flex items-center gap-1 text-xs text-gray-500">
           <Tooltip title={task.type} placement="top">
             <span className="inline-flex">
@@ -55,7 +62,10 @@ export function ExpandedTaskCard({
           className="rounded-md p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
           onClick={onDeleteClick}
         >
-          <Trash size={16} className="hidden group-hover:block" />
+          <Trash
+            size={16}
+            className="opacity-0 transition-opacity group-hover:opacity-100"
+          />
         </button>
       </div>
 
@@ -72,23 +82,18 @@ export function ExpandedTaskCard({
       <div className="mt-4 flex items-center justify-between">
         <p className="text-sm text-gray-600">Assignee:</p>
         <div className="flex -space-x-2">
-          {task.assignee && (
-            <span
-              key={task.assignee._id}
-              className="inline-flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-gray-100 text-[11px] font-semibold text-gray-700"
-              title={task.assignee.name}
-            >
-              <img
-                src={
-                  task.assignee.profileImage
-                    ? task.assignee.profileImage
-                    : '/profile.png'
-                }
-                alt={task.assignee.name}
-                className="h-full w-full object-cover"
-              />
-            </span>
-          )}
+          <div
+            className="h-7 w-45 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <AssigneeCell
+              task={task}
+              members={members}
+              loading={loadingMembers}
+              onUpdated={onUpdated}
+            />
+          </div>
         </div>
       </div>
 

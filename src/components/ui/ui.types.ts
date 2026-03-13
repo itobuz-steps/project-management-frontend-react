@@ -9,6 +9,7 @@ export type AssigneeCellType = {
   loading: boolean;
   onUpdated: (t: TaskPopulated) => void;
   loadMembers?: () => void;
+  field?: 'assignee' | 'reporter';
 };
 
 export type DueDateCellType = {

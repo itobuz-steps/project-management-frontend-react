@@ -369,6 +369,7 @@ function reporterColumn(
           members={members}
           loading={loadingMembers}
           onUpdated={onTaskUpdated}
+          field="reporter"
         />
       ) : (
         <UserCell user={record.reporter} emptyText="Unknown" />

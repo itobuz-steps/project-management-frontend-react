@@ -4,7 +4,7 @@ import {
 } from '@dnd-kit/sortable';
 import ColumnDropZone from './ColumnDropZone';
 import { TaskCard } from './TaskCard';
-import type { TaskPopulated } from '../../../services/types/tasks.types';
+import type { TaskPopulated, User } from '../../../services/types/tasks.types';
 import { Can } from '../../../utils/PermissionHoc';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 
@@ -17,6 +17,9 @@ interface ColumnProps {
   onAdd: (col: string) => void;
   onDelete: (col: string) => void;
   onTaskOpen: (taskId: string) => void;
+  onUpdated: (task: TaskPopulated) => void;
+  members: User[];
+  loadingMembers: boolean;
 }
 
 export function Column({
@@ -28,9 +31,15 @@ export function Column({
   onAdd,
   onDelete,
   onTaskOpen,
+  onUpdated,
+  members,
+  loadingMembers,
 }: ColumnProps) {
   return (
-    <div key={col} className="group w-80 shrink-0">
+    <div
+      key={col}
+      className="group/column w-80 shrink-0 hover:[&:has(.task-card:hover)_.column-actions]:opacity-0"
+    >
       <div className="h-full rounded-lg bg-[#f8f8f8] shadow-sm">
         <div className="sticky top-0 z-10 flex items-center justify-between gap-2 px-4 py-2">
           <div className="flex items-center gap-2">
@@ -42,12 +51,12 @@ export function Column({
             </span>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="column-actions flex items-center gap-1">
             <Can permission="ADD_COLUMN">
               <button
                 type="button"
                 aria-label="Add column"
-                className="pointer-events-none rounded p-1 text-gray-500 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-gray-200 hover:text-gray-700 focus:opacity-100"
+                className="pointer-events-none rounded p-1 text-gray-500 opacity-0 transition-opacity duration-150 group-hover/column:pointer-events-auto group-hover/column:opacity-100 hover:bg-gray-200 hover:text-gray-700"
                 onClick={() => onAdd(col)}
               >
                 <PlusOutlined />
@@ -57,7 +66,7 @@ export function Column({
               <button
                 type="button"
                 aria-label="Delete column"
-                className="pointer-events-none rounded p-1 text-gray-500 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-red-100 hover:text-red-600 focus:opacity-100"
+                className="pointer-events-none rounded p-1 text-gray-500 opacity-0 transition-opacity duration-150 group-hover/column:pointer-events-auto group-hover/column:opacity-100 hover:bg-gray-200 hover:text-gray-700"
                 onClick={() => onDelete(col)}
               >
                 <DeleteOutlined />
@@ -99,6 +108,9 @@ export function Column({
                     column={col}
                     compactMode={compactMode}
                     onOpen={() => onTaskOpen(task._id)}
+                    onUpdated={onUpdated}
+                    members={members}
+                    loadingMembers={loadingMembers}
                   />
                 ))}
             </div>

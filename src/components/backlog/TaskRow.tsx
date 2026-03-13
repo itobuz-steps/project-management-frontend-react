@@ -130,6 +130,7 @@ export function TaskRow({
             members={members}
             loading={loadingMembers}
             onUpdated={onUpdated}
+            field="reporter"
           />
         ) : (
           <UserCell user={task.reporter} emptyText="Unknown" />
