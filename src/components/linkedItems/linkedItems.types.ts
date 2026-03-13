@@ -37,13 +37,15 @@ export interface LinkedItemsTableProps {
   rows: LinkedRow[];
   projectColumns: string[];
   onRemove: (type: LinkedRow['type'], id: string) => void;
-  onChange: (task: TaskReference) => void;
+  // pass full updated task so parent has all fields
+  onChange: (task: TaskPopulated) => void;
 }
 
 export interface StatusCellProps {
   row: LinkedRow;
   projectColumns: string[];
-  onStatusChange: (task: TaskReference) => void;
+  // pass full updated task so parent has all fields
+  onStatusChange: (task: TaskPopulated) => void;
 }
 
 export interface LinkColumnsProps {

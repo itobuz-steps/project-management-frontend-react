@@ -12,10 +12,7 @@ import { useProjectTasks } from '../../hooks/useProjectTasks';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { LinkedItemsTable } from './LinkedItemsTable';
 import { LinkedItemsAddPanel } from './LinkedItemsAddPanel';
-import type {
-  TaskPopulated,
-  TaskReference,
-} from '../../services/types/tasks.types';
+import type { TaskPopulated } from '../../services/types/tasks.types';
 import { DataLoader } from '../ui/DataLoader';
 
 export function LinkedItemsTab({ task, onUpdated }: LinkedItemsTabProps) {
@@ -49,14 +46,25 @@ export function LinkedItemsTab({ task, onUpdated }: LinkedItemsTabProps) {
     return Array.from(map.values());
   }, [task]);
 
-  const handleChange = (updatedLinkedTask: TaskReference) => {
+  const handleChange = (updatedLinkedTask: TaskPopulated) => {
     const updatedTask: TaskPopulated = { ...task };
 
+    const replaceItem = <T extends { _id: string }>(item: T): T =>
+      item._id === updatedLinkedTask._id
+        ? (updatedLinkedTask as unknown as T)
+        : item;
+
     (Object.keys(RELATIONSHIP_CONFIG) as RelationshipKey[]).forEach((type) => {
-      updatedTask[type] = (task[type] ?? []).map((item) =>
-        item._id === updatedLinkedTask._id ? updatedLinkedTask : item
-      );
+      updatedTask[type] = (task[type] ?? []).map(replaceItem);
     });
+
+    // Duplicates share the same status — sync parent status when a duplicate changes
+    const isDuplicate = (task.duplicates ?? []).some(
+      (item) => item._id === updatedLinkedTask._id
+    );
+    if (isDuplicate) {
+      updatedTask.status = updatedLinkedTask.status;
+    }
 
     onUpdated(updatedTask);
   };

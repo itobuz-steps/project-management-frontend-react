@@ -7,11 +7,9 @@ export function StatusCell({
   projectColumns,
   onStatusChange,
 }: StatusCellProps) {
+  // Pass the full updated task back to parent so it can fully reconcile state
   const { update } = useTaskUpdate(row.item._id, (updatedTask) => {
-    onStatusChange({
-      ...row.item,
-      status: updatedTask.status,
-    });
+    onStatusChange(updatedTask);
   });
 
   return (

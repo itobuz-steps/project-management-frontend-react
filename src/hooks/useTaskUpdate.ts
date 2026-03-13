@@ -2,9 +2,13 @@ import { message } from 'antd';
 import { updateTask } from '../services/taskService';
 import type { TaskPopulated } from '../services/types/tasks.types';
 import type { OnUpdatedFn } from './hooks.types';
+import { AxiosError } from 'axios';
 
 export function useTaskUpdate(taskId: string, onUpdated: OnUpdatedFn) {
-  const update = async (payload: Partial<TaskPopulated>, errorMsg: string) => {
+  const update = async (
+    payload: Partial<TaskPopulated>,
+    errorMsg = 'Failed to update'
+  ) => {
     try {
       const updatedTask = await updateTask(
         taskId,
@@ -16,8 +20,12 @@ export function useTaskUpdate(taskId: string, onUpdated: OnUpdatedFn) {
       window.dispatchEvent(event);
 
       message.success('Task Updated');
-    } catch {
-      message.error(errorMsg);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        message.error(
+          error.response?.data?.message || error.message || errorMsg
+        );
+      }
     }
   };
 

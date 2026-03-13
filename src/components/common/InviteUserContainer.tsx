@@ -95,10 +95,7 @@ export function InviteUserContainer({
             backgroundColor: 'rgba(0,0,0,0.45)',
           }}
         >
-          <InviteUserForm
-            submitHandler={handleFinish}
-            onCancel={() => setFormOpen(false)}
-          />
+          <InviteUserForm submitHandler={handleFinish} />
         </Modal>
       </>
     </Can>
