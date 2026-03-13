@@ -9,7 +9,7 @@ import {
   closestCorners,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { message, Skeleton } from 'antd';
+import { message, Skeleton, Tooltip } from 'antd';
 import { updateTask } from '../../../services/taskService';
 import type {
   TaskPopulated,
@@ -22,9 +22,11 @@ import { useSearchParams } from 'react-router-dom';
 import useBoard from '../../../hooks/useBoard';
 import Column from './Column';
 import { AddColumnModal, DeleteColumnModal } from './ColumnModals';
+import { Minimize2, Maximize2 } from 'lucide-react';
 
 function BoardView() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isCompactMode, setIsCompactMode] = useState(false);
   const [newColumnName, setNewColumnName] = useState('');
   const [isAddColumnOpen, setIsAddColumnOpen] = useState(false);
   const [isSavingColumn, setIsSavingColumn] = useState(false);
@@ -337,12 +339,35 @@ function BoardView() {
         }
       }}
     >
+      <div className="mb-3 flex justify-end">
+        <Tooltip
+          title={
+            isCompactMode ? 'Switch to expanded view' : 'Switch to compact view'
+          }
+          placement="left"
+        >
+          <button
+            type="button"
+            onClick={() => setIsCompactMode((prev) => !prev)}
+            aria-label={
+              isCompactMode
+                ? 'Switch to expanded view'
+                : 'Switch to compact view'
+            }
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isCompactMode ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
+          </button>
+        </Tooltip>
+      </div>
+
       <div className="flex gap-4 overflow-x-auto pb-2 sm:gap-6">
         {columns.map((col) => (
           <Column
             key={col}
             col={col}
             tasks={tasksByColumn[col] ?? []}
+            compactMode={isCompactMode}
             loading={loading}
             error={error}
             onAdd={openAddColumnModal}
