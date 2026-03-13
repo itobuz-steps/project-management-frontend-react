@@ -22,6 +22,7 @@ export function useSprintActions(
       const dueDate = new Date(dueDateRef.current.value);
 
       await sprintService.updateSprint(sprint._id, { dueDate });
+      message.success('Sprint Updated');
 
       setSprints?.((prev) =>
         prev.map((newSprint) =>
@@ -40,6 +41,7 @@ export function useSprintActions(
       await sprintService.updateSprint(sprint._id, {
         isCompleted: true,
       });
+      message.success('Sprint Completed');
 
       setSprints?.((prev) =>
         prev.map((completedSprint) =>
@@ -63,6 +65,7 @@ export function useSprintActions(
         projectId: project?._id || '',
         storyPoint,
       });
+      message.success('Sprint Created');
 
       setSprints?.((prevSprints) => [sprint, ...prevSprints]);
     } catch (error) {

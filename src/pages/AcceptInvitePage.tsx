@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { acceptInvite } from '../services/inviteService';
 import { AxiosError } from 'axios';
-import { toast } from 'react-toastify';
 import { useCountdown } from '../hooks/useCountdown';
+import { message } from 'antd';
 
 export function AcceptInvitePage() {
   const [searchParams] = useSearchParams();
@@ -32,7 +32,7 @@ export function AcceptInvitePage() {
       } catch (error) {
         if (error instanceof AxiosError) {
           setLoading(false);
-          toast.error(
+          message.error(
             error.response?.data?.message || 'Failed to accept invite'
           );
           setError(error.response?.data?.message || 'Failed to accept invite');

@@ -2,9 +2,9 @@ import { useForm } from 'react-hook-form';
 import { Input } from '../common/Input';
 import userService from '../../services/userService';
 import { AxiosError } from 'axios';
-import { toast } from 'react-toastify';
 import { useEffect } from 'react';
 import { formErrorHandler } from '../../utils/formErrorHandler';
+import { message } from 'antd';
 
 interface IEditProfileInput {
   username: string;
@@ -37,10 +37,10 @@ export function EditProfileForm({
         name: data.username,
         profileImage: data.profileImage[0],
       });
-      toast.success('Profile updated successfully!');
+      message.success('Profile updated successfully!');
     } catch (error) {
       if (error instanceof AxiosError) {
-        toast.error(
+        message.error(
           'Profile update failed: ' +
             (error.response?.data?.message || error.message)
         );

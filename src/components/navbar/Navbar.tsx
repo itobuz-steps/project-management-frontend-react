@@ -96,7 +96,7 @@ export default function Navbar() {
         {/* Hamburger — mobile only */}
         <button
           ref={hamburgerRef}
-          className="flex items-center justify-center p-1 text-gray-900 sm:hidden"
+          className="flex items-center justify-center p-1 text-gray-900 md:hidden"
           aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileMenuOpen}
           onClick={() => setMobileMenuOpen((open) => !open)}
@@ -109,7 +109,7 @@ export default function Navbar() {
         </button>
 
         {/* Icon row — desktop only */}
-        <div className="hidden items-center gap-3 sm:flex sm:justify-end sm:gap-4">
+        <div className="hidden items-center md:flex md:justify-end xl:gap-3">
           {project && !projectInfoHidden && (
             <div className="flex items-center justify-center rounded-md p-2 text-gray-900 transition-colors hover:bg-gray-200">
               <Can permission="SEND_INVITE">
@@ -162,7 +162,7 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div
           ref={menuRef}
-          className="fixed top-14 right-5 z-100 flex w-max flex-col rounded-lg border border-gray-200 bg-white p-2 shadow-lg sm:hidden"
+          className="fixed top-14 right-5 z-100 flex w-max flex-col rounded-lg border border-gray-200 bg-white p-2 shadow-lg md:hidden"
         >
           {project && !projectInfoHidden && (
             <Can permission="SEND_INVITE">
@@ -258,7 +258,7 @@ export default function Navbar() {
       {/* Always-mounted controlled instances for mobile triggers */}
       <InviteUserContainer open={inviteOpen} onOpenChange={setInviteOpen} />
       {notifOpen && (
-        <div className="fixed top-14 right-2 z-50 sm:hidden">
+        <div className="fixed top-14 right-2 z-50 md:hidden">
           <Notifications open={notifOpen} onOpenChange={setNotifOpen} />
         </div>
       )}

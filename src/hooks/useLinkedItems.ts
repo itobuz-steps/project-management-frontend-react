@@ -45,6 +45,7 @@ export function useLinkedItems(
       });
 
       onUpdated(updatedTask);
+      message.success('Linked Task added.');
     } catch {
       message.error('Failed to add linked task');
     } finally {
@@ -64,6 +65,7 @@ export function useLinkedItems(
       });
 
       onUpdated(updatedTask);
+      message.success('Linked Task removed.');
     } catch {
       message.error('Failed to remove linked task');
     } finally {
