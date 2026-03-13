@@ -18,7 +18,12 @@ export function EditProfileForm({
   setSelectedFile: React.Dispatch<React.SetStateAction<string>>;
   initialUsername?: string;
 }) {
-  const { register, handleSubmit, setValue } = useForm<IEditProfileInput>();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<IEditProfileInput>({ mode: 'onChange' });
 
   useEffect(() => {
     if (initialUsername) {
@@ -88,7 +93,12 @@ export function EditProfileForm({
       >
         max 500KB
       </label>
-
+      {errors.username && (
+        <p className="text-sm text-red-500">Username is invalid.</p>
+      )}
+      {errors.profileImage && (
+        <p className="text-sm text-red-500">Profile image is invalid.</p>
+      )}
       <button
         type="submit"
         className="btn btn-primary bg-primary-500 hover:bg-primary-600 w-full rounded-lg py-2 font-medium text-white transition-all duration-300"

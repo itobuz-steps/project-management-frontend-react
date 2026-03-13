@@ -16,8 +16,13 @@ interface ILoginInput {
 }
 
 export function LoginForm() {
-  const { register, handleSubmit } = useForm<ILoginInput>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ILoginInput>({
     resolver: yupResolver(loginSchema),
+    mode: 'onChange',
   });
 
   const { inputType, icon, togglePassword } = usePasswordToggle();
@@ -65,6 +70,16 @@ export function LoginForm() {
           {icon === 'eye' ? <Eye size={18} /> : <EyeOff size={18} />}
         </button>
       </div>
+
+      <div className="mr-auto max-w-xs flex-col text-start text-red-400">
+        {errors.email && (
+          <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+        )}
+        {errors.password && (
+          <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
+        )}
+      </div>
+
       <Link
         to={'/forgot-password'}
         className="text-primary-300 hover:text-primary-400 font-semibold text-nowrap transition-colors duration-300"
@@ -73,7 +88,7 @@ export function LoginForm() {
       </Link>
 
       <button
-        className="login-button bg-primary-500 hover:bg-primary-600 mt-8 w-full cursor-pointer rounded-lg py-3 font-semibold text-white transition-all duration-300"
+        className="login-button bg-primary-500 hover:bg-primary-600 mt-4 w-full cursor-pointer rounded-lg py-3 font-semibold text-white transition-all duration-300"
         type="submit"
       >
         Login

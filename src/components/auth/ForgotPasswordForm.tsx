@@ -33,10 +33,16 @@ export function ForgotPasswordForm() {
     return () => clearInterval(timer);
   }, [cooldown]);
 
-  const { register, getValues, handleSubmit, trigger } =
-    useForm<IForgotPasswordInput>({
-      resolver: yupResolver(forgotPasswordSchema),
-    });
+  const {
+    register,
+    getValues,
+    handleSubmit,
+    trigger,
+    formState: { errors },
+  } = useForm<IForgotPasswordInput>({
+    resolver: yupResolver(forgotPasswordSchema),
+    mode: 'onChange',
+  });
   const { inputType, icon, togglePassword } = usePasswordToggle();
   const navigate = useNavigate();
 
@@ -128,6 +134,20 @@ export function ForgotPasswordForm() {
             {icon === 'eye' ? <Eye size={18} /> : <EyeOff size={18} />}
           </button>
         </div>
+      </div>
+
+      <div className="mr-auto max-w-xs flex-col text-start text-red-400">
+        {errors.email && (
+          <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+        )}
+        {errors.otp && (
+          <p className="mt-1 text-sm text-red-400">{errors.otp.message}</p>
+        )}
+        {errors.newPassword && (
+          <p className="mt-1 text-sm text-red-400">
+            {errors.newPassword.message}
+          </p>
+        )}
       </div>
 
       <button
