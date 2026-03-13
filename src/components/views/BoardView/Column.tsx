@@ -4,7 +4,7 @@ import {
 } from '@dnd-kit/sortable';
 import ColumnDropZone from './ColumnDropZone';
 import { TaskCard } from './TaskCard';
-import type { TaskPopulated } from '../../../services/types/tasks.types';
+import type { TaskPopulated, User } from '../../../services/types/tasks.types';
 import { Can } from '../../../utils/PermissionHoc';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 
@@ -17,6 +17,9 @@ interface ColumnProps {
   onAdd: (col: string) => void;
   onDelete: (col: string) => void;
   onTaskOpen: (taskId: string) => void;
+  onUpdated: (task: TaskPopulated) => void;
+  members: User[];
+  loadingMembers: boolean;
 }
 
 export function Column({
@@ -28,6 +31,9 @@ export function Column({
   onAdd,
   onDelete,
   onTaskOpen,
+  onUpdated,
+  members,
+  loadingMembers,
 }: ColumnProps) {
   return (
     <div key={col} className="group w-80 shrink-0">
@@ -99,6 +105,9 @@ export function Column({
                     column={col}
                     compactMode={compactMode}
                     onOpen={() => onTaskOpen(task._id)}
+                    onUpdated={onUpdated}
+                    members={members}
+                    loadingMembers={loadingMembers}
                   />
                 ))}
             </div>

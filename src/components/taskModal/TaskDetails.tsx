@@ -210,6 +210,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                       members={members}
                       loading={loadingMembers}
                       onUpdated={onUpdated}
+                      field="reporter"
                     />
                   ) : (
                     <UserCell user={task.reporter} emptyText="—" />

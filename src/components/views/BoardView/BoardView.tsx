@@ -23,6 +23,7 @@ import useBoard from '../../../hooks/useBoard';
 import Column from './Column';
 import { AddColumnModal, DeleteColumnModal } from './ColumnModals';
 import { Minimize2, Maximize2 } from 'lucide-react';
+import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
 
 function BoardView() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -39,6 +40,8 @@ function BoardView() {
 
   const { projectId } = useParams();
   const { project } = useProject();
+  const { members, loadingMembers } = useProjectMetaData(projectId);
+
   const type = project?.projectType;
   const isScrum = type === 'scrum';
 
@@ -55,6 +58,15 @@ function BoardView() {
     handleDeleteColumn,
     setError,
   } = useBoard(projectId, searchParams.get('searchInput') || '', isScrum);
+
+  const handleTaskUpdated = useCallback(
+    (updated: TaskPopulated) => {
+      setTasks((prev) =>
+        prev.map((task) => (task._id === updated._id ? updated : task))
+      );
+    },
+    [setTasks]
+  );
 
   const normalize = useCallback(
     (value?: string) => (value ?? '').toLowerCase().trim(),
@@ -373,6 +385,9 @@ function BoardView() {
             onAdd={openAddColumnModal}
             onDelete={openDeleteColumnModal}
             onTaskOpen={(taskId: string) => setSearchParams({ taskId })}
+            onUpdated={handleTaskUpdated}
+            members={members}
+            loadingMembers={loadingMembers}
           />
         ))}
       </div>

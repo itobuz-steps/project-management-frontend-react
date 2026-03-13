@@ -12,9 +12,12 @@ export function AssigneeCell({
   loading,
   onUpdated,
   loadMembers,
+  field = 'assignee',
 }: AssigneeCellType) {
   const [editing, setEditing] = useState(false);
   const { userId } = useAuthContext();
+
+  const currentUser = task[field] as User | undefined;
 
   if (!editing) {
     return (
@@ -26,10 +29,10 @@ export function AssigneeCell({
             loadMembers?.();
           }}
         >
-          <UserCell user={task.assignee} emptyText="Unassigned" />
+          <UserCell user={currentUser} emptyText="Unassigned" />
         </div>
 
-        {!task.assignee && userId && (
+        {!currentUser && userId && (
           <>
             <span className="text-gray-300">·</span>
 
@@ -43,14 +46,14 @@ export function AssigneeCell({
 
                 const optimistic = {
                   ...task,
-                  assignee: selectedUser as User,
+                  [field]: selectedUser as User,
                 };
 
                 onUpdated(optimistic);
 
                 try {
                   await updateTask(task._id, {
-                    assignee: userId as unknown as User,
+                    [field]: userId as unknown as User,
                   });
 
                   message.success('Assigned to you');
@@ -73,7 +76,7 @@ export function AssigneeCell({
       className="h-7 w-[100px] truncate lg:w-full"
       size="small"
       loading={loading}
-      value={task.assignee?._id ?? null}
+      value={currentUser?._id ?? null}
       placeholder="Unassigned"
       allowClear
       onBlur={() => setEditing(false)}
@@ -83,7 +86,7 @@ export function AssigneeCell({
 
         const optimistic = {
           ...task,
-          assignee: selectedUser as User,
+          [field]: selectedUser as User,
         };
 
         onUpdated(optimistic);
@@ -91,7 +94,7 @@ export function AssigneeCell({
 
         try {
           await updateTask(task._id, {
-            assignee: (userId as unknown as User) ?? null,
+            [field]: (userId as unknown as User) ?? null,
           });
           message.success('Task Updated');
         } catch {

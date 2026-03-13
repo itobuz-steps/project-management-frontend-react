@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { TaskPopulated } from '../../../services/types/tasks.types';
+import type { TaskPopulated, User } from '../../../services/types/tasks.types';
 import { useSortable } from '@dnd-kit/sortable';
 import { DeleteTaskModal } from '../../../utils/DeleteTaskModal';
 import { CSS } from '@dnd-kit/utilities';
@@ -12,11 +12,17 @@ export function TaskCard({
   column,
   compactMode,
   onOpen,
+  onUpdated,
+  members,
+  loadingMembers,
 }: {
   task: TaskPopulated;
   column: string;
   compactMode: boolean;
   onOpen: () => void;
+  onUpdated: (task: TaskPopulated) => void;
+  members: User[];
+  loadingMembers: boolean;
 }) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const { columns } = useProject();
@@ -52,10 +58,23 @@ export function TaskCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md ${
+      className={`group rounded-xl border border-gray-200 bg-white px-4 py-2 shadow-sm transition-all hover:shadow-md ${
         isDragging ? 'opacity-50' : ''
       }`}
-      onClick={() => onOpen()}
+      onClick={(e) => {
+        const target = e.target as HTMLElement;
+
+        if (
+          target.closest('button') ||
+          target.closest('a') ||
+          target.closest('[role="combobox"]') ||
+          target.closest('.ant-select')
+        ) {
+          return;
+        }
+
+        onOpen();
+      }}
       {...attributes}
       {...listeners}
     >
@@ -66,6 +85,9 @@ export function TaskCard({
           linksCount={linksCount}
           subtasksTotal={subtasksTotal}
           priorityLabel={priorityLabel}
+          onUpdated={onUpdated}
+          members={members}
+          loadingMembers={loadingMembers}
           onDeleteClick={(event) => {
             event.stopPropagation();
             setIsDeleteOpen(true);
@@ -78,6 +100,9 @@ export function TaskCard({
           linksCount={linksCount}
           subtasksTotal={subtasksTotal}
           priorityLabel={priorityLabel}
+          onUpdated={onUpdated}
+          members={members}
+          loadingMembers={loadingMembers}
           onDeleteClick={(event) => {
             event.stopPropagation();
             setIsDeleteOpen(true);

@@ -82,7 +82,7 @@ export function CommentsTab({ task }: CommentsTabProps) {
       {composer.contextHolder}
 
       {/* Composer */}
-      <div className="border-b border-gray-200 pb-4" ref={composerRef}>
+      <div className="border-b border-gray-200 py-4" ref={composerRef}>
         <div className="flex gap-3">
           <img src="/profile.png" className="h-8 w-8 rounded-full" />
 
