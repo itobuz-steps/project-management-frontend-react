@@ -7,9 +7,9 @@ import { useProject } from '../context/ProjectContext';
 import { setupPushNotifications } from '../utils/setupNotification';
 import { AddTaskModal } from '../utils/addTaskModal';
 import { getAllProjects } from '../services/projectService';
-import { toast } from 'react-toastify';
 import userService from '../services/userService';
 import { useAuthContext } from '../context/AuthContext';
+import { message } from 'antd';
 
 function Dashboard() {
   const { setProject } = useProject();
@@ -41,7 +41,7 @@ function Dashboard() {
           setRole(memberRole);
         }
       } catch {
-        toast.error('Failed to load projects');
+        message.error('Failed to load projects');
         setProjects([]);
         setProject(undefined);
       }

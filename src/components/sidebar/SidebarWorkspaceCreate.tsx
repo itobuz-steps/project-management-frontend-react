@@ -1,7 +1,6 @@
 import { AxiosError } from 'axios';
 import { Plus, SendHorizontal } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
 import { createWorkspace } from '../../services/workspaceService';
 import { message } from 'antd';
 
@@ -25,7 +24,7 @@ export default function SidebarWorkspaceCreate({
     try {
       setIsCreatingWorkspace(true);
       await createWorkspace(trimmedName);
-      toast.success('Workspace created successfully!');
+      message.success('Workspace created successfully!');
       setWorkspaceName('');
       setWorkspaceInputOpen(false);
       onCreated();

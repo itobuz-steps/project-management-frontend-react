@@ -14,9 +14,10 @@ import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../hooks/useSprintActions';
 import { taskTableColumns } from '../../config/constants';
 import { CreateSprintForm } from './CreateSprintForm';
-import { message, Popconfirm } from 'antd';
-import { format } from 'date-fns';
+import { DatePicker, message, Popconfirm } from 'antd';
+import dayjs from 'dayjs';
 import { Can } from '../../utils/PermissionHoc';
+import { usePermissions } from '../../hooks/usePermissions';
 
 export function TaskTable({
   sprint,
@@ -31,6 +32,9 @@ export function TaskTable({
   const [localTasks, setLocalTasks] = useState(tasks);
   const [editingDueDate, setEditingDueDate] = useState(false);
   const { project } = useProject();
+
+  const { can } = usePermissions();
+  const canEditDueDate = can('EDIT_SPRINT');
 
   useEffect(() => {
     setLocalTasks(tasks);
@@ -111,25 +115,47 @@ export function TaskTable({
           <div className="xs:flex-row xs:items-center xs:gap-2 flex flex-col items-start gap-1">
             <span className="font-semibold">{title || sprint?.key}</span>
             {sprint?.dueDate &&
-              (editingDueDate ? (
-                <input
-                  ref={dueDateRef}
-                  type="date"
-                  defaultValue={format(new Date(sprint.dueDate), 'dd-MM-yyyy')}
-                  className="rounded border px-2 py-1 text-xs"
-                  autoFocus
-                  onBlur={async () => {
-                    await startSprint(sprint);
-                    setEditingDueDate(false);
-                  }}
-                />
+              (editingDueDate && canEditDueDate ? (
+                <div className="relative">
+                  <DatePicker
+                    defaultValue={dayjs(sprint.dueDate)}
+                    size="small"
+                    className="rounded border text-xs"
+                    autoFocus
+                    onChange={(date) => {
+                      if (!date || !dueDateRef.current) {
+                        return;
+                      }
+
+                      dueDateRef.current.value = date.toISOString();
+                    }}
+                    onOpenChange={async (open) => {
+                      if (!open) {
+                        await startSprint(sprint);
+                        setEditingDueDate(false);
+                      }
+                    }}
+                  />
+
+                  <input
+                    ref={dueDateRef}
+                    type="hidden"
+                    defaultValue={dayjs(sprint.dueDate).toISOString()}
+                  />
+                </div>
               ) : (
                 <span
-                  onClick={() => setEditingDueDate(true)}
-                  className="group bg-primary-50 text-primary-600 hover:bg-primary-100 relative inline-flex cursor-pointer items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                  onClick={() => canEditDueDate && setEditingDueDate(true)}
+                  className={`group relative inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                    canEditDueDate
+                      ? 'bg-primary-50 text-primary-600 hover:bg-primary-100 cursor-pointer'
+                      : 'cursor-default bg-gray-100 text-gray-500'
+                  }`}
                 >
-                  Due {format(new Date(sprint.dueDate), 'MMM d')}
-                  <Pencil className="absolute -right-4 h-3 w-3 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
+                  Due {dayjs(sprint.dueDate).format('MMM D')}
+                  {canEditDueDate && (
+                    <Pencil className="absolute -right-4 h-3 w-3 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
+                  )}
                 </span>
               ))}
           </div>

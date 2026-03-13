@@ -1,8 +1,7 @@
-import { Button, Form, InputNumber } from 'antd';
+import { Button, Form, InputNumber, message } from 'antd';
 import type { Sprint } from '../../services/types/sprints.types';
 import { SprintButton } from './SprintButton';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
 import { X } from 'lucide-react';
 
 interface CreateSprintFormProps {
@@ -32,7 +31,7 @@ export function CreateSprintForm({
             setShowForm(false);
           }}
           onFinishFailed={() => {
-            toast.error('Please enter a valid integer for story points');
+            message.error('Please enter a valid integer for story points');
           }}
           style={{
             display: 'flex',

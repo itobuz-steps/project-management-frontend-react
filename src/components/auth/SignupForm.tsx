@@ -17,8 +17,13 @@ interface ISignupInput {
 }
 
 export function SignupForm() {
-  const { register, handleSubmit } = useForm<ISignupInput>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ISignupInput>({
     resolver: yupResolver(signupSchema),
+    mode: 'onChange',
   });
 
   const navigate = useNavigate();
@@ -64,6 +69,18 @@ export function SignupForm() {
         >
           {icon === 'eye' ? <Eye size={18} /> : <EyeOff size={18} />}
         </button>
+      </div>
+
+      <div className="mr-auto max-w-xs flex-col text-start text-red-400">
+        {errors.username && (
+          <p className="mt-1 text-sm text-red-400">{errors.username.message}</p>
+        )}
+        {errors.email && (
+          <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+        )}
+        {errors.password && (
+          <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
+        )}
       </div>
       <button
         className="bg-primary-500 hover:bg-primary-600 mt-5 w-full cursor-pointer rounded-lg py-3 font-semibold text-white transition-all duration-300 disabled:bg-gray-300 disabled:text-gray-400"

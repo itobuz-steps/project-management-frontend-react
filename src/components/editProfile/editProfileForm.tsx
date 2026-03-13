@@ -2,9 +2,9 @@ import { useForm } from 'react-hook-form';
 import { Input } from '../common/Input';
 import userService from '../../services/userService';
 import { AxiosError } from 'axios';
-import { toast } from 'react-toastify';
 import { useEffect } from 'react';
 import { formErrorHandler } from '../../utils/formErrorHandler';
+import { message } from 'antd';
 
 interface IEditProfileInput {
   username: string;
@@ -18,7 +18,12 @@ export function EditProfileForm({
   setSelectedFile: React.Dispatch<React.SetStateAction<string>>;
   initialUsername?: string;
 }) {
-  const { register, handleSubmit, setValue } = useForm<IEditProfileInput>();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<IEditProfileInput>({ mode: 'onChange' });
 
   useEffect(() => {
     if (initialUsername) {
@@ -32,10 +37,10 @@ export function EditProfileForm({
         name: data.username,
         profileImage: data.profileImage[0],
       });
-      toast.success('Profile updated successfully!');
+      message.success('Profile updated successfully!');
     } catch (error) {
       if (error instanceof AxiosError) {
-        toast.error(
+        message.error(
           'Profile update failed: ' +
             (error.response?.data?.message || error.message)
         );
@@ -88,7 +93,12 @@ export function EditProfileForm({
       >
         max 500KB
       </label>
-
+      {errors.username && (
+        <p className="text-sm text-red-500">Username is invalid.</p>
+      )}
+      {errors.profileImage && (
+        <p className="text-sm text-red-500">Profile image is invalid.</p>
+      )}
       <button
         type="submit"
         className="btn btn-primary bg-primary-500 hover:bg-primary-600 w-full rounded-lg py-2 font-medium text-white transition-all duration-300"

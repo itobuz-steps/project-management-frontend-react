@@ -14,7 +14,7 @@ const MAX_DRAWER_WIDTH = 520;
 export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
   const [task, setTask] = useState<TaskPopulated | null>(null);
   const [loading, setLoading] = useState(false);
-  const isMobile = useIsMobile(800);
+  const isMobile = useIsMobile(1000);
   const { drawerWidth, startResizing } = useResizableDrawer({
     initialWidth: 420,
     minWidth: MIN_DRAWER_WIDTH,
