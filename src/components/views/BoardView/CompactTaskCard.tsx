@@ -38,7 +38,7 @@ export function CompactTaskCard({
 
   return (
     <>
-      <div className="group flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-2">
         <span className="mt-2 flex items-center gap-1 text-xs text-gray-500">
           <Tooltip title={task.type} placement="top">
             <span className="inline-flex">
@@ -87,7 +87,10 @@ export function CompactTaskCard({
           className="rounded-md p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
           onClick={onDeleteClick}
         >
-          <Trash size={16} className="hidden group-hover:block" />
+          <Trash
+            size={16}
+            className="opacity-0 transition-opacity group-hover:opacity-100"
+          />
         </button>
       </div>
 

@@ -58,18 +58,13 @@ export function TaskCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group rounded-xl border border-gray-200 bg-white px-4 py-2 shadow-sm transition-all hover:shadow-md ${
+      className={`task-card group rounded-xl border border-gray-200 bg-white px-4 py-2 shadow-sm transition-all hover:shadow-md ${
         isDragging ? 'opacity-50' : ''
       }`}
       onClick={(e) => {
         const target = e.target as HTMLElement;
 
-        if (
-          target.closest('button') ||
-          target.closest('a') ||
-          target.closest('[role="combobox"]') ||
-          target.closest('.ant-select')
-        ) {
+        if (target.closest('button') || target.closest('.ant-select')) {
           return;
         }
 
