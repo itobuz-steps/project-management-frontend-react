@@ -27,7 +27,9 @@ export function getTypeBorder(type?: string) {
 }
 
 export function formatDateForInput(date?: string) {
-  if (!date) return '';
+  if (!date) {
+    return '';
+  }
   return new Date(date).toISOString().split('T')[0];
 }
 

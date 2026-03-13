@@ -7,6 +7,7 @@ import type {
   BackendAttachment,
 } from '../services/types/tasks.types';
 import type { TaskWithAttachments } from './hooks.types';
+import { AxiosError } from 'axios';
 
 export function useTaskAttachments(
   task: TaskWithAttachments,
@@ -66,8 +67,12 @@ export function useTaskAttachments(
 
       onUpdated?.(updatedTask);
       message.success(successMsg);
-    } catch {
-      message.error(errorMsg);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        message.error(
+          error.response?.data?.message || error.message || errorMsg
+        );
+      }
     } finally {
       setSaving(false);
     }
