@@ -36,9 +36,13 @@ export function CommentItem({
     avatar: member.profileImage,
   }));
 
+  const { isEditing, reset } = editor;
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (!editor.isEditing) return;
+      if (!isEditing) {
+        return;
+      }
 
       const target = event.target as HTMLElement;
 
@@ -57,13 +61,13 @@ export function CommentItem({
         !clickedAntdDropdown &&
         !clickedMentionDropdown
       ) {
-        editor.reset();
+        reset();
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [editor.isEditing]);
+  }, [isEditing, reset]);
 
   const markdownComponents: Components = {
     span: (props) => {

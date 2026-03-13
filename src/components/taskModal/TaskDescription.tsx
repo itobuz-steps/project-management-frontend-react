@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import { TextEditor } from '../textEditor/TextEditor';
 import { useTaskUpdate } from '../../hooks/useTaskUpdate';
@@ -17,6 +17,11 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
 
   useEffect(() => {
     setValue(task.description || '');
+  }, [task.description]);
+
+  const cancel = useCallback(() => {
+    setValue(task.description || '');
+    closeEditor();
   }, [task.description]);
 
   useEffect(() => {
@@ -44,7 +49,7 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [editing]);
+  }, [editing, cancel]);
 
   const save = async () => {
     if (value === task.description) {
@@ -62,11 +67,6 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
       setSaving(false);
       closeEditor();
     }
-  };
-
-  const cancel = () => {
-    setValue(task.description || '');
-    closeEditor();
   };
 
   const openEditor = () => {

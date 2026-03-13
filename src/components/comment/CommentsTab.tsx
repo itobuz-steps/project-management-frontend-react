@@ -28,6 +28,8 @@ export function CommentsTab({ task }: CommentsTabProps) {
     avatar: member.profileImage,
   }));
 
+  const { reset } = composer;
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -47,14 +49,14 @@ export function CommentsTab({ task }: CommentsTabProps) {
         !clickedMentionDropdown &&
         !clickedAntdDropdown
       ) {
-        composer.reset();
+        reset();
         setIsComposerOpen(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isComposerOpen]);
+  }, [isComposerOpen, reset]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
