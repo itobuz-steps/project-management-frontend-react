@@ -80,12 +80,13 @@ const Timeline = () => {
 
   const rows = useMemo(() => {
     const makeSprintItem = (sprint: Sprint): Omit<GanttItem, 'lane'> => {
-      const start = dayjs(sprint.createdAt).toDate();
+      const start = dayjs(sprint.startDate || sprint.createdAt).toDate();
       const end = dayjs(sprint.endDate || sprint.dueDate).toDate();
       let status = 'Planned';
+
       if (sprint.isCompleted) {
         status = 'Completed';
-      } else if (dayjs().isAfter(start) && dayjs().isBefore(end)) {
+      } else if (sprint.isStarted) {
         status = 'Active';
       }
       return {

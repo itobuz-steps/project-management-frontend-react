@@ -99,7 +99,7 @@ export function TaskTable({
     }
   };
 
-  const sprintStarted = Boolean(sprint?.dueDate);
+  const sprintStarted = sprint?.isStarted === true;
 
   return (
     <div className="rounded-lg bg-white shadow-sm">
