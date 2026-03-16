@@ -70,6 +70,9 @@ export function AttachmentsTab({
             setExpanded(true);
           }}
         >
+          <span className="pr-2 text-xs font-normal text-red-400">
+            Max size: 5MB
+          </span>
           <Upload {...uploadProps} disabled={saving}>
             <Button
               style={{
