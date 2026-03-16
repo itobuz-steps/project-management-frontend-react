@@ -86,29 +86,37 @@ export function TaskItem({ task }: { task: TaskPopulated }) {
   return (
     <li
       onClick={() => setSearchParams({ taskId: task._id }, { replace: true })}
-      className="group flex items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-neutral-50 px-3 py-2 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-colors hover:cursor-pointer hover:border-gray-300"
+      className="group flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-neutral-50 px-3 py-2 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-colors hover:cursor-pointer hover:border-gray-300"
     >
       <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
         <div className="mb-1 min-w-0">
-          <p className="truncate text-lg leading-7 font-semibold text-gray-900 sm:text-xl">
-            {task.title}
-          </p>
-          <p className="mt-1 text-xs! text-gray-500">{projectName}</p>
+          <div className="flex items-center gap-2">
+            <TaskTypeIcon type={task.type} />
+            <p className="truncate text-lg leading-7 font-semibold text-gray-900 sm:text-xl">
+              {task.title}
+            </p>
+          </div>
+          <div className="mt-1 flex items-center gap-2 text-xs! text-gray-500">
+            <span className="bg-primary-400 rounded-sm px-1 py-0.5 text-[10px]! font-semibold text-white">
+              {task.key}
+            </span>
+            <span>{projectName}</span>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-end gap-3 text-sm">
-          <span className="hidden items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-gray-700 sm:inline-flex">
+        <div className="flex flex-col items-end justify-end gap-3 text-sm sm:flex-row sm:items-center">
+          <span className="hidden w-15 items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-gray-700 sm:inline-flex">
             <Link2 size={14} />
             {linksCount}
           </span>
 
           <span
-            className={`rounded-md px-3 py-1 text-sm font-semibold ${getPriorityBadgeClass(task.priority || 'low')}`}
+            className={`w-21 rounded-md px-3 py-1 text-center text-sm font-semibold ${getPriorityBadgeClass(task.priority || 'low')}`}
           >
             {priorityLabel}
           </span>
 
-          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700">
+          <span className="inline-flex w-36 items-center gap-1.5 text-sm font-medium text-gray-700">
             <Clock3 size={14} />
             {daysLeft}
           </span>
@@ -116,8 +124,6 @@ export function TaskItem({ task }: { task: TaskPopulated }) {
       </div>
 
       <div className="hidden items-center gap-4 md:flex">
-        <TaskTypeIcon type={task.type} />
-
         <div className="flex min-w-[132px] items-center gap-3">
           <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
             <div
