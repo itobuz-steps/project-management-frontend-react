@@ -8,8 +8,6 @@ export interface CommentsTabProps {
 export interface CommentItemProps {
   task: TaskPopulated;
   comment: Comment;
-  onDelete: (id: string) => void;
-  onUpdate: (comment: Comment) => void;
 }
 
 export type MentionSpanProps = React.HTMLAttributes<HTMLSpanElement> & {

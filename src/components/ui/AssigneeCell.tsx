@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Select, message } from 'antd';
+import { Select } from 'antd';
 import type { User } from '../../services/types/tasks.types';
 import { UserCell } from './UserCell';
-import { updateTask } from '../../services/taskService';
 import type { AssigneeCellType } from './ui.types';
 import { useAuthContext } from '../../context/AuthContext';
+import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 
 export function AssigneeCell({
   task,
@@ -17,7 +17,24 @@ export function AssigneeCell({
   const [editing, setEditing] = useState(false);
   const { userId } = useAuthContext();
 
+  const { update, loading: saving } = useTaskUpdate(task._id, onUpdated);
+
   const currentUser = task[field] as User | undefined;
+
+  const updateAssignee = (id: string | null) => {
+    const selectedUser = members.find((member) => member._id === id) ?? null;
+
+    const optimistic = {
+      ...task,
+      [field]: selectedUser as User,
+    };
+
+    onUpdated(optimistic);
+
+    update({
+      [field]: id ?? null,
+    });
+  };
 
   if (!editing) {
     return (
@@ -38,28 +55,9 @@ export function AssigneeCell({
 
             <button
               className="text-primary-600 text-xs hover:underline"
-              onClick={async (e) => {
+              onClick={(e) => {
                 e.stopPropagation();
-
-                const selectedUser =
-                  members.find((member) => member._id === userId) ?? null;
-
-                const optimistic = {
-                  ...task,
-                  [field]: selectedUser as User,
-                };
-
-                onUpdated(optimistic);
-
-                try {
-                  await updateTask(task._id, {
-                    [field]: userId as unknown as User,
-                  });
-
-                  message.success('Assigned to you');
-                } catch {
-                  message.error('Failed to assign task');
-                }
+                updateAssignee(userId);
               }}
             >
               Assign me
@@ -75,31 +73,14 @@ export function AssigneeCell({
       autoFocus
       className="h-7 w-[100px] truncate lg:w-full"
       size="small"
-      loading={loading}
+      loading={loading || saving}
       value={currentUser?._id ?? null}
       placeholder="Unassigned"
       allowClear
       onBlur={() => setEditing(false)}
-      onChange={async (userId) => {
-        const selectedUser =
-          members.find((member) => member._id === userId) ?? null;
-
-        const optimistic = {
-          ...task,
-          [field]: selectedUser as User,
-        };
-
-        onUpdated(optimistic);
+      onChange={(id) => {
+        updateAssignee(id ?? null);
         setEditing(false);
-
-        try {
-          await updateTask(task._id, {
-            [field]: (userId as unknown as User) ?? null,
-          });
-          message.success('Task Updated');
-        } catch {
-          message.error('Failed to update assignee');
-        }
       }}
       options={members.map((member) => ({
         value: member._id,

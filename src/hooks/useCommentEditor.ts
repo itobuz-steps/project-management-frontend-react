@@ -1,82 +1,103 @@
 import { useEffect, useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
 import { commentsApi } from '../services/commentService';
 import type { JSONContent } from '@tiptap/react';
 import type { UseCommentEditorParams } from './hooks.types';
+import type { Comment } from '../services/types/comments.types';
+import { AxiosError } from 'axios';
+import { extractMentions } from '../utils/extractMentions';
 
-export function useCommentEditor({
-  comment,
-  onUpdate,
-  onDelete,
-}: UseCommentEditorParams) {
+export function useCommentEditor({ comment }: UseCommentEditorParams) {
+  const queryClient = useQueryClient();
+
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState<string>(comment.message);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [editorJson, setEditorJson] = useState<JSONContent | null>(null);
 
-  const [messageApi, contextHolder] = message.useMessage();
-
   useEffect(() => {
     setContent(comment.message);
   }, [comment]);
-
-  const extractMentions = () => {
-    if (!editorJson) {
-      return [];
-    }
-
-    const ids = new Set<string>();
-
-    const walk = (node: JSONContent) => {
-      if (node.type === 'mention' && node.attrs?.id) {
-        ids.add(node.attrs.id);
-      }
-      node.content?.forEach(walk);
-    };
-
-    walk(editorJson);
-    return Array.from(ids);
-  };
 
   const reset = () => {
     setIsEditing(false);
     setContent(comment.message);
     setAttachments([]);
+    setEditorJson(null);
   };
+
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      const mentions = extractMentions(editorJson);
+
+      return commentsApi.updateComment(comment.taskId as string, comment._id, {
+        message: content,
+        mentions,
+      });
+    },
+    onSuccess: (updated) => {
+      queryClient.setQueryData<Comment[]>(
+        ['comments', comment.taskId],
+        (prev = []) =>
+          prev.map((item) =>
+            item._id === comment._id ? { ...item, ...updated } : item
+          )
+      );
+
+      message.success('Comment updated');
+      reset();
+    },
+    onError: (error) => {
+      const axiosError = error as AxiosError<{ message?: string }>;
+
+      message.error(
+        axiosError.response?.data?.message ||
+          axiosError.message ||
+          'Failed to update comment'
+      );
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () =>
+      commentsApi.deleteComment(comment.taskId as string, comment._id),
+    onSuccess: () => {
+      queryClient.setQueryData<Comment[]>(
+        ['comments', comment.taskId],
+        (prev = []) => prev.filter((item) => item._id !== comment._id)
+      );
+
+      message.success('Comment deleted');
+    },
+    onError: (error) => {
+      const axiosError = error as AxiosError<{ message?: string }>;
+
+      message.error(
+        axiosError.response?.data?.message ||
+          axiosError.message ||
+          'Failed to delete comment'
+      );
+    },
+  });
 
   const save = async () => {
     if (!content.trim()) {
-      messageApi.warning('Comment cannot be empty');
+      message.warning('Comment cannot be empty');
       return;
     }
 
-    const mentions = extractMentions();
-
-    const updated = await commentsApi.updateComment(
-      comment.taskId as string,
-      comment._id,
-      {
-        message: content,
-        mentions,
-      }
-    );
-
-    onUpdate({ ...comment, ...updated });
-    reset();
+    await updateMutation.mutateAsync();
   };
 
   const remove = async () => {
-    await commentsApi.deleteComment(comment.taskId as string, comment._id);
-
-    messageApi.success('Comment deleted');
-    onDelete(comment._id);
+    await deleteMutation.mutateAsync();
   };
 
   return {
     isEditing,
     content,
     attachments,
-    contextHolder,
     editorJson,
     setEditorJson,
     setIsEditing,
@@ -85,5 +106,7 @@ export function useCommentEditor({
     save,
     remove,
     reset,
+    saving: updateMutation.isPending,
+    deleting: deleteMutation.isPending,
   };
 }

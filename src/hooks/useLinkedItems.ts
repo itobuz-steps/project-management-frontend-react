@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateTask } from '../services/taskService';
 import type {
   TaskPopulated,
@@ -7,12 +7,13 @@ import type {
 import type { RelationshipKey } from '../components/linkedItems/linkedItems.types';
 import { RELATIONSHIP_CONFIG } from '../components/linkedItems/linkedItems.types';
 import { message } from 'antd';
+import { AxiosError } from 'axios';
 
 export function useLinkedItems(
   task: TaskPopulated,
   onUpdated: (task: TaskPopulated) => void
 ) {
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const normalizeIds = (items: TaskReference[] = []) =>
     Array.from(new Set(items.map((item) => item?._id).filter(Boolean)));
@@ -27,51 +28,68 @@ export function useLinkedItems(
     return Array.from(new Set(allIds));
   };
 
-  const addLinkedItem = async (type: RelationshipKey, targetId: string) => {
-    try {
-      setLoading(true);
-
-      const allLinkedIds = getAllLinkedIds();
-
-      if (allLinkedIds.includes(targetId)) {
-        return;
-      }
-
+  const mutation = useMutation({
+    mutationFn: async ({
+      type,
+      targetId,
+      action,
+    }: {
+      type: RelationshipKey;
+      targetId: string;
+      action: 'add' | 'remove';
+    }) => {
       const currentIds = normalizeIds(task[type]);
-      const updatedIds = [...currentIds, targetId];
+
+      const updatedIds =
+        action === 'add'
+          ? [...currentIds, targetId]
+          : currentIds.filter((id) => id !== targetId);
 
       const updatedTask = await updateTask(task._id, {
         [type]: updatedIds,
       });
 
+      return updatedTask;
+    },
+
+    onSuccess: (updatedTask) => {
+      queryClient.setQueryData(['task', task._id], updatedTask);
+
       onUpdated(updatedTask);
-      message.success('Linked Task added.');
-    } catch {
-      message.error('Failed to add linked task');
-    } finally {
-      setLoading(false);
+    },
+
+    onError: (error) => {
+      const axiosError = error as AxiosError<{ message?: string }>;
+
+      message.error(
+        axiosError.response?.data?.message ||
+          axiosError.message ||
+          'Failed to update linked task'
+      );
+    },
+  });
+
+  const addLinkedItem = async (type: RelationshipKey, targetId: string) => {
+    const allLinkedIds = getAllLinkedIds();
+
+    if (allLinkedIds.includes(targetId)) {
+      return;
     }
+
+    await mutation.mutateAsync({ type, targetId, action: 'add' });
+
+    message.success('Linked task added');
   };
 
   const removeLinkedItem = async (type: RelationshipKey, targetId: string) => {
-    try {
-      setLoading(true);
+    await mutation.mutateAsync({ type, targetId, action: 'remove' });
 
-      const currentIds = normalizeIds(task[type]);
-      const updatedIds = currentIds.filter((id) => id !== targetId);
-
-      const updatedTask = await updateTask(task._id, {
-        [type]: updatedIds,
-      });
-
-      onUpdated(updatedTask);
-      message.success('Linked Task removed.');
-    } catch {
-      message.error('Failed to remove linked task');
-    } finally {
-      setLoading(false);
-    }
+    message.success('Linked task removed');
   };
 
-  return { loading, addLinkedItem, removeLinkedItem };
+  return {
+    loading: mutation.isPending,
+    addLinkedItem,
+    removeLinkedItem,
+  };
 }

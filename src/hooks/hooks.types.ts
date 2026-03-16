@@ -8,8 +8,6 @@ import type { JSONContent } from '@tiptap/react';
 
 export interface UseCommentEditorParams {
   comment: Comment;
-  onUpdate: (comment: Comment) => void;
-  onDelete: (id: string) => void;
 }
 
 export type OnUpdatedFn = (updated: TaskPopulated) => void;
@@ -31,4 +29,10 @@ export interface UseTextEditorParams {
 export type TaskWithAttachments = {
   _id: string;
   attachments?: TaskAttachment[];
+};
+
+export type AttachmentMutationType = {
+  updated: TaskAttachment[];
+  successMsg: string;
+  errorMsg: string;
 };

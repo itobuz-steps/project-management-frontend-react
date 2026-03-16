@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
 import { updateTask } from '../services/taskService';
 import type {
@@ -6,14 +7,17 @@ import type {
   TaskPopulated,
   BackendAttachment,
 } from '../services/types/tasks.types';
-import type { TaskWithAttachments } from './hooks.types';
+import type {
+  AttachmentMutationType,
+  TaskWithAttachments,
+} from './hooks.types';
 import { AxiosError } from 'axios';
 
 export function useTaskAttachments(
   task: TaskWithAttachments,
   onUpdated?: (task: TaskPopulated) => void
 ) {
-  const [saving, setSaving] = useState(false);
+  const queryClient = useQueryClient();
 
   const attachments = useMemo<TaskAttachment[]>(() => {
     return Array.isArray(task.attachments)
@@ -23,14 +27,8 @@ export function useTaskAttachments(
         : [];
   }, [task.attachments]);
 
-  const updateAttachments = async (
-    updated: TaskAttachment[],
-    successMsg: string,
-    errorMsg: string
-  ) => {
-    setSaving(true);
-
-    try {
+  const mutation = useMutation({
+    mutationFn: async ({ updated, successMsg }: AttachmentMutationType) => {
       const existingAttachments: string[] = updated.reduce<string[]>(
         (acc, attachment) => {
           if (typeof attachment === 'string') {
@@ -65,17 +63,31 @@ export function useTaskAttachments(
         });
       }
 
+      return { updatedTask, successMsg };
+    },
+
+    onSuccess: ({ updatedTask, successMsg }) => {
+      queryClient.setQueryData<TaskPopulated>(['task', task._id], updatedTask);
+
       onUpdated?.(updatedTask);
       message.success(successMsg);
-    } catch (error) {
+    },
+
+    onError: (error, variables) => {
       if (error instanceof AxiosError) {
         message.error(
-          error.response?.data?.message || error.message || errorMsg
+          error.response?.data?.message || error.message || variables.errorMsg
         );
       }
-    } finally {
-      setSaving(false);
-    }
+    },
+  });
+
+  const updateAttachments = (
+    updated: TaskAttachment[],
+    successMsg: string,
+    errorMsg: string
+  ) => {
+    mutation.mutate({ updated, successMsg, errorMsg });
   };
 
   const addAttachment = (file: File) => {
@@ -96,7 +108,7 @@ export function useTaskAttachments(
 
   return {
     attachments,
-    saving,
+    saving: mutation.isPending,
     addAttachment,
     removeAttachment,
   };

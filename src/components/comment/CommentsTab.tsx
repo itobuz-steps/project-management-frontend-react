@@ -15,8 +15,7 @@ export function CommentsTab({ task }: CommentsTabProps) {
   const composerRef = useRef<HTMLDivElement | null>(null);
   const { tasks: projectTasks } = useProjectTasks(task.projectId as string);
 
-  const { comments, loading, addComment, updateComment, removeComment } =
-    useTaskComments(task._id);
+  const { comments, loading } = useTaskComments(task._id);
 
   const composer = useCommentComposer(task._id);
 
@@ -71,16 +70,14 @@ export function CommentsTab({ task }: CommentsTabProps) {
 
   const handleSubmit = async () => {
     const comment = await composer.submit();
+
     if (comment) {
-      addComment(comment);
       setIsComposerOpen(false);
     }
   };
 
   return (
     <>
-      {composer.contextHolder}
-
       {/* Composer */}
       <div className="border-b border-gray-200 py-4" ref={composerRef}>
         <div className="flex gap-3">
@@ -180,13 +177,7 @@ export function CommentsTab({ task }: CommentsTabProps) {
       >
         <div className="space-y-1">
           {comments.map((comment) => (
-            <CommentItem
-              key={comment._id}
-              task={task}
-              comment={comment}
-              onDelete={removeComment}
-              onUpdate={updateComment}
-            />
+            <CommentItem key={comment._id} task={task} comment={comment} />
           ))}
         </div>
       </DataLoader>

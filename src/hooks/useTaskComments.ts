@@ -1,51 +1,37 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { commentsApi } from '../services/commentService';
 import type { Comment } from '../services/types/comments.types';
 import { message } from 'antd';
+import { AxiosError } from 'axios';
 
 export function useTaskComments(taskId?: string) {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loading, setLoading] = useState(false);
+  const commentsQuery = useQuery({
+    queryKey: ['comments', taskId],
+    queryFn: async () => {
+      const { result } = await commentsApi.getAllComments(taskId as string);
+      return result;
+    },
+    enabled: !!taskId,
+  });
+
+  const comments: Comment[] = commentsQuery.data ?? [];
+  const loading = commentsQuery.isLoading;
 
   useEffect(() => {
-    if (!taskId) {
-      return;
+    if (commentsQuery.error) {
+      const error = commentsQuery.error as AxiosError<{ message?: string }>;
+
+      message.error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to get comments'
+      );
     }
-
-    async function fetchComments() {
-      setLoading(true);
-      try {
-        const { result } = await commentsApi.getAllComments(taskId as string);
-        setComments(result);
-      } catch {
-        message.error('Failed to get comments');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchComments();
-  }, [taskId]);
-
-  const addComment = (comment: Comment) => {
-    setComments((prev) => [...prev, comment]);
-  };
-
-  const updateComment = (updated: Comment) => {
-    setComments((prev) =>
-      prev.map((comment) => (comment._id === updated._id ? updated : comment))
-    );
-  };
-
-  const removeComment = (id: string) => {
-    setComments((prev) => prev.filter((comment) => comment._id !== id));
-  };
+  }, [commentsQuery.error]);
 
   return {
     comments,
     loading,
-    addComment,
-    updateComment,
-    removeComment,
   };
 }

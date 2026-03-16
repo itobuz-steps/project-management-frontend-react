@@ -1,31 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { getTasks } from '../services/taskService';
 import type { TaskPopulated } from '../services/types/tasks.types';
 import { message } from 'antd';
+import { AxiosError } from 'axios';
 
 export function useProjectTasks(projectId: string) {
-  const [tasks, setTasks] = useState<TaskPopulated[]>([]);
-  const [loading, setLoading] = useState(false);
+  const tasksQuery = useQuery({
+    queryKey: ['projectTasks', projectId],
+    queryFn: () => getTasks({ projectId }),
+    enabled: !!projectId,
+  });
+
+  const tasks: TaskPopulated[] = tasksQuery.data ?? [];
+  const loading = tasksQuery.isFetching;
 
   useEffect(() => {
-    if (!projectId) {
-      return;
+    if (tasksQuery.error) {
+      const error = tasksQuery.error as AxiosError<{ message?: string }>;
+
+      message.error(
+        error.response?.data?.message || error.message || 'Failed to get tasks'
+      );
     }
-
-    const fetchTasks = async () => {
-      setLoading(true);
-      try {
-        const data = await getTasks({ projectId });
-        setTasks(data);
-      } catch {
-        message.error('Failed to get tasks');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTasks();
-  }, [projectId]);
+  }, [tasksQuery.error]);
 
   return { tasks, loading };
 }
