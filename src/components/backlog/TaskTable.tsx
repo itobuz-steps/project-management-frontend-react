@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
+import { ChevronDown, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
@@ -14,7 +14,7 @@ import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../hooks/useSprintActions';
 import { taskTableColumns } from '../../config/constants';
 import { CreateSprintForm } from './CreateSprintForm';
-import { DatePicker, message, Popconfirm } from 'antd';
+import { message, Popconfirm } from 'antd';
 import dayjs from 'dayjs';
 import { Can } from '../../utils/PermissionHoc';
 import { usePermissions } from '../../hooks/usePermissions';
@@ -30,7 +30,6 @@ export function TaskTable({
 }: TaskTableProps) {
   const [open, setOpen] = useState(true);
   const [localTasks, setLocalTasks] = useState(tasks);
-  const [editingDueDate, setEditingDueDate] = useState(false);
   const { project } = useProject();
 
   const { can } = usePermissions();
@@ -115,64 +114,13 @@ export function TaskTable({
           />
           <div className="xs:flex-row xs:items-center xs:gap-2 flex flex-col items-start gap-1">
             <span className="font-semibold">{title || sprint?.key}</span>
-            {sprint?.dueDate &&
-              (editingDueDate && canEditDueDate ? (
-                <div className="relative">
-                  <DatePicker
-                    defaultValue={dayjs(sprint.dueDate)}
-                    size="small"
-                    className="rounded border text-xs"
-                    autoFocus
-                    onChange={(date) => {
-                      if (!date || !dueDateRef.current) {
-                        return;
-                      }
-
-                      dueDateRef.current.value = date.toISOString();
-                    }}
-                    onOpenChange={async (open) => {
-                      if (!open) {
-                        if (sprint.isStarted && dueDateRef.current?.value) {
-                          const updatedDueDate = new Date(
-                            dueDateRef.current.value
-                          );
-                          const currentStartDate = sprint.startDate
-                            ? new Date(sprint.startDate)
-                            : new Date();
-                          await updateSprintDates(
-                            sprint,
-                            currentStartDate,
-                            updatedDueDate
-                          );
-                        } else {
-                          await startSprint(sprint);
-                        }
-                        setEditingDueDate(false);
-                      }
-                    }}
-                  />
-
-                  <input
-                    ref={dueDateRef}
-                    type="hidden"
-                    defaultValue={dayjs(sprint.dueDate).toISOString()}
-                  />
-                </div>
-              ) : (
-                <span
-                  onClick={() => canEditDueDate && setEditingDueDate(true)}
-                  className={`group relative inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                    canEditDueDate
-                      ? 'bg-primary-50 text-primary-600 hover:bg-primary-100 cursor-pointer'
-                      : 'cursor-default bg-gray-100 text-gray-500'
-                  }`}
-                >
-                  Due {dayjs(sprint.dueDate).format('MMM D')}
-                  {canEditDueDate && (
-                    <Pencil className="absolute -right-4 h-3 w-3 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
-                  )}
-                </span>
-              ))}
+            {sprint?.dueDate && (
+              <span
+                className={`group ? 'bg-primary-50 text-primary-600 hover:bg-primary-100 cursor-pointer' : 'cursor-default text-gray-500' } relative inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium`}
+              >
+                Due {dayjs(sprint.dueDate).format('MMM D')}
+              </span>
+            )}
           </div>
         </div>
         <span className="mr-1 ml-auto hidden text-xs text-gray-400 sm:mr-4 sm:block">
