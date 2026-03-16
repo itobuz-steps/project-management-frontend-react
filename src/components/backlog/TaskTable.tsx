@@ -494,13 +494,6 @@ export function TaskTable({
           />
           <div className="xs:flex-row xs:items-center xs:gap-2 flex flex-col items-start gap-1">
             <span className="font-semibold">{title || sprint?.key}</span>
-            {sprint?.dueDate && (
-              <span
-                className={`group ? 'bg-primary-50 text-primary-600 hover:bg-primary-100 cursor-pointer' : 'cursor-default text-gray-500' } relative inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium`}
-              >
-                Due {dayjs(sprint.dueDate).format('MMM D')}
-              </span>
-            )}
           </div>
         </div>
         <span className="mr-1 ml-auto hidden text-xs text-gray-400 sm:mr-4 sm:block">
