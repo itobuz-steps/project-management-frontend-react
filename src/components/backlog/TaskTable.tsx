@@ -65,6 +65,7 @@ export function TaskTable({
     dueDateRef,
     startSprint,
     completeSprint,
+    updateSprintDates,
     createSprint,
     deleteSprint,
   } = useSprintActions(project?._id, setSprints);
@@ -131,7 +132,21 @@ export function TaskTable({
                     }}
                     onOpenChange={async (open) => {
                       if (!open) {
-                        await startSprint(sprint);
+                        if (sprint.isStarted && dueDateRef.current?.value) {
+                          const updatedDueDate = new Date(
+                            dueDateRef.current.value
+                          );
+                          const currentStartDate = sprint.startDate
+                            ? new Date(sprint.startDate)
+                            : new Date();
+                          await updateSprintDates(
+                            sprint,
+                            currentStartDate,
+                            updatedDueDate
+                          );
+                        } else {
+                          await startSprint(sprint);
+                        }
                         setEditingDueDate(false);
                       }
                     }}
@@ -166,9 +181,14 @@ export function TaskTable({
         <div className="xs:flex-row xs:gap-4 flex flex-col items-center gap-1">
           {sprint && (
             <SprintMenu
+              sprint={sprint}
               dueDateRef={dueDateRef}
               sprintStarted={!!sprintStarted}
+              canEditDates={canEditDueDate}
               startSprint={() => startSprint(sprint)}
+              updateSprintDates={(startDate, endDate) =>
+                updateSprintDates(sprint, startDate, endDate)
+              }
               completeSprint={() => handleCompleteSprint()}
             />
           )}

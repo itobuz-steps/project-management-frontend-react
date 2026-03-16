@@ -73,6 +73,39 @@ export function useSprintActions(
     }
   };
 
+  const updateSprintDates = async (
+    sprint: Sprint,
+    startDate: Date,
+    dueDate: Date
+  ) => {
+    try {
+      await sprintService.updateSprint(sprint._id, {
+        startDate,
+        dueDate,
+      });
+
+      setSprints?.((prev) =>
+        prev.map((existingSprint) =>
+          existingSprint._id === sprint._id
+            ? {
+                ...existingSprint,
+                startDate,
+                dueDate,
+              }
+            : existingSprint
+        )
+      );
+
+      message.success('Sprint dates updated');
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        message.error(
+          err.response?.data.message || 'Failed to update sprint dates'
+        );
+      }
+    }
+  };
+
   const createSprint = async (storyPoint: number) => {
     try {
       const sprint = await sprintService.createSprint({
@@ -111,6 +144,7 @@ export function useSprintActions(
     dueDateRef,
     startSprint,
     completeSprint,
+    updateSprintDates,
     createSprint,
     deleteSprint,
   };
