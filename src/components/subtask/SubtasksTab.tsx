@@ -11,6 +11,7 @@ import { ManageSubtasks } from './ManageSubtasks';
 import { useManageSubtasks } from '../../hooks/useManageSubtasksModal';
 import { useSubtasks } from '../../hooks/useSubtasks';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
+import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 
 export function SubtasksTab({ task }: { task: TaskPopulated }) {
   const { projectId } = useParams();
@@ -43,12 +44,16 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
     onUpdated: updateSubtask,
   });
 
+  const { update } = useTaskUpdate(task._id, updateSubtask);
+
   const saveSubtasks = async () => {
     try {
-      await updateTask(task._id, { subTasks: manage.draftIds });
+      await update({ subTasks: manage.draftIds });
+
       await Promise.all(
         manage.draftIds.map((id) => updateTask(id, { parentTask: task._id }))
       );
+
       setSelectedIds(manage.draftIds);
       message.success('Subtasks updated');
       manage.closeModal();
