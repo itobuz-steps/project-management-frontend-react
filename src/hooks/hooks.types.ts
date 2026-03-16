@@ -30,3 +30,9 @@ export type TaskWithAttachments = {
   _id: string;
   attachments?: TaskAttachment[];
 };
+
+export type AttachmentMutationType = {
+  updated: TaskAttachment[];
+  successMsg: string;
+  errorMsg: string;
+};
