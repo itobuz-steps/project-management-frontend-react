@@ -198,6 +198,7 @@ export function CommentItem({
                     id: task._id,
                     label: task.title,
                     type: task.type,
+                    key: task.key,
                   }))}
                 />
 

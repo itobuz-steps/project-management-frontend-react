@@ -27,4 +27,5 @@ export interface TaskItem {
   id: string;
   label: string;
   type: TaskType;
+  key: string | undefined;
 }

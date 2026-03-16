@@ -43,7 +43,7 @@ export const TaskMentionList = forwardRef<
   return (
     <List
       size="small"
-      className="mention-dropdown max-h-60 overflow-y-auto rounded-md border bg-white shadow-md"
+      className="mention-dropdown max-h-60 w-[260px] overflow-y-auto rounded-md border bg-white shadow-md"
       dataSource={props.items}
       renderItem={(item, index) => (
         <List.Item
@@ -53,8 +53,10 @@ export const TaskMentionList = forwardRef<
           onClick={() => selectItem(index)}
         >
           <div className="flex items-center gap-2">
-            <TaskTypeIcon type={item.type} />
-            <span>{item.label}</span>
+            <div>
+              <TaskTypeIcon type={item.type} />
+            </div>
+            <span>{item.key + ' ' + item.label}</span>
           </div>
         </List.Item>
       )}

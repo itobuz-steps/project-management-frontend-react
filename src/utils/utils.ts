@@ -27,6 +27,35 @@ export function getTypeBorder(type?: string) {
 }
 
 export function formatDateForInput(date?: string) {
-  if (!date) return '';
+  if (!date) {
+    return '';
+  }
   return new Date(date).toISOString().split('T')[0];
+}
+
+export function positionDropdown(
+  container: HTMLDivElement,
+  rect: DOMRect,
+  width = 260
+) {
+  const padding = 8;
+
+  let left = rect.left;
+  let top = rect.bottom + 4;
+
+  if (left + width > window.innerWidth) {
+    left = window.innerWidth - width - padding;
+  }
+
+  left = Math.max(padding, left);
+
+  if (top + 300 > window.innerHeight) {
+    top = rect.top - 8;
+    container.style.transform = 'translateY(-100%)';
+  } else {
+    container.style.transform = 'none';
+  }
+
+  container.style.left = `${left}px`;
+  container.style.top = `${top}px`;
 }

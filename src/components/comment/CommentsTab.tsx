@@ -134,6 +134,7 @@ export function CommentsTab({ task }: CommentsTabProps) {
                     id: task._id,
                     label: task.title,
                     type: task.type,
+                    key: task.key,
                   }))}
                 />
 

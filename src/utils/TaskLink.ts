@@ -19,6 +19,7 @@ export const TaskLink = Node.create({
     return {
       id: { default: null },
       label: { default: null },
+      key: { default: null },
     };
   },
 
@@ -37,7 +38,7 @@ export const TaskLink = Node.create({
         'data-task-id': node.attrs.id,
         class: 'text-purple-600 font-medium cursor-pointer',
       }),
-      `${node.attrs.label}`,
+      `${node.attrs.key}-${node.attrs.label}`,
     ];
   },
 

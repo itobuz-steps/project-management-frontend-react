@@ -23,19 +23,32 @@ export function AttachmentsTab({
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: false,
-    beforeUpload: (file) => {
+    beforeUpload: (uploadFile) => {
       setExpanded(true);
 
-      const f = file as File;
-      const type = f.type || '';
-      const ext = f.name.split('.').pop()?.toLowerCase() || '';
+      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-      if (!allowedTypes.includes(type) && !allowedExtensions.includes(ext)) {
-        message.error(`File type not allowed: ${f.name}`);
+      const file = uploadFile as File;
+      const type = file.type || '';
+      const extension = file.name.split('.').pop()?.toLowerCase() || '';
+
+      if (file.size > MAX_FILE_SIZE) {
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        message.error(
+          `"${file.name}" is ${sizeMB}MB. Max allowed size is 5MB.`
+        );
         return false;
       }
 
-      addAttachment(f);
+      if (
+        !allowedTypes.includes(type) &&
+        !allowedExtensions.includes(extension)
+      ) {
+        message.error(`File type not allowed: ${file.name}`);
+        return false;
+      }
+
+      addAttachment(file);
       return false;
     },
   };
@@ -57,6 +70,9 @@ export function AttachmentsTab({
             setExpanded(true);
           }}
         >
+          <span className="pr-2 text-xs font-normal text-red-400">
+            Max size: 5MB
+          </span>
           <Upload {...uploadProps} disabled={saving}>
             <Button
               style={{
