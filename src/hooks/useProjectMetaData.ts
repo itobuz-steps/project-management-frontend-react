@@ -1,50 +1,48 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { getProjectById, getProjectMembers } from '../services/projectService';
 import type { User } from '../services/types/tasks.types';
 import { message } from 'antd';
+import { AxiosError } from 'axios';
 
 export function useProjectMetaData(projectId?: string) {
-  const [columns, setColumns] = useState<string[]>([]);
-  const [members, setMembers] = useState<User[]>([]);
-  const [loadingMembers, setLoadingMembers] = useState(false);
+  const projectQuery = useQuery({
+    queryKey: ['project', projectId],
+    queryFn: () => getProjectById(projectId as string),
+    enabled: !!projectId,
+  });
+
+  const membersQuery = useQuery({
+    queryKey: ['project', projectId, 'members'],
+    queryFn: () => getProjectMembers(projectId as string),
+    enabled: !!projectId,
+  });
+
+  const columns: string[] = projectQuery.data?.columns ?? [];
+  const members: User[] = membersQuery.data ?? [];
+  const loadingMembers = membersQuery.isFetching;
 
   useEffect(() => {
-    if (!projectId) {
-      return;
-    }
+    if (projectQuery.error) {
+      const error = projectQuery.error as AxiosError<{ message?: string }>;
 
-    async function load() {
-      try {
-        const project = await getProjectById(projectId as string);
-        setColumns(project.columns);
-      } catch {
-        message.error('Project not found.');
-      }
+      message.error(
+        error.response?.data?.message || error.message || 'Project not found.'
+      );
     }
-
-    load();
-  }, [projectId]);
+  }, [projectQuery.error]);
 
   useEffect(() => {
-    if (!projectId) {
-      return;
+    if (membersQuery.error) {
+      const error = membersQuery.error as AxiosError<{ message?: string }>;
+
+      message.error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to get Project Members'
+      );
     }
-
-    async function loadMembers() {
-      setLoadingMembers(true);
-
-      try {
-        const res = await getProjectMembers(projectId as string);
-        setMembers(res);
-      } catch {
-        message.error('Failed to get Project Members');
-      } finally {
-        setLoadingMembers(false);
-      }
-    }
-
-    loadMembers();
-  }, [projectId]);
+  }, [membersQuery.error]);
 
   return { columns, members, loadingMembers };
 }
