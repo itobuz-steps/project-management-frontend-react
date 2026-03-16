@@ -21,6 +21,8 @@ import { useProject } from '../../../context/ProjectContext';
 import { useSearchParams } from 'react-router-dom';
 import { getTasks } from '../../../services/taskService';
 import { message, Skeleton } from 'antd';
+import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
+import { TaskTypeColor } from '../../../utils/TaskTypeColor';
 
 function BacklogView() {
   const { projectId } = useParams();
@@ -87,7 +89,7 @@ function BacklogView() {
     return true;
   };
 
-  const searchInput = searchParams.get('searchInput');
+  const searchInput = searchParams.get('searchInput') || undefined;
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -121,7 +123,7 @@ function BacklogView() {
         const [tasksRes, sprintsRes] = await Promise.all([
           getTasks({
             projectId,
-            searchInput: searchParams.get('searchInput') || '',
+            searchInput,
           }),
           type === 'scrum' && sprintService
             ? sprintService.getSprints()
@@ -185,6 +187,21 @@ function BacklogView() {
       task.status !== 'done' &&
       matchesFilters(task)
   );
+
+  const activeTask = activeTaskId ? taskById.get(activeTaskId) : null;
+
+  const priorityChipClass = (priority?: string) => {
+    const normalized = (priority ?? '').toLowerCase();
+    if (normalized.includes('highest') || normalized.includes('high')) {
+      return 'bg-red-50 text-red-700 border-red-200';
+    }
+
+    if (normalized.includes('medium')) {
+      return 'bg-amber-50 text-amber-700 border-amber-200';
+    }
+
+    return 'bg-blue-50 text-blue-700 border-blue-200';
+  };
 
   return (
     <div className="rounded-lg bg-white p-1">
@@ -340,9 +357,38 @@ function BacklogView() {
 
         {/* DRAG PREVIEW */}
         <DragOverlay>
-          {activeTaskId ? (
-            <div className="w-64 cursor-move rounded-md border bg-white p-3 shadow-lg">
-              {taskById.get(activeTaskId)?.title ?? 'Dragging...'}
+          {activeTask ? (
+            <div className="w-80 cursor-move rounded-xl border border-gray-200 bg-white/95 p-3 shadow-2xl backdrop-blur-sm">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <TaskTypeIcon type={activeTask.type} />
+                  <TaskTypeColor type={activeTask.type}>
+                    <span className="rounded px-2 py-0.5 text-xs font-semibold text-white">
+                      {activeTask.key || 'TASK'}
+                    </span>
+                  </TaskTypeColor>
+                </div>
+                <span className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-[11px] font-medium text-gray-600 capitalize">
+                  {activeTask.status || 'todo'}
+                </span>
+              </div>
+
+              <p className="line-clamp-2 text-sm leading-5 font-semibold text-gray-800">
+                {activeTask.title || 'Untitled task'}
+              </p>
+
+              <div className="mt-3 flex items-center gap-2 text-[11px]">
+                {activeTask.priority ? (
+                  <span
+                    className={`rounded-full border px-2 py-0.5 font-medium capitalize ${priorityChipClass(activeTask.priority)}`}
+                  >
+                    {activeTask.priority}
+                  </span>
+                ) : null}
+                <span className="truncate text-gray-500">
+                  {activeTask.assignee?.name || 'Unassigned'}
+                </span>
+              </div>
             </div>
           ) : null}
         </DragOverlay>
