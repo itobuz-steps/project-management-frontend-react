@@ -1,6 +1,6 @@
 import { Button, Tag, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { Trash2 } from 'lucide-react';
+import { DeleteOutlined } from '@ant-design/icons';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { StatusSelect } from '../ui/StatusSelect';
@@ -99,7 +99,7 @@ export function useSubtaskColumns({
       width: 65,
       render: (_, task) => (
         <Button type="text" danger onClick={() => removeSubtask(task._id)}>
-          <Trash2 size={14} />
+          <DeleteOutlined size={14} />
         </Button>
       ),
     },

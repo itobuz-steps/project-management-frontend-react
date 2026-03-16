@@ -1,33 +1,32 @@
-import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
-import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
   SortableContext,
-  verticalListSortingStrategy,
   useSortable,
+  verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import type { TaskTableProps } from './type';
-import type { TaskPopulated, User } from '../../services/types/tasks.types';
-import { SprintMenu } from './SprintMenu';
+import { CSS } from '@dnd-kit/utilities';
+import type { TableColumnsType } from 'antd';
+import { message, Table } from 'antd';
+import dayjs from 'dayjs';
+import { ChevronDown } from 'lucide-react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useProject } from '../../context/ProjectContext';
+import { usePermissions } from '../../hooks/usePermissions';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../hooks/useSprintActions';
-import { CreateSprintForm } from './CreateSprintForm';
-import { DatePicker, Table, message, Popconfirm } from 'antd';
-import dayjs from 'dayjs';
-import { Can } from '../../utils/PermissionHoc';
-import { usePermissions } from '../../hooks/usePermissions';
-import { CSS } from '@dnd-kit/utilities';
-import { getPriorityBorder } from '../../utils/utils';
-import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
+import { updateTask } from '../../services/taskService';
+import type { TaskPopulated, User } from '../../services/types/tasks.types';
 import { TaskTypeColor } from '../../utils/TaskTypeColor';
-import { Link, useSearchParams } from 'react-router-dom';
-import { StatusSelect } from '../ui/StatusSelect';
+import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
+import { getPriorityBorder } from '../../utils/utils';
 import { AssigneeCell } from '../ui/AssigneeCell';
 import { DueDateCell } from '../ui/DueDateCell';
+import { StatusSelect } from '../ui/StatusSelect';
 import { UserCell } from '../ui/UserCell';
-import { updateTask } from '../../services/taskService';
-import type { TableColumnsType } from 'antd';
+import { CreateSprintForm } from './CreateSprintForm';
+import { SprintMenu } from './SprintMenu';
+import type { TaskTableProps } from './type';
 
 const normalize = (value?: string | null) => (value ?? '').toLowerCase().trim();
 
@@ -346,7 +345,6 @@ export function TaskTable({
 }: TaskTableProps) {
   const [open, setOpen] = useState(true);
   const [localTasks, setLocalTasks] = useState(tasks);
-  const [editingDueDate, setEditingDueDate] = useState(false);
   const { project } = useProject();
   const [, setSearchParams] = useSearchParams();
 
@@ -383,8 +381,8 @@ export function TaskTable({
     dueDateRef,
     startSprint,
     completeSprint,
+    updateSprintDates,
     createSprint,
-    deleteSprint,
   } = useSprintActions(project?._id, setSprints);
 
   const { setNodeRef, isOver } = useDroppable({
@@ -496,50 +494,13 @@ export function TaskTable({
           />
           <div className="xs:flex-row xs:items-center xs:gap-2 flex flex-col items-start gap-1">
             <span className="font-semibold">{title || sprint?.key}</span>
-            {sprint?.dueDate &&
-              (editingDueDate && canEditDueDate ? (
-                <div className="relative">
-                  <DatePicker
-                    defaultValue={dayjs(sprint.dueDate)}
-                    size="small"
-                    className="rounded border text-xs"
-                    autoFocus
-                    onChange={(date) => {
-                      if (!date || !dueDateRef.current) {
-                        return;
-                      }
-
-                      dueDateRef.current.value = date.toISOString();
-                    }}
-                    onOpenChange={async (open) => {
-                      if (!open) {
-                        await startSprint(sprint);
-                        setEditingDueDate(false);
-                      }
-                    }}
-                  />
-
-                  <input
-                    ref={dueDateRef}
-                    type="hidden"
-                    defaultValue={dayjs(sprint.dueDate).toISOString()}
-                  />
-                </div>
-              ) : (
-                <span
-                  onClick={() => canEditDueDate && setEditingDueDate(true)}
-                  className={`group relative inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                    canEditDueDate
-                      ? 'bg-primary-50 text-primary-600 hover:bg-primary-100 cursor-pointer'
-                      : 'cursor-default bg-gray-100 text-gray-500'
-                  }`}
-                >
-                  Due {dayjs(sprint.dueDate).format('MMM D')}
-                  {canEditDueDate && (
-                    <Pencil className="absolute -right-4 h-3 w-3 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
-                  )}
-                </span>
-              ))}
+            {sprint?.dueDate && (
+              <span
+                className={`group ? 'bg-primary-50 text-primary-600 hover:bg-primary-100 cursor-pointer' : 'cursor-default text-gray-500' } relative inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium`}
+              >
+                Due {dayjs(sprint.dueDate).format('MMM D')}
+              </span>
+            )}
           </div>
         </div>
         <span className="mr-1 ml-auto hidden text-xs text-gray-400 sm:mr-4 sm:block">
@@ -548,43 +509,17 @@ export function TaskTable({
         <div className="xs:flex-row xs:gap-4 flex flex-col items-center gap-1">
           {sprint && (
             <SprintMenu
+              sprint={sprint}
               dueDateRef={dueDateRef}
               sprintStarted={!!sprintStarted}
+              canEditDates={canEditDueDate}
               startSprint={() => startSprint(sprint)}
+              updateSprintDates={(startDate, endDate) =>
+                updateSprintDates(sprint, startDate, endDate)
+              }
               completeSprint={() => handleCompleteSprint()}
             />
           )}
-
-          <Can permission="DELETE_SPRINT">
-            {sprint && (
-              <Popconfirm
-                title="Delete sprint"
-                description="Are you sure you want to delete this sprint?"
-                okText="Delete"
-                cancelText="Cancel"
-                okButtonProps={{
-                  style: {
-                    backgroundColor: 'var(--color-primary-500)',
-                    color: 'white',
-                  },
-                }}
-                cancelButtonProps={{
-                  style: {
-                    border: 'var(--color-primary-500) solid 1px',
-                  },
-                  type: 'text',
-                }}
-                onConfirm={() => deleteSprint(sprint)}
-              >
-                <button
-                  title="Delete Sprint"
-                  className="flex items-center gap-1 text-red-500 hover:cursor-pointer hover:text-red-600"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </Popconfirm>
-            )}
-          </Can>
 
           {!sprint && project?.projectType == 'scrum' && (
             <CreateSprintForm createSprintHandler={createSprint} />

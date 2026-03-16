@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 import type { MouseEvent } from 'react';
 import { Tooltip } from 'antd';
-import { CalendarDays, Flag, Link2, SquareCheckBig, Trash } from 'lucide-react';
+import { CalendarDays, Flag, Link2, SquareCheckBig } from 'lucide-react';
+import { DeleteOutlined } from '@ant-design/icons';
 import type { TaskPopulated, User } from '../../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../../utils/TaskTypeColor';
@@ -62,7 +63,7 @@ export function ExpandedTaskCard({
           className="rounded-md p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
           onClick={onDeleteClick}
         >
-          <Trash
+          <DeleteOutlined
             size={16}
             className="opacity-0 transition-opacity group-hover:opacity-100"
           />
