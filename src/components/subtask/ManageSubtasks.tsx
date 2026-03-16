@@ -32,6 +32,7 @@ export function ManageSubtasks({
             style={{
               backgroundColor: 'var(--color-primary-500)',
               color: 'white',
+              border: 'var(--color-primary-500)',
             }}
             onClick={() => setCreating(true)}
           >
@@ -52,19 +53,28 @@ export function ManageSubtasks({
       </div>
 
       {/* List */}
-      <div className="max-h-[260px] overflow-y-auto">
+      <div className="max-h-[200px] overflow-y-auto">
         {projectTasks.map((task) => {
           const checked = draftIds.includes(task._id);
 
           return (
             <div
               key={task._id}
-              className={`flex items-center justify-between border-b border-gray-200 px-2 py-1 transition ${
+              onClick={() =>
+                setDraftIds((prev) =>
+                  checked
+                    ? prev.filter((id) => id !== task._id)
+                    : [...prev, task._id]
+                )
+              }
+              className={`flex cursor-pointer items-center justify-between border-b border-gray-200 px-2 py-2.5 transition ${
                 checked ? 'bg-primary-50' : 'hover:bg-gray-100'
               }`}
             >
               <div className="flex items-center gap-2 truncate text-sm text-gray-700">
-                <TaskTypeIcon type={task.type} />
+                <div>
+                  <TaskTypeIcon type={task.type} />
+                </div>
                 <span className="truncate">
                   <span className="mr-1 text-gray-500">{task.key}</span>
                   {task.title}
@@ -73,6 +83,7 @@ export function ManageSubtasks({
 
               <Checkbox
                 checked={checked}
+                onClick={(e) => e.stopPropagation()}
                 onChange={(e) =>
                   setDraftIds((prev) =>
                     e.target.checked
@@ -88,7 +99,7 @@ export function ManageSubtasks({
 
       {/* Create new subtask */}
       {creating && (
-        <div className="mb-1 flex items-center gap-2 rounded-md bg-white px-2 py-3">
+        <div className="mb-1 flex items-center gap-2 rounded-md border border-gray-50 bg-white px-2 py-3">
           <TaskTypeIcon type="task" />
 
           <input
