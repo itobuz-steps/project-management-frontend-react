@@ -1,5 +1,5 @@
 import { Tag, Button } from 'antd';
-import { Trash2 } from 'lucide-react';
+import { DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { LinkColumnsProps, LinkedRow } from './linkedItems.types';
 import { RELATIONSHIP_CONFIG } from './linkedItems.types';
@@ -58,7 +58,7 @@ export const useLinkedItemsColumns = ({
             danger
             onClick={() => onRemove(row.type, row.item._id)}
           >
-            <Trash2 size={14} />
+            <DeleteOutlined size={14} />
           </Button>
         </div>
       ),

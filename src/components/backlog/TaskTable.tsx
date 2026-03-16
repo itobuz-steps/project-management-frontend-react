@@ -1,4 +1,4 @@
-import { ChevronDown, Trash2 } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
@@ -14,9 +14,8 @@ import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../hooks/useSprintActions';
 import { taskTableColumns } from '../../config/constants';
 import { CreateSprintForm } from './CreateSprintForm';
-import { message, Popconfirm } from 'antd';
+import { message } from 'antd';
 import dayjs from 'dayjs';
-import { Can } from '../../utils/PermissionHoc';
 import { usePermissions } from '../../hooks/usePermissions';
 
 export function TaskTable({
@@ -66,7 +65,6 @@ export function TaskTable({
     completeSprint,
     updateSprintDates,
     createSprint,
-    deleteSprint,
   } = useSprintActions(project?._id, setSprints);
 
   useEffect(() => {
@@ -140,37 +138,6 @@ export function TaskTable({
               completeSprint={() => handleCompleteSprint()}
             />
           )}
-
-          <Can permission="DELETE_SPRINT">
-            {sprint && (
-              <Popconfirm
-                title="Delete sprint"
-                description="Are you sure you want to delete this sprint?"
-                okText="Delete"
-                cancelText="Cancel"
-                okButtonProps={{
-                  style: {
-                    backgroundColor: 'var(--color-primary-500)',
-                    color: 'white',
-                  },
-                }}
-                cancelButtonProps={{
-                  style: {
-                    border: 'var(--color-primary-500) solid 1px',
-                  },
-                  type: 'text',
-                }}
-                onConfirm={() => deleteSprint(sprint)}
-              >
-                <button
-                  title="Delete Sprint"
-                  className="flex items-center gap-1 text-red-500 hover:cursor-pointer hover:text-red-600"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </Popconfirm>
-            )}
-          </Can>
 
           {!sprint && project?.projectType == 'scrum' && (
             <CreateSprintForm createSprintHandler={createSprint} />
