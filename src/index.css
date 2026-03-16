@@ -99,3 +99,7 @@ h2 {
     /* slate-400 */
   }
 }
+
+@view-transition {
+  navigation: auto;
+}

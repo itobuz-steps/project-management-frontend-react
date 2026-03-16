@@ -7,7 +7,7 @@ interface CustomStatisticProps {
 
 export function CustomStatistic({ title, value }: CustomStatisticProps) {
   return (
-    <div className="flex-1 rounded-md border-2 border-gray-200 p-4 md:p-4 md:px-8">
+    <div className="flex-1 rounded-md border border-gray-50 bg-white p-4 shadow-sm md:p-4 md:px-8">
       <Statistic
         title={title}
         value={value}
