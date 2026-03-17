@@ -30,13 +30,17 @@ export default function MainLayout() {
   const taskId = searchParams.get('taskId');
 
   const location = useLocation();
+  const view = searchParams.get('view');
+
   const isBacklog = location.pathname.includes('/backlog');
-  const isTaskDrawerOpen = Boolean(taskId && isBacklog);
+  const isDrawerView = view === 'drawer' || (isBacklog && !view);
+  const isTaskDrawerOpen = Boolean(taskId && isDrawerView);
 
   const closeTaskPanel = () => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       next.delete('taskId');
+      next.delete('view');
       return next;
     });
   };
@@ -60,6 +64,23 @@ export default function MainLayout() {
     }
   };
 
+  const toggleView = () => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      const currentView = next.get('view');
+
+      const effectiveView = currentView ?? (isBacklog ? 'drawer' : 'modal');
+
+      if (effectiveView === 'drawer') {
+        next.set('view', 'modal');
+      } else {
+        next.set('view', 'drawer');
+      }
+
+      return next;
+    });
+  };
+
   return (
     <div className="relative flex h-screen w-full overflow-hidden">
       <Sidebar
@@ -77,12 +98,23 @@ export default function MainLayout() {
       </div>
 
       {taskId ? (
-        isBacklog ? (
-          <TaskDrawer taskId={taskId} onClose={closeTaskPanel} />
+        isTaskDrawerOpen ? (
+          <TaskDrawer
+            taskId={taskId}
+            onClose={closeTaskPanel}
+            onToggleView={toggleView}
+            isDrawerView={true}
+          />
         ) : (
-          <TaskModal taskId={taskId} onClose={closeTaskPanel} />
+          <TaskModal
+            taskId={taskId}
+            onClose={closeTaskPanel}
+            onToggleView={toggleView}
+            isDrawerView={false}
+          />
         )
       ) : null}
+
       <CommandPalette
         open={open}
         onClose={() => {

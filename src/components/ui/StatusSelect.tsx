@@ -1,6 +1,7 @@
 import { Dropdown, Button } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import type { StatusSelectType } from './ui.types';
+import { capitalizeWords } from '../../utils/utils';
 
 export function StatusSelect({
   value,
@@ -35,7 +36,7 @@ export function StatusSelect({
                 columns.length
               )}`}
             >
-              {col}
+              {capitalizeWords(col)}
             </span>
           ),
           onClick: () => onChange(col),
@@ -51,7 +52,7 @@ export function StatusSelect({
         size="small"
         className={` ${className} ${getColorClass(selectedIndex, columns.length)} flex items-center gap-1 rounded-full border-none text-white`}
       >
-        <span className="truncate">{value}</span>
+        <span className="truncate">{capitalizeWords(value)}</span>
         <DownOutlined className="text-[10px]" />
       </Button>
     </Dropdown>

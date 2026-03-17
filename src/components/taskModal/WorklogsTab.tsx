@@ -3,6 +3,7 @@ import { Avatar, Empty, List, Spin, Tag, Typography } from 'antd';
 import { DateTime } from 'luxon';
 import { useQuery } from '@tanstack/react-query';
 import { getTaskWorklogs } from '../../services/taskService';
+import { ArrowRightOutlined } from '@ant-design/icons';
 
 type WorklogsTabProps = {
   taskId: string;
@@ -77,7 +78,7 @@ export function WorklogsTab({ taskId }: WorklogsTabProps) {
 
                   <Typography.Text className="block text-xs text-gray-600">
                     {DateTime.fromJSDate(start).toFormat('dd LLL yyyy, HH:mm')}{' '}
-                    {'->'}{' '}
+                    <ArrowRightOutlined className="mx-1 text-[10px] text-gray-400" />
                     {end
                       ? DateTime.fromJSDate(end).toFormat('dd LLL yyyy, HH:mm')
                       : 'Now'}

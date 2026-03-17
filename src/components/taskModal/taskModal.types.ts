@@ -5,6 +5,8 @@ export type EditingField = 'priority' | 'type' | null;
 export interface TaskModalProps {
   taskId: string;
   onClose: () => void;
+  onToggleView?: () => void;
+  isDrawerView?: boolean;
 }
 
 export type ViewProps = {
@@ -20,6 +22,8 @@ export type HeaderProps = {
   onClose?: () => void;
   page: boolean;
   drawer: boolean;
+  onToggleView?: () => void;
+  isDrawerView?: boolean;
 };
 
 export type TaskDescriptionProps = {

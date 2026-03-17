@@ -3,7 +3,7 @@ import type { Role } from './user';
 
 export type TaskType = 'bug' | 'story' | 'task';
 export type TaskStatus = 'todo' | 'in-progress' | 'done';
-export type TaskPriority = 'low' | 'medium' | 'high';
+export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export interface Task {
   _id: string;
