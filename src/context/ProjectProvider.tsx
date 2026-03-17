@@ -10,6 +10,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (project?.theme) {
       setTheme(project.theme);
+      localStorage.setItem('lastProjectTheme', project.theme);
     }
   }, [project?.theme, setTheme]);
 
