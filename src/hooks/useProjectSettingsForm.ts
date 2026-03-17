@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { message, type FormInstance } from 'antd';
+import { AxiosError } from 'axios';
 import { updateProject } from '../services/projectService';
 import type {
   EditableProjectMember,
@@ -19,7 +20,7 @@ export function useProjectSettingsForm({
   const [loading, setLoading] = useState(false);
 
   const [projectMembers, setProjectMembers] = useState<EditableProjectMember[]>(
-    project.members || []
+    project.members ?? []
   );
 
   const [visibleMembers, setVisibleMembers] = useState<EditableProjectMember[]>(
@@ -30,7 +31,7 @@ export function useProjectSettingsForm({
   const [selectedRole, setSelectedRole] = useState<ProjectMemberRole>('member');
 
   useEffect(() => {
-    setProjectMembers(project.members || []);
+    setProjectMembers(project.members ?? []);
     setVisibleMembers([]);
   }, [project]);
 
@@ -51,16 +52,13 @@ export function useProjectSettingsForm({
       );
 
       formData.append('name', values.name);
+      formData.append('projectType', values.projectType);
+      formData.append('memberLead', values.memberLead);
+      formData.append('defaultAssignee', values.defaultAssignee ?? 'null');
 
       if (values.prefix) {
         formData.append('prefix', values.prefix);
       }
-
-      formData.append('projectType', values.projectType);
-
-      formData.append('memberLead', values.memberLead);
-
-      formData.append('defaultAssignee', values.defaultAssignee ?? 'null');
 
       filteredMembers.forEach((member, index) => {
         formData.append(`members[${index}][user]`, member.user);
@@ -82,8 +80,12 @@ export function useProjectSettingsForm({
       setIconPreview(updated.icon ?? null);
 
       message.success('Project updated successfully');
-    } catch {
-      message.error('Update failed');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        message.error(
+          error.response?.data?.message || error.message || 'Update failed'
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -98,7 +100,7 @@ export function useProjectSettingsForm({
       (member) => member.user === selectedUser
     );
 
-    if (exists && exists.role === selectedRole) {
+    if (exists?.role === selectedRole) {
       message.warning('Member already has this role');
       return;
     }
@@ -118,24 +120,19 @@ export function useProjectSettingsForm({
       ]);
     }
 
-    const visibleExists = visibleMembers.find(
-      (member) => member.user === selectedUser
-    );
+    setVisibleMembers((prev) => {
+      const visibleExists = prev.find((member) => member.user === selectedUser);
 
-    if (!visibleExists) {
-      setVisibleMembers((prev) => [
-        ...prev,
-        { user: selectedUser, role: selectedRole },
-      ]);
-    } else {
-      setVisibleMembers((prev) =>
-        prev.map((member) =>
-          member.user === selectedUser
-            ? { ...member, role: selectedRole }
-            : member
-        )
+      if (!visibleExists) {
+        return [...prev, { user: selectedUser, role: selectedRole }];
+      }
+
+      return prev.map((member) =>
+        member.user === selectedUser
+          ? { ...member, role: selectedRole }
+          : member
       );
-    }
+    });
 
     setSelectedUser(undefined);
     setSelectedRole('member');
@@ -159,6 +156,7 @@ export function useProjectSettingsForm({
     setProjectMembers((prev) =>
       prev.filter((member) => member.user !== userId)
     );
+
     setVisibleMembers((prev) =>
       prev.filter((member) => member.user !== userId)
     );

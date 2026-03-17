@@ -7,7 +7,7 @@ export function UserCell({ user, emptyText }: UserCellType) {
   }
 
   return (
-    <div className="flex w-[100px] items-center gap-2 truncate lg:w-[150px] xl:w-full">
+    <div className="flex items-center gap-2 truncate">
       <Avatar
         size="small"
         className="h-6 w-6 shrink-0"
