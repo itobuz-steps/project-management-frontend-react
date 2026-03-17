@@ -59,3 +59,6 @@ export function positionDropdown(
   container.style.left = `${left}px`;
   container.style.top = `${top}px`;
 }
+
+export const capitalizeWords = (text: string) =>
+  text.replace(/\b\w/g, (char) => char.toUpperCase());

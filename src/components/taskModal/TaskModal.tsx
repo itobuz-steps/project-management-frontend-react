@@ -6,7 +6,12 @@ import { useIsMobile } from '../../utils/isMobile';
 import { useTask } from '../../hooks/useTask';
 import { DataLoader } from '../ui/DataLoader';
 
-export default function TaskModal({ taskId, onClose }: TaskModalProps) {
+export default function TaskModal({
+  taskId,
+  onClose,
+  onToggleView,
+  isDrawerView,
+}: TaskModalProps) {
   const isMobile = useIsMobile(768);
   const { task, setTask, loading } = useTask(taskId);
 
@@ -35,6 +40,8 @@ export default function TaskModal({ taskId, onClose }: TaskModalProps) {
             onUpdated={setTask}
             onClose={onClose}
             page={false}
+            onToggleView={onToggleView}
+            isDrawerView={isDrawerView}
           />
         )
       }

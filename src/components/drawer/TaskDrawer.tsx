@@ -11,7 +11,12 @@ import { useResizableDrawer } from '../../hooks/useResizableDrawer.ts';
 const MIN_DRAWER_WIDTH = 360;
 const MAX_DRAWER_WIDTH = 520;
 
-export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
+export default function TaskDrawer({
+  taskId,
+  onClose,
+  onToggleView,
+  isDrawerView,
+}: TaskModalProps) {
   const [task, setTask] = useState<TaskPopulated | null>(null);
   const [loading, setLoading] = useState(false);
   const isMobile = useIsMobile(1000);
@@ -98,6 +103,8 @@ export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
                 onClose={onClose}
                 page={false}
                 drawer={true}
+                onToggleView={onToggleView}
+                isDrawerView={isDrawerView}
               />
             )}
           </div>

@@ -1,5 +1,10 @@
 import { Button, Input, type InputRef } from 'antd';
-import { ArrowsAltOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  ArrowsAltOutlined,
+  CloseOutlined,
+  FullscreenOutlined,
+  ShrinkOutlined,
+} from '@ant-design/icons';
 import { useEffect, useRef, useState } from 'react';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { SidebarRow } from '../ui/SidebarRow';
@@ -16,6 +21,8 @@ export function TaskModalHeader({
   onClose,
   page,
   drawer,
+  onToggleView,
+  isDrawerView,
 }: HeaderProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(task.title);
@@ -80,6 +87,15 @@ export function TaskModalHeader({
             page ? 'pointer-events-none opacity-0' : 'opacity-100'
           }`}
         >
+          <Button
+            style={{
+              border: 'var(--color-primary-500) solid 1px',
+            }}
+            type="text"
+            size="middle"
+            icon={isDrawerView ? <ArrowsAltOutlined /> : <ShrinkOutlined />}
+            onClick={onToggleView}
+          />
           <Link to={`/task/${task._id}`} target="_blank">
             <Button
               style={{
@@ -87,7 +103,7 @@ export function TaskModalHeader({
               }}
               type="text"
               size="middle"
-              icon={<ArrowsAltOutlined />}
+              icon={<FullscreenOutlined />}
             />
           </Link>
           <Button
@@ -147,7 +163,7 @@ export function TaskModalHeader({
         >
           <SidebarRow>
             <StatusSelect
-              className="px-6! py-4!"
+              className="px-3! py-4!"
               value={task.status}
               columns={columns}
               onChange={(status) =>
