@@ -14,6 +14,7 @@ import type { HeaderProps } from './taskModal.types';
 import { useParentTask } from '../../hooks/useParentTask';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { useTaskUpdate } from '../../hooks/useTaskUpdate';
+import { TaskTimerSection } from './TaskTimerSection';
 
 export function TaskModalHeader({
   task,
@@ -80,6 +81,8 @@ export function TaskModalHeader({
           >
             {task.key}
           </Link>
+
+          <TaskTimerSection taskId={task._id} assigneeId={task.assignee?._id} />
         </div>
 
         <div
