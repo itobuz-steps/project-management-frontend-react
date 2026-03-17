@@ -10,6 +10,7 @@ import type {
 import { attachInterceptor } from '../utils/attachInterceptor';
 import { mapObjectToFormData } from '../utils/mapObjectToFormdata';
 import type { Activity } from './types/activity.types';
+import type { Worklog } from './types/worklog.types';
 
 const API_URL = `${config.api_base_url}/tasks`;
 
@@ -221,5 +222,20 @@ export async function getTaskActivities(taskId: string): Promise<Activity[]> {
 
 export async function getTaskStats() {
   const res = await api.get<{ result: TaskStats }>('/stats');
+  return res.data.result;
+}
+
+export async function startTaskTimer(taskId: string): Promise<Worklog> {
+  const res = await api.post<{ result: Worklog }>(`/${taskId}/start-timer`);
+  return res.data.result;
+}
+
+export async function stopTaskTimer(worklogId: string): Promise<Worklog> {
+  const res = await api.patch<{ result: Worklog }>(`/stop-timer/${worklogId}`);
+  return res.data.result;
+}
+
+export async function getTaskWorklogs(taskId: string): Promise<Worklog[]> {
+  const res = await api.get<{ result: Worklog[] }>(`/${taskId}/worklogs`);
   return res.data.result;
 }

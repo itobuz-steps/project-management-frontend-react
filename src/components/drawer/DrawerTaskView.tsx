@@ -8,6 +8,7 @@ import { TaskDetails } from '../taskModal/TaskDetails';
 import { tabs } from './tabsConfig';
 import type { Tabs, DrawerViewProps } from './drawer.type';
 import { LinkedItemsTab } from '../linkedItems/LinkedItemsTab';
+import { WorklogsTab } from '../taskModal/WorklogsTab';
 
 export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
   const [activeTab, setActiveTab] = useState<Tabs>('comments');
@@ -71,6 +72,7 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
               />
             )}
             {activeTab === 'activity' && <ActivityTab taskId={task._id} />}
+            {activeTab === 'worklogs' && <WorklogsTab taskId={task._id} />}
           </div>
         </div>
       </div>

@@ -7,12 +7,9 @@ import { TaskDetails } from './TaskDetails';
 import { Tabs, type TabsProps } from 'antd';
 import { ActivityTab } from './ActivityTab';
 import { LinkedItemsTab } from '../linkedItems/LinkedItemsTab';
+import { WorklogsTab } from './WorklogsTab';
 
 export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
-  const onChange = (key: string) => {
-    console.log(key);
-  };
-
   const items: TabsProps['items'] = [
     {
       key: '1',
@@ -23,6 +20,11 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
       key: '2',
       label: 'Activity',
       children: <ActivityTab taskId={task._id} />,
+    },
+    {
+      key: '3',
+      label: 'Worklogs',
+      children: <WorklogsTab taskId={task._id} />,
     },
   ];
 
@@ -38,12 +40,7 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
 
         <LinkedItemsTab task={task} onUpdated={onUpdated} />
 
-        <Tabs
-          className="custom-tabs"
-          defaultActiveKey="1"
-          items={items}
-          onChange={onChange}
-        />
+        <Tabs className="custom-tabs" defaultActiveKey="1" items={items} />
       </div>
 
       {!isMobile && (
