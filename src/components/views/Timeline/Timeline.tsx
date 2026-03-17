@@ -5,6 +5,7 @@ import { getTasks } from '../../../services/taskService';
 import type { Sprint } from '../../../services/types/sprints.types';
 import type { TaskPopulated } from '../../../services/types/tasks.types';
 import { useTheme } from '../../../hooks/useTheme';
+import { useColorMode } from '../../../hooks/useColorMode';
 import { THEME_COLORS } from '../../../config/constants';
 import { scaleTime } from 'd3-scale';
 import { timeMonth } from 'd3-time';
@@ -26,6 +27,7 @@ const { LANE_HEIGHT, ROW_GAP, MARGIN, MIN_ZOOM, MAX_ZOOM, BAR_GAP } =
 const Timeline = () => {
   const { projectId } = useParams();
   const [theme] = useTheme();
+  const [colorMode] = useColorMode();
   const themeColors = THEME_COLORS[theme];
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [tasks, setTasks] = useState<TaskPopulated[]>([]);
@@ -211,7 +213,10 @@ const Timeline = () => {
   const handleReset = () => setZoom(1);
 
   return (
-    <div className="rounded-lg bg-white p-4 shadow-sm" ref={containerRef}>
+    <div
+      className="rounded-lg bg-white p-4 shadow-sm dark:bg-slate-900"
+      ref={containerRef}
+    >
       <div
         style={{
           display: 'flex',
@@ -220,10 +225,20 @@ const Timeline = () => {
           marginBottom: 16,
         }}
       >
-        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Timeline</h2>
+        <h2
+          style={{
+            fontSize: 18,
+            fontWeight: 600,
+            margin: 0,
+            color: colorMode === 'dark' ? '#e2e8f0' : '#0f172a',
+          }}
+        >
+          Timeline
+        </h2>
 
         {/* Zoom controls */}
         <ZoomControls
+          colorMode={colorMode}
           zoom={zoom}
           onZoomIn={handleZoomIn}
           onZoomOut={handleZoomOut}
@@ -232,15 +247,18 @@ const Timeline = () => {
       </div>
 
       {loading ? (
-        <div>Loading...</div>
+        <div className="text-gray-600 dark:text-slate-300">Loading...</div>
       ) : !hasData ? (
-        <div>No sprints or tasks with due dates found for this project.</div>
+        <div className="text-gray-600 dark:text-slate-300">
+          No sprints or tasks with due dates found for this project.
+        </div>
       ) : (
         <div
           ref={scrollRef}
           style={{ position: 'relative', overflowX: 'auto' }}
         >
           <TimelineChart
+            colorMode={colorMode}
             rows={rows}
             timeScale={timeScale}
             rowOffsets={rowOffsets}
@@ -255,7 +273,9 @@ const Timeline = () => {
           />
 
           {/* Tooltip */}
-          {tooltip.visible && tooltip.item && <TimelineTooltip {...tooltip} />}
+          {tooltip.visible && tooltip.item && (
+            <TimelineTooltip colorMode={colorMode} {...tooltip} />
+          )}
         </div>
       )}
     </div>

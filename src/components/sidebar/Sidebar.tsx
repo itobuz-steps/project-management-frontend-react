@@ -76,7 +76,7 @@ export default function Sidebar({
           onSidebarOpen?.();
           onMobileOpenChange(true);
         }}
-        className="absolute top-10 -left-1 z-10 rounded-full border border-slate-200 bg-white p-1.5 text-slate-600 shadow-sm transition-colors hover:bg-slate-100 md:hidden"
+        className="absolute top-10 -left-1 z-10 rounded-full border border-slate-200 bg-white p-1.5 text-slate-600 shadow-sm transition-colors hover:bg-slate-100 md:hidden dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
         aria-label="Open sidebar"
       >
         {!mobileOpen ? <ChevronsRight size={18} /> : <ChevronsLeft size={18} />}
@@ -93,7 +93,7 @@ export default function Sidebar({
       {/* Sidebar */}
       <aside
         id="sidebar"
-        className={`fixed z-50 h-full border-r border-slate-200/80 bg-[#f7f7f8] text-slate-900 shadow-xl transition-all duration-300 ease-in-out md:relative md:z-auto ${
+        className={`fixed z-50 h-full border-r border-slate-200/80 bg-[#f7f7f8] text-slate-900 shadow-xl transition-all duration-300 ease-in-out md:relative md:z-auto dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 ${
           mobileOpen ? 'left-0 w-80' : '-left-80 w-80 md:left-0'
         } ${collapsed ? 'md:w-16' : 'md:w-80'} `}
       >
@@ -107,7 +107,7 @@ export default function Sidebar({
             }
             onCollapsedChange(nextCollapsed);
           }}
-          className="absolute top-7 -right-5 z-10 hidden rounded-full border border-slate-200 bg-white p-1.5 text-slate-600 shadow-sm transition-colors hover:bg-slate-100 md:inline-flex"
+          className="absolute top-7 -right-5 z-10 hidden rounded-full border border-slate-200 bg-white p-1.5 text-slate-600 shadow-sm transition-colors hover:bg-slate-100 md:inline-flex dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? <ChevronsRight size={18} /> : <ChevronsLeft size={18} />}
@@ -116,7 +116,7 @@ export default function Sidebar({
         {/* Mobile close button */}
         <button
           onClick={() => onMobileOpenChange(false)}
-          className="absolute top-4 right-4 rounded-lg bg-slate-50 p-1 text-slate-600 transition-colors hover:bg-slate-200/70 md:hidden"
+          className="absolute top-4 right-4 rounded-lg bg-slate-50 p-1 text-slate-600 transition-colors hover:bg-slate-200/70 md:hidden dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
           aria-label="Close sidebar"
         >
           <X size={24} />
@@ -137,7 +137,7 @@ export default function Sidebar({
                   `group flex items-center gap-3 rounded-lg border px-2.5 py-2.5 ${
                     isActive
                       ? 'border-primary-900 bg-primary-900 text-white'
-                      : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-white/80 hover:shadow-xs'
+                      : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-white/80 hover:shadow-xs dark:text-slate-300 dark:hover:border-slate-700 dark:hover:bg-slate-800'
                   } `
                 }
               >

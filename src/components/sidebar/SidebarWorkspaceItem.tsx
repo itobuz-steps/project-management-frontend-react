@@ -24,21 +24,21 @@ function SidebarWorkspaceItem({
       <button
         type="button"
         onClick={() => setIsExpanded((prev) => !prev)}
-        className="group flex w-full items-center justify-between rounded-lg px-1.5 py-1.5 transition-all duration-200 hover:bg-white/80 hover:shadow-sm"
+        className="group flex w-full items-center justify-between rounded-lg px-1.5 py-1.5 transition-all duration-200 hover:bg-white/80 hover:shadow-sm dark:hover:bg-slate-800"
       >
         <span className="flex min-w-0 items-center gap-2">
           <span className="group-hover:bg-primary-500 aspect-square h-1.5 w-1.5 rounded-full bg-slate-400 transition-colors" />
-          <span className="text-start text-xs font-semibold tracking-[0.08em] text-slate-500 uppercase">
+          <span className="text-start text-xs font-semibold tracking-[0.08em] text-slate-500 uppercase dark:text-slate-400">
             {workspace.workspaceName}
           </span>
         </span>
-        <span className="group-hover:text-primary-700 my-auto text-slate-500 transition-colors">
+        <span className="group-hover:text-primary-700 my-auto text-slate-500 transition-colors dark:text-slate-400">
           {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         </span>
       </button>
 
       <ul
-        className={`mt-1 ml-2 flex flex-col gap-1.5 border-l border-slate-200 pl-2 transition-all duration-200 ${
+        className={`mt-1 ml-2 flex flex-col gap-1.5 border-l border-slate-200 pl-2 transition-all duration-200 dark:border-slate-700 ${
           isExpanded
             ? 'max-h-80 opacity-100'
             : 'max-h-0 overflow-hidden opacity-0'
@@ -51,7 +51,7 @@ function SidebarWorkspaceItem({
             className={`hover:border-primary-200 hover:bg-primary-50 hover:text-primary-900 flex cursor-pointer items-center gap-2 truncate rounded-md border px-2 py-1.5 text-sm font-semibold whitespace-nowrap text-slate-800 transition-all duration-200 ease-in-out ${
               activeProjectId === project._id
                 ? 'border-primary-200 bg-primary-100 text-primary-900 shadow-sm'
-                : 'border-transparent'
+                : 'border-transparent dark:text-slate-200'
             }`}
           >
             {project.icon && (
@@ -65,7 +65,7 @@ function SidebarWorkspaceItem({
           </li>
         ))}
         {!workspace.projects.length && (
-          <li className="rounded-md border border-dashed border-slate-300 bg-white/70 px-2 py-1 text-xs font-medium tracking-wide text-slate-500">
+          <li className="rounded-md border border-dashed border-slate-300 bg-white/70 px-2 py-1 text-xs font-medium tracking-wide text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
             No projects yet
           </li>
         )}

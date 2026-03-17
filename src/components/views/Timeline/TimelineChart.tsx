@@ -8,6 +8,7 @@ const { BAR_HEIGHT, BAR_GAP, LANE_HEIGHT, MARGIN } = TIMELINE_CONSTANTS;
 const formatTick = timeFormat('%b %Y');
 
 interface TimelineChartProps {
+  colorMode: 'light' | 'dark';
   rows: TimelineRow[];
   timeScale: ScaleTime<number, number>;
   ticks: Date[];
@@ -20,6 +21,7 @@ interface TimelineChartProps {
 }
 
 export const TimelineChart = ({
+  colorMode,
   rows,
   timeScale,
   ticks,
@@ -30,6 +32,7 @@ export const TimelineChart = ({
   onItemHover,
   onItemLeave,
 }: TimelineChartProps) => {
+  const isDark = colorMode === 'dark';
   const svgHeight = totalInnerHeight + MARGIN.top + MARGIN.bottom;
   const svgWidth = innerWidth + MARGIN.left + MARGIN.right;
 
@@ -44,7 +47,7 @@ export const TimelineChart = ({
             x2={timeScale(tick)}
             y1={0}
             y2={totalInnerHeight}
-            stroke="rgba(0,0,0,0.06)"
+            stroke={isDark ? 'rgba(148,163,184,0.22)' : 'rgba(0,0,0,0.06)'}
             strokeDasharray="3,3"
           />
         ))}
@@ -64,7 +67,7 @@ export const TimelineChart = ({
                 dominantBaseline="middle"
                 fontSize={12}
                 fontWeight={600}
-                fill="#475569"
+                fill={isDark ? '#cbd5e1' : '#475569'}
               >
                 {row.label}
               </text>
@@ -73,7 +76,7 @@ export const TimelineChart = ({
                 y={0}
                 width={innerWidth}
                 height={trackHeight}
-                fill="#f1f5f9"
+                fill={isDark ? '#0f172a' : '#f1f5f9'}
                 rx={6}
               />
               {row.items.map((item) => {
@@ -141,7 +144,7 @@ export const TimelineChart = ({
               y={12}
               textAnchor="middle"
               fontSize={11}
-              fill="#94a3b8"
+              fill={isDark ? '#94a3b8' : '#64748b'}
             >
               {formatTick(tick)}
             </text>

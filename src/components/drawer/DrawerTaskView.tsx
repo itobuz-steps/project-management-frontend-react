@@ -15,7 +15,7 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
 
   return (
     <div
-      className="flex h-full flex-col overflow-y-auto"
+      className="flex h-full flex-col overflow-y-auto dark:text-slate-200"
       style={{ scrollbarWidth: 'thin', scrollbarColor: '#c1c7d0 transparent' }}
     >
       <div className="px-5 py-4">
@@ -23,7 +23,7 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
         <TaskDetails task={task} onUpdated={onUpdated} />
 
         {/* Divider */}
-        <div className="my-4 border-t border-[#dfe1e6]" />
+        <div className="my-4 border-t border-[#dfe1e6] dark:border-slate-700" />
 
         {/* Description */}
         <TaskDescription task={task} onUpdated={onUpdated} />
@@ -36,25 +36,25 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
         <LinkedItemsTab task={task} onUpdated={onUpdated} />
 
         {/* Divider */}
-        <div className="my-4 border-t border-[#dfe1e6]" />
+        <div className="my-4 border-t border-[#dfe1e6] dark:border-slate-700" />
 
         {/* Activity section */}
         <div>
           {/* Tab bar */}
-          <div className="flex gap-0 border-b border-[#dfe1e6]">
+          <div className="flex gap-0 border-b border-[#dfe1e6] dark:border-slate-700">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={`relative px-3 pt-1 pb-2 text-sm font-medium transition-colors ${
                   activeTab === tab.key
-                    ? 'text-[var(--color-primary-900)]'
-                    : 'text-[#383c44] hover:text-[var(--color-primary-900)]'
+                    ? 'text-(--color-primary-900)'
+                    : 'text-[#383c44] hover:text-(--color-primary-900) dark:text-slate-300'
                 }`}
               >
                 {tab.label}
                 {activeTab === tab.key && (
-                  <span className="absolute right-0 bottom-0 left-0 h-0.5 rounded-full bg-[var(--color-primary-700)]" />
+                  <span className="absolute right-0 bottom-0 left-0 h-0.5 rounded-full bg-(--color-primary-700)" />
                 )}
               </button>
             ))}

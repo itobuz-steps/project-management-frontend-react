@@ -39,7 +39,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
         {
           key: 'details',
           label: (
-            <span className="text-base font-semibold text-gray-900">
+            <span className="text-base font-semibold text-gray-900 dark:text-slate-100">
               Details
             </span>
           ),
@@ -73,7 +73,9 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                         )}
                       </>
                     ) : (
-                      <span className="text-sm text-gray-400">Add labels</span>
+                      <span className="text-sm text-gray-400 dark:text-slate-400">
+                        Add labels
+                      </span>
                     )}
                   </div>
                 ) : (

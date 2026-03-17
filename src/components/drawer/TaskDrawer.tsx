@@ -59,7 +59,7 @@ export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
       )}
 
       <aside
-        className="overflow-hidden border-l border-gray-200 bg-white shadow-xl"
+        className="overflow-hidden border-l border-gray-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900"
         style={
           isMobile
             ? {
@@ -85,7 +85,7 @@ export default function TaskDrawer({ taskId, onClose }: TaskModalProps) {
             type="button"
             aria-label="Resize task drawer"
             onMouseDown={startResizing}
-            className="hover:bg-primary-300 absolute top-0 bottom-0 left-0 z-10 w-1.5 cursor-col-resize border-r border-transparent hover:border-gray-300"
+            className="hover:bg-primary-300 absolute top-0 bottom-0 left-0 z-10 w-1.5 cursor-col-resize border-r border-transparent hover:border-gray-300 dark:hover:border-slate-600"
           />
         )}
 

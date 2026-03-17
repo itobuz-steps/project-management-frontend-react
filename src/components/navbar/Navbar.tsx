@@ -8,15 +8,17 @@ import {
 } from '@ant-design/icons';
 import { useState, useRef, useEffect } from 'react';
 import { Tag } from 'antd';
-import { Users, Bell } from 'lucide-react';
+import { Users, Bell, Moon, Sun } from 'lucide-react';
 import { Can } from '../../utils/PermissionHoc';
 import { InviteUserContainer } from '../common/InviteUserContainer';
 import { ProjectMembersModal } from '../common/ProjectMembersModal';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../../context/ProjectContext';
+import { useColorMode } from '../../hooks/useColorMode';
 
 export default function Navbar() {
   const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [colorMode, setColorMode] = useColorMode();
   const [isMembersOpen, setIsMembersOpen] = useState(false);
   const [paletteSearch, setPaletteSearch] = useState('');
   const navigate = useNavigate();
@@ -28,6 +30,10 @@ export default function Navbar() {
 
   const handleSearchClick = () => {
     setCommandPaletteOpen(true);
+  };
+
+  const toggleColorMode = () => {
+    setColorMode((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -58,7 +64,7 @@ export default function Navbar() {
   }, [mobileMenuOpen]);
 
   return (
-    <div className="header border border-gray-50 bg-gray-100">
+    <div className="header border border-gray-50 bg-gray-100 dark:border-slate-800 dark:bg-slate-900">
       <nav className="flex flex-row justify-between p-4 pl-5 shadow-sm sm:flex-row sm:items-center md:px-4 md:py-4">
         {/* TOP ROW */}
         <div className="flex flex-col gap-3 text-start sm:flex-row sm:items-center sm:justify-between">
@@ -72,7 +78,7 @@ export default function Navbar() {
                 />
               )}
               {!projectInfoHidden && (
-                <h2 className="topbar-project-header inline items-center text-lg! font-semibold text-gray-900 sm:text-xl">
+                <h2 className="topbar-project-header inline items-center text-lg! font-semibold text-gray-900 sm:text-xl dark:text-slate-100">
                   {project?.name}
                 </h2>
               )}
@@ -96,7 +102,7 @@ export default function Navbar() {
         {/* Hamburger — mobile only */}
         <button
           ref={hamburgerRef}
-          className="flex items-center justify-center p-1 text-gray-900 md:hidden"
+          className="flex items-center justify-center p-1 text-gray-900 md:hidden dark:text-slate-100"
           aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileMenuOpen}
           onClick={() => setMobileMenuOpen((open) => !open)}
@@ -111,7 +117,7 @@ export default function Navbar() {
         {/* Icon row — desktop only */}
         <div className="hidden items-center md:flex md:justify-end xl:gap-3">
           {project && !projectInfoHidden && (
-            <div className="flex items-center justify-center rounded-md p-2 text-gray-900 transition-colors hover:bg-gray-200">
+            <div className="flex items-center justify-center rounded-md p-2 text-gray-900 transition-colors hover:bg-gray-200 dark:text-slate-100 dark:hover:bg-slate-700">
               <Can permission="SEND_INVITE">
                 <InviteUserContainer />
               </Can>
@@ -121,7 +127,7 @@ export default function Navbar() {
           {project && !projectInfoHidden && (
             <button
               onClick={() => setIsMembersOpen(true)}
-              className="flex items-center justify-center rounded-md p-2 text-gray-900 transition-colors hover:bg-gray-200"
+              className="flex items-center justify-center rounded-md p-2 text-gray-900 transition-colors hover:bg-gray-200 dark:text-slate-100 dark:hover:bg-slate-700"
             >
               <Users className="h-6 w-6" />
             </button>
@@ -134,13 +140,29 @@ export default function Navbar() {
 
           <button
             onClick={handleSearchClick}
-            className="rounded-md p-2 transition-colors hover:bg-gray-200"
+            className="rounded-md p-2 transition-colors hover:bg-gray-200 dark:text-slate-100 dark:hover:bg-slate-700"
             aria-label="Search"
           >
             <SearchOutlined style={{ fontSize: '1.5rem' }} />
           </button>
 
-          <div className="rounded-md p-2 transition-colors hover:bg-gray-200">
+          <button
+            onClick={toggleColorMode}
+            className="rounded-md p-2 text-gray-900 transition-colors hover:bg-gray-200 dark:text-slate-100 dark:hover:bg-slate-700"
+            aria-label={
+              colorMode === 'light'
+                ? 'Switch to dark mode'
+                : 'Switch to light mode'
+            }
+          >
+            {colorMode === 'light' ? (
+              <Moon className="h-5 w-5" />
+            ) : (
+              <Sun className="h-5 w-5" />
+            )}
+          </button>
+
+          <div className="rounded-md p-2 transition-colors hover:bg-gray-200 dark:text-slate-100 dark:hover:bg-slate-700">
             <Notifications />
           </div>
 
@@ -148,7 +170,7 @@ export default function Navbar() {
             <Can permission="PROJECT_SETTINGS">
               <button
                 onClick={() => navigate(`project/${project?._id}/settings`)}
-                className="rounded-md p-2 transition-colors hover:bg-gray-200"
+                className="rounded-md p-2 transition-colors hover:bg-gray-200 dark:text-slate-100 dark:hover:bg-slate-700"
                 aria-label="Settings"
               >
                 <SettingOutlined style={{ fontSize: '1.5rem' }} />
@@ -162,20 +184,16 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div
           ref={menuRef}
-          className="fixed top-14 right-5 z-100 flex w-max flex-col rounded-lg border border-gray-200 bg-white p-2 shadow-lg md:hidden"
+          className="fixed top-14 right-5 z-100 flex w-max flex-col rounded-lg border border-gray-200 bg-white p-2 shadow-lg md:hidden dark:border-slate-700 dark:bg-slate-800"
         >
           {project && !projectInfoHidden && (
             <Can permission="SEND_INVITE">
               <button
-                className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800"
+                className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-slate-100 dark:hover:bg-slate-700"
                 onClick={() => {
                   setMobileMenuOpen(false);
                   setInviteOpen(true);
                 }}
-                onMouseOver={(e) =>
-                  (e.currentTarget.style.background = '#f9fafb')
-                }
-                onMouseOut={(e) => (e.currentTarget.style.background = 'none')}
               >
                 <Users size={16} />
                 Invite Users
@@ -184,13 +202,11 @@ export default function Navbar() {
           )}
 
           <button
-            className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800"
+            className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-slate-100 dark:hover:bg-slate-700"
             onClick={() => {
               setMobileMenuOpen(false);
               setNotifOpen(true);
             }}
-            onMouseOver={(e) => (e.currentTarget.style.background = '#f9fafb')}
-            onMouseOut={(e) => (e.currentTarget.style.background = 'none')}
           >
             <Bell size={16} />
             Notifications
@@ -202,11 +218,7 @@ export default function Navbar() {
                 setMobileMenuOpen(false);
                 setIsMembersOpen(true);
               }}
-              className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800"
-              onMouseOver={(e) =>
-                (e.currentTarget.style.background = '#f9fafb')
-              }
-              onMouseOut={(e) => (e.currentTarget.style.background = 'none')}
+              className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-slate-100 dark:hover:bg-slate-700"
             >
               <Users size={16} />
               Members
@@ -214,16 +226,25 @@ export default function Navbar() {
           )}
 
           <button
-            className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800"
+            className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-slate-100 dark:hover:bg-slate-700"
             onClick={() => {
               setMobileMenuOpen(false);
               handleSearchClick();
             }}
-            onMouseOver={(e) => (e.currentTarget.style.background = '#f9fafb')}
-            onMouseOut={(e) => (e.currentTarget.style.background = 'none')}
           >
             <SearchOutlined style={{ fontSize: '1rem' }} />
             Search
+          </button>
+
+          <button
+            className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-slate-100 dark:hover:bg-slate-700"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              toggleColorMode();
+            }}
+          >
+            {colorMode === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+            {colorMode === 'light' ? 'Dark mode' : 'Light mode'}
           </button>
 
           {!projectInfoHidden && (
@@ -234,17 +255,11 @@ export default function Navbar() {
                   style={{ height: 1, background: '#f3f4f6', margin: '4px 0' }}
                 />
                 <button
-                  className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800"
+                  className="flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-slate-100 dark:hover:bg-slate-700"
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigate(`project/${project?._id}/settings`);
                   }}
-                  onMouseOver={(e) =>
-                    (e.currentTarget.style.background = '#f9fafb')
-                  }
-                  onMouseOut={(e) =>
-                    (e.currentTarget.style.background = 'none')
-                  }
                 >
                   <SettingOutlined style={{ fontSize: '1rem' }} />
                   Settings

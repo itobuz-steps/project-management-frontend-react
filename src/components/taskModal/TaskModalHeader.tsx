@@ -47,7 +47,7 @@ export function TaskModalHeader({
   return (
     <div className="flex flex-col pr-1">
       {/* Top row */}
-      <div className="flex items-center justify-between text-sm text-gray-500">
+      <div className="flex items-center justify-between text-sm text-gray-500 dark:text-slate-400">
         <div className="flex items-center gap-1">
           {parentTask && (
             <>
@@ -56,7 +56,7 @@ export function TaskModalHeader({
                 to={`/task/${parentTask._id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-inherit! hover:text-gray-600 hover:underline"
+                className="text-inherit! hover:text-gray-600 hover:underline dark:hover:text-slate-200"
               >
                 {parentTask.key}
               </Link>
@@ -69,7 +69,7 @@ export function TaskModalHeader({
             to={`/task/${task._id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-inherit! hover:text-gray-600 hover:underline"
+            className="text-inherit! hover:text-gray-600 hover:underline dark:hover:text-slate-200"
           >
             {task.key}
           </Link>
@@ -111,7 +111,7 @@ export function TaskModalHeader({
         <div className="flex min-w-0 flex-1 items-center">
           {!editing ? (
             <h1
-              className="cursor-pointer rounded px-1 text-2xl font-semibold break-words hover:bg-gray-100"
+              className="cursor-pointer rounded px-1 text-2xl font-semibold wrap-break-word hover:bg-gray-100 dark:text-slate-100 dark:hover:bg-slate-700"
               onClick={() => {
                 setValue(task.title);
                 setEditing(true);
@@ -143,7 +143,7 @@ export function TaskModalHeader({
         </div>
 
         <div
-          className={`shrink-0 self-end ${drawer ? 'flex' : 'md:w-[296px] lg:w-[396px] 2xl:w-[496px]'}`}
+          className={`shrink-0 self-end ${drawer ? 'flex' : 'md:w-74 lg:w-99 2xl:w-124'}`}
         >
           <SidebarRow>
             <StatusSelect

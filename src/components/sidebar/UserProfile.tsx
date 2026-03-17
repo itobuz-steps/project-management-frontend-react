@@ -42,7 +42,7 @@ export function UserProfile({ collapsed, mobileOpen }: UserProfileProps) {
       className={`flex flex-col gap-3 rounded-xl p-2 ${
         collapsed && !mobileOpen
           ? 'justify-center md:w-auto'
-          : 'border border-slate-200 bg-white'
+          : 'border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800'
       }`}
       onClick={() => {
         if (collapsed) {
@@ -66,17 +66,19 @@ export function UserProfile({ collapsed, mobileOpen }: UserProfileProps) {
               : 'w-auto translate-x-0 opacity-100'
           }`}
         >
-          <p className="truncate text-[15px] font-semibold text-slate-900">
+          <p className="truncate text-[15px] font-semibold text-slate-900 dark:text-slate-100">
             {userName}
           </p>
-          <p className="truncate text-sm text-slate-500">{userEmail}</p>
+          <p className="truncate text-sm text-slate-500 dark:text-slate-400">
+            {userEmail}
+          </p>
         </div>
         {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
       </div>
       {open && !collapsed && (
         <Link
           to="/edit-profile"
-          className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3"
+          className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-slate-700 dark:bg-slate-700 dark:text-slate-100"
         >
           {' '}
           <Edit3 className="size-4" />

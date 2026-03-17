@@ -21,13 +21,15 @@ export function NotificationItem({
 
   return (
     <li onClick={handleClick} className="cursor-pointer">
-      <div className="flex items-start gap-4 bg-white p-2 transition hover:bg-gray-100">
+      <div className="flex items-start gap-4 bg-white p-2 transition hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700">
         <div className="relative shrink-0">
           <Bell className="text-primary-400 mt-0.5 h-5 w-5" />
         </div>
         <div className="flex flex-col gap-1">
-          <p className="text-sm font-medium text-gray-900">{data.title}</p>
-          <span className="text-xs text-gray-400">
+          <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
+            {data.title}
+          </p>
+          <span className="text-xs text-gray-400 dark:text-slate-400">
             {DateTime.fromISO(data.createdAt).toRelative()}
           </span>
         </div>

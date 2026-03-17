@@ -8,6 +8,7 @@ import { useIsMobile } from '../../utils/isMobile';
 import { Can } from '../../utils/PermissionHoc';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useSprintActions } from '../../hooks/useSprintActions';
+import { useProject } from '../../context/ProjectContext';
 
 interface SprintMenuProps {
   sprint: Sprint;
@@ -20,7 +21,9 @@ interface SprintMenuProps {
 }
 
 const toDateInputValue = (value?: Date) => {
-  if (!value) return '';
+  if (!value) {
+    return '';
+  }
   return dayjs(value).format('YYYY-MM-DD');
 };
 
@@ -41,15 +44,34 @@ export function SprintMenu({
   const [isEditingDates, setIsEditingDates] = useState(false);
   const [startDateInput, setStartDateInput] = useState('');
   const [endDateInput, setEndDateInput] = useState('');
+  const [startSprintDueDateInput, setStartSprintDueDateInput] = useState('');
   const [saving, setSaving] = useState(false);
   const isMobile = useIsMobile(640);
+  const { project } = useProject();
+
+  const datePickerFormat = 'DD-MM-YYYY';
+
+  const toPickerValue = (value?: string) => {
+    if (!value) {
+      return null;
+    }
+    return dayjs(value, 'YYYY-MM-DD');
+  };
+
+  const syncStartSprintDueDate = (value: string) => {
+    setStartSprintDueDateInput(value);
+    if (dueDateRef.current) {
+      dueDateRef.current.value = value;
+    }
+  };
 
   const openEditDates = () => {
     setStartDateInput(toDateInputValue(sprint.startDate));
     setEndDateInput(toDateInputValue(sprint.dueDate));
     setIsEditingDates(true);
   };
-  const { deleteSprint } = useSprintActions();
+
+  const { deleteSprint } = useSprintActions(project?._id);
   const closeEditDates = () => setIsEditingDates(false);
 
   const handleSaveDates = async () => {
@@ -78,20 +100,26 @@ export function SprintMenu({
       <div className="flex flex-col gap-1">
         <span className="text-xs font-medium text-gray-500">Start date</span>
         <DatePicker
-          defaultValue={dayjs(sprint.startDate)}
+          value={toPickerValue(startDateInput)}
+          format={datePickerFormat}
           size="small"
           className="w-full rounded border text-xs"
           autoFocus
-          onChange={(date) => date && setStartDateInput(date.toISOString())}
+          onChange={(date) =>
+            setStartDateInput(date ? date.format('YYYY-MM-DD') : '')
+          }
         />
       </div>
       <div className="flex flex-col gap-1">
         <span className="text-xs font-medium text-gray-500">End date</span>
         <DatePicker
-          defaultValue={dayjs(sprint.dueDate)}
+          value={toPickerValue(endDateInput)}
+          format={datePickerFormat}
           size="small"
           className="w-full rounded border text-xs"
-          onChange={(date) => date && setEndDateInput(date.toISOString())}
+          onChange={(date) =>
+            setEndDateInput(date ? date.format('YYYY-MM-DD') : '')
+          }
         />
       </div>
     </div>
@@ -103,7 +131,11 @@ export function SprintMenu({
       {!sprintStarted && dueDateInputHidden && (
         <SprintButton
           type="button"
-          onClick={() => setDueDateInputHidden(false)}
+          onClick={() => {
+            const initialDate = toDateInputValue(sprint.dueDate);
+            syncStartSprintDueDate(initialDate);
+            setDueDateInputHidden(false);
+          }}
           className="bg-primary-400 hover:bg-primary-500 cursor-pointer rounded-sm px-2 py-1 text-xs font-medium text-white shadow-xs focus:outline-none"
         >
           Start Sprint
@@ -115,8 +147,19 @@ export function SprintMenu({
         <div className="flex flex-wrap items-center gap-2">
           <input
             type="date"
-            className="rounded-sm border border-gray-300 px-2 py-1 text-xs"
+            className="hidden"
             ref={dueDateRef}
+            value={startSprintDueDateInput}
+            onChange={(event) => setStartSprintDueDateInput(event.target.value)}
+          />
+          <DatePicker
+            value={toPickerValue(startSprintDueDateInput)}
+            format={datePickerFormat}
+            size="small"
+            className="rounded-sm border border-gray-300 text-xs"
+            onChange={(date) =>
+              syncStartSprintDueDate(date ? date.format('YYYY-MM-DD') : '')
+            }
           />
           <SprintButton
             type="button"
@@ -178,21 +221,23 @@ export function SprintMenu({
                 (isEditingDates ? (
                   <div className="flex items-center gap-2">
                     <DatePicker
-                      defaultValue={dayjs(sprint.startDate)}
+                      value={toPickerValue(startDateInput)}
+                      format={datePickerFormat}
                       size="small"
                       className="rounded border text-xs"
                       autoFocus
                       onChange={(date) =>
-                        date && setStartDateInput(date.toISOString())
+                        setStartDateInput(date ? date.format('YYYY-MM-DD') : '')
                       }
                     />
                     <span className="text-xs text-gray-400">→</span>
                     <DatePicker
-                      defaultValue={dayjs(sprint.dueDate)}
+                      value={toPickerValue(endDateInput)}
+                      format={datePickerFormat}
                       size="small"
                       className="rounded border text-xs"
                       onChange={(date) =>
-                        date && setEndDateInput(date.toISOString())
+                        setEndDateInput(date ? date.format('YYYY-MM-DD') : '')
                       }
                     />
                     <SprintButton type="button" onClick={handleSaveDates}>
