@@ -31,7 +31,9 @@ export function TaskTimerSection({
   });
 
   const activeWorklog = useMemo(() => {
-    if (!userId) return null;
+    if (!userId) {
+      return null;
+    }
 
     return (
       worklogsQuery.data?.find((worklog) => {
@@ -53,13 +55,17 @@ export function TaskTimerSection({
   });
 
   useEffect(() => {
-    if (!activeWorklog) return;
+    if (!activeWorklog) {
+      return;
+    }
 
     const interval = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(interval);
   }, [activeWorklog]);
 
-  if (!isAssignee) return null; // Hide if the user is not the assignee
+  if (!isAssignee) {
+    return null;
+  } // Hide if the user is not the assignee
 
   const startMs = activeWorklog
     ? new Date(activeWorklog.startTime).getTime()
