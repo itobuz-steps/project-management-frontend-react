@@ -139,3 +139,16 @@
 :root[data-color-mode='dark'] [class*='dark:hover:text-slate-200']:hover {
   color: #e5e5e5 !important;
 }
+
+:root[data-color-mode='dark'] .sprint-removed-table .ant-table-thead>tr>th,
+:root[data-color-mode='dark'] .sprint-removed-table .ant-table-tbody>tr>td,
+:root[data-color-mode='dark'] .sprint-removed-table .ant-table-cell {
+  color: #f5f5f5 !important;
+}
+
+:root[data-color-mode='dark'] .sprint-chart-card .g2-axis,
+:root[data-color-mode='dark'] .sprint-chart-card .g2-legend,
+:root[data-color-mode='dark'] .sprint-chart-card .g2-label {
+  color: #f5f5f5 !important;
+  fill: #f5f5f5 !important;
+}

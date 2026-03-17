@@ -8,8 +8,10 @@ import type { SprintChartsProps, ChartCardProps } from './sprintView.types';
 
 function ChartCard({ title, children }: ChartCardProps) {
   return (
-    <div className="flex w-full flex-1 flex-col items-center rounded-md border-2 border-gray-200 p-4 sm:w-auto">
-      <h4 className="text-primary-500 mb-2 font-semibold">{title}</h4>
+    <div className="sprint-chart-card flex w-full flex-1 flex-col items-center rounded-md border-2 border-gray-200 p-4 text-gray-900 sm:w-auto dark:text-white">
+      <h4 className="text-primary-500 mb-2 font-semibold dark:text-white">
+        {title}
+      </h4>
       {children}
     </div>
   );
