@@ -56,7 +56,7 @@ export function AttachmentsTab({
   return (
     <div className="my-4">
       <div
-        className="flex cursor-pointer items-center justify-between text-base font-semibold text-gray-900"
+        className="flex cursor-pointer items-center justify-between text-base font-semibold text-gray-900 dark:text-neutral-100"
         onClick={() => setExpanded((dropdown) => !dropdown)}
       >
         <div className="flex items-center gap-2">
@@ -70,7 +70,7 @@ export function AttachmentsTab({
             setExpanded(true);
           }}
         >
-          <span className="pr-2 text-xs font-normal text-red-400">
+          <span className="pr-2 text-xs font-normal text-red-400 dark:text-red-300">
             Max size: 5MB
           </span>
           <Upload {...uploadProps} disabled={saving}>

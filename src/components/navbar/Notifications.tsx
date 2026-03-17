@@ -101,14 +101,14 @@ export default function Notifications({
       {!isControlled && (
         <button
           type="button"
-          className="flex items-center justify-center border-none outline-none"
+          className="flex items-center justify-center rounded-md border-none p-1 transition-colors outline-none hover:bg-gray-200 dark:hover:bg-slate-700"
           onClick={() => {
             setNewNotificationCount(0);
             setOpen(!open);
           }}
         >
           <span className="relative inline-flex">
-            <Bell className="size-6 stroke-black max-md:size-6" />
+            <Bell className="size-6 text-gray-900 max-md:size-6 dark:text-slate-100" />
 
             {newNotificationCount > 0 && !open && (
               <span

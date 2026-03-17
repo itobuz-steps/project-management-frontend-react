@@ -22,8 +22,8 @@ body {
 }
 
 :root[data-color-mode='dark'] {
-  --app-bg: #020617;
-  --app-text: #e2e8f0;
+  --app-bg: #1f1d1d;
+  --app-text: #ededed;
 }
 
 @theme {

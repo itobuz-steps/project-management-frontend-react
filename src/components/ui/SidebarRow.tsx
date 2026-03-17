@@ -10,14 +10,14 @@ export function SidebarRow({ label, children }: SidebarRowType) {
       } `}
     >
       {hasLabel && (
-        <div className="mr-4 inline-flex w-fit px-2 py-1 text-[11px] leading-6 font-medium tracking-wide text-gray-500 hover:bg-gray-100">
+        <div className="mr-4 inline-flex w-fit px-2 py-1 text-[11px] leading-6 font-medium tracking-wide text-gray-500 hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-800">
           {label}
         </div>
       )}
 
       <div
         className={`inline-flex w-fit rounded px-2 py-1 leading-6 ${
-          hasLabel ? 'hover:bg-gray-100' : ''
+          hasLabel ? 'hover:bg-gray-100 dark:hover:bg-neutral-800' : ''
         }`}
       >
         {children}

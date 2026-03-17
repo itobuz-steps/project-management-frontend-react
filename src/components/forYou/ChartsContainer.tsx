@@ -99,19 +99,19 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
 
   return (
     <div className="flex w-full flex-1 flex-wrap items-center justify-center gap-2 sm:justify-start">
-      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto">
+      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto dark:border-slate-700 dark:bg-slate-800">
         <h4 className="text-primary-500 m-2 font-semibold">
           Assigned Task By Project
         </h4>
         <Pie {...pieConfig} data={allAssignedTaskByProject} />
       </div>
-      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto">
+      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto dark:border-slate-700 dark:bg-slate-800">
         <h4 className="text-primary-500 m-2 font-semibold">
           Completed Task By Project
         </h4>
         <Pie {...pieConfig} data={completedTaskByProject} />
       </div>
-      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto lg:col-span-2 lg:p-8 xl:col-span-1 xl:p-2">
+      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto lg:col-span-2 lg:p-8 xl:col-span-1 xl:p-2 dark:border-slate-700 dark:bg-slate-800">
         <h4 className="text-primary-500 m-2 font-semibold">
           Completed Task By Date (Last 7 Days)
         </h4>

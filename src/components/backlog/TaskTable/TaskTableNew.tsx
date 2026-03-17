@@ -371,7 +371,7 @@ export function TaskTable({
             pageSizeOptions: ['10', '20', '50', '100'],
           }}
           rowClassName={(record) =>
-            `whitespace-nowrap text-sm hover:bg-gray-50 ${getPriorityBorder(record.priority)}`
+            `whitespace-nowrap text-sm hover:bg-gray-50 dark:hover:bg-slate-800 ${getPriorityBorder(record.priority)}`
           }
           locale={{
             emptyText: error ?? 'No tasks available',

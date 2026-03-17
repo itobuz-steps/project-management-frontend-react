@@ -95,7 +95,7 @@ export function CommentItem({ task, comment }: CommentItemProps) {
 
   return (
     <div
-      className="group flex gap-2 rounded-md px-2 py-2 hover:bg-gray-50"
+      className="group flex gap-2 rounded-md px-2 py-2 hover:bg-gray-50 dark:hover:bg-neutral-800"
       ref={editorRef}
     >
       <Avatar
@@ -113,10 +113,10 @@ export function CommentItem({ task, comment }: CommentItemProps) {
           {/* Header */}
           <Space className="w-full justify-between">
             <div>
-              <Text className="text-sm font-medium text-gray-900">
+              <Text className="text-sm font-medium text-gray-900 dark:text-neutral-100">
                 {comment.author.name || 'You'}
               </Text>
-              <span className="ml-2 text-xs text-gray-400">
+              <span className="ml-2 text-xs text-gray-400 dark:text-neutral-400">
                 {formatDistanceToNow(new Date(comment.createdAt), {
                   addSuffix: true,
                 })}

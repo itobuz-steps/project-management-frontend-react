@@ -69,10 +69,11 @@ export function ProjectMembersModal({
 
   return (
     <Modal
+      wrapClassName="project-members-modal"
       title={
         <div className="flex items-center gap-2">
           <span>Project Members</span>
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-500">
+          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-500 dark:bg-slate-700 dark:text-slate-300">
             {projectMembers.length}
           </span>
         </div>
@@ -108,7 +109,7 @@ export function ProjectMembersModal({
           <Spin />
         </div>
       ) : projectMembers.length === 0 ? (
-        <p className="py-6 text-center text-sm text-gray-400">
+        <p className="py-6 text-center text-sm text-gray-400 dark:text-slate-400">
           No members found.
         </p>
       ) : (
@@ -120,7 +121,7 @@ export function ProjectMembersModal({
             return (
               <div
                 key={localMember.user}
-                className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2"
+                className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800"
               >
                 <div className="flex min-w-0 items-center gap-2">
                   <UserCell user={user} emptyText="Unknown" />

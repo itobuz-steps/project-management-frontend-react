@@ -103,7 +103,7 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
         <div className="mt-2 ml-5">
           {!editing ? (
             <div
-              className="cursor-pointer rounded-md bg-gray-100 p-3 text-sm hover:bg-gray-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+              className="cursor-pointer rounded-md bg-gray-100 p-3 text-sm hover:bg-gray-200 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
               onClick={openEditor}
             >
               {task.description ? (
@@ -111,7 +111,7 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
                   <ReactMarkdown>{task.description}</ReactMarkdown>
                 </div>
               ) : (
-                <span className="text-gray-400 dark:text-slate-400">
+                <span className="text-gray-400 dark:text-neutral-400">
                   Add a description…
                 </span>
               )}

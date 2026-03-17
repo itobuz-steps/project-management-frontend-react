@@ -27,7 +27,7 @@ export function NotificationDropdown({
 
   return (
     <div
-      className="absolute -right-full z-15 max-h-125 min-w-74 flex-col overflow-y-auto rounded-sm border border-gray-200 bg-white px-2 pb-2 shadow-md sm:right-0 dark:border-slate-700 dark:bg-slate-800"
+      className="absolute -right-full z-15 max-h-125 min-w-74 flex-col overflow-y-auto rounded-sm border border-gray-200 bg-white px-2 pb-2 shadow-md sm:right-0 dark:border-slate-700 dark:bg-slate-700"
       ref={ref}
     >
       <h3 className="p-3 py-2 text-lg font-semibold dark:text-slate-100">

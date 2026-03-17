@@ -38,7 +38,7 @@ export function AssigneeCell({
 
   if (!editing) {
     return (
-      <div className="flex h-7 w-[100px] items-center gap-1 truncate rounded-md px-1 hover:bg-gray-100 lg:w-full">
+      <div className="flex h-7 w-25 items-center gap-1 truncate rounded-md px-1 hover:bg-gray-100 lg:w-full dark:hover:bg-slate-700">
         <div
           className="cursor-pointer truncate"
           onClick={() => {
@@ -51,7 +51,7 @@ export function AssigneeCell({
 
         {!currentUser && userId && (
           <>
-            <span className="text-gray-300">·</span>
+            <span className="text-gray-300 dark:text-slate-500">·</span>
 
             <button
               className="text-primary-600 text-xs hover:underline"
@@ -71,7 +71,7 @@ export function AssigneeCell({
   return (
     <Select
       autoFocus
-      className="h-7 w-[100px] truncate lg:w-full"
+      className="h-7 w-25 truncate lg:w-full"
       size="small"
       loading={loading || saving}
       value={currentUser?._id ?? null}

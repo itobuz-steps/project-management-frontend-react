@@ -138,19 +138,21 @@ function TopBar({
                     setIsFiltersOpen((prev) => !prev);
                     onOpenFilters();
                   }}
-                  className="w-full rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 sm:w-auto"
+                  className="w-full rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 sm:w-auto dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
                   Filters
                 </button>
 
                 {isFiltersOpen && (
-                  <div className="absolute right-0 z-20 mt-2 w-56 rounded-md border border-gray-200 bg-white p-2 shadow-lg">
+                  <div className="absolute right-0 z-20 mt-2 w-56 rounded-md border border-gray-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-800">
                     {/* Filter buttons */}
                     <button
                       onClick={() => setActiveFilter('status')}
                       className={`${
-                        activeFilter === 'status' ? 'bg-gray-100' : ''
-                      } w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100`}
+                        activeFilter === 'status'
+                          ? 'bg-gray-100 dark:bg-slate-700'
+                          : ''
+                      } w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-slate-200 dark:hover:bg-slate-700`}
                     >
                       Status
                     </button>
@@ -158,8 +160,10 @@ function TopBar({
                     <button
                       onClick={() => setActiveFilter('priority')}
                       className={`${
-                        activeFilter === 'priority' ? 'bg-gray-100' : ''
-                      } w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100`}
+                        activeFilter === 'priority'
+                          ? 'bg-gray-100 dark:bg-slate-700'
+                          : ''
+                      } w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-slate-200 dark:hover:bg-slate-700`}
                     >
                       Priority
                     </button>
@@ -167,8 +171,10 @@ function TopBar({
                     <button
                       onClick={() => setActiveFilter('assignee')}
                       className={`${
-                        activeFilter === 'assignee' ? 'bg-gray-100' : ''
-                      } w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100`}
+                        activeFilter === 'assignee'
+                          ? 'bg-gray-100 dark:bg-slate-700'
+                          : ''
+                      } w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-slate-200 dark:hover:bg-slate-700`}
                     >
                       Assignee
                     </button>
@@ -245,7 +251,7 @@ function TopBar({
               <button
                 onClick={onClearFilters}
                 title="Clear all filters"
-                className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
               >
                 <FunnelX className="h-5 w-5" />
               </button>

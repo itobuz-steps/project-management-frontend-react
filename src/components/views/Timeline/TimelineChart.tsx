@@ -67,7 +67,7 @@ export const TimelineChart = ({
                 dominantBaseline="middle"
                 fontSize={12}
                 fontWeight={600}
-                fill={isDark ? '#cbd5e1' : '#475569'}
+                fill={isDark ? '#d4d4d4' : '#475569'}
               >
                 {row.label}
               </text>
@@ -76,7 +76,7 @@ export const TimelineChart = ({
                 y={0}
                 width={innerWidth}
                 height={trackHeight}
-                fill={isDark ? '#0f172a' : '#f1f5f9'}
+                fill={isDark ? '#0f0f10' : '#f1f5f9'}
                 rx={6}
               />
               {row.items.map((item) => {
@@ -144,7 +144,7 @@ export const TimelineChart = ({
               y={12}
               textAnchor="middle"
               fontSize={11}
-              fill={isDark ? '#94a3b8' : '#64748b'}
+              fill={isDark ? '#a3a3a3' : '#64748b'}
             >
               {formatTick(tick)}
             </text>

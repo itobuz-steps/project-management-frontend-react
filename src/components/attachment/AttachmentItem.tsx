@@ -61,21 +61,21 @@ export function AttachmentItem({
 
     if (isPdf) {
       return (
-        <div className="flex h-10 w-10 items-center justify-center rounded bg-white">
+        <div className="flex h-10 w-10 items-center justify-center rounded bg-white dark:bg-neutral-900">
           <FilePdfOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
         </div>
       );
     }
 
     return (
-      <div className="flex h-10 w-10 items-center justify-center rounded bg-white">
+      <div className="flex h-10 w-10 items-center justify-center rounded bg-white dark:bg-neutral-900">
         <FileOutlined style={{ fontSize: 18 }} />
       </div>
     );
   };
 
   return (
-    <div className="group flex items-center justify-between rounded-md bg-gray-100 px-3 py-2 hover:bg-gray-50">
+    <div className="group flex items-center justify-between rounded-md bg-gray-100 px-3 py-2 hover:bg-gray-50 dark:bg-neutral-800 dark:hover:bg-neutral-700">
       <div className="flex items-center gap-3">
         {renderPreview()}
 

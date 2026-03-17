@@ -21,13 +21,13 @@
   }
 }
 
-.subtasks-table .ant-table-thead > tr > th {
+.subtasks-table .ant-table-thead>tr>th {
   background-color: #f1f1f1;
   font-weight: 600;
   border: 0.05px solid rgb(200, 200, 200);
 }
 
-.subtasks-table .ant-table-tbody > tr:hover > td {
+.subtasks-table .ant-table-tbody>tr:hover>td {
   background: #f1f1f1 !important;
 }
 
@@ -70,4 +70,24 @@
 
 .custom-tabs .ant-tabs-ink-bar {
   background: var(--color-primary-700);
+}
+
+:root[data-color-mode='dark'] .custom-tabs .ant-tabs-nav::before {
+  border-bottom-color: #2a2a2a;
+}
+
+:root[data-color-mode='dark'] .custom-tabs .ant-tabs-tab {
+  color: #a3a3a3;
+}
+
+:root[data-color-mode='dark'] .custom-tabs .ant-tabs-tab:hover {
+  color: #ededed;
+}
+
+:root[data-color-mode='dark'] .custom-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #f5f5f5 !important;
+}
+
+:root[data-color-mode='dark'] .custom-tabs .ant-tabs-content-holder {
+  color: #e5e5e5;
 }

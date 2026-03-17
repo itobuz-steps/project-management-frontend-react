@@ -30,7 +30,7 @@ export function StatsContainer() {
   }, []);
 
   return loading ? (
-    <div>Loading...</div>
+    <div className="text-gray-600 dark:text-slate-300">Loading...</div>
   ) : (
     <>
       <div className="flex flex-wrap justify-center gap-2 sm:justify-start md:grid md:grid-cols-3">

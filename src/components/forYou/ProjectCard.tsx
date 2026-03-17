@@ -10,7 +10,7 @@ export function ProjectCard({ project }: { project: Project }) {
 
   return (
     <div
-      className="border-s-primary-500 flex min-w-48 cursor-pointer flex-col gap-3 rounded-sm border border-s-2 border-gray-200 bg-white p-4 shadow-sm hover:bg-gray-100 md:min-w-64"
+      className="border-s-primary-500 flex min-w-48 cursor-pointer flex-col gap-3 rounded-sm border border-s-2 border-gray-200 bg-white p-4 text-gray-800 shadow-sm hover:bg-gray-100 md:min-w-64 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
       onClick={handleClick}
     >
       <p className="font-semibold">{project.name}</p>

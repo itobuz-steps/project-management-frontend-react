@@ -16,13 +16,13 @@ export function ProjectContainer() {
 
   return (
     <div id="forYouProjects" className="mb-4 flex flex-col gap-2">
-      <h2 className="font-semibold">Your Projects</h2>
+      <h2 className="font-semibold dark:text-slate-100">Your Projects</h2>
       <div
         id="forYouProjectsContainer"
         className="xs:flex-row flex flex-col flex-wrap gap-2"
       >
         {projects.length === 0 ? (
-          <div className="flex w-full justify-center bg-gray-50 p-5 text-center font-semibold text-gray-400">
+          <div className="flex w-full justify-center bg-gray-50 p-5 text-center font-semibold text-gray-400 dark:bg-slate-800 dark:text-slate-400">
             No projects found!
           </div>
         ) : (

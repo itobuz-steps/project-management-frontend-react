@@ -127,30 +127,30 @@ export function CommandPalette({
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
       {/* Palette */}
-      <div className="relative mx-auto mt-[20vh] w-full max-w-xl rounded-xl bg-white text-black shadow-2xl">
+      <div className="relative mx-auto mt-[20vh] w-full max-w-xl rounded-xl bg-white text-black shadow-2xl dark:bg-slate-700 dark:text-neutral-100">
         <input
           ref={inputRef}
           type="search"
           placeholder="Search tasks by key, title, or description…"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-t-xl bg-white px-4 py-4 text-lg outline-none placeholder:text-neutral-400"
+          className="w-full rounded-t-xl bg-white px-4 py-4 text-lg outline-none placeholder:text-neutral-400 dark:bg-slate-700 dark:text-neutral-100 dark:placeholder:text-neutral-400"
         />
 
         {/* RESULTS */}
-        <div className="max-h-[360px] overflow-y-auto">
+        <div className="max-h-90 overflow-y-auto">
           {value.trim() === '' ? (
             <>
-              <div className="px-4 py-2 text-xs font-semibold text-neutral-400 uppercase">
+              <div className="px-4 py-2 text-xs font-semibold text-neutral-400 uppercase dark:text-neutral-400">
                 Recently created
               </div>
               {loading && (
-                <div className="px-4 py-3 text-sm text-neutral-400">
+                <div className="px-4 py-3 text-sm text-neutral-400 dark:text-neutral-400">
                   Loading…
                 </div>
               )}
               {!loading && recentTasks.length === 0 && (
-                <div className="px-4 py-3 text-sm text-neutral-400">
+                <div className="px-4 py-3 text-sm text-neutral-400 dark:text-neutral-400">
                   No recent tasks
                 </div>
               )}
@@ -173,9 +173,9 @@ export function CommandPalette({
                       });
                       onClose();
                     }}
-                    className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-neutral-100"
+                    className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-neutral-100 dark:hover:bg-neutral-800"
                   >
-                    <span className="rounded bg-neutral-200 px-2 py-0.5 font-mono text-xs">
+                    <span className="rounded bg-neutral-200 px-2 py-0.5 font-mono text-xs dark:bg-neutral-800 dark:text-neutral-100">
                       {task.key}
                     </span>
                     <span className="truncate">{task.title}</span>
@@ -184,16 +184,16 @@ export function CommandPalette({
             </>
           ) : (
             <>
-              <div className="px-4 py-2 text-xs font-semibold text-neutral-400 uppercase">
+              <div className="px-4 py-2 text-xs font-semibold text-neutral-400 uppercase dark:text-neutral-400">
                 Search results
               </div>
               {searchLoading && (
-                <div className="px-4 py-3 text-sm text-neutral-400">
+                <div className="px-4 py-3 text-sm text-neutral-400 dark:text-neutral-400">
                   Searching…
                 </div>
               )}
               {!searchLoading && searchResults.length === 0 && (
-                <div className="px-4 py-3 text-sm text-neutral-400">
+                <div className="px-4 py-3 text-sm text-neutral-400 dark:text-neutral-400">
                   No tasks found for "{value}"
                 </div>
               )}
@@ -216,9 +216,9 @@ export function CommandPalette({
                       });
                       onClose();
                     }}
-                    className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-neutral-100"
+                    className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-neutral-100 dark:hover:bg-neutral-800"
                   >
-                    <span className="rounded bg-neutral-200 px-2 py-0.5 font-mono text-xs">
+                    <span className="rounded bg-neutral-200 px-2 py-0.5 font-mono text-xs dark:bg-neutral-800 dark:text-neutral-100">
                       {task.key}
                     </span>
                     <span className="truncate">{task.title}</span>
@@ -228,7 +228,7 @@ export function CommandPalette({
           )}
         </div>
 
-        <div className="border-t border-neutral-200 px-4 py-3 text-sm text-neutral-400">
+        <div className="border-t border-neutral-200 px-4 py-3 text-sm text-neutral-400 dark:border-neutral-700 dark:text-neutral-400">
           Press <kbd>Esc</kbd> to close
         </div>
       </div>
