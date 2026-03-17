@@ -18,7 +18,10 @@ export function useManageSubtasks(task: TaskPopulated, projectId?: string) {
   });
 
   const projectTasks = (projectTasksQuery.data ?? []).filter(
-    (subtask: TaskPopulated) => subtask._id !== task._id
+    (subtask: TaskPopulated) =>
+      subtask._id !== task._id &&
+      subtask.parentTask !== task._id &&
+      !subtask.parentTask
   );
 
   const setProjectTasks: React.Dispatch<

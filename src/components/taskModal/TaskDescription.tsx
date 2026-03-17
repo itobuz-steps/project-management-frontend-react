@@ -88,7 +88,7 @@ export function TaskDescription({ task, onUpdated }: TaskDescriptionProps) {
   };
 
   return (
-    <div className="my-4">
+    <div className="py-2.5">
       {/* Header */}
       <div
         className="flex cursor-pointer items-center gap-2 text-base font-bold"

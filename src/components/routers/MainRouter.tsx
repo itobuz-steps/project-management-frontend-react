@@ -78,8 +78,18 @@ export function MainRouter() {
             {/* Dashboard routes */}
             <Route path="/for-you" element={<ForYouPage />} />
             <Route path="/" element={<Navigate to="/for-you" replace />} />
-            <Route path="/project/:projectId" element={<Dashboard />}>
-              <Route index element={<Navigate to="backlog" replace />} />
+            <Route path="/project/:projectId">
+              {/* Dashboard wrapper */}
+              <Route element={<Dashboard />}>
+                <Route index element={<Navigate to="backlog" replace />} />
+                <Route path="backlog" element={<BacklogView />} />
+                <Route path="board" element={<BoardView />} />
+                <Route path="list" element={<ListView />} />
+                <Route path="sprints-overview" element={<SprintView />} />
+                <Route path="timeline" element={<Timeline />} />
+              </Route>
+
+              {/* Settings OUTSIDE Dashboard */}
               <Route
                 path="settings"
                 element={
@@ -88,11 +98,6 @@ export function MainRouter() {
                   </PermissionGuard>
                 }
               />
-              <Route path="backlog" element={<BacklogView />} />
-              <Route path="board" element={<BoardView />} />
-              <Route path="list" element={<ListView />} />
-              <Route path="sprints-overview" element={<SprintView />} />
-              <Route path="timeline" element={<Timeline />} />
             </Route>
             {/* Task detail page */}
             <Route path="/task/:taskId" element={<TaskPage />} />

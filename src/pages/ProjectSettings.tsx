@@ -20,7 +20,7 @@ function ProjectSettings() {
   }
 
   return (
-    <div style={{ padding: 10, maxWidth: 800, margin: 'auto' }}>
+    <div style={{ padding: 10, maxWidth: 700, margin: 'auto' }}>
       <ProjectSettingsHeader
         project={project}
         iconFile={iconFile}

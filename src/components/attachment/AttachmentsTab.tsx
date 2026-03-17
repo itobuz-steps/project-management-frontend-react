@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Upload } from 'antd';
+import { Button, Tag, Upload } from 'antd';
 import { message } from 'antd';
 import type { UploadProps } from 'antd';
 import type { BackendAttachment } from '../../services/types/tasks.types';
@@ -54,7 +54,7 @@ export function AttachmentsTab({
   };
 
   return (
-    <div className="my-4">
+    <div className="py-3">
       <div
         className="flex cursor-pointer items-center justify-between text-base font-semibold text-gray-900 dark:text-neutral-100"
         onClick={() => setExpanded((dropdown) => !dropdown)}
@@ -70,9 +70,9 @@ export function AttachmentsTab({
             setExpanded(true);
           }}
         >
-          <span className="pr-2 text-xs font-normal text-red-400 dark:text-red-300">
+          <Tag className="mr-1! px-1! text-[10px]!" color="red">
             Max size: 5MB
-          </span>
+          </Tag>
           <Upload {...uploadProps} disabled={saving}>
             <Button
               style={{
@@ -81,9 +81,7 @@ export function AttachmentsTab({
               type="text"
               size="small"
               icon={<PlusOutlined />}
-            >
-              Add
-            </Button>
+            ></Button>
           </Upload>
         </div>
       </div>

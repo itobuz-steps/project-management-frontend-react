@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { createTask } from '../../services/taskService';
 import type { ManageSubtasksProps } from './subtask.types';
+import { Input, Select } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 
 export function ManageSubtasks({
   parentTask,
@@ -17,10 +19,20 @@ export function ManageSubtasks({
 }: ManageSubtasksProps) {
   const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
+  const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState<string | null>(null);
+
+  const filteredTasks = projectTasks.filter((task) => {
+    const matchesSearch =
+      task.title.toLowerCase().includes(search.toLowerCase()) ||
+      task.key!.toLowerCase().includes(search.toLowerCase());
+
+    const matchesType = typeFilter ? task.type === typeFilter : true;
+    return matchesSearch && matchesType;
+  });
 
   return (
     <div className="mt-3 rounded-md border border-gray-200 px-3 py-2">
-      {/* Header */}
       <div className="mb-2 flex items-center justify-between">
         <span className="text-sm font-semibold text-gray-700">
           Add existing subtasks
@@ -52,9 +64,37 @@ export function ManageSubtasks({
         </div>
       </div>
 
-      {/* List */}
+      <div className="mb-2 flex items-center gap-2">
+        <Input
+          placeholder="Search tasks..."
+          prefix={<SearchOutlined />}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          allowClear
+          className="flex-1"
+        />
+
+        <Select
+          placeholder="Type"
+          allowClear
+          value={typeFilter ?? undefined}
+          onChange={(value) => setTypeFilter(value ?? null)}
+          className="w-[120px]"
+          options={[
+            { label: 'Task', value: 'task' },
+            { label: 'Bug', value: 'bug' },
+            { label: 'Story', value: 'story' },
+          ]}
+        />
+      </div>
+
       <div className="max-h-[200px] overflow-y-auto">
-        {projectTasks.map((task) => {
+        {filteredTasks.length === 0 && (
+          <div className="py-4 text-center text-sm text-gray-500">
+            No tasks found
+          </div>
+        )}
+        {filteredTasks.map((task) => {
           const checked = draftIds.includes(task._id);
 
           return (
@@ -97,7 +137,6 @@ export function ManageSubtasks({
         })}
       </div>
 
-      {/* Create new subtask */}
       {creating && (
         <div className="mb-1 flex items-center gap-2 rounded-md border border-gray-50 bg-white px-2 py-3">
           <TaskTypeIcon type="task" />
@@ -144,7 +183,6 @@ export function ManageSubtasks({
         </div>
       )}
 
-      {/* Footer */}
       <div className="mt-2 flex justify-end gap-2 border-t border-gray-200 pt-2">
         <Button
           style={{

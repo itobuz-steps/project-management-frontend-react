@@ -51,4 +51,4 @@ export interface DrawerSidebarRowProps {
   children: React.ReactNode;
 }
 
-export type Tabs = 'comments' | 'attachments' | 'activity';
+export type Tabs = 'comments' | 'attachments' | 'activity' | 'worklogs';
