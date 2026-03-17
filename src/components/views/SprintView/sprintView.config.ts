@@ -5,13 +5,27 @@ import type {
   StatusPieItem,
 } from './sprintView.types';
 
-export function getPieConfig(chartSize: number, colors: string[]): PieConfig {
+export function getPieConfig(
+  chartSize: number,
+  colors: string[],
+  isDark = false
+): PieConfig {
+  const textColor = isDark ? '#f5f5f5' : '#374151';
+
   return {
     angleField: 'value',
     colorField: 'type',
     label: {
       text: 'value',
       position: 'outside',
+      style: {
+        fill: textColor,
+      },
+    },
+    legend: {
+      color: {
+        itemLabelFill: textColor,
+      },
     },
     tooltip: (data: StatusPieItem) => ({
       name: data.type,
@@ -27,8 +41,11 @@ export function getPieConfig(chartSize: number, colors: string[]): PieConfig {
 
 export function getGroupedColumnConfig(
   chartSize: number,
-  colors: string[]
+  colors: string[],
+  isDark = false
 ): ColumnConfig {
+  const textColor = isDark ? '#f5f5f5' : '#374151';
+
   return {
     xField: 'priority',
     yField: 'count',
@@ -42,7 +59,13 @@ export function getGroupedColumnConfig(
       color: { range: [colors[0], colors[3]] },
     },
     axis: {
-      x: { labelAutoRotate: false },
+      x: { labelAutoRotate: false, labelFill: textColor },
+      y: { labelFill: textColor },
+    },
+    legend: {
+      color: {
+        itemLabelFill: textColor,
+      },
     },
     width: chartSize * 1.5,
     height: chartSize,
@@ -51,8 +74,11 @@ export function getGroupedColumnConfig(
 
 export function getStoryPointColumnConfig(
   chartSize: number,
-  colors: string[]
+  colors: string[],
+  isDark = false
 ): ColumnConfig {
+  const textColor = isDark ? '#f5f5f5' : '#374151';
+
   return {
     xField: 'category',
     yField: 'points',
@@ -65,7 +91,8 @@ export function getStoryPointColumnConfig(
       color: { range: colors },
     },
     axis: {
-      x: { labelAutoRotate: false },
+      x: { labelAutoRotate: false, labelFill: textColor },
+      y: { labelFill: textColor },
     },
     legend: false,
     width: chartSize * 1.5,

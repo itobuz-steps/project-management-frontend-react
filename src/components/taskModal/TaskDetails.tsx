@@ -98,6 +98,9 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                 {editing !== 'priority' ? (
                   <Tag
                     className="cursor-pointer capitalize"
+                    style={{
+                      border: 'none',
+                    }}
                     color={
                       PRIORITY_COLORS[
                         task.priority as keyof typeof PRIORITY_COLORS

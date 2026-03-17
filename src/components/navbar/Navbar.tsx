@@ -146,6 +146,10 @@ export default function Navbar() {
             <SearchOutlined style={{ fontSize: '1.5rem' }} />
           </button>
 
+          <div className="rounded-md p-2 transition-colors hover:bg-gray-200 dark:text-neutral-100 dark:hover:bg-neutral-800">
+            <Notifications />
+          </div>
+
           <button
             onClick={toggleColorMode}
             className="rounded-md p-2 text-gray-900 transition-colors hover:bg-gray-200 dark:text-neutral-100 dark:hover:bg-neutral-800"
@@ -161,10 +165,6 @@ export default function Navbar() {
               <Sun className="h-5 w-5" />
             )}
           </button>
-
-          <div className="rounded-md p-2 transition-colors hover:bg-gray-200 dark:text-neutral-100 dark:hover:bg-neutral-800">
-            <Notifications />
-          </div>
 
           {!projectInfoHidden && (
             <Can permission="PROJECT_SETTINGS">

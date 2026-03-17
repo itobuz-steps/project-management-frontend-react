@@ -124,17 +124,15 @@
   margin-left: 0;
 }
 
-.editor-prose .ProseMirror li[data-checked] > label {
+.editor-prose .ProseMirror li[data-checked]>label {
   display: flex;
   align-items: center;
   flex: 0 0 auto;
 }
 
-.editor-prose .ProseMirror li[data-checked] > label span {
-  display: none;
-}
 
-.editor-prose .ProseMirror li[data-checked] > div {
+
+.editor-prose .ProseMirror li[data-checked]>div {
   flex: 1;
 }
 
@@ -155,4 +153,51 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
+}
+
+:root[data-color-mode='dark'] .editor-prose,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror p,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror ul,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror ol,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror li,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror h1,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror h2,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror h3,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror h4,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror h5,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror h6 {
+  color: #f5f5f5;
+}
+
+:root[data-color-mode='dark'] .editor-prose .ProseMirror pre {
+  background: #141414;
+  border-color: #2a2a2a;
+  color: #f5f5f5;
+}
+
+:root[data-color-mode='dark'] .editor-prose .ProseMirror code {
+  background: #434242;
+  color: #f5f5f5;
+}
+
+:root[data-color-mode='dark'] .prose pre code {
+  background: #434242;
+  color: #f5f5f5 !important;
+}
+
+:root[data-color-mode='dark'] .prose pre {
+  background: #434242 !important;
+}
+
+:root[data-color-mode='dark'] .editor-prose .ProseMirror p.is-empty::before,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror p.is-editor-empty::before {
+  color: #a3a3a3;
+}
+
+:root[data-color-mode='dark'] .editor-prose .ProseMirror strong,
+:root[data-color-mode='dark'] .editor-prose .ProseMirror b,
+:root[data-color-mode='dark'] .editor-prose.prose strong,
+:root[data-color-mode='dark'] .editor-prose.prose b {
+  color: #f5f5f5 !important;
 }

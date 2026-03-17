@@ -5,6 +5,7 @@ import {
   getStoryPointColumnConfig,
 } from './sprintView.config';
 import type { SprintChartsProps, ChartCardProps } from './sprintView.types';
+import { useColorMode } from '../../../hooks/useColorMode';
 
 function ChartCard({ title, children }: ChartCardProps) {
   return (
@@ -25,9 +26,12 @@ export function SprintCharts({
   chartSize,
   colors,
 }: SprintChartsProps) {
-  const pieConfig = getPieConfig(chartSize, colors);
-  const groupedColumnConfig = getGroupedColumnConfig(chartSize, colors);
-  const storyPointConfig = getStoryPointColumnConfig(chartSize, colors);
+  const [colorMode] = useColorMode();
+  const isDark = colorMode === 'dark';
+
+  const pieConfig = getPieConfig(chartSize, colors, isDark);
+  const groupedColumnConfig = getGroupedColumnConfig(chartSize, colors, isDark);
+  const storyPointConfig = getStoryPointColumnConfig(chartSize, colors, isDark);
 
   return (
     <>

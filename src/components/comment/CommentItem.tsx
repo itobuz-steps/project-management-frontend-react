@@ -167,7 +167,7 @@ export function CommentItem({ task, comment }: CommentItemProps) {
 
           {/* Body */}
           {!editor.isEditing ? (
-            <div className="prose">
+            <div className="prose prose-sm dark:prose-invert max-w-none dark:text-neutral-100">
               <ReactMarkdown
                 rehypePlugins={[rehypeRaw]}
                 components={markdownComponents}
