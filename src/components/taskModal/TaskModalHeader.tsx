@@ -53,7 +53,7 @@ export function TaskModalHeader({
   };
 
   return (
-    <div className="flex flex-col pr-1">
+    <div className="flex flex-col sm:pr-1">
       {/* Top row */}
       <div className="flex items-center justify-between text-sm text-gray-500">
         <div className="flex items-center gap-1">
@@ -64,11 +64,11 @@ export function TaskModalHeader({
                 to={`/task/${parentTask._id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-inherit! hover:text-gray-600 hover:underline"
+                className="text-[12px] text-inherit! hover:underline!"
               >
                 {parentTask.key}
               </Link>
-              <span className="mx-1">/</span>
+              <span>/</span>
             </>
           )}
 
@@ -77,12 +77,10 @@ export function TaskModalHeader({
             to={`/task/${task._id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-inherit! hover:text-gray-600 hover:underline"
+            className="text-[12px] text-inherit! hover:underline!"
           >
             {task.key}
           </Link>
-
-          <TaskTimerSection taskId={task._id} assigneeId={task.assignee?._id} />
         </div>
 
         <div
@@ -162,11 +160,13 @@ export function TaskModalHeader({
         </div>
 
         <div
-          className={`shrink-0 self-end ${drawer ? 'flex' : 'md:w-[296px] lg:w-[396px] 2xl:w-[496px]'}`}
+          className={`flex shrink-0 items-center self-end ${
+            drawer ? '' : 'md:w-[296px] lg:w-[396px] 2xl:w-[496px]'
+          }`}
         >
           <SidebarRow>
             <StatusSelect
-              className="px-3! py-4!"
+              className="px-3! py-4.5!"
               value={task.status}
               columns={columns}
               onChange={(status) =>
@@ -174,6 +174,8 @@ export function TaskModalHeader({
               }
             />
           </SidebarRow>
+
+          <TaskTimerSection taskId={task._id} assigneeId={task.assignee?._id} />
         </div>
       </div>
     </div>

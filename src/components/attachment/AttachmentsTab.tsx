@@ -54,7 +54,7 @@ export function AttachmentsTab({
   };
 
   return (
-    <div className="my-4">
+    <div className="py-3">
       <div
         className="flex cursor-pointer items-center justify-between text-base font-semibold text-gray-900"
         onClick={() => setExpanded((dropdown) => !dropdown)}
@@ -70,7 +70,7 @@ export function AttachmentsTab({
             setExpanded(true);
           }}
         >
-          <span className="pr-2 text-xs font-normal text-red-400">
+          <span className="pr-2 text-[10px] font-normal text-red-400 sm:text-xs">
             Max size: 5MB
           </span>
           <Upload {...uploadProps} disabled={saving}>
@@ -81,9 +81,7 @@ export function AttachmentsTab({
               type="text"
               size="small"
               icon={<PlusOutlined />}
-            >
-              Add
-            </Button>
+            ></Button>
           </Upload>
         </div>
       </div>

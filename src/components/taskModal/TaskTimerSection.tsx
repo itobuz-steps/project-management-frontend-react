@@ -78,13 +78,12 @@ export function TaskTimerSection({
     return (
       <Button
         type="text"
-        size="small"
+        size="middle"
         icon={<ClockCircleOutlined />}
         loading={startMutation.isPending || worklogsQuery.isFetching}
         onClick={() => startMutation.mutate()}
         style={{
           border: '1px solid var(--color-primary-500)',
-          marginLeft: '8px',
           color: 'var(--color-primary-700)',
         }}
         className="hover:bg-primary-500! hover:border-none! hover:text-white!"

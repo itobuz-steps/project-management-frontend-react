@@ -17,6 +17,7 @@ import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { DueDateCell } from '../ui/DueDateCell';
 import { usePermissions } from '../../hooks/usePermissions';
+import { formatDistanceToNow } from 'date-fns';
 
 export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
   const { can } = usePermissions();
@@ -28,6 +29,16 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
   const { members, loadingMembers } = useProjectMetaData(
     task.projectId as string
   );
+
+  const formatRelativeTime = (date?: string | Date) => {
+    if (!date) {
+      return '—';
+    }
+
+    return formatDistanceToNow(new Date(date), {
+      addSuffix: true,
+    });
+  };
 
   return (
     <Collapse
@@ -44,15 +55,17 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
             </span>
           ),
           children: (
-            <div className="space-y-4">
-              <SidebarRow label="Assignee">
-                <AssigneeCell
-                  task={task}
-                  members={members}
-                  loading={loadingMembers}
-                  onUpdated={onUpdated}
-                />
-              </SidebarRow>
+            <div className="space-y-3">
+              <div className="flex truncate">
+                <SidebarRow label="Assignee">
+                  <AssigneeCell
+                    task={task}
+                    members={members}
+                    loading={loadingMembers}
+                    onUpdated={onUpdated}
+                  />
+                </SidebarRow>
+              </div>
 
               {/* Labels */}
               <SidebarRow label="Labels">
@@ -202,7 +215,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                 />
               </SidebarRow>
 
-              <div className="pb-3">
+              <div className="flex truncate">
                 <SidebarRow label="Reporter">
                   {can('REPORTER_CHANGE') ? (
                     <AssigneeCell
@@ -215,6 +228,20 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                   ) : (
                     <UserCell user={task.reporter} emptyText="—" />
                   )}
+                </SidebarRow>
+              </div>
+
+              <div className="gap-3 pb-3">
+                <SidebarRow label="Created">
+                  <span className="text-sm text-gray-700">
+                    {formatRelativeTime(task.createdAt)}
+                  </span>
+                </SidebarRow>
+
+                <SidebarRow label="Updated">
+                  <span className="text-sm text-gray-700">
+                    {formatRelativeTime(task.updatedAt)}
+                  </span>
                 </SidebarRow>
               </div>
             </div>

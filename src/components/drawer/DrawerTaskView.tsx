@@ -19,7 +19,7 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
       className="flex h-full flex-col overflow-y-auto"
       style={{ scrollbarWidth: 'thin', scrollbarColor: '#c1c7d0 transparent' }}
     >
-      <div className="px-5 py-4">
+      <div className="px-5 py-0">
         {/* Details / Sidebar fields */}
         <TaskDetails task={task} onUpdated={onUpdated} />
 
@@ -30,7 +30,7 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
         <TaskDescription task={task} onUpdated={onUpdated} />
 
         {/* Child issues / Subtasks */}
-        <div className="mt-5">
+        <div className="mt-1">
           {!task.parentTask && <SubtasksTab task={task} />}
         </div>
 
