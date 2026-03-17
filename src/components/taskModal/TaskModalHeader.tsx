@@ -175,7 +175,11 @@ export function TaskModalHeader({
             />
           </SidebarRow>
 
-          <TaskTimerSection taskId={task._id} assigneeId={task.assignee?._id} />
+          <TaskTimerSection
+            taskId={task._id}
+            assigneeId={task.assignee?._id}
+            status={task.status}
+          />
         </div>
       </div>
     </div>

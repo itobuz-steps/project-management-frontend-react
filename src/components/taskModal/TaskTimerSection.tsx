@@ -8,19 +8,25 @@ import {
   stopTaskTimer,
 } from '../../services/taskService';
 import { useAuthContext } from '../../context/AuthContext';
+import { useProject } from '../../context/ProjectContext';
 
 type TaskTimerSectionProps = {
   taskId: string;
   assigneeId?: string;
+  status: string;
 };
 
 export function TaskTimerSection({
   taskId,
   assigneeId,
+  status,
 }: TaskTimerSectionProps) {
   const { userId } = useAuthContext();
   const queryClient = useQueryClient();
   const [now, setNow] = useState(() => Date.now());
+  const { columns } = useProject();
+
+  const isDone = columns[columns.length - 1] === status;
 
   const isAssignee = Boolean(userId && assigneeId && userId === assigneeId);
 
@@ -55,6 +61,12 @@ export function TaskTimerSection({
   });
 
   useEffect(() => {
+    if (isDone && activeWorklog && !stopMutation.isPending) {
+      stopMutation.mutate(activeWorklog._id);
+    }
+  }, [isDone, activeWorklog, stopMutation]);
+
+  useEffect(() => {
     if (!activeWorklog) {
       return;
     }
@@ -66,6 +78,10 @@ export function TaskTimerSection({
   if (!isAssignee) {
     return null;
   } // Hide if the user is not the assignee
+
+  if (isDone) {
+    return null;
+  }
 
   const startMs = activeWorklog
     ? new Date(activeWorklog.startTime).getTime()
