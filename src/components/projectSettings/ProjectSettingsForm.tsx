@@ -58,7 +58,7 @@ function ProjectSettingsForm({
         onFinish={(values) => handleSubmit(values, form)}
       >
         <Row gutter={24}>
-          <Col xs={24} md={12}>
+          <Col xs={24} lg={12}>
             <Form.Item
               label="Project Name"
               name="name"
@@ -70,13 +70,14 @@ function ProjectSettingsForm({
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item label="Project Key" name="prefix">
-                  <Input style={{ textTransform: 'uppercase' }} />
+                  <Input size="middle" />
                 </Form.Item>
               </Col>
 
               <Col span={12}>
                 <Form.Item label="Category" name="projectType">
                   <Select
+                    size="middle"
                     options={[
                       { label: 'Kanban', value: 'kanban' },
                       { label: 'Scrum', value: 'scrum' },
@@ -86,12 +87,62 @@ function ProjectSettingsForm({
               </Col>
             </Row>
 
+            <Form.Item label="Project Owner" name="memberLead">
+              <Select
+                options={projectMembers
+                  .filter((member) => member.role === 'admin')
+                  .map((member) => {
+                    const user = members.find(
+                      (user) => user._id === member.user
+                    );
+
+                    return {
+                      value: member.user,
+                      label: <UserCell user={user} emptyText="Unknown" />,
+                    };
+                  })}
+              />
+            </Form.Item>
+          </Col>
+
+          <Col xs={24} lg={12}>
+            <Form.Item label="Default Assignee" name="defaultAssignee">
+              <Select
+                allowClear
+                placeholder="Unassigned"
+                options={members.map((member) => ({
+                  value: member._id,
+                  label: <UserCell user={member} emptyText="Unknown" />,
+                }))}
+              />
+            </Form.Item>
+
+            <Form.Item label="Remove Project Members" name="removeMembers">
+              <Select
+                mode="multiple"
+                allowClear
+                placeholder="Select members to remove"
+                options={projectMembers
+                  .filter((member) => member.role === 'member')
+                  .map((member) => {
+                    const user = members.find(
+                      (user) => user._id === member.user
+                    );
+
+                    return {
+                      value: member.user,
+                      label: <UserCell user={user} emptyText="Unknown" />,
+                    };
+                  })}
+              />
+            </Form.Item>
+
             <Form.Item label="Project Members">
               <div className="flex flex-col gap-3">
-                <div className="flex flex-wrap gap-2 sm:flex-nowrap">
+                <div className="flex flex-wrap gap-2 sm:flex-row sm:flex-nowrap sm:items-center">
                   <Select
                     placeholder="Select Member"
-                    style={{ maxWidth: 190 }}
+                    className="w-full lg:w-42!"
                     value={selectedUser}
                     onChange={(userId) => {
                       setSelectedUser(userId);
@@ -109,7 +160,8 @@ function ProjectSettingsForm({
                   />
 
                   <Select
-                    style={{ maxWidth: 100 }}
+                    className="w-40! sm:w-full! lg:w-19!"
+                    size="large"
                     value={selectedRole}
                     onChange={setSelectedRole}
                     options={[
@@ -121,7 +173,7 @@ function ProjectSettingsForm({
                   <Button
                     style={{
                       background: 'var(--color-primary-500)',
-                      padding: '10px',
+                      padding: '20px 10px',
                     }}
                     type="primary"
                     onClick={addMemberRole}
@@ -154,56 +206,6 @@ function ProjectSettingsForm({
                   );
                 })}
               </div>
-            </Form.Item>
-          </Col>
-
-          <Col xs={24} md={12}>
-            <Form.Item label="Default Assignee" name="defaultAssignee">
-              <Select
-                allowClear
-                placeholder="Unassigned"
-                options={members.map((member) => ({
-                  value: member._id,
-                  label: <UserCell user={member} emptyText="Unknown" />,
-                }))}
-              />
-            </Form.Item>
-
-            <Form.Item label="Project Owner" name="memberLead">
-              <Select
-                options={projectMembers
-                  .filter((member) => member.role === 'admin')
-                  .map((member) => {
-                    const user = members.find(
-                      (user) => user._id === member.user
-                    );
-
-                    return {
-                      value: member.user,
-                      label: <UserCell user={user} emptyText="Unknown" />,
-                    };
-                  })}
-              />
-            </Form.Item>
-
-            <Form.Item label="Remove Project Members" name="removeMembers">
-              <Select
-                mode="multiple"
-                allowClear
-                placeholder="Select members to remove"
-                options={projectMembers
-                  .filter((member) => member.role === 'member')
-                  .map((member) => {
-                    const user = members.find(
-                      (user) => user._id === member.user
-                    );
-
-                    return {
-                      value: member.user,
-                      label: <UserCell user={user} emptyText="Unknown" />,
-                    };
-                  })}
-              />
             </Form.Item>
           </Col>
         </Row>
