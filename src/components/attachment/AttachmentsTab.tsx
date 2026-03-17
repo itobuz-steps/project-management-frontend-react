@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Upload } from 'antd';
+import { Button, Tag, Upload } from 'antd';
 import { message } from 'antd';
 import type { UploadProps } from 'antd';
 import type { BackendAttachment } from '../../services/types/tasks.types';
@@ -70,9 +70,9 @@ export function AttachmentsTab({
             setExpanded(true);
           }}
         >
-          <span className="pr-2 text-[10px] font-normal text-red-400 sm:text-xs">
+          <Tag className="mr-1! px-1! text-[10px]!" color="red">
             Max size: 5MB
-          </span>
+          </Tag>
           <Upload {...uploadProps} disabled={saving}>
             <Button
               style={{
