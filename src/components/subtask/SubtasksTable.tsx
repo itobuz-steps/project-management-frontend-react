@@ -22,7 +22,7 @@ export function SubtasksTable({
           rowKey="_id"
           size="small"
           pagination={false}
-          scroll={{ x: 600 }}
+          scroll={{ x: 700 }}
           styles={{ content: { padding: 0 } }}
         />
       </div>

@@ -20,7 +20,16 @@ export function useSubtaskColumns({
   return [
     {
       title: 'Type',
-      width: 55,
+      dataIndex: 'type',
+      width: 60,
+      ellipsis: true,
+      filters: [
+        { text: 'Task', value: 'task' },
+        { text: 'Bug', value: 'bug' },
+        { text: 'Story', value: 'story' },
+      ],
+      onFilter: (value, record) => record.type === value,
+      sorter: (a, b) => a.type.localeCompare(b.type),
       render: (_, task) => (
         <div className="flex justify-center">
           <TaskTypeIcon type={task.type} />
@@ -29,13 +38,15 @@ export function useSubtaskColumns({
     },
     {
       title: 'Summary',
+      dataIndex: 'title',
       ellipsis: true,
+      sorter: (a, b) => a.title.localeCompare(b.title),
       render: (_, task) => {
         const isDone = task.status === columns[columns.length - 1];
 
         return (
           <div
-            className="flex w-full items-center gap-2"
+            className="flex w-full cursor-pointer items-center gap-2"
             onClick={() => openTask(task._id)}
           >
             <Tag color="blue">{task.key}</Tag>
@@ -52,8 +63,14 @@ export function useSubtaskColumns({
     },
     {
       title: 'Status',
-      ellipsis: true,
+      dataIndex: 'status',
       width: 140,
+      filters: columns.map((col) => ({
+        text: col,
+        value: col,
+      })),
+      onFilter: (value, record) => record.status === value,
+      sorter: (a, b) => columns.indexOf(a.status) - columns.indexOf(b.status),
       render: (_, task) => (
         <StatusSelect
           value={task.status}
@@ -68,8 +85,23 @@ export function useSubtaskColumns({
     },
     {
       title: 'Priority',
-      width: 80,
+      dataIndex: 'priority',
+      width: 90,
       ellipsis: true,
+      filters: [
+        { text: 'Low', value: 'low' },
+        { text: 'Medium', value: 'medium' },
+        { text: 'High', value: 'high' },
+        { text: 'Critical', value: 'critical' },
+      ],
+      onFilter: (value, record) => record.priority === value,
+      sorter: (a, b) => {
+        const order = { low: 1, medium: 2, high: 3 };
+        return (
+          (order[a.priority as keyof typeof order] || 0) -
+          (order[b.priority as keyof typeof order] || 0)
+        );
+      },
       render: (_, task) => (
         <Tag
           className="m-0 items-center rounded-2xl capitalize"
@@ -84,7 +116,15 @@ export function useSubtaskColumns({
     },
     {
       title: 'Assignee',
-      width: 100,
+      dataIndex: ['assignee', '_id'],
+      width: 120,
+      filters: members.map((member) => ({
+        text: member.name,
+        value: member._id,
+      })),
+      onFilter: (value, record) => record.assignee?._id === value,
+      sorter: (a, b) =>
+        (a.assignee?.name || '').localeCompare(b.assignee?.name || ''),
       render: (_, task) => (
         <AssigneeCell
           task={task}
