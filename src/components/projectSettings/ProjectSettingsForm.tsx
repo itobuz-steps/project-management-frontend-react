@@ -142,7 +142,7 @@ function ProjectSettingsForm({
                 <div className="flex flex-wrap gap-2 sm:flex-row sm:flex-nowrap sm:items-center">
                   <Select
                     placeholder="Select Member"
-                    className="w-full lg:w-45!"
+                    className="w-full lg:w-42!"
                     value={selectedUser}
                     onChange={(userId) => {
                       setSelectedUser(userId);
@@ -160,7 +160,7 @@ function ProjectSettingsForm({
                   />
 
                   <Select
-                    className="sm:w-full! w-40! lg:w-20!"
+                    className="w-40! sm:w-full! lg:w-19!"
                     size="large"
                     value={selectedRole}
                     onChange={setSelectedRole}

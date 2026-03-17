@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { message, type FormInstance } from 'antd';
 import { AxiosError } from 'axios';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateProject } from '../services/projectService';
 import type {
   EditableProjectMember,
@@ -17,78 +18,101 @@ export function useProjectSettingsForm({
   setIconPreview,
   theme,
 }: ProjectSettingsFormProps) {
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+
+  const [selectedUser, setSelectedUser] = useState<string>();
+  const [selectedRole, setSelectedRole] = useState<ProjectMemberRole>('member');
 
   const [projectMembers, setProjectMembers] = useState<EditableProjectMember[]>(
-    project.members ?? []
+    () => project.members ?? []
   );
 
   const [visibleMembers, setVisibleMembers] = useState<EditableProjectMember[]>(
     []
   );
 
-  const [selectedUser, setSelectedUser] = useState<string>();
-  const [selectedRole, setSelectedRole] = useState<ProjectMemberRole>('member');
+  const [currentProjectId, setCurrentProjectId] = useState(project._id);
 
-  useEffect(() => {
+  if (currentProjectId !== project._id) {
+    setCurrentProjectId(project._id);
     setProjectMembers(project.members ?? []);
     setVisibleMembers([]);
-  }, [project]);
+  }
 
-  const handleSubmit = async (
-    values: ProjectSettingsFormValues,
-    form: FormInstance
-  ) => {
-    try {
-      setLoading(true);
+  const updateProjectMutation = useMutation({
+    mutationFn: ({
+      projectId,
+      formData,
+    }: {
+      projectId: string;
+      formData: FormData;
+    }) => updateProject(projectId, formData),
 
-      const formData = new FormData();
-
-      const removeList = values.removeMembers ?? [];
-
-      const filteredMembers = projectMembers.filter(
-        (member) =>
-          !(removeList.includes(member.user) && member.role === 'member')
-      );
-
-      formData.append('name', values.name);
-      formData.append('projectType', values.projectType);
-      formData.append('memberLead', values.memberLead);
-      formData.append('defaultAssignee', values.defaultAssignee ?? 'null');
-
-      if (values.prefix) {
-        formData.append('prefix', values.prefix);
-      }
-
-      filteredMembers.forEach((member, index) => {
-        formData.append(`members[${index}][user]`, member.user);
-        formData.append(`members[${index}][role]`, member.role);
-      });
-
-      if (iconFile) {
-        formData.append('icon', iconFile);
-      }
-
-      formData.append('theme', theme);
-
-      const updated = await updateProject(project._id, formData);
-
+    onSuccess: (updated) => {
       setProject(updated);
 
-      form.resetFields(['removeMembers']);
-      setIconFile(null);
-      setIconPreview(updated.icon ?? null);
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({
+        queryKey: ['project', project._id],
+      });
 
       message.success('Project updated successfully');
-    } catch (error) {
+    },
+
+    onError: (error) => {
       if (error instanceof AxiosError) {
         message.error(
           error.response?.data?.message || error.message || 'Update failed'
         );
+      } else {
+        message.error('Something went wrong');
       }
-    } finally {
-      setLoading(false);
+    },
+  });
+
+  const handleSubmit = (
+    values: ProjectSettingsFormValues,
+    form: FormInstance
+  ) => {
+    const formData = new FormData();
+
+    const removeList = values.removeMembers ?? [];
+
+    const filteredMembers = projectMembers.filter(
+      (member) =>
+        !(removeList.includes(member.user) && member.role === 'member')
+    );
+
+    formData.append('name', values.name);
+    formData.append('projectType', values.projectType);
+    formData.append('memberLead', values.memberLead);
+    formData.append('defaultAssignee', values.defaultAssignee ?? 'null');
+
+    if (values.prefix) {
+      formData.append('prefix', values.prefix);
     }
+
+    filteredMembers.forEach((member, index) => {
+      formData.append(`members[${index}][user]`, member.user);
+      formData.append(`members[${index}][role]`, member.role);
+    });
+
+    if (iconFile) {
+      formData.append('icon', iconFile);
+    }
+
+    formData.append('theme', theme);
+
+    updateProjectMutation.mutate(
+      { projectId: project._id, formData },
+      {
+        onSuccess: (updated) => {
+          form.resetFields(['removeMembers']);
+          setIconFile(null);
+          setIconPreview(updated.icon ?? null);
+        },
+      }
+    );
   };
 
   const addMemberRole = () => {
@@ -163,7 +187,7 @@ export function useProjectSettingsForm({
   };
 
   return {
-    loading,
+    loading: updateProjectMutation.isPending,
     projectMembers,
     visibleMembers,
     selectedUser,
