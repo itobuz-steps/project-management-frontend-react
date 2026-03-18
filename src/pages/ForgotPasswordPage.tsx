@@ -5,7 +5,7 @@ import { ForgotPasswordContainer } from '../components/auth/ForgotPasswordContai
 export function ForgotPasswordPage() {
   return (
     <AuthLayout backgroundImageUrl={bgImage}>
-      <div className="relative flex h-full w-full flex-col items-center justify-center gap-10">
+      <div className="relative flex h-full w-full flex-col items-center justify-center gap-10 dark:bg-slate-700">
         <ForgotPasswordContainer />
       </div>
     </AuthLayout>

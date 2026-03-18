@@ -46,7 +46,7 @@ export function SignupForm() {
   return (
     <form
       onSubmit={handleSubmit(submitHandler, formErrorHandler)}
-      className="xs:min-w-75 flex flex-col items-center justify-between gap-3"
+      className="xs:min-w-75 flex flex-col items-center justify-between gap-3 rounded-lg border border-transparent bg-white p-6 text-gray-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:shadow-md"
     >
       <Input
         {...register('username')}
@@ -65,7 +65,7 @@ export function SignupForm() {
         <button
           type="button"
           onClick={togglePassword}
-          className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500"
+          className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-slate-300"
         >
           {icon === 'eye' ? <Eye size={18} /> : <EyeOff size={18} />}
         </button>
@@ -73,17 +73,23 @@ export function SignupForm() {
 
       <div className="mr-auto max-w-xs flex-col text-start text-red-400">
         {errors.username && (
-          <p className="mt-1 text-sm text-red-400">{errors.username.message}</p>
+          <p className="mt-1 text-sm text-red-400 dark:text-red-300">
+            {errors.username.message}
+          </p>
         )}
         {errors.email && (
-          <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+          <p className="mt-1 text-sm text-red-400 dark:text-red-300">
+            {errors.email.message}
+          </p>
         )}
         {errors.password && (
-          <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
+          <p className="mt-1 text-sm text-red-400 dark:text-red-300">
+            {errors.password.message}
+          </p>
         )}
       </div>
       <button
-        className="bg-primary-500 hover:bg-primary-600 mt-5 w-full cursor-pointer rounded-lg py-3 font-semibold text-white transition-all duration-300 disabled:bg-gray-300 disabled:text-gray-400"
+        className="bg-primary-500 hover:bg-primary-600 dark:bg-primary-500 dark:hover:bg-primary-600 mt-5 w-full cursor-pointer rounded-lg py-3 font-semibold text-white transition-all duration-300 disabled:bg-gray-300 disabled:text-gray-400"
         type="submit"
       >
         Sign Up
