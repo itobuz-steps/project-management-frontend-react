@@ -15,6 +15,7 @@ import { ProjectMembersModal } from '../common/ProjectMembersModal';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../../context/ProjectContext';
 import { useColorMode } from '../../hooks/useColorMode';
+import { normalizeAndCapitalize } from '../../utils/utils';
 
 export default function Navbar() {
   const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -78,8 +79,13 @@ export default function Navbar() {
                 />
               )}
               {!projectInfoHidden && (
-                <h2 className="topbar-project-header inline items-center text-lg! font-semibold text-gray-900 sm:text-xl dark:text-neutral-100">
-                  {project?.name}
+                <h2
+                  onClick={() => navigate(`/project/${project?._id}/backlog`)}
+                  role="button"
+                  tabIndex={0}
+                  className="topbar-project-header inline cursor-pointer items-center text-lg! font-semibold text-gray-900 hover:text-blue-500 sm:text-xl dark:text-neutral-100"
+                >
+                  {normalizeAndCapitalize(project?.name || '')}
                 </h2>
               )}
             </div>
@@ -93,7 +99,7 @@ export default function Navbar() {
                   marginLeft: '0.5rem',
                 }}
               >
-                {project.projectType}
+                {normalizeAndCapitalize(project.projectType)}
               </Tag>
             )}
           </div>
