@@ -12,7 +12,7 @@ export function TemplateCategory({
     {
       key: category.id,
       label: (
-        <span className="text-base font-semibold text-gray-800">
+        <span className="text-base font-semibold text-gray-800 dark:text-neutral-200">
           {category.name}
         </span>
       ),

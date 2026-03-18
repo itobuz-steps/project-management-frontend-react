@@ -21,7 +21,7 @@ export function NotificationItem({
 
   return (
     <li onClick={handleClick} className="cursor-pointer">
-      <div className="flex items-start gap-4 bg-white p-2 transition hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600">
+      <div className="flex items-start gap-4 bg-white p-2 transition hover:bg-gray-100 dark:bg-[#1b1b1f] dark:hover:bg-[#27272e]">
         <div className="relative shrink-0">
           <Bell className="text-primary-400 mt-0.5 h-5 w-5" />
         </div>
