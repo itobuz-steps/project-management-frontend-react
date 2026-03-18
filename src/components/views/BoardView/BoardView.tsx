@@ -24,6 +24,8 @@ import Column from './Column';
 import { AddColumnModal, DeleteColumnModal } from './ColumnModals';
 import { Minimize2, Maximize2 } from 'lucide-react';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
+import { useSprintActions } from '../../../hooks/useSprintActions';
+import SprintModal from '../../sprintModal/SprintModal';
 
 function BoardView() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -50,6 +52,7 @@ function BoardView() {
     setTasks,
     columns,
     sprints,
+    setSprints,
     loading,
     error,
     activeTaskId,
@@ -58,6 +61,12 @@ function BoardView() {
     handleDeleteColumn,
     setError,
   } = useBoard(projectId, searchParams.get('searchInput') || '', isScrum);
+
+  const { completeSprint } = useSprintActions(projectId, setSprints);
+  const [isCompletingSprint, setIsCompletingSprint] = useState(false);
+  const [completedSprintId, setCompletedSprintId] = useState<string | null>(
+    null
+  );
 
   const handleTaskUpdated = useCallback(
     (updated: TaskPopulated) => {
@@ -162,6 +171,30 @@ function BoardView() {
 
     return new Set(activeSprint.tasks);
   }, [isScrum, sprints]);
+
+  const activeSprint = useMemo(() => {
+    if (!isScrum) {
+      return null;
+    }
+
+    return (
+      sprints.find((sprint) => sprint.dueDate && !sprint.isCompleted) ?? null
+    );
+  }, [isScrum, sprints]);
+
+  const handleCompleteSprint = useCallback(async () => {
+    if (!activeSprint || isCompletingSprint) {
+      return;
+    }
+
+    setIsCompletingSprint(true);
+    try {
+      await completeSprint(activeSprint);
+      setCompletedSprintId(activeSprint._id);
+    } finally {
+      setIsCompletingSprint(false);
+    }
+  }, [activeSprint, completeSprint, isCompletingSprint]);
 
   const visibleTasks = useMemo(() => {
     if (!isScrum) {
@@ -351,7 +384,18 @@ function BoardView() {
         }
       }}
     >
-      <div className="mb-3 flex justify-end">
+      <div className="mb-3 flex justify-end gap-2">
+        {isScrum && activeSprint?.isStarted ? (
+          <button
+            type="button"
+            onClick={handleCompleteSprint}
+            disabled={isCompletingSprint}
+            className="bg-primary-400 hover:bg-primary-500 inline-flex items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isCompletingSprint ? 'Completing...' : 'Complete Sprint'}
+          </button>
+        ) : null}
+
         <Tooltip
           title={
             isCompactMode ? 'Switch to expanded view' : 'Switch to compact view'
@@ -440,6 +484,15 @@ function BoardView() {
         }}
         onOk={confirmDeleteColumn}
       />
+
+      {completedSprintId && projectId ? (
+        <SprintModal
+          visible={!!completedSprintId}
+          onClose={() => setCompletedSprintId(null)}
+          sprintId={completedSprintId}
+          projectId={projectId}
+        />
+      ) : null}
     </DndContext>
   );
 }
