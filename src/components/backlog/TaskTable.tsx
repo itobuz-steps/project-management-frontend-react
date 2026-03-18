@@ -482,9 +482,9 @@ export function TaskTable({
   const sprintStarted = sprint?.isStarted === true;
 
   return (
-    <div className="rounded-lg bg-white shadow-sm">
+    <div className="rounded-lg bg-white shadow-sm dark:bg-slate-900">
       {/* Sprint Header */}
-      <div className="flex w-full items-center justify-between rounded-t-lg bg-gray-100 px-1 py-2 text-left hover:bg-gray-100 sm:px-4">
+      <div className="flex w-full items-center justify-between rounded-t-lg bg-gray-100 px-1 py-2 text-left hover:bg-gray-100 sm:px-4 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-800">
         <div
           onClick={() => setOpen(!open)}
           className="xs:gap-2 flex cursor-pointer items-center gap-1"
@@ -496,7 +496,7 @@ export function TaskTable({
             <span className="font-semibold">{title || sprint?.key}</span>
           </div>
         </div>
-        <span className="mr-1 ml-auto hidden text-xs text-gray-400 sm:mr-4 sm:block">
+        <span className="mr-1 ml-auto hidden text-xs text-gray-400 sm:mr-4 sm:block dark:text-slate-400">
           {tasks.length} issue{tasks.length !== 1 && 's'}
         </span>
         <div className="xs:flex-row xs:gap-4 flex flex-col items-center gap-1">
@@ -524,7 +524,7 @@ export function TaskTable({
       {open && (
         <div
           ref={setNodeRef}
-          className={`relative mt-2 overflow-x-auto rounded-md border border-gray-200 ${isOver ? 'bg-primary-50' : ''}`}
+          className={`relative mt-2 overflow-x-auto rounded-md border border-gray-200 dark:border-slate-700 ${isOver ? 'bg-primary-50 dark:bg-slate-800' : ''}`}
         >
           <SortableContext
             items={localTasks.map((task) => task._id)}
@@ -544,7 +544,7 @@ export function TaskTable({
               }}
               pagination={false}
               rowClassName={(record) =>
-                `whitespace-nowrap text-sm hover:bg-gray-50 ${getPriorityBorder(record.priority)}`
+                `whitespace-nowrap text-sm hover:bg-gray-50 dark:hover:bg-slate-800 ${getPriorityBorder(record.priority)}`
               }
               locale={{
                 emptyText: 'Drop tasks here...',

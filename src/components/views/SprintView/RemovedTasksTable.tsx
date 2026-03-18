@@ -44,11 +44,12 @@ export function RemovedTasksTable({ tasks }: RemovedTasksTableProps) {
   }
 
   return (
-    <div className="rounded-md border-2 border-gray-200 p-4">
-      <h4 className="text-primary-500 mb-3 font-semibold">
+    <div className="rounded-md border-2 border-gray-200 p-4 dark:text-white">
+      <h4 className="text-primary-500 mb-3 font-semibold dark:text-white">
         Tasks Removed During Sprint ({tasks.length})
       </h4>
       <Table
+        className="sprint-removed-table"
         dataSource={tasks}
         columns={columns}
         rowKey="_id"

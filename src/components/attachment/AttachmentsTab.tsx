@@ -56,7 +56,7 @@ export function AttachmentsTab({
   return (
     <div className="py-3">
       <div
-        className="flex cursor-pointer items-center justify-between text-base font-semibold text-gray-900"
+        className="flex cursor-pointer items-center justify-between text-base font-semibold text-gray-900 dark:text-neutral-100"
         onClick={() => setExpanded((dropdown) => !dropdown)}
       >
         <div className="flex items-center gap-2">

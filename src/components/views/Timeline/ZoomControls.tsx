@@ -1,6 +1,7 @@
 import { TIMELINE_CONSTANTS } from './timeline.types';
 
 interface ZoomControlsProps {
+  colorMode: 'light' | 'dark';
   zoom: number;
   onZoomIn: () => void;
   onZoomOut: () => void;
@@ -8,12 +9,14 @@ interface ZoomControlsProps {
 }
 
 export const ZoomControls = ({
+  colorMode,
   zoom,
   onZoomIn,
   onZoomOut,
   onReset,
 }: ZoomControlsProps) => {
   const { MIN_ZOOM, MAX_ZOOM } = TIMELINE_CONSTANTS;
+  const isDark = colorMode === 'dark';
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -24,9 +27,23 @@ export const ZoomControls = ({
           width: 28,
           height: 28,
           borderRadius: 6,
-          border: '1px solid #e2e8f0',
-          background: zoom <= MIN_ZOOM ? '#f8fafc' : '#fff',
-          color: zoom <= MIN_ZOOM ? '#cbd5e1' : '#475569',
+          border: isDark ? '1px solid #475569' : '1px solid #e2e8f0',
+          background:
+            zoom <= MIN_ZOOM
+              ? isDark
+                ? '#0b0b0c'
+                : '#f8fafc'
+              : isDark
+                ? '#1a1a1a'
+                : '#fff',
+          color:
+            zoom <= MIN_ZOOM
+              ? isDark
+                ? '#737373'
+                : '#cbd5e1'
+              : isDark
+                ? '#d4d4d4'
+                : '#475569',
           cursor: zoom <= MIN_ZOOM ? 'not-allowed' : 'pointer',
           fontSize: 16,
           lineHeight: 1,
@@ -40,7 +57,7 @@ export const ZoomControls = ({
       <span
         style={{
           fontSize: 12,
-          color: '#94a3b8',
+          color: isDark ? '#a3a3a3' : '#64748b',
           minWidth: 40,
           textAlign: 'center',
         }}
@@ -54,9 +71,23 @@ export const ZoomControls = ({
           width: 28,
           height: 28,
           borderRadius: 6,
-          border: '1px solid #e2e8f0',
-          background: zoom >= MAX_ZOOM ? '#f8fafc' : '#fff',
-          color: zoom >= MAX_ZOOM ? '#cbd5e1' : '#475569',
+          border: isDark ? '1px solid #475569' : '1px solid #e2e8f0',
+          background:
+            zoom >= MAX_ZOOM
+              ? isDark
+                ? '#0b0b0c'
+                : '#f8fafc'
+              : isDark
+                ? '#1a1a1a'
+                : '#fff',
+          color:
+            zoom >= MAX_ZOOM
+              ? isDark
+                ? '#737373'
+                : '#cbd5e1'
+              : isDark
+                ? '#d4d4d4'
+                : '#475569',
           cursor: zoom >= MAX_ZOOM ? 'not-allowed' : 'pointer',
           fontSize: 16,
           lineHeight: 1,
@@ -73,9 +104,9 @@ export const ZoomControls = ({
           height: 28,
           padding: '0 10px',
           borderRadius: 6,
-          border: '1px solid #e2e8f0',
-          background: '#fff',
-          color: '#475569',
+          border: isDark ? '1px solid #475569' : '1px solid #e2e8f0',
+          background: isDark ? '#1a1a1a' : '#fff',
+          color: isDark ? '#d4d4d4' : '#475569',
           cursor: 'pointer',
           fontSize: 12,
         }}

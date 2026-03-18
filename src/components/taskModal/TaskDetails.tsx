@@ -50,7 +50,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
         {
           key: 'details',
           label: (
-            <span className="text-base font-semibold text-gray-900">
+            <span className="text-base font-semibold text-gray-900 dark:text-slate-100">
               Details
             </span>
           ),
@@ -86,7 +86,9 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                         )}
                       </>
                     ) : (
-                      <span className="text-sm text-gray-400">Add labels</span>
+                      <span className="text-sm text-gray-400 dark:text-slate-400">
+                        Add labels
+                      </span>
                     )}
                   </div>
                 ) : (
@@ -109,6 +111,9 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                 {editing !== 'priority' ? (
                   <Tag
                     className="cursor-pointer capitalize"
+                    style={{
+                      border: 'none',
+                    }}
                     color={
                       PRIORITY_COLORS[
                         task.priority as keyof typeof PRIORITY_COLORS
@@ -233,13 +238,13 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
 
               <div className="gap-3 pb-3">
                 <SidebarRow label="Created">
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-gray-700 dark:text-slate-100">
                     {formatRelativeTime(task.createdAt)}
                   </span>
                 </SidebarRow>
 
                 <SidebarRow label="Updated">
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-gray-700 dark:text-slate-100">
                     {formatRelativeTime(task.updatedAt)}
                   </span>
                 </SidebarRow>

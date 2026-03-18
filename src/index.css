@@ -2,9 +2,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
+@custom-variant dark (&:where([data-color-mode='dark'], [data-color-mode='dark'] *));
 
 body {
   font-family: 'Montserrat', sans-serif;
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+:root {
+  --app-bg: #f8fafc;
+  --app-text: #0f172a;
+}
+
+:root[data-color-mode='light'] {
+  --app-bg: #f8fafc;
+  --app-text: #0f172a;
+}
+
+:root[data-color-mode='dark'] {
+  --app-bg: #1f1d1d;
+  --app-text: #ededed;
 }
 
 @theme {
@@ -69,6 +88,7 @@ h2 {
 
 /* ===== Custom scrollbar (desktop only) ===== */
 @media (hover: hover) {
+
   /* Firefox */
   * {
     scrollbar-width: thin;

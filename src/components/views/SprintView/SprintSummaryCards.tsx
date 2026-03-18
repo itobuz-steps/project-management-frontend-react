@@ -8,8 +8,10 @@ export function SprintSummaryCards({ stats }: SprintSummaryCardsProps) {
           key={key}
           className={`rounded-lg border-2 ${border} ${bg} p-4 text-center`}
         >
-          <p className={`text-2xl font-bold ${text}`}>{stats[key]}</p>
-          <p className={`text-sm ${subText}`}>{label}</p>
+          <p className={`text-2xl font-bold ${text} dark:text-white`}>
+            {stats[key]}
+          </p>
+          <p className={`text-sm ${subText} dark:text-neutral-100`}>{label}</p>
         </div>
       ))}
     </div>

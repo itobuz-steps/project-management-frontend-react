@@ -36,11 +36,11 @@ function SprintView() {
 
   if (!projectId) {
     return (
-      <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500">
-        <h2 className="mb-2 text-lg font-semibold text-gray-700">
+      <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500 dark:text-neutral-100">
+        <h2 className="mb-2 text-lg font-semibold text-gray-700 dark:text-white">
           No project selected
         </h2>
-        <p className="text-sm">
+        <p className="text-sm dark:text-neutral-200">
           Select a project from the sidebar to view sprint reports.
         </p>
       </div>
@@ -58,13 +58,17 @@ function SprintView() {
   if (sprints.length === 0) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Empty description="No completed sprints found" />
+        <Empty
+          description={
+            <span className="dark:text-white">No completed sprints found</span>
+          }
+        />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6 p-4">
+    <div className="flex flex-col gap-6 p-4 text-gray-900 dark:text-white">
       <SprintSelector
         sprints={sprints}
         selectedSprintId={selectedSprintId}
@@ -76,7 +80,11 @@ function SprintView() {
           <Spin size="large" />
         </div>
       ) : !summary ? (
-        <Empty description="No data available" />
+        <Empty
+          description={
+            <span className="dark:text-white">No data available</span>
+          }
+        />
       ) : (
         <>
           <SprintSummaryCards stats={stats} />

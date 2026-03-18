@@ -40,13 +40,13 @@ export function Column({
       key={col}
       className="group/column w-80 shrink-0 hover:[&:has(.task-card:hover)_.column-actions]:opacity-0"
     >
-      <div className="h-full rounded-lg bg-[#f8f8f8] shadow-sm">
+      <div className="h-full rounded-lg bg-[#f8f8f8] shadow-sm dark:bg-slate-900">
         <div className="sticky top-0 z-10 flex items-center justify-between gap-2 px-4 py-2">
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-semibold text-gray-600 uppercase">
+            <h2 className="text-sm font-semibold text-gray-600 uppercase dark:text-slate-300">
               {col}
             </h2>
-            <span className="rounded-full bg-gray-300 px-2 py-0.5 text-xs font-semibold text-gray-900">
+            <span className="rounded-full bg-gray-300 px-2 py-0.5 text-xs font-semibold text-gray-900 dark:bg-slate-700 dark:text-slate-100">
               {tasks?.length ?? 0}
             </span>
           </div>
@@ -56,7 +56,7 @@ export function Column({
               <button
                 type="button"
                 aria-label="Add column"
-                className="pointer-events-none rounded p-1 text-gray-500 opacity-0 transition-opacity duration-150 group-hover/column:pointer-events-auto group-hover/column:opacity-100 hover:bg-gray-200 hover:text-gray-700"
+                className="pointer-events-none rounded p-1 text-gray-500 opacity-0 transition-opacity duration-150 group-hover/column:pointer-events-auto group-hover/column:opacity-100 hover:bg-gray-200 hover:text-gray-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
                 onClick={() => onAdd(col)}
               >
                 <PlusOutlined />
@@ -66,7 +66,7 @@ export function Column({
               <button
                 type="button"
                 aria-label="Delete column"
-                className="pointer-events-none rounded p-1 text-gray-500 opacity-0 transition-opacity duration-150 group-hover/column:pointer-events-auto group-hover/column:opacity-100 hover:bg-gray-200 hover:text-gray-700"
+                className="pointer-events-none rounded p-1 text-gray-500 opacity-0 transition-opacity duration-150 group-hover/column:pointer-events-auto group-hover/column:opacity-100 hover:bg-gray-200 hover:text-gray-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
                 onClick={() => onDelete(col)}
               >
                 <DeleteOutlined />
@@ -82,7 +82,7 @@ export function Column({
           >
             <div className="flex flex-col gap-3 p-3">
               {loading && (
-                <div className="rounded-md border border-dashed border-gray-200 bg-gray-50 p-3 text-sm text-gray-500">
+                <div className="rounded-md border border-dashed border-gray-200 bg-gray-50 p-3 text-sm text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
                   Loading tasks...
                 </div>
               )}
@@ -94,7 +94,7 @@ export function Column({
               )}
 
               {!loading && !error && tasks?.length === 0 && (
-                <div className="rounded-md border border-dashed border-gray-200 bg-gray-50 p-3 text-sm text-gray-500">
+                <div className="rounded-md border border-dashed border-gray-200 bg-gray-50 p-3 text-sm text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
                   No tasks
                 </div>
               )}

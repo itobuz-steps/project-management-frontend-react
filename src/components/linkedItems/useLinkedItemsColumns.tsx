@@ -5,6 +5,7 @@ import type { LinkColumnsProps, LinkedRow } from './linkedItems.types';
 import { RELATIONSHIP_CONFIG } from './linkedItems.types';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { StatusCell } from '../ui/StatusCell';
+import { useColorMode } from '../../hooks/useColorMode';
 import { Link } from 'react-router-dom';
 
 export const useLinkedItemsColumns = ({
@@ -12,6 +13,8 @@ export const useLinkedItemsColumns = ({
   onRemove,
   onChange,
 }: LinkColumnsProps): ColumnsType<LinkedRow> => {
+  const [colorMode] = useColorMode();
+  const $isDark = colorMode === 'dark';
   return [
     {
       width: 100,
@@ -31,7 +34,7 @@ export const useLinkedItemsColumns = ({
 
             <Link
               to={`?taskId=${row.item._id}`}
-              className={`block max-w-[200px] truncate hover:underline! ${isDone ? 'text-gray-400! line-through!' : 'text-gray-800!'} `}
+              className={`block max-w-[200px] truncate hover:underline! ${isDone ? 'text-gray-400! line-through!' : $isDark ? 'text-neutral-300!' : 'text-gray-800!'} `}
             >
               {row.item.title}
             </Link>

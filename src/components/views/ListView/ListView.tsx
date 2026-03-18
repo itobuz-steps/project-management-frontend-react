@@ -168,8 +168,8 @@ function ListView() {
 
   if (!projectId) {
     return (
-      <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500">
-        <h2 className="mb-2 text-lg font-semibold text-gray-700">
+      <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+        <h2 className="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-200">
           No project selected
         </h2>
         <p className="text-sm">
@@ -180,15 +180,15 @@ function ListView() {
   }
 
   return (
-    <div className="relative mt-2 w-full rounded-md border border-gray-200">
-      <div className="sticky top-0 z-10 flex items-center justify-end gap-2 border-b border-gray-200 bg-gray-50 px-2 py-1">
+    <div className="relative mt-2 w-full rounded-md border border-gray-200 dark:border-slate-700 dark:bg-slate-900">
+      <div className="sticky top-0 z-10 flex items-center justify-end gap-2 border-b border-gray-200 bg-gray-50 px-2 py-1 dark:border-slate-700 dark:bg-slate-800">
         <button
           type="button"
           onClick={handleResetFilters}
           disabled={!hasActiveFilters}
           aria-label="Reset filters"
           title="Reset filters"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
         >
           <FilterX size={14} />
         </button>
@@ -203,7 +203,7 @@ function ListView() {
         </button>
       </div>
 
-      <div className="no-scrollbar max-h-[600px] overflow-auto border border-gray-200">
+      <div className="no-scrollbar max-h-150 overflow-auto border border-gray-200 dark:border-slate-700">
         <TaskTable
           key={tableRenderKey}
           tasks={tasks}

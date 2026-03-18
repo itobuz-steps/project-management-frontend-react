@@ -59,9 +59,9 @@ export function TextEditor({
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+    <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 border-b border-gray-200 bg-gray-50 p-2">
+      <div className="flex flex-wrap items-center gap-1 border-b border-gray-200 bg-gray-50 p-2 dark:border-slate-700 dark:bg-slate-900">
         {/* Headings */}
         <Select
           size="small"
@@ -81,7 +81,7 @@ export function TextEditor({
           }}
         />
 
-        <div className="mx-1 h-5 w-px bg-gray-300" />
+        <div className="mx-1 h-5 w-px bg-gray-300 dark:bg-slate-700" />
 
         <Button
           size="small"
@@ -105,7 +105,7 @@ export function TextEditor({
           I
         </Button>
 
-        <div className="mx-1 h-5 w-px bg-gray-300" />
+        <div className="mx-1 h-5 w-px bg-gray-300 dark:bg-slate-700" />
 
         <Button
           size="small"
@@ -140,7 +140,7 @@ export function TextEditor({
           ☑
         </Button>
 
-        <div className="mx-1 h-5 w-px bg-gray-300" />
+        <div className="mx-1 h-5 w-px bg-gray-300 dark:bg-slate-700" />
 
         {/* Attach Upload */}
         {comment && (
@@ -230,10 +230,16 @@ export function TextEditor({
       />
 
       {comment && (
-        <div className="px-4 pt-2 text-xs text-gray-400">
-          Tip: Type <span className="font-medium text-gray-600">@</span> to
-          mention a user and{' '}
-          <span className="font-medium text-gray-600">/</span> to link a task.
+        <div className="px-4 pt-2 text-xs text-gray-400 dark:text-slate-400">
+          Tip: Type{' '}
+          <span className="font-medium text-gray-600 dark:text-slate-200">
+            @
+          </span>{' '}
+          to mention a user and{' '}
+          <span className="font-medium text-gray-600 dark:text-slate-200">
+            /
+          </span>{' '}
+          to link a task.
         </div>
       )}
 
@@ -242,13 +248,13 @@ export function TextEditor({
         {attachments.map((attachment, index) => (
           <div
             key={index}
-            className="flex items-center justify-between rounded-md bg-gray-50 px-2 py-1 text-sm"
+            className="flex items-center justify-between rounded-md bg-gray-50 px-2 py-1 text-sm dark:bg-slate-700"
           >
             <RouterLink
               to={attachment.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 truncate text-gray-700"
+              className="flex items-center gap-1 truncate text-gray-700 dark:text-slate-200"
             >
               <PaperClipOutlined />
               <span className="truncate">{attachment.file.name}</span>

@@ -57,11 +57,11 @@ export default function ProfileMenu() {
       {open && (
         <div
           id="dropdownMenu"
-          className="absolute right-0 z-50 mt-2 w-40 flex-col gap-6 rounded-sm border border-gray-200 bg-white p-4 shadow-lg"
+          className="absolute right-0 z-50 mt-2 w-40 flex-col gap-6 rounded-sm border border-gray-200 bg-white p-4 shadow-lg dark:border-slate-700 dark:bg-slate-800"
         >
           <Link
             to="/edit-profile"
-            className="block rounded-xs bg-gray-50 p-2 font-medium text-black shadow-sm hover:bg-gray-100"
+            className="block rounded-xs bg-gray-50 p-2 font-medium text-black shadow-sm hover:bg-gray-100 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600"
           >
             Edit Profile
           </Link>

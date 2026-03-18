@@ -47,7 +47,7 @@ function SidebarProjectsDropdown({
         />
       ))}
       {!workspaces.length && !collapsed && (
-        <li className="rounded-md border border-dashed border-slate-300 bg-white/70 px-2 py-2 text-xs font-medium tracking-wide text-slate-500">
+        <li className="rounded-md border border-dashed border-slate-300 bg-white/70 px-2 py-2 text-xs font-medium tracking-wide text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
           No workspaces yet
         </li>
       )}

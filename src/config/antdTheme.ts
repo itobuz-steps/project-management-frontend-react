@@ -1,12 +1,18 @@
+import { theme as antdTheme } from 'antd';
 import type { ThemeConfig } from 'antd';
 import { THEME_COLORS } from './constants';
 import { oklchToHex } from '../utils/oklchToHex';
 
-export function getAntdTheme(themeName: string): ThemeConfig {
+export function getAntdTheme(
+  themeName: string,
+  colorMode: 'light' | 'dark' = 'light'
+): ThemeConfig {
   const palette = THEME_COLORS[themeName] ?? THEME_COLORS.indigo;
   const primaryColor = oklchToHex(palette[5]);
+  const isDark = colorMode === 'dark';
 
   return {
+    algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
     token: {
       colorPrimary: primaryColor,
       colorInfo: primaryColor,
@@ -14,9 +20,9 @@ export function getAntdTheme(themeName: string): ThemeConfig {
       colorSuccess: '#16a34a',
       colorWarning: '#d97706',
       colorError: '#dc2626',
-      colorTextBase: '#1f2937',
-      colorBgBase: '#ffffff',
-      colorBorder: '#e5e7eb',
+      colorTextBase: isDark ? '#ededed' : '#1f2937',
+      colorBgBase: isDark ? '#0b0b0c' : '#ffffff',
+      colorBorder: isDark ? '#2a2a2a' : '#e5e7eb',
       borderRadius: 6,
       borderRadiusLG: 8,
       controlHeight: 36,
@@ -47,8 +53,8 @@ export function getAntdTheme(themeName: string): ThemeConfig {
         paddingLG: 20,
       },
       Tabs: {
-        itemColor: '#000000',
-        itemHoverColor: '#000000',
+        itemColor: isDark ? '#e5e7eb' : '#000000',
+        itemHoverColor: isDark ? '#ffffff' : '#000000',
         itemSelectedColor: primaryColor,
         itemActiveColor: primaryColor,
         inkBarColor: primaryColor,

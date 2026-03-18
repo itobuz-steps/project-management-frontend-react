@@ -16,7 +16,7 @@ export default function SidebarGroup({
 
   return (
     <li className="relative" id={id}>
-      <div className="group hover:border-primary-200 flex items-center justify-between rounded-lg px-2.5 py-2 transition-all duration-200 hover:bg-white hover:shadow-xs">
+      <div className="group hover:border-primary-200 flex items-center justify-between rounded-lg px-2.5 py-2 transition-all duration-200 hover:bg-white hover:shadow-xs dark:hover:bg-slate-800">
         <button
           type="button"
           onClick={collapsible ? onToggle : undefined}
@@ -26,11 +26,11 @@ export default function SidebarGroup({
           aria-expanded={collapsible ? isExpanded : undefined}
           aria-label={collapsible ? `Toggle ${label}` : undefined}
         >
-          <span className="group-hover:text-primary-800 shrink-0 text-slate-700 transition-colors">
+          <span className="group-hover:text-primary-800 shrink-0 text-slate-700 transition-colors dark:text-slate-300">
             {icon}
           </span>
           <span
-            className={`group-hover:text-primary-900 text-[14px] font-semibold tracking-wide whitespace-nowrap text-slate-800 transition-all duration-300 ease-in-out ${
+            className={`group-hover:text-primary-900 text-[14px] font-semibold tracking-wide whitespace-nowrap text-slate-800 transition-all duration-300 ease-in-out dark:text-slate-200 ${
               collapsed
                 ? 'w-0 -translate-x-2 opacity-0'
                 : 'w-auto translate-x-0 opacity-100'
@@ -48,7 +48,7 @@ export default function SidebarGroup({
           {collapsible ? (
             <ChevronDown
               size={16}
-              className={`text-slate-500 transition-transform duration-300 ${
+              className={`text-slate-500 transition-transform duration-300 dark:text-slate-400 ${
                 isExpanded ? 'rotate-0' : '-rotate-90'
               }`}
             />

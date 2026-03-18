@@ -9,3 +9,156 @@
 .task-drawer .ant-drawer-close {
   margin-top: 2px;
 }
+
+:root[data-color-mode='dark'] .backlog-task-antd-table .ant-table-thead>tr>th {
+  background: #1f1d1d;
+  color: #ededed;
+  border-bottom-color: #2a2a2a;
+}
+
+:root[data-color-mode='dark'] .backlog-task-antd-table .ant-table-tbody>tr>td {
+  background: #0b0b0c;
+  color: #ededed;
+  border-bottom-color: #1a1a1a;
+}
+
+:root[data-color-mode='dark'] .ant-table-filter-dropdown,
+:root[data-color-mode='dark'] .ant-dropdown .ant-dropdown-menu {
+  background: #1f1d1d;
+  border: 1px solid #2a2a2a;
+}
+
+:root[data-color-mode='dark'] .ant-table-filter-dropdown .ant-dropdown-menu-item,
+:root[data-color-mode='dark'] .ant-table-filter-dropdown .ant-dropdown-menu-title-content,
+:root[data-color-mode='dark'] .ant-dropdown .ant-dropdown-menu-item {
+  color: #ededed;
+}
+
+:root[data-color-mode='dark'] .ant-table-filter-dropdown .ant-dropdown-menu-item:hover,
+:root[data-color-mode='dark'] .ant-dropdown .ant-dropdown-menu-item:hover {
+  background: #1f1d1d;
+}
+
+:root[data-color-mode='dark'] .ant-select-dropdown {
+  background: #1f1d1d;
+  border: 1px solid #2a2a2a;
+}
+
+:root[data-color-mode='dark'] .ant-select-dropdown .ant-select-item {
+  color: #ededed;
+}
+
+:root[data-color-mode='dark'] .ant-select-dropdown .ant-select-item-option-active,
+:root[data-color-mode='dark'] .ant-select-dropdown .ant-select-item-option-selected {
+  background: #1f1d1d;
+}
+
+:root[data-color-mode='dark'] .project-members-modal .ant-modal-content {
+  background: #1f1d1d;
+  color: #ededed;
+}
+
+:root[data-color-mode='dark'] .project-members-modal .ant-modal-header {
+  border-bottom: 1px solid #2a2a2a;
+}
+
+:root[data-color-mode='dark'] .project-members-modal .ant-modal-title,
+:root[data-color-mode='dark'] .project-members-modal .ant-modal-close {
+  color: #ededed;
+}
+
+:root[data-color-mode='dark'] .project-members-modal .ant-modal-footer {
+  border-top: 1px solid #2a2a2a;
+}
+
+/* Global neutral dark remap for existing slate dark utility classes */
+:root[data-color-mode='dark'] [class*='dark:bg-slate-950'] {
+  background-color: #050505 !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:bg-slate-900'] {
+  background-color: #0b0b0c !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:bg-slate-800'] {
+  background-color: #0f0f10 !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:bg-slate-700'] {
+  background-color: #1f1d1d !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:border-slate-900'] {
+  border-color: #1f1f1f !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:border-slate-800'] {
+  border-color: #232323 !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:border-slate-700'] {
+  border-color: #2a2a2a !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:border-slate-600'] {
+  border-color: #343434 !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:text-slate-100'] {
+  color: #f5f5f5 !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:text-slate-200'] {
+  color: #e5e5e5 !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:text-slate-300'] {
+  color: #d4d4d4 !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:text-slate-400'] {
+  color: #a3a3a3 !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:text-slate-500'] {
+  color: #737373 !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:placeholder:text-slate-400']::placeholder {
+  color: #a3a3a3 !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:hover:bg-slate-700']:hover {
+  background-color: #1a1a1a !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:hover:bg-slate-800']:hover {
+  background-color: #141414 !important;
+}
+
+:root[data-color-mode='dark'] [class*='dark:hover:text-slate-200']:hover {
+  color: #e5e5e5 !important;
+}
+
+:root[data-color-mode='dark'] #sidebar [class*='hover:bg-white']:hover {
+  background-color: #141414 !important;
+}
+
+:root[data-color-mode='dark'] #sidebar [class*='hover:bg-primary-50']:hover,
+:root[data-color-mode='dark'] #sidebar [class*='hover:bg-primary-100']:hover,
+:root[data-color-mode='dark'] #sidebar [class*='hover:bg-primary-200']:hover {
+  background-color: #1a1a1a !important;
+}
+
+:root[data-color-mode='dark'] .sprint-removed-table .ant-table-thead>tr>th,
+:root[data-color-mode='dark'] .sprint-removed-table .ant-table-tbody>tr>td,
+:root[data-color-mode='dark'] .sprint-removed-table .ant-table-cell {
+  color: #f5f5f5 !important;
+}
+
+:root[data-color-mode='dark'] .sprint-chart-card .g2-axis,
+:root[data-color-mode='dark'] .sprint-chart-card .g2-legend,
+:root[data-color-mode='dark'] .sprint-chart-card .g2-label {
+  color: #f5f5f5 !important;
+  fill: #f5f5f5 !important;
+}

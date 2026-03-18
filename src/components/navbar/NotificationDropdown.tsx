@@ -27,16 +27,18 @@ export function NotificationDropdown({
 
   return (
     <div
-      className="absolute -right-full z-15 max-h-125 min-w-74 flex-col overflow-y-auto rounded-sm border border-gray-200 bg-white px-2 pb-2 shadow-md sm:right-0"
+      className="absolute -right-full z-15 max-h-125 min-w-74 flex-col overflow-y-auto rounded-sm border border-gray-200 bg-white px-2 pb-2 shadow-md sm:right-0 dark:border-slate-700 dark:bg-slate-700"
       ref={ref}
     >
-      <h3 className="p-3 py-2 text-lg font-semibold">Notifications</h3>
-      <hr className="border-gray-100 pb-2" />
+      <h3 className="p-3 py-2 text-lg font-semibold dark:text-slate-100">
+        Notifications
+      </h3>
+      <hr className="border-gray-100 pb-2 dark:border-slate-700" />
       <ul className="w-full">
         {notifications.length === 0 ? (
           <li
             id="notificationListEmpty"
-            className="w-full p-2 text-center text-gray-500"
+            className="w-full p-2 text-center text-gray-500 dark:text-slate-400"
           >
             Nothing to see here
           </li>
@@ -48,7 +50,7 @@ export function NotificationDropdown({
                 key={notification._id}
                 data={notification}
               />
-              <hr className="border-gray-50" />
+              <hr className="border-gray-50 dark:border-slate-700" />
             </>
           ))
         )}
@@ -60,7 +62,7 @@ export function NotificationDropdown({
         ref={targetRef}
       >
         {notifications.length !== 0 && hasMore && (
-          <LoaderCircle className="animate-spin text-gray-400" />
+          <LoaderCircle className="animate-spin text-gray-400 dark:text-slate-400" />
         )}
       </li>
     </div>

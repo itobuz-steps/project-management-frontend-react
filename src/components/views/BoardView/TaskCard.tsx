@@ -58,7 +58,7 @@ export function TaskCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`task-card group rounded-xl border border-gray-200 bg-white px-4 py-2 shadow-sm transition-all hover:shadow-md ${
+      className={`task-card group rounded-xl border border-gray-200 bg-white px-4 py-2 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-800 ${
         isDragging ? 'opacity-50' : ''
       }`}
       onClick={(e) => {

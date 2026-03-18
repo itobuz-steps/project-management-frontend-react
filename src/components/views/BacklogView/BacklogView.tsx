@@ -145,8 +145,8 @@ function BacklogView() {
 
   if (!projectId) {
     return (
-      <div className="rounded-lg border bg-white p-6 text-center text-gray-500">
-        <h2 className="mb-2 text-lg font-semibold text-gray-700">
+      <div className="rounded-lg border bg-white p-6 text-center text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+        <h2 className="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-200">
           No project selected
         </h2>
         <p className="text-sm">
@@ -204,7 +204,7 @@ function BacklogView() {
   };
 
   return (
-    <div className="rounded-lg bg-white p-1">
+    <div className="rounded-lg bg-white p-1 dark:bg-slate-900">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
@@ -299,8 +299,8 @@ function BacklogView() {
           {isScrum && (
             <section className="mb-4 w-full">
               {sprints.length === 0 ? (
-                <div className="rounded border bg-gray-50 p-6 text-center text-gray-400">
-                  <h2 className="mb-2 font-semibold text-gray-500">
+                <div className="rounded border bg-gray-50 p-6 text-center text-gray-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+                  <h2 className="mb-2 font-semibold text-gray-500 dark:text-slate-300">
                     No sprints found
                   </h2>
                   <p className="text-sm">
@@ -358,7 +358,7 @@ function BacklogView() {
         {/* DRAG PREVIEW */}
         <DragOverlay>
           {activeTask ? (
-            <div className="w-80 cursor-move rounded-xl border border-gray-200 bg-white/95 p-3 shadow-2xl backdrop-blur-sm">
+            <div className="w-80 cursor-move rounded-xl border border-gray-200 bg-white/95 p-3 shadow-2xl backdrop-blur-sm dark:border-slate-700 dark:bg-slate-800/95">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <TaskTypeIcon type={activeTask.type} />
@@ -368,12 +368,12 @@ function BacklogView() {
                     </span>
                   </TaskTypeColor>
                 </div>
-                <span className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-[11px] font-medium text-gray-600 capitalize">
+                <span className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-[11px] font-medium text-gray-600 capitalize dark:border-slate-700 dark:bg-slate-700 dark:text-slate-300">
                   {activeTask.status || 'todo'}
                 </span>
               </div>
 
-              <p className="line-clamp-2 text-sm leading-5 font-semibold text-gray-800">
+              <p className="line-clamp-2 text-sm leading-5 font-semibold text-gray-800 dark:text-slate-100">
                 {activeTask.title || 'Untitled task'}
               </p>
 
@@ -385,7 +385,7 @@ function BacklogView() {
                     {activeTask.priority}
                   </span>
                 ) : null}
-                <span className="truncate text-gray-500">
+                <span className="truncate text-gray-500 dark:text-slate-400">
                   {activeTask.assignee?.name || 'Unassigned'}
                 </span>
               </div>

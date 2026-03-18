@@ -65,8 +65,8 @@ export default function EditProfileContainer() {
   };
 
   return (
-    <div className="card xs:p-8 align-center xs:rounded-xl xs:h-auto bg-primary-50 flex h-screen w-full max-w-100 flex-col justify-center border border-gray-200 p-4 shadow-md">
-      <h3 className="mb-4 text-center text-[28px] font-semibold text-gray-700">
+    <div className="card xs:p-8 align-center xs:rounded-xl xs:h-auto bg-primary-50 flex h-screen w-full max-w-100 flex-col justify-center border border-gray-200 p-4 shadow-md dark:border-slate-700 dark:bg-slate-800">
+      <h3 className="mb-4 text-center text-[28px] font-semibold text-gray-700 dark:text-slate-100">
         Edit Profile
       </h3>
       <div className="align-center mb-3 flex justify-center">
@@ -88,7 +88,9 @@ export default function EditProfileContainer() {
       <div className="mb-4 space-y-3 px-4">
         {/* 🔔 Push */}
         <div className="flex items-center justify-between">
-          <span className="font-medium text-gray-600">Push Notifications</span>
+          <span className="font-medium text-gray-600 dark:text-slate-300">
+            Push Notifications
+          </span>
           <Switch
             className="custom-switch"
             checked={notifications.push}
@@ -99,7 +101,9 @@ export default function EditProfileContainer() {
 
         {/* 📧 Email */}
         <div className="flex items-center justify-between">
-          <span className="font-medium text-gray-600">Email Notifications</span>
+          <span className="font-medium text-gray-600 dark:text-slate-300">
+            Email Notifications
+          </span>
           <Switch
             className="custom-switch"
             checked={notifications.email}
@@ -110,7 +114,7 @@ export default function EditProfileContainer() {
 
         {/* 🖥️ In-App */}
         <div className="flex items-center justify-between">
-          <span className="font-medium text-gray-600">
+          <span className="font-medium text-gray-600 dark:text-slate-300">
             In-App Notifications
           </span>
           <Switch

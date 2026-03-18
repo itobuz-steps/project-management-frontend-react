@@ -242,8 +242,8 @@ function BoardView() {
 
   if (!projectId) {
     return (
-      <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500">
-        <h2 className="mb-2 text-lg font-semibold text-gray-700">
+      <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+        <h2 className="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-200">
           No project selected
         </h2>
         <p className="text-sm">
@@ -366,7 +366,7 @@ function BoardView() {
                 ? 'Switch to expanded view'
                 : 'Switch to compact view'
             }
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
           >
             {isCompactMode ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
           </button>
@@ -394,11 +394,11 @@ function BoardView() {
 
       <DragOverlay>
         {activeTaskId ? (
-          <div className="rounded-md border border-gray-200 bg-white p-3 shadow-md">
-            <p className="text-sm font-semibold text-gray-900">
+          <div className="rounded-md border border-gray-200 bg-white p-3 shadow-md dark:border-slate-700 dark:bg-slate-800">
+            <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
               {tasks.find((task) => task._id === activeTaskId)?.title}
               {tasks.find((task) => task._id === activeTaskId) ? (
-                <span className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+                <span className="mt-1 flex items-center gap-1 text-xs text-gray-500 dark:text-slate-400">
                   <TaskTypeIcon
                     type={
                       tasks.find((task) => task._id === activeTaskId)?.type ||

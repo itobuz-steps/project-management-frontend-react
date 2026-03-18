@@ -82,26 +82,27 @@ const SprintModal = ({
       width={820}
       centered
       title={null}
+      className="sprint-review-modal"
       bodyStyle={{ padding: 0, borderRadius: 8, overflow: 'hidden' }}
       maskStyle={{ backdropFilter: 'none' }}
       closeIcon={
-        <span className="flex h-7 w-7 items-center justify-center rounded text-[#626F86] hover:bg-[#F1F2F4] hover:text-[#172B4D]">
+        <span className="flex h-7 w-7 items-center justify-center rounded text-[#626F86] hover:bg-[#F1F2F4] hover:text-[#172B4D] dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white">
           ✕
         </span>
       }
     >
-      <div className="flex flex-col bg-white font-['Atlassian_Sans',ui-sans-serif,system-ui,sans-serif]">
+      <div className="flex flex-col bg-white font-['Atlassian_Sans',ui-sans-serif,system-ui,sans-serif] dark:bg-neutral-800 dark:text-neutral-100">
         {/* ── Modal Header ── */}
-        <div className="border-b border-[#DCDFE4] px-6 pt-5 pb-4">
+        <div className="border-b border-[#DCDFE4] px-6 pt-5 pb-4 dark:border-neutral-700 dark:bg-neutral-800">
           <div className="flex items-start justify-between">
             <div>
-              <p className="mb-1 text-xs font-semibold tracking-widest text-[#0C66E4] uppercase">
+              <p className="mb-1 text-xs font-semibold tracking-widest text-[#0C66E4] uppercase dark:text-blue-300">
                 Sprint Review
               </p>
-              <h2 className="text-[1.25rem] leading-tight font-bold text-[#172B4D]">
+              <h2 className="text-[1.25rem] leading-tight font-bold text-[#172B4D] dark:text-white">
                 Sprint Summary
               </h2>
-              <p className="mt-1 text-sm text-[#626F86]">
+              <p className="mt-1 text-sm text-[#626F86] dark:text-neutral-300">
                 Review sprint performance and plan next steps.
               </p>
             </div>
@@ -130,12 +131,14 @@ const SprintModal = ({
           {/* ── Stacked Progress Bar ── */}
           <div className="mt-4">
             <div className="mb-1.5 flex items-center justify-between">
-              <span className="text-xs text-[#626F86]">Sprint progress</span>
-              <span className="text-xs font-semibold text-[#172B4D]">
+              <span className="text-xs text-[#626F86] dark:text-neutral-300">
+                Sprint progress
+              </span>
+              <span className="text-xs font-semibold text-[#172B4D] dark:text-white">
                 {completionPct}% complete
               </span>
             </div>
-            <div className="flex h-2 w-full overflow-hidden rounded-full bg-[#DCDFE4]">
+            <div className="flex h-2 w-full overflow-hidden rounded-full bg-[#DCDFE4] dark:bg-neutral-700">
               <div
                 className="h-full bg-[#1F845A] transition-all"
                 style={{ width: `${completionPct}%` }}
@@ -149,7 +152,7 @@ const SprintModal = ({
                 style={{ width: `${backlogPct}%` }}
               />
             </div>
-            <div className="mt-1.5 flex items-center gap-4 text-xs text-[#626F86]">
+            <div className="mt-1.5 flex items-center gap-4 text-xs text-[#626F86] dark:text-neutral-300">
               <span className="flex items-center gap-1">
                 <span className="inline-block h-2 w-2 rounded-full bg-[#1F845A]" />
                 Completed
@@ -168,13 +171,15 @@ const SprintModal = ({
 
         {/* ── Body ── */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-20">
+          <div className="flex flex-col items-center justify-center gap-3 py-20 dark:bg-neutral-800">
             <Spin size="large" />
-            <span className="text-sm text-[#626F86]">Loading sprint data…</span>
+            <span className="text-sm text-[#626F86] dark:text-neutral-300">
+              Loading sprint data…
+            </span>
           </div>
         ) : (
           <div
-            className="space-y-3 overflow-y-auto px-6 py-5"
+            className="space-y-3 overflow-y-auto px-6 py-5 dark:bg-neutral-800"
             style={{ maxHeight: '55vh' }}
           >
             <Section

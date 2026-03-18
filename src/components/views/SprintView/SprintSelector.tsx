@@ -8,7 +8,7 @@ export function SprintSelector({
 }: SprintSelectorProps) {
   return (
     <div className="flex items-center gap-3">
-      <label className="text-sm font-semibold text-gray-600">
+      <label className="text-sm font-semibold text-gray-600 dark:text-white">
         Completed Sprint:
       </label>
       <Select

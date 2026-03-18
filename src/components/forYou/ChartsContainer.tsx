@@ -6,15 +6,19 @@ import {
 } from '@ant-design/plots';
 import { THEME_COLORS, GRAY_SHADES } from '../../config/constants';
 import { useTheme } from '../../hooks/useTheme';
+import { useColorMode } from '../../hooks/useColorMode';
 import type { TaskStats } from '../../services/types/tasks.types';
 import { Grid } from 'antd';
 import { DateTime } from 'luxon';
 
 export function ChartsContainer({ data }: { data: TaskStats | null }) {
   const [theme] = useTheme();
+  const [colorMode] = useColorMode();
   const screens = Grid.useBreakpoint();
   const isSmall = !screens.sm; // < 640px
   const chartSize = isSmall ? 250 : 300;
+  const isDark = colorMode === 'dark';
+  const textColor = isDark ? '#f5f5f5' : '#374151';
 
   const themeColors = THEME_COLORS[theme] ?? THEME_COLORS['indigo'];
   const isBlackTheme = theme === 'custom_2';
@@ -57,6 +61,14 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
     label: {
       text: 'value',
       position: 'outside',
+      style: {
+        fill: textColor,
+      },
+    },
+    legend: {
+      color: {
+        itemLabelFill: textColor,
+      },
     },
     tooltip: (d: { type: string; value: number }) => ({
       name: d.type,
@@ -90,6 +102,10 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
     axis: {
       x: {
         labelAutoRotate: false,
+        labelFill: textColor,
+      },
+      y: {
+        labelFill: textColor,
       },
     },
     legend: false,
@@ -99,19 +115,19 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
 
   return (
     <div className="flex w-full flex-1 flex-wrap items-center justify-center gap-2 sm:justify-start">
-      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto">
+      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto dark:border-slate-700 dark:bg-slate-800">
         <h4 className="text-primary-500 m-2 font-semibold">
           Assigned Task By Project
         </h4>
         <Pie {...pieConfig} data={allAssignedTaskByProject} />
       </div>
-      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto">
+      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto dark:border-slate-700 dark:bg-slate-800">
         <h4 className="text-primary-500 m-2 font-semibold">
           Completed Task By Project
         </h4>
         <Pie {...pieConfig} data={completedTaskByProject} />
       </div>
-      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto lg:col-span-2 lg:p-8 xl:col-span-1 xl:p-2">
+      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto lg:col-span-2 lg:p-8 xl:col-span-1 xl:p-2 dark:border-slate-700 dark:bg-slate-800">
         <h4 className="text-primary-500 m-2 font-semibold">
           Completed Task By Date (Last 7 Days)
         </h4>

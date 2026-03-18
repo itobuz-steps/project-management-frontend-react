@@ -16,7 +16,7 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
 
   return (
     <div
-      className="flex h-full flex-col overflow-y-auto"
+      className="flex h-full flex-col overflow-y-auto dark:text-slate-200"
       style={{ scrollbarWidth: 'thin', scrollbarColor: '#c1c7d0 transparent' }}
     >
       <div className="px-4 py-0">
@@ -24,7 +24,7 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
         <TaskDetails task={task} onUpdated={onUpdated} />
 
         {/* Divider */}
-        <div className="my-4 border-t border-[#dfe1e6]" />
+        <div className="my-4 border-t border-[#dfe1e6] dark:border-slate-700" />
 
         {/* Description */}
         <TaskDescription task={task} onUpdated={onUpdated} />
@@ -37,13 +37,13 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
         <LinkedItemsTab task={task} onUpdated={onUpdated} />
 
         {/* Divider */}
-        <div className="my-4 border-t border-[#dfe1e6]" />
+        <div className="my-4 border-t border-[#dfe1e6] dark:border-slate-700" />
 
         {/* Activity section */}
         <div>
           {/* Tab bar */}
           <div className="no-scrollbar overflow-x-auto">
-            <div className="flex min-w-max border-b border-[#dfe1e6]">
+            <div className="flex min-w-max border-b border-[#dfe1e6] dark:border-slate-700">
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
@@ -51,7 +51,7 @@ export function DrawerTaskView({ task, onUpdated }: DrawerViewProps) {
                   className={`relative shrink-0 px-2.5 pt-1 pb-2 text-sm font-medium transition-colors ${
                     activeTab === tab.key
                       ? 'text-[var(--color-primary-900)]'
-                      : 'text-[#383c44] hover:text-[var(--color-primary-900)]'
+                      : 'text-[#383c44] hover:text-[var(--color-primary-900)] dark:text-slate-300'
                   }`}
                 >
                   {tab.label}

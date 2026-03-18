@@ -30,9 +30,9 @@ export function TaskContainer() {
 
   return (
     <div className="flex flex-col">
-      <h2 className="flex w-full gap-1.5 border-b border-b-gray-400 pb-2 text-lg font-semibold">
+      <h2 className="flex w-full gap-1.5 border-b border-b-gray-400 pb-2 text-lg font-semibold dark:border-b-slate-700 dark:text-slate-100">
         Your Tasks
-        <div className="h-5 w-5 rounded-full bg-gray-200 text-center text-sm text-black">
+        <div className="h-5 w-5 rounded-full bg-gray-200 text-center text-sm text-black dark:bg-slate-700 dark:text-slate-100">
           {tasks.length}
         </div>
       </h2>
@@ -40,7 +40,7 @@ export function TaskContainer() {
         <div className="relative overflow-x-auto rounded-md" />
         {tasks.length === 0 && (
           <div
-            className="flex w-full justify-center bg-gray-50 p-5 text-center font-semibold text-gray-400"
+            className="flex w-full justify-center bg-gray-50 p-5 text-center font-semibold text-gray-400 dark:bg-slate-800 dark:text-slate-400"
             id="empty-for-you-container"
           >
             No tasks found!

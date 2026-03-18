@@ -79,7 +79,10 @@ export function CommentsTab({ task }: CommentsTabProps) {
   return (
     <>
       {/* Composer */}
-      <div className="border-b border-gray-200 py-4" ref={composerRef}>
+      <div
+        className="border-b border-gray-200 py-4 dark:border-neutral-700"
+        ref={composerRef}
+      >
         <div className="flex gap-3">
           <img src="/profile.png" className="h-8 w-8 rounded-full" />
 
@@ -88,7 +91,7 @@ export function CommentsTab({ task }: CommentsTabProps) {
               <>
                 <div
                   onClick={() => setIsComposerOpen(true)}
-                  className="cursor-text rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-500 hover:border-gray-400"
+                  className="cursor-text rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-500 hover:border-gray-400 dark:border-neutral-700 dark:text-neutral-400 dark:hover:border-neutral-600"
                 >
                   Add a comment…
                 </div>
@@ -101,14 +104,14 @@ export function CommentsTab({ task }: CommentsTabProps) {
                         composer.setContent(template + ' ');
                         setIsComposerOpen(true);
                       }}
-                      className="rounded border px-2 py-1 text-xs hover:bg-gray-50"
+                      className="rounded border px-2 py-1 text-xs hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
                     >
                       {template}
                     </button>
                   ))}
                 </div>
 
-                <div className="mt-2 text-xs text-gray-400">
+                <div className="mt-2 text-xs text-gray-400 dark:text-neutral-400">
                   <strong>Pro tip:</strong> press <kbd>'M'</kbd> to comment
                 </div>
               </>

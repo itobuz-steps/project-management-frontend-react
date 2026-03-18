@@ -47,7 +47,7 @@ export function DeleteTaskModal({ open, task, onClose, onDeleted }: Props) {
         },
       }}
     >
-      <p className="text-neutral-700">
+      <p className="text-neutral-700 dark:text-neutral-300">
         Are you sure you want to delete{' '}
         <strong>
           {task.key} – {task.title}

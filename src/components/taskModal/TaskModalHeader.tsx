@@ -55,7 +55,7 @@ export function TaskModalHeader({
   return (
     <div className="flex flex-col sm:pr-1">
       {/* Top row */}
-      <div className="flex items-center justify-between text-sm text-gray-500">
+      <div className="flex items-center justify-between text-sm text-gray-500 dark:text-slate-400">
         <div className="flex items-center gap-1">
           {parentTask && (
             <>
@@ -64,7 +64,7 @@ export function TaskModalHeader({
                 to={`/task/${parentTask._id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[12px] text-inherit! hover:underline!"
+                className="text-[12px] text-inherit! hover:underline! dark:hover:text-neutral-200!"
               >
                 {parentTask.key}
               </Link>
@@ -77,7 +77,7 @@ export function TaskModalHeader({
             to={`/task/${task._id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[12px] text-inherit! hover:underline!"
+            className="text-[12px] text-inherit! hover:underline! dark:hover:text-neutral-200!"
           >
             {task.key}
           </Link>
@@ -128,7 +128,7 @@ export function TaskModalHeader({
         <div className="flex min-w-0 flex-1 items-center">
           {!editing ? (
             <h1
-              className="cursor-pointer rounded px-1 text-2xl font-semibold break-words hover:bg-gray-100"
+              className="cursor-pointer rounded px-1 text-2xl font-semibold wrap-break-word hover:bg-gray-100 dark:text-neutral-100 dark:hover:bg-neutral-800"
               onClick={() => {
                 setValue(task.title);
                 setEditing(true);
