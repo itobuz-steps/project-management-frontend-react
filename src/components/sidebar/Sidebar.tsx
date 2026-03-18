@@ -170,7 +170,7 @@ export default function Sidebar({
                   <button
                     type="button"
                     id="plus-icon"
-                    className="plus-icon add-project group hover:border-primary-200 hover:bg-primary-200/80 hover:text-primary-900 relative shrink-0 cursor-pointer rounded-lg border border-transparent p-1 text-slate-700 transition-all duration-200"
+                    className="plus-icon add-project group hover:border-primary-200 hover:bg-primary-200/80 hover:text-primary-900 relative shrink-0 cursor-pointer rounded-lg border border-transparent p-1 text-slate-700 transition-all duration-200 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-100"
                     title="Add project"
                     onClick={() => setProjectModalOpen(true)}
                   >

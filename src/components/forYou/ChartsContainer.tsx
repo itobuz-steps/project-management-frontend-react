@@ -6,15 +6,19 @@ import {
 } from '@ant-design/plots';
 import { THEME_COLORS, GRAY_SHADES } from '../../config/constants';
 import { useTheme } from '../../hooks/useTheme';
+import { useColorMode } from '../../hooks/useColorMode';
 import type { TaskStats } from '../../services/types/tasks.types';
 import { Grid } from 'antd';
 import { DateTime } from 'luxon';
 
 export function ChartsContainer({ data }: { data: TaskStats | null }) {
   const [theme] = useTheme();
+  const [colorMode] = useColorMode();
   const screens = Grid.useBreakpoint();
   const isSmall = !screens.sm; // < 640px
   const chartSize = isSmall ? 250 : 300;
+  const isDark = colorMode === 'dark';
+  const textColor = isDark ? '#f5f5f5' : '#374151';
 
   const themeColors = THEME_COLORS[theme] ?? THEME_COLORS['indigo'];
   const isBlackTheme = theme === 'custom_2';
@@ -57,6 +61,14 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
     label: {
       text: 'value',
       position: 'outside',
+      style: {
+        fill: textColor,
+      },
+    },
+    legend: {
+      color: {
+        itemLabelFill: textColor,
+      },
     },
     tooltip: (d: { type: string; value: number }) => ({
       name: d.type,
@@ -90,6 +102,10 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
     axis: {
       x: {
         labelAutoRotate: false,
+        labelFill: textColor,
+      },
+      y: {
+        labelFill: textColor,
       },
     },
     legend: false,

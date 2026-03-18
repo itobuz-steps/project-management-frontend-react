@@ -143,6 +143,16 @@
   color: #e5e5e5 !important;
 }
 
+:root[data-color-mode=dark] #sidebar [class*="hover:bg-white"]:hover {
+  background-color: #141414 !important;
+}
+
+:root[data-color-mode=dark] #sidebar [class*="hover:bg-primary-50"]:hover,
+:root[data-color-mode=dark] #sidebar [class*="hover:bg-primary-100"]:hover,
+:root[data-color-mode=dark] #sidebar [class*="hover:bg-primary-200"]:hover {
+  background-color: #1a1a1a !important;
+}
+
 :root[data-color-mode=dark] .sprint-removed-table .ant-table-thead > tr > th,
 :root[data-color-mode=dark] .sprint-removed-table .ant-table-tbody > tr > td,
 :root[data-color-mode=dark] .sprint-removed-table .ant-table-cell {

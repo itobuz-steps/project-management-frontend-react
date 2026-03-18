@@ -76,7 +76,7 @@ export function EditProfileForm({
           Upload Profile Image
         </label>
         <input
-          className="form-control file:bg-primary-400 hover:border-primary-400 focus:border-primary-400 w-full cursor-pointer rounded-lg border border-gray-300 bg-white p-2 text-gray-400 shadow-xs transition-all duration-200 outline-none file:mr-4 file:cursor-pointer file:rounded-md file:border-none file:px-4 file:py-1 file:font-medium file:text-white"
+          className="form-control file:bg-primary-400 hover:border-primary-400 focus:border-primary-400 w-full cursor-pointer rounded-lg border border-gray-300 bg-white p-2 text-gray-400 shadow-xs transition-all duration-200 outline-none file:mr-4 file:cursor-pointer file:rounded-md file:border-none file:px-4 file:py-1 file:font-medium file:text-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
           type="file"
           accept="image/*"
           {...register('profileImage', {
@@ -89,7 +89,7 @@ export function EditProfileForm({
       </div>
       <label
         htmlFor="profile_image"
-        className="form-label -mt-3 mb-3 self-start text-xs text-gray-400 before:text-sm before:text-red-500 before:content-['*']"
+        className="form-label -mt-3 mb-3 self-start text-xs text-gray-400 before:text-sm before:text-red-500 before:content-['*'] dark:text-slate-400"
       >
         max 500KB
       </label>

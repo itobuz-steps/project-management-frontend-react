@@ -238,13 +238,13 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
 
               <div className="gap-3 pb-3">
                 <SidebarRow label="Created">
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-gray-700 dark:text-slate-100">
                     {formatRelativeTime(task.createdAt)}
                   </span>
                 </SidebarRow>
 
                 <SidebarRow label="Updated">
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-gray-700 dark:text-slate-100">
                     {formatRelativeTime(task.updatedAt)}
                   </span>
                 </SidebarRow>

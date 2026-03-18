@@ -13,7 +13,7 @@ export function SubtasksTable({
       isEmpty={!subtasks.length}
       emptyText="No subtasks"
     >
-      <div className="rounded-lg border border-gray-200">
+      <div className="rounded-lg border border-gray-200 dark:border-slate-700">
         <Table
           className="subtasks-table"
           tableLayout="fixed"
