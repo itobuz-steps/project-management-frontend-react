@@ -32,7 +32,7 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
     }));
 
     return (
-      <div className="mention-dropdown w-56 rounded-md border bg-white shadow">
+      <div className="mention-dropdown dark:bg-slate-800hover:bg-slate-700 w-56 rounded-md border bg-white shadow dark:border-slate-700 dark:hover:bg-slate-800">
         <List<MentionItem>
           size="small"
           dataSource={items}

@@ -1,6 +1,7 @@
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { List } from 'antd';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
+import { useColorMode } from '../../hooks/useColorMode';
 import type { TaskMentionListProps, TaskMentionListRef } from './ui.types';
 
 export const TaskMentionList = forwardRef<
@@ -8,6 +9,8 @@ export const TaskMentionList = forwardRef<
   TaskMentionListProps
 >((props, ref) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [colorMode] = useColorMode();
+  const $isDark = colorMode === 'dark';
 
   const selectItem = (index: number) => {
     const item = props.items[index];
@@ -43,12 +46,16 @@ export const TaskMentionList = forwardRef<
   return (
     <List
       size="small"
-      className="mention-dropdown max-h-60 w-[260px] overflow-y-auto rounded-md border bg-white shadow-md"
+      className="mention-dropdown max-h-60 w-[260px] overflow-y-auto rounded-md border bg-white shadow-md dark:border-slate-700 dark:bg-slate-800"
       dataSource={props.items}
       renderItem={(item, index) => (
         <List.Item
           className={`cursor-pointer px-3 py-2 ${
-            index === selectedIndex ? 'bg-gray-100' : ''
+            index === selectedIndex
+              ? $isDark
+                ? 'bg-slate-700'
+                : 'bg-gray-100'
+              : ''
           }`}
           onClick={() => selectItem(index)}
         >

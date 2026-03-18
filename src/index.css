@@ -22,7 +22,7 @@ body {
 }
 
 :root[data-color-mode='dark'] {
-  --app-bg: #1f1d1d;
+  --app-bg: #28282b;
   --app-text: #ededed;
 }
 

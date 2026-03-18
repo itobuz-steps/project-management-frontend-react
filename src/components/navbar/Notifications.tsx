@@ -101,7 +101,7 @@ export default function Notifications({
       {!isControlled && (
         <button
           type="button"
-          className="flex items-center justify-center rounded-md border-none p-1 transition-colors outline-none hover:bg-gray-200 dark:hover:bg-slate-700"
+          className="flex items-center justify-center rounded-md border-none p-1 transition-colors outline-none hover:bg-gray-200 dark:hover:bg-[#27272e]"
           onClick={() => {
             setNewNotificationCount(0);
             setOpen(!open);

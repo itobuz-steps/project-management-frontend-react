@@ -31,10 +31,10 @@ export const ZoomControls = ({
           background:
             zoom <= MIN_ZOOM
               ? isDark
-                ? '#0b0b0c'
+                ? '#141414'
                 : '#f8fafc'
               : isDark
-                ? '#1a1a1a'
+                ? '#27272e'
                 : '#fff',
           color:
             zoom <= MIN_ZOOM
@@ -75,10 +75,10 @@ export const ZoomControls = ({
           background:
             zoom >= MAX_ZOOM
               ? isDark
-                ? '#0b0b0c'
+                ? '#141414'
                 : '#f8fafc'
               : isDark
-                ? '#1a1a1a'
+                ? '#27272e'
                 : '#fff',
           color:
             zoom >= MAX_ZOOM
@@ -105,7 +105,7 @@ export const ZoomControls = ({
           padding: '0 10px',
           borderRadius: 6,
           border: isDark ? '1px solid #475569' : '1px solid #e2e8f0',
-          background: isDark ? '#1a1a1a' : '#fff',
+          background: isDark ? '#27272e' : '#fff',
           color: isDark ? '#d4d4d4' : '#475569',
           cursor: 'pointer',
           fontSize: 12,

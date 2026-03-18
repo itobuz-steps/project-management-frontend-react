@@ -11,11 +11,11 @@ export function TemplateCard({
       onClick={onClick}
       className={`flex min-h-30 cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 p-4 transition-all duration-200 ${
         isSelected
-          ? 'border-primary-500 bg-primary-50'
-          : 'hover:border-primary-300 border-transparent bg-gray-100'
+          ? 'border-primary-500 bg-primary-50 dark:bg-slate-700'
+          : 'hover:border-primary-300 border-transparent bg-gray-100 dark:bg-neutral-800'
       } `}
     >
-      <h4 className="text-center text-base font-semibold text-gray-800">
+      <h4 className="text-center text-base font-semibold text-gray-800 dark:text-neutral-200">
         {template.name}
       </h4>
       <div className="flex flex-wrap justify-center gap-1">
