@@ -7,6 +7,7 @@ import { SprintSelector } from './SprintSelector';
 import { SprintSummaryCards } from './SprintSummaryCards';
 import { SprintCharts } from './SprintCharts';
 import { RemovedTasksTable } from './RemovedTasksTable';
+import { BurndownChart } from './BurndownChart';
 
 function SprintView() {
   const { projectId } = useParams();
@@ -97,7 +98,10 @@ function SprintView() {
             chartSize={chartSize}
             colors={primaryColors}
           />
-
+          <BurndownChart
+            projectId={projectId}
+            sprintId={selectedSprintId as string}
+          />
           <RemovedTasksTable tasks={removedTasks} />
         </>
       )}
