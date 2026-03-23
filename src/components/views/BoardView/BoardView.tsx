@@ -278,51 +278,6 @@ function BoardView() {
     return map;
   }, [columns, filteredVisibleTasks]);
 
-  // const groupedTasksByColumn = useMemo(() => {
-  //   if (!groupBy) {
-  //     return [{ key: 'all', label: null, tasksByColumn }];
-  //   }
-
-  //   let tasksToGroup = [];
-
-  //   if (groupBy === 'story') {
-  //     tasksToGroup = filteredVisibleTasks.filter((t) => t.type === 'story');
-  //   } else {
-  //     tasksToGroup = filteredVisibleTasks;
-  //   }
-
-  //   const laneMap = new Map<
-  //     string,
-  //     { label: string; tasks: TaskPopulated[] }
-  //   >();
-
-  //   for (const task of tasksToGroup) {
-  //     const key =
-  //       groupBy === 'assignee'
-  //         ? (task.assignee?._id ?? 'unassigned')
-  //         : (task.parentTask ?? 'no-story');
-
-  //     const label =
-  //       groupBy === 'assignee'
-  //         ? (task.assignee?.name ?? 'Unassigned')
-  //         : (storyMap.get(task.parentTask ?? '') ?? 'No Story');
-
-  //     if (!laneMap.has(key)) laneMap.set(key, { label, tasks: [] });
-  //     laneMap.get(key)!.tasks.push(task);
-  //   }
-
-  //   return [...laneMap.entries()].map(([key, { label, tasks }]) => {
-  //     const byCol: Record<string, TaskPopulated[]> = {};
-  //     columns.forEach((col) => {
-  //       byCol[col] = [];
-  //     });
-  //     tasks.forEach((task) => {
-  //       if (byCol[task.status]) byCol[task.status].push(task);
-  //       else if (columns.length) byCol[columns[0]].push(task);
-  //     });
-  //     return { key, label, tasksByColumn: byCol };
-  //   });
-  // }, [groupBy, filteredVisibleTasks, columns, tasksByColumn, storyMap]);
   const groupedTasksByColumn = useMemo(() => {
     if (!groupBy) {
       return [{ key: 'all', label: null, tasksByColumn }];
@@ -336,21 +291,11 @@ function BoardView() {
     >();
 
     for (const task of tasksToGroup) {
-      // const key =
-      //   groupBy === 'assignee'
-      //     ? (task.assignee?._id ?? 'unassigned')
-      //     : (task.parentTask ?? 'no-story');
-
-      // const label =
-      //   groupBy === 'assignee'
-      //     ? (task.assignee?.name ?? 'Unassigned')
-      //     : (storyMap.get(task.parentTask ?? '') ?? 'No Story');
-
       const key =
         groupBy === 'assignee'
           ? (task.assignee?._id ?? 'unassigned')
           : task.type === 'story'
-            ? task._id // story creates its own lane
+            ? task._id
             : (task.parentTask ?? 'no-story');
 
       const label =
@@ -384,7 +329,6 @@ function BoardView() {
       },
     })
   );
-  // hook handles loading/initial load and column add/delete
 
   if (!projectId) {
     return (
