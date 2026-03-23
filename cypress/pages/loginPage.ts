@@ -9,9 +9,7 @@ class LoginPage {
   }
 
   getPassword() {
-    return cy.get(
-      'input[type="password"], input[type="text"][placeholder="Enter Password"]'
-    );
+    return cy.get('input[name="password"]');
   }
 
   getLoginButton() {

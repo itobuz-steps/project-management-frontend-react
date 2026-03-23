@@ -39,15 +39,9 @@ Cypress.Commands.add('stubSignup', (statusCode = 201, body = {}) => {
 Cypress.Commands.add(
   'signupUI',
   (username: string, email: string, password: string) => {
-    cy.get('input[type="text"][placeholder="Enter Username"]')
-      .clear()
-      .type(username);
-    cy.get('input[type="email"][placeholder="Enter Email"]')
-      .clear()
-      .type(email);
-    cy.get('input[type="password"][placeholder="Enter Password"]')
-      .clear()
-      .type(password);
+    cy.get('input[name="username"]').clear().type(username);
+    cy.get('input[type="email"]').clear().type(email);
+    cy.get('input[name="password"]').clear().type(password);
     cy.contains('button', 'Sign Up').click();
   }
 );

@@ -5,17 +5,15 @@ class SignupPage {
   }
 
   getUsername() {
-    return cy.get('input[type="text"][placeholder="Enter Username"]');
+    return cy.get('input[name="username"]');
   }
 
   getEmail() {
-    return cy.get('input[type="email"][placeholder="Enter Email"]');
+    return cy.get('input[type="email"]');
   }
 
   getPassword() {
-    return cy.get(
-      'input[type="password"][placeholder="Enter Password"], input[type="text"][placeholder="Enter Password"]'
-    );
+    return cy.get('input[name="password"]');
   }
 
   getSignUpButton() {
