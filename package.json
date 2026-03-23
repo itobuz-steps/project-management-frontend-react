@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "prepare": "husky",
     "commitlint": "commitlint --edit",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\""
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\"",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@ant-design/plots": "^2.6.8",
@@ -65,6 +67,7 @@
     "@commitlint/cli": "^20.4.2",
     "@commitlint/config-conventional": "^20.4.2",
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/typography": "^0.5.19",
     "@types/d3-scale": "^4.0.9",
     "@types/d3-time": "^3.0.4",
