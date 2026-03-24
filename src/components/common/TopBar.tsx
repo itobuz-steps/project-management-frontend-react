@@ -4,7 +4,7 @@ import { NavLink, useLocation, useSearchParams } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import { ProjectMembersModal } from './ProjectMembersModal';
 import { useProject } from '../../context/ProjectContext';
-import { PRIORITIES } from '../taskModal/constants';
+import { PRIORITIES, TASK_TYPES } from '../taskModal/constants';
 import SearchBar from '../navbar/SearchBar';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { UserCell } from '../ui/UserCell';
@@ -22,7 +22,7 @@ function TopBar({
   const { columns, members, loadingMembers } = useProjectMetaData(project?._id);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<
-    'status' | 'priority' | 'assignee' | null
+    'status' | 'priority' | 'assignee' | 'type' | null
   >(null);
   const [isMembersOpen, setIsMembersOpen] = useState(false);
 
@@ -63,7 +63,7 @@ function TopBar({
   }, [columns]);
 
   const updateFilterParam = (
-    key: 'status' | 'priority' | 'assignee',
+    key: 'status' | 'priority' | 'assignee' | 'type',
     value: string | string[]
   ) => {
     setSearchParams((prev) => {
@@ -102,7 +102,9 @@ function TopBar({
     [views]
   );
 
-  const getFilterValues = (key: 'status' | 'priority' | 'assignee') => {
+  const getFilterValues = (
+    key: 'status' | 'priority' | 'assignee' | 'type'
+  ) => {
     const raw = searchParams.get(key);
     if (!raw) {
       return [];
@@ -138,7 +140,7 @@ function TopBar({
                     setIsFiltersOpen((prev) => !prev);
                     onOpenFilters();
                   }}
-                  className="w-full rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 sm:w-auto dark:border-[#27272e] dark:text-slate-200 dark:hover:bg-[#27272e]"
+                  className="w-full rounded-md border border-gray-300 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-100 sm:w-auto dark:border-[#27272e] dark:text-slate-200 dark:hover:bg-[#27272e]"
                 >
                   Filters
                 </button>
@@ -177,6 +179,17 @@ function TopBar({
                       } w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-slate-200 dark:hover:bg-[#27272e]`}
                     >
                       Assignee
+                    </button>
+
+                    <button
+                      onClick={() => setActiveFilter('type')}
+                      className={`${
+                        activeFilter === 'type'
+                          ? 'bg-gray-100 dark:bg-[#27272e]'
+                          : ''
+                      } w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-slate-200 dark:hover:bg-[#27272e]`}
+                    >
+                      Type
                     </button>
 
                     {/* STATUS SELECT */}
@@ -237,6 +250,23 @@ function TopBar({
                             label: (
                               <UserCell user={member} emptyText="Unassigned" />
                             ),
+                          }))}
+                        />
+                      </div>
+                    )}
+
+                    {activeFilter === 'type' && (
+                      <div className="mt-2">
+                        <Select
+                          mode="multiple"
+                          allowClear
+                          placeholder="All"
+                          value={getFilterValues('type')}
+                          onChange={(value) => updateFilterParam('type', value)}
+                          className="w-full"
+                          options={TASK_TYPES.map((type) => ({
+                            value: type,
+                            label: type,
                           }))}
                         />
                       </div>
