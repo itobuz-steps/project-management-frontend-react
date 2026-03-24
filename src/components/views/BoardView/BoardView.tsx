@@ -22,7 +22,7 @@ import { useSearchParams } from 'react-router-dom';
 import useBoard from '../../../hooks/useBoard';
 import Column from './Column';
 import { AddColumnModal, DeleteColumnModal } from './ColumnModals';
-import { Minimize2, Maximize2, ChevronRight } from 'lucide-react';
+import { Minimize2, Maximize2, ChevronRight, User, Tag } from 'lucide-react';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../../hooks/useSprintActions';
 import SprintModal from '../../sprintModal/SprintModal';
@@ -97,6 +97,15 @@ function BoardView() {
   const [completedSprintId, setCompletedSprintId] = useState<string | null>(
     null
   );
+
+  const getParentTaskId = (task: TaskPopulated): string | null => {
+    if (!task.parentTask) return null;
+    if (typeof task.parentTask === 'string') return task.parentTask;
+    if (typeof task.parentTask === 'object' && '_id' in task.parentTask) {
+      return String((task.parentTask as { _id: string })._id);
+    }
+    return String(task.parentTask);
+  };
 
   const handleTaskUpdated = useCallback(
     (updated: TaskPopulated) => {
@@ -248,38 +257,6 @@ function BoardView() {
     return tasks.filter((task) => sprintTaskIds.has(task._id));
   }, [isScrum, sprintTaskIds, tasks]);
 
-  const getParentTaskId = (task: TaskPopulated): string | null => {
-    if (!task.parentTask) return null;
-    if (typeof task.parentTask === 'string') return task.parentTask;
-    if (typeof task.parentTask === 'object' && '_id' in task.parentTask) {
-      return String((task.parentTask as { _id: string })._id);
-    }
-    return String(task.parentTask);
-  };
-  const storyMap = useMemo(() => {
-    const allStoryTitles = new Map<string, string>();
-    tasks.forEach((t) => {
-      if (t.type === 'story') allStoryTitles.set(t._id, t.title);
-    });
-
-    const map = new Map<string, string>();
-
-    visibleTasks.forEach((t) => {
-      if (t.type === 'story') {
-        map.set(t._id, t.title);
-      }
-
-      // ✅ Use helper instead of raw .toString()
-      const parentId = getParentTaskId(t);
-      if (parentId) {
-        const title = allStoryTitles.get(parentId);
-        if (title) map.set(parentId, title);
-      }
-    });
-
-    return map;
-  }, [tasks, visibleTasks]);
-
   const filteredVisibleTasks = useMemo(() => {
     if (
       !statusFilters.length &&
@@ -325,6 +302,29 @@ function BoardView() {
     visibleTasks,
     typeFilter,
   ]);
+
+  const storyMap = useMemo(() => {
+    const allStoryTitles = new Map<string, string>();
+    tasks.forEach((t) => {
+      if (t.type === 'story') allStoryTitles.set(t._id, t.title);
+    });
+
+    const map = new Map<string, string>();
+
+    filteredVisibleTasks.forEach((t) => {
+      if (t.type === 'story') {
+        map.set(t._id, t.title);
+      }
+
+      const parentId = getParentTaskId(t);
+      if (parentId) {
+        const title = allStoryTitles.get(parentId);
+        if (title) map.set(parentId, title);
+      }
+    });
+
+    return map;
+  }, [tasks, filteredVisibleTasks]);
 
   const tasksByColumn = useMemo(() => {
     const map: Record<string, TaskPopulated[]> = {};
@@ -400,14 +400,19 @@ function BoardView() {
         ])
       );
 
-      laneMap.set('no-story', { label: 'No Story', tasks: [] });
-
       for (const task of filteredVisibleTasks.filter(
         (t) => t.type !== 'story'
       )) {
         const key = getParentTaskId(task) ?? 'no-story';
-        const lane = laneMap.get(key) ?? laneMap.get('no-story')!;
-        lane.tasks.push(task);
+
+        if (laneMap.has(key)) {
+          laneMap.get(key)!.tasks.push(task);
+        } else {
+          if (!laneMap.has('no-story')) {
+            laneMap.set('no-story', { label: 'No Story', tasks: [] });
+          }
+          laneMap.get('no-story')!.tasks.push(task);
+        }
       }
 
       return Array.from(laneMap.entries())
@@ -607,46 +612,86 @@ function BoardView() {
             const isCollapsed = collapsedLanes.has(key);
 
             return (
-              <div key={key}>
+              <div
+                key={key}
+                className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900"
+              >
                 {label && (
                   <button
                     onClick={() => toggleLane(key)}
-                    className="mb-2 flex w-full items-center gap-2 text-left text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-slate-300 dark:hover:text-slate-100"
+                    className="group flex w-full items-center gap-3 bg-gray-50/80 px-5 py-3.5 text-left transition-colors hover:bg-gray-100/80 dark:bg-slate-800/60 dark:hover:bg-slate-800"
                   >
                     <ChevronRight
-                      className={`h-4 w-4 shrink-0 transition-transform duration-200 ${!isCollapsed ? 'rotate-90' : ''}`}
+                      className={`h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200 group-hover:text-gray-600 dark:text-slate-500 dark:group-hover:text-slate-300 ${!isCollapsed ? 'rotate-90' : ''}`}
                     />
-                    <span>{label}</span>
-                    <span className="text-xs text-gray-400 dark:text-slate-500">
+                    {groupBy === 'story' && (
+                      <Tag className="h-4 w-4 shrink-0 text-green-400 dark:text-green-500" />
+                    )}
+
+                    {groupBy === 'assignee' &&
+                      (key === 'unassigned' ? (
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-200 dark:bg-slate-700">
+                          <User className="h-3.5 w-3.5 text-gray-400 dark:text-slate-500" />
+                        </div>
+                      ) : (
+                        (() => {
+                          const member = members.find((m) => m._id === key);
+                          return member?.profileImage ? (
+                            <img
+                              src={member.profileImage}
+                              alt={label ?? ''}
+                              className="h-6 w-6 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-100 text-xs font-semibold text-violet-600 uppercase dark:bg-violet-900/40 dark:text-violet-400">
+                              {label?.charAt(0)}
+                            </div>
+                          );
+                        })()
+                      ))}
+
+                    <span className="text-sm font-semibold tracking-wide text-gray-800 dark:text-slate-100">
+                      {label}
+                    </span>
+
+                    <span className="text-gray-300 dark:text-slate-600">·</span>
+
+                    <span className="rounded-full bg-gray-200/80 px-2 py-0.5 text-xs font-medium text-gray-500 tabular-nums dark:bg-slate-700 dark:text-slate-400">
                       {Object.values(laneColumns).flat().length} tasks
+                    </span>
+
+                    <span className="ml-auto text-xs text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-slate-500">
+                      {isCollapsed ? 'Expand' : 'Collapse'}
                     </span>
                   </button>
                 )}
 
                 {!isCollapsed && (
-                  <div className="flex gap-4 overflow-x-auto pb-2 sm:gap-6">
-                    {columns.map((col) => (
-                      <Column
-                        key={col}
-                        col={col}
-                        tasks={laneColumns[col] ?? []}
-                        compactMode={isCompactMode}
-                        loading={loading}
-                        error={error}
-                        onAdd={openAddColumnModal}
-                        onDelete={openDeleteColumnModal}
-                        onTaskOpen={(taskId: string) =>
-                          setSearchParams((prev) => {
-                            const next = new URLSearchParams(prev);
-                            next.set('taskId', taskId);
-                            return next;
-                          })
-                        }
-                        onUpdated={handleTaskUpdated}
-                        members={members}
-                        loadingMembers={loadingMembers}
-                      />
-                    ))}
+                  <div className="border-t border-gray-200/80 bg-white p-5 dark:border-slate-700/60 dark:bg-slate-900">
+                    <div className="flex gap-4 overflow-x-auto pb-2 sm:gap-6">
+                      {columns.map((col) => (
+                        <Column
+                          key={col}
+                          col={col}
+                          tasks={laneColumns[col] ?? []}
+                          compactMode={isCompactMode}
+                          loading={loading}
+                          error={error}
+                          onAdd={openAddColumnModal}
+                          onDelete={openDeleteColumnModal}
+                          onTaskOpen={(taskId: string) =>
+                            setSearchParams((prev) => {
+                              const next = new URLSearchParams(prev);
+                              next.set('taskId', taskId);
+                              return next;
+                            })
+                          }
+                          onUpdated={handleTaskUpdated}
+                          members={members}
+                          loadingMembers={loadingMembers}
+                        />
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
