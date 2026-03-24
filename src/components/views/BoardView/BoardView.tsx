@@ -229,11 +229,6 @@ function BoardView() {
   }, [isScrum, sprintTaskIds, tasks]);
 
   const filteredVisibleTasks = useMemo(() => {
-    console.log('typeFilter values:', typeFilter);
-    console.log(
-      'task.type samples:',
-      visibleTasks.slice(0, 3).map((t) => t.type)
-    );
     if (
       !statusFilters.length &&
       !priorityFilters.length &&
