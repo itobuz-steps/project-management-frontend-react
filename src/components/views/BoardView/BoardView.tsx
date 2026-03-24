@@ -22,7 +22,7 @@ import { useSearchParams } from 'react-router-dom';
 import useBoard from '../../../hooks/useBoard';
 import Column from './Column';
 import { AddColumnModal, DeleteColumnModal } from './ColumnModals';
-import { Minimize2, Maximize2 } from 'lucide-react';
+import { Minimize2, Maximize2, ChevronRight } from 'lucide-react';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../../hooks/useSprintActions';
 import SprintModal from '../../sprintModal/SprintModal';
@@ -48,6 +48,34 @@ function BoardView() {
 
   const type = project?.projectType;
   const isScrum = type === 'scrum';
+
+  const [collapsedLanes, setCollapsedLanes] = useState<Set<string>>(() => {
+    try {
+      const stored = sessionStorage.getItem('boardCollapsedLanes');
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+  const toggleLane = (key: string) => {
+    setCollapsedLanes((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      try {
+        sessionStorage.setItem(
+          'boardCollapsedLanes',
+          JSON.stringify(Array.from(next))
+        );
+      } catch (error) {
+        console.log('error', error);
+      }
+      return next;
+    });
+  };
 
   const {
     tasks,
@@ -115,14 +143,6 @@ function BoardView() {
       .filter(Boolean)
       .map(normalize);
   }, [searchParams, normalize]);
-
-  const storyMap = useMemo(() => {
-    const map = new Map<string, string>();
-    tasks.forEach((t) => {
-      if (t.type === 'story') map.set(t._id, t.title);
-    });
-    return map;
-  }, [tasks]);
 
   const rawGroupBy = searchParams.get('groupBy');
   const groupBy =
@@ -228,6 +248,38 @@ function BoardView() {
     return tasks.filter((task) => sprintTaskIds.has(task._id));
   }, [isScrum, sprintTaskIds, tasks]);
 
+  const getParentTaskId = (task: TaskPopulated): string | null => {
+    if (!task.parentTask) return null;
+    if (typeof task.parentTask === 'string') return task.parentTask;
+    if (typeof task.parentTask === 'object' && '_id' in task.parentTask) {
+      return String((task.parentTask as { _id: string })._id);
+    }
+    return String(task.parentTask);
+  };
+  const storyMap = useMemo(() => {
+    const allStoryTitles = new Map<string, string>();
+    tasks.forEach((t) => {
+      if (t.type === 'story') allStoryTitles.set(t._id, t.title);
+    });
+
+    const map = new Map<string, string>();
+
+    visibleTasks.forEach((t) => {
+      if (t.type === 'story') {
+        map.set(t._id, t.title);
+      }
+
+      // ✅ Use helper instead of raw .toString()
+      const parentId = getParentTaskId(t);
+      if (parentId) {
+        const title = allStoryTitles.get(parentId);
+        if (title) map.set(parentId, title);
+      }
+    });
+
+    return map;
+  }, [tasks, visibleTasks]);
+
   const filteredVisibleTasks = useMemo(() => {
     if (
       !statusFilters.length &&
@@ -285,7 +337,6 @@ function BoardView() {
       if (map[task.status]) {
         map[task.status].push(task);
       } else if (columns.length) {
-        // fallback to first column
         map[columns[0]].push(task);
       }
     });
@@ -295,93 +346,84 @@ function BoardView() {
 
   const groupedTasksByColumn = useMemo(() => {
     if (!groupBy) {
-      return [
-        {
-          key: 'all',
-          label: null,
-          tasksByColumn,
-        },
-      ];
+      return [{ key: 'all', label: null, tasksByColumn }];
     }
 
-    const tasksToGroup = filteredVisibleTasks; // tasks at current sprint
+    const buildTasksByStatus = (tasks: TaskPopulated[]) => {
+      const tasksByStatus: Record<string, TaskPopulated[]> = Object.fromEntries(
+        columns.map((col) => [col, []])
+      );
 
-    const getGroupKey = (task: TaskPopulated): string => {
-      if (groupBy === 'assignee') {
-        return task.assignee?._id ?? 'unassigned';
+      for (const task of tasks) {
+        const col = tasksByStatus[task.status] ? task.status : columns[0];
+        if (col) tasksByStatus[col].push(task);
       }
 
-      if (task.type === 'story') {
-        return task._id;
-      }
-
-      return task.parentTask ?? 'no-story';
+      return tasksByStatus;
     };
 
-    const getGroupLabel = (task: TaskPopulated): string => {
-      if (groupBy === 'assignee') {
-        return task.assignee?.name ?? 'Unassigned';
+    if (groupBy === 'assignee') {
+      const laneMap = new Map<
+        string,
+        { label: string; tasks: TaskPopulated[] }
+      >();
+
+      for (const task of filteredVisibleTasks) {
+        const key = task.assignee?._id ?? 'unassigned';
+        const label = task.assignee?.name ?? 'Unassigned';
+
+        if (!laneMap.has(key)) laneMap.set(key, { label, tasks: [] });
+        laneMap.get(key)!.tasks.push(task);
       }
 
-      if (task.type === 'story') {
-        return task.title;
-      }
-
-      return storyMap.get(task.parentTask ?? '') ?? 'No Story';
-    };
-
-    const laneMap = new Map<
-      string,
-      { label: string; tasks: TaskPopulated[] }
-    >();
-
-    for (const task of tasksToGroup) {
-      const key = getGroupKey(task);
-      const label = getGroupLabel(task);
-
-      if (!laneMap.has(key)) {
-        laneMap.set(key, { label, tasks: [] });
-      }
-
-      laneMap.get(key)!.tasks.push(task);
+      return Array.from(laneMap.entries())
+        .sort(([keyA, a], [keyB, b]) => {
+          if (keyA === 'unassigned') return 1;
+          if (keyB === 'unassigned') return -1;
+          return a.label.localeCompare(b.label);
+        })
+        .map(([key, lane]) => ({
+          key,
+          label: lane.label,
+          tasksByColumn: buildTasksByStatus(lane.tasks),
+        }));
     }
 
-    const sortedLanes = Array.from(laneMap.entries()).sort(
-      ([keyA, laneA], [keyB, laneB]) => {
-        const isAUnassigned = keyA === 'unassigned';
-        const isBUnassigned = keyB === 'unassigned';
+    if (groupBy === 'story') {
+      const laneMap = new Map<
+        string,
+        { label: string; tasks: TaskPopulated[] }
+      >(
+        Array.from(storyMap.entries()).map(([id, name]) => [
+          id,
+          { label: name, tasks: [] },
+        ])
+      );
 
-        if (isAUnassigned && !isBUnassigned) return 1;
-        if (!isAUnassigned && isBUnassigned) return -1;
+      laneMap.set('no-story', { label: 'No Story', tasks: [] });
 
-        return laneA.label.localeCompare(laneB.label);
-      }
-    );
-
-    const result = sortedLanes.map(([key, lane]) => {
-      // Initialize empty columns
-      const tasksByStatus: Record<string, TaskPopulated[]> = {};
-
-      for (const col of columns) {
-        tasksByStatus[col] = [];
-      }
-
-      for (const task of lane.tasks) {
-        if (tasksByStatus[task.status]) {
-          tasksByStatus[task.status].push(task);
-        } else if (columns.length > 0) {
-          tasksByStatus[columns[0]].push(task);
-        }
+      for (const task of filteredVisibleTasks.filter(
+        (t) => t.type !== 'story'
+      )) {
+        const key = getParentTaskId(task) ?? 'no-story';
+        const lane = laneMap.get(key) ?? laneMap.get('no-story')!;
+        lane.tasks.push(task);
       }
 
-      return {
-        key,
-        label: lane.label,
-        tasksByColumn: tasksByStatus,
-      };
-    });
+      return Array.from(laneMap.entries())
+        .sort(([keyA, a], [keyB, b]) => {
+          if (keyA === 'no-story') return 1;
+          if (keyB === 'no-story') return -1;
+          return a.label.localeCompare(b.label);
+        })
+        .map(([key, lane]) => ({
+          key,
+          label: lane.label,
+          tasksByColumn: buildTasksByStatus(lane.tasks),
+        }));
+    }
 
-    return result;
+    return [{ key: 'all', label: null, tasksByColumn }];
   }, [groupBy, filteredVisibleTasks, columns, tasksByColumn, storyMap]);
 
   const sensors = useSensors(
@@ -561,42 +603,55 @@ function BoardView() {
 
       <div className="flex flex-col gap-6">
         {groupedTasksByColumn.map(
-          ({ key, label, tasksByColumn: laneColumns }) => (
-            <div key={key}>
-              {label && (
-                <div className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-slate-300">
-                  <span>{label}</span>
-                  <span className="text-xs text-gray-400 dark:text-slate-500">
-                    {Object.values(laneColumns).flat().length} tasks
-                  </span>
-                </div>
-              )}
-              <div className="flex gap-4 overflow-x-auto pb-2 sm:gap-6">
-                {columns.map((col) => (
-                  <Column
-                    key={col}
-                    col={col}
-                    tasks={laneColumns[col] ?? []}
-                    compactMode={isCompactMode}
-                    loading={loading}
-                    error={error}
-                    onAdd={openAddColumnModal}
-                    onDelete={openDeleteColumnModal}
-                    onTaskOpen={(taskId: string) =>
-                      setSearchParams((prev) => {
-                        const next = new URLSearchParams(prev);
-                        next.set('taskId', taskId);
-                        return next;
-                      })
-                    }
-                    onUpdated={handleTaskUpdated}
-                    members={members}
-                    loadingMembers={loadingMembers}
-                  />
-                ))}
+          ({ key, label, tasksByColumn: laneColumns }) => {
+            const isCollapsed = collapsedLanes.has(key);
+
+            return (
+              <div key={key}>
+                {label && (
+                  <button
+                    onClick={() => toggleLane(key)}
+                    className="mb-2 flex w-full items-center gap-2 text-left text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-slate-300 dark:hover:text-slate-100"
+                  >
+                    <ChevronRight
+                      className={`h-4 w-4 shrink-0 transition-transform duration-200 ${!isCollapsed ? 'rotate-90' : ''}`}
+                    />
+                    <span>{label}</span>
+                    <span className="text-xs text-gray-400 dark:text-slate-500">
+                      {Object.values(laneColumns).flat().length} tasks
+                    </span>
+                  </button>
+                )}
+
+                {!isCollapsed && (
+                  <div className="flex gap-4 overflow-x-auto pb-2 sm:gap-6">
+                    {columns.map((col) => (
+                      <Column
+                        key={col}
+                        col={col}
+                        tasks={laneColumns[col] ?? []}
+                        compactMode={isCompactMode}
+                        loading={loading}
+                        error={error}
+                        onAdd={openAddColumnModal}
+                        onDelete={openDeleteColumnModal}
+                        onTaskOpen={(taskId: string) =>
+                          setSearchParams((prev) => {
+                            const next = new URLSearchParams(prev);
+                            next.set('taskId', taskId);
+                            return next;
+                          })
+                        }
+                        onUpdated={handleTaskUpdated}
+                        members={members}
+                        loadingMembers={loadingMembers}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          )
+            );
+          }
         )}
       </div>
 
