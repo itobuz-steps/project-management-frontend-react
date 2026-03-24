@@ -109,6 +109,13 @@ function BoardView() {
     [searchParams, normalize]
   );
 
+  const typeFilter = useMemo(() => {
+    return (searchParams.get('type') || '')
+      .split(',')
+      .filter(Boolean)
+      .map(normalize);
+  }, [searchParams, normalize]);
+
   const storyMap = useMemo(() => {
     const map = new Map<string, string>();
     tasks.forEach((t) => {
@@ -222,10 +229,16 @@ function BoardView() {
   }, [isScrum, sprintTaskIds, tasks]);
 
   const filteredVisibleTasks = useMemo(() => {
+    console.log('typeFilter values:', typeFilter);
+    console.log(
+      'task.type samples:',
+      visibleTasks.slice(0, 3).map((t) => t.type)
+    );
     if (
       !statusFilters.length &&
       !priorityFilters.length &&
-      !assigneeFilters.length
+      !assigneeFilters.length &&
+      !typeFilter.length
     ) {
       return visibleTasks;
     }
@@ -249,6 +262,12 @@ function BoardView() {
       ) {
         return false;
       }
+      if (
+        typeFilter.length &&
+        !typeFilter.includes(normalize(task.type || ''))
+      ) {
+        return false;
+      }
       return true;
     });
   }, [
@@ -257,6 +276,7 @@ function BoardView() {
     assigneeFilters,
     normalize,
     visibleTasks,
+    typeFilter,
   ]);
 
   const tasksByColumn = useMemo(() => {
@@ -280,10 +300,40 @@ function BoardView() {
 
   const groupedTasksByColumn = useMemo(() => {
     if (!groupBy) {
-      return [{ key: 'all', label: null, tasksByColumn }];
+      return [
+        {
+          key: 'all',
+          label: null,
+          tasksByColumn,
+        },
+      ];
     }
 
-    const tasksToGroup = filteredVisibleTasks;
+    const tasksToGroup = filteredVisibleTasks; // tasks at current sprint
+
+    const getGroupKey = (task: TaskPopulated): string => {
+      if (groupBy === 'assignee') {
+        return task.assignee?._id ?? 'unassigned';
+      }
+
+      if (task.type === 'story') {
+        return task._id;
+      }
+
+      return task.parentTask ?? 'no-story';
+    };
+
+    const getGroupLabel = (task: TaskPopulated): string => {
+      if (groupBy === 'assignee') {
+        return task.assignee?.name ?? 'Unassigned';
+      }
+
+      if (task.type === 'story') {
+        return task.title;
+      }
+
+      return storyMap.get(task.parentTask ?? '') ?? 'No Story';
+    };
 
     const laneMap = new Map<
       string,
@@ -291,35 +341,52 @@ function BoardView() {
     >();
 
     for (const task of tasksToGroup) {
-      const key =
-        groupBy === 'assignee'
-          ? (task.assignee?._id ?? 'unassigned')
-          : task.type === 'story'
-            ? task._id
-            : (task.parentTask ?? 'no-story');
+      const key = getGroupKey(task);
+      const label = getGroupLabel(task);
 
-      const label =
-        groupBy === 'assignee'
-          ? (task.assignee?.name ?? 'Unassigned')
-          : task.type === 'story'
-            ? task.title // story title as lane name
-            : (storyMap.get(task.parentTask ?? '') ?? 'No Story');
+      if (!laneMap.has(key)) {
+        laneMap.set(key, { label, tasks: [] });
+      }
 
-      if (!laneMap.has(key)) laneMap.set(key, { label, tasks: [] });
       laneMap.get(key)!.tasks.push(task);
     }
 
-    return [...laneMap.entries()].map(([key, { label, tasks }]) => {
-      const byCol: Record<string, TaskPopulated[]> = {};
-      columns.forEach((col) => {
-        byCol[col] = [];
-      });
-      tasks.forEach((task) => {
-        if (byCol[task.status]) byCol[task.status].push(task);
-        else if (columns.length) byCol[columns[0]].push(task);
-      });
-      return { key, label, tasksByColumn: byCol };
+    const sortedLanes = Array.from(laneMap.entries()).sort(
+      ([keyA, laneA], [keyB, laneB]) => {
+        const isAUnassigned = keyA === 'unassigned';
+        const isBUnassigned = keyB === 'unassigned';
+
+        if (isAUnassigned && !isBUnassigned) return 1;
+        if (!isAUnassigned && isBUnassigned) return -1;
+
+        return laneA.label.localeCompare(laneB.label);
+      }
+    );
+
+    const result = sortedLanes.map(([key, lane]) => {
+      // Initialize empty columns
+      const tasksByStatus: Record<string, TaskPopulated[]> = {};
+
+      for (const col of columns) {
+        tasksByStatus[col] = [];
+      }
+
+      for (const task of lane.tasks) {
+        if (tasksByStatus[task.status]) {
+          tasksByStatus[task.status].push(task);
+        } else if (columns.length > 0) {
+          tasksByStatus[columns[0]].push(task);
+        }
+      }
+
+      return {
+        key,
+        label: lane.label,
+        tasksByColumn: tasksByStatus,
+      };
     });
+
+    return result;
   }, [groupBy, filteredVisibleTasks, columns, tasksByColumn, storyMap]);
 
   const sensors = useSensors(
@@ -520,7 +587,13 @@ function BoardView() {
                     error={error}
                     onAdd={openAddColumnModal}
                     onDelete={openDeleteColumnModal}
-                    onTaskOpen={(taskId: string) => setSearchParams({ taskId })}
+                    onTaskOpen={(taskId: string) =>
+                      setSearchParams((prev) => {
+                        const next = new URLSearchParams(prev);
+                        next.set('taskId', taskId);
+                        return next;
+                      })
+                    }
                     onUpdated={handleTaskUpdated}
                     members={members}
                     loadingMembers={loadingMembers}
