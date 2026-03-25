@@ -74,3 +74,43 @@ export async function mockLoginFailure(page: Page) {
     })
   );
 }
+
+export async function mockSendOtpSuccess(page: Page) {
+  await page.route('**/auth/send-otp', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'OTP sent' }),
+    })
+  );
+}
+
+export async function mockSendOtpFailure(page: Page) {
+  await page.route('**/auth/send-otp', (route) =>
+    route.fulfill({
+      status: 404,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'User not found' }),
+    })
+  );
+}
+
+export async function mockResetPasswordSuccess(page: Page) {
+  await page.route('**/auth/reset-password', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Password reset successful' }),
+    })
+  );
+}
+
+export async function mockResetPasswordInvalidOtp(page: Page) {
+  await page.route('**/auth/reset-password', (route) =>
+    route.fulfill({
+      status: 400,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Invalid OTP' }),
+    })
+  );
+}
