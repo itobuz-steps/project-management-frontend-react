@@ -98,3 +98,52 @@ export const PRIORITY_COLOR_MAP: Record<string, string> = {
   medium: 'orange',
   low: 'green',
 };
+
+export interface DayPoint {
+  date: string;
+  ideal: number;
+  actual: number;
+  completed: number;
+  scopeAdded: number;
+}
+
+export interface ScopeChange {
+  date: string;
+  pointsAdded: number;
+  actual: number;
+}
+
+export interface BurndownSummary {
+  initialScope: number;
+  currentScope: number;
+  completedPoints: number;
+  remainingPoints: number;
+  percentComplete: number;
+  status: 'on_track' | 'at_risk' | 'behind';
+  variance: number;
+  variancePct: number;
+}
+
+export interface BurndownData {
+  sprint: {
+    id: string;
+    key: string;
+    startDate: string;
+    endDate: string;
+    totalWorkingDays: number;
+  };
+  summary: BurndownSummary;
+  series: DayPoint[];
+  scopeChanges: ScopeChange[];
+}
+
+export interface BurndownChartProps {
+  projectId: string;
+  sprintId: string;
+}
+
+export interface CustomTooltipProps {
+  active?: boolean;
+  payload?: { name: string; value: number; color: string }[];
+  label?: string;
+}
