@@ -8,7 +8,9 @@ body {
   font-family: 'Montserrat', sans-serif;
   background-color: var(--app-bg);
   color: var(--app-text);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 :root {
@@ -75,7 +77,7 @@ h2 {
 }
 
 .topbar-project-header {
-  font-size: 22px;
+  font-size: 18px;
 }
 
 .smaller-text {
@@ -88,7 +90,6 @@ h2 {
 
 /* ===== Custom scrollbar (desktop only) ===== */
 @media (hover: hover) {
-
   /* Firefox */
   * {
     scrollbar-width: thin;

@@ -1,4 +1,4 @@
-import { UsergroupAddOutlined } from '@ant-design/icons';
+import { UserPlus } from 'lucide-react';
 
 interface InviteUserButtonProps {
   onClick: () => void;
@@ -8,9 +8,9 @@ export function InviteUserButton({ onClick }: InviteUserButtonProps) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center justify-center rounded-md p-1 text-gray-900 transition-colors hover:bg-gray-200 dark:text-neutral-100 dark:hover:bg-neutral-800"
+      className="flex h-8 w-8 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600"
     >
-      <UsergroupAddOutlined style={{ fontSize: '1.5rem' }} />
+      <UserPlus size={16} strokeWidth={1.9} />
     </button>
   );
 }

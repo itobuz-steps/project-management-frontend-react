@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import userService from '../../services/userService';
 import { message } from 'antd';
-import { ChevronDown, ChevronRight, Edit3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface UserProfileProps {
@@ -13,7 +12,6 @@ export function UserProfile({ collapsed, mobileOpen }: UserProfileProps) {
   const [userName, setUserName] = useState('Workspace');
   const [userEmail, setUserEmail] = useState('project manager');
   const [userImage, setUserImage] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     async function loadUser() {
@@ -38,18 +36,13 @@ export function UserProfile({ collapsed, mobileOpen }: UserProfileProps) {
   }, []);
 
   return (
-    <div
+    <Link
+      to="/edit-profile"
       className={`flex flex-col gap-3 rounded-xl p-2 ${
         collapsed && !mobileOpen
           ? 'justify-center md:w-auto'
           : 'border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800'
       }`}
-      onClick={() => {
-        if (collapsed) {
-          return;
-        }
-        setOpen((prev) => !prev);
-      }}
     >
       <div className="flex cursor-pointer items-center gap-3">
         <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-slate-700">
@@ -73,18 +66,7 @@ export function UserProfile({ collapsed, mobileOpen }: UserProfileProps) {
             {userEmail}
           </p>
         </div>
-        {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
       </div>
-      {open && !collapsed && (
-        <Link
-          to="/edit-profile"
-          className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-slate-700 dark:bg-slate-700 dark:text-slate-100"
-        >
-          {' '}
-          <Edit3 className="size-4" />
-          Edit Profile
-        </Link>
-      )}
-    </div>
+    </Link>
   );
 }
