@@ -7,14 +7,18 @@ import {
   Home,
   ChevronsLeft,
   ChevronsRight,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import SidebarProjectsDropdown from './SidebarProjectDropdown';
 import SidebarWorkspaceCreate from './SidebarWorkspaceCreate';
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
 import { CreateProjectModal } from '../createProject';
 import { Can } from '../../utils/PermissionHoc';
 import { UserProfile } from './UserProfile';
+import { useColorMode } from '../../hooks/useColorMode';
 
 type SidebarProps = {
   collapsed: boolean;
@@ -31,9 +35,16 @@ export default function Sidebar({
   onMobileOpenChange,
   onSidebarOpen,
 }: SidebarProps) {
+  const [colorMode, setColorMode] = useColorMode();
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   const [workspaceRefreshKey, setWorkspaceRefreshKey] = useState(0);
   const [workspacesExpanded, setWorkspacesExpanded] = useState(true);
+
+  const isCompactSidebar = collapsed && !mobileOpen;
+
+  const toggleColorMode = () => {
+    setColorMode((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   const handleWorkspaceToggle = () => {
     // In collapsed desktop mode, clicking the workspace icon should open sidebar and keep workspaces visible.
@@ -123,7 +134,7 @@ export default function Sidebar({
         </button>
 
         <div
-          className={`flex h-full flex-col gap-6 overflow-x-hidden overflow-y-auto px-3 py-4 ${
+          className={`flex h-full flex-col gap-4 overflow-x-hidden overflow-y-auto px-3 py-4 ${
             collapsed && !mobileOpen ? 'md:px-2' : 'md:px-4'
           }`}
         >
@@ -203,7 +214,48 @@ export default function Sidebar({
             </SidebarGroup>
           </ul>
 
-          <LogoutButton collapsed={collapsed && !mobileOpen} />
+          <div className="mt-auto flex flex-col gap-2">
+            <motion.button
+              type="button"
+              onClick={toggleColorMode}
+              className={`group flex w-full items-center rounded-lg border px-2.5 py-2.5 transition-colors ${
+                isCompactSidebar ? 'justify-center' : 'gap-3'
+              } ${
+                colorMode === 'dark'
+                  ? 'border-slate-800 bg-slate-800 text-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white'
+                  : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-white/80 dark:text-slate-300 dark:hover:border-slate-700 dark:hover:bg-slate-800'
+              }`}
+              aria-label={
+                colorMode === 'light'
+                  ? 'Switch to dark mode'
+                  : 'Switch to light mode'
+              }
+              whileHover={{ y: -1 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <motion.span
+                animate={{ rotate: colorMode === 'light' ? 0 : 180 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+              >
+                {colorMode === 'light' ? (
+                  <Moon size={16} className="shrink-0" />
+                ) : (
+                  <Sun size={16} className="shrink-0" />
+                )}
+              </motion.span>
+              <span
+                className={`truncate text-[14px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${
+                  isCompactSidebar
+                    ? '-translate-x-2 opacity-0'
+                    : 'translate-x-0 opacity-100'
+                }`}
+              >
+                {colorMode === 'light' ? 'Dark mode' : 'Light mode'}
+              </span>
+            </motion.button>
+
+            <LogoutButton collapsed={isCompactSidebar} />
+          </div>
         </div>
       </aside>
 
