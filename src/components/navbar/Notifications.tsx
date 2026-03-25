@@ -35,22 +35,27 @@ export default function Notifications({
   const [hasMore, setHasMore] = useState(true);
   const [newNotificationCount, setNewNotificationCount] = useState(0);
   const [inAppEnabled, setInAppEnabled] = useState(true);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         open &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
       ) {
-        setOpen(false);
+        if (isControlled) {
+          onOpenChange?.(false);
+        } else {
+          setInternalOpen(false);
+        }
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [open]);
+  }, [open, isControlled, onOpenChange]);
 
   useEffect(() => {
     async function fetchUserPreferences() {
@@ -97,23 +102,23 @@ export default function Notifications({
   }
 
   return (
-    <div className="relative mx-auto w-max">
+    <div className="relative mx-auto w-max" ref={containerRef}>
       {!isControlled && (
         <button
           type="button"
-          className="flex items-center justify-center rounded-md border-none p-1 transition-colors outline-none hover:bg-gray-200 dark:hover:bg-[#27272e]"
+          className="flex h-8 w-8 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600"
           onClick={() => {
             setNewNotificationCount(0);
             setOpen(!open);
           }}
         >
           <span className="relative inline-flex">
-            <Bell className="size-6 text-gray-900 max-md:size-6 dark:text-slate-100" />
+            <Bell size={16} strokeWidth={1.9} />
 
             {newNotificationCount > 0 && !open && (
               <span
                 id="notificationBadge"
-                className="absolute -top-1 -right-0.5 flex min-h-3 min-w-3 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-semibold text-white"
+                className="absolute -top-0.5 -right-0.5 flex min-h-2.5 min-w-2.5 items-center justify-center rounded-full bg-red-600 px-0.5 text-[10px] leading-none font-semibold text-white"
               >
                 {newNotificationCount}
               </span>

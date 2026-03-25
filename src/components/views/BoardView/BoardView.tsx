@@ -26,6 +26,7 @@ import { Minimize2, Maximize2, ChevronRight, User, Tag } from 'lucide-react';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../../hooks/useSprintActions';
 import SprintModal from '../../sprintModal/SprintModal';
+import { parseBoardTaskFilters } from '../../../config/taskFilters';
 
 const { Option } = Select;
 
@@ -48,6 +49,10 @@ function BoardView() {
 
   const type = project?.projectType;
   const isScrum = type === 'scrum';
+  const boardFilters = useMemo(
+    () => parseBoardTaskFilters(searchParams),
+    [searchParams]
+  );
 
   const [collapsedLanes, setCollapsedLanes] = useState<Set<string>>(() => {
     try {
@@ -90,7 +95,12 @@ function BoardView() {
     handleAddColumn,
     handleDeleteColumn,
     setError,
-  } = useBoard(projectId, searchParams.get('searchInput') || '', isScrum);
+  } = useBoard(
+    projectId,
+    searchParams.get('searchInput') || '',
+    isScrum,
+    boardFilters
+  );
 
   const { completeSprint } = useSprintActions(projectId, setSprints);
   const [isCompletingSprint, setIsCompletingSprint] = useState(false);
@@ -156,7 +166,6 @@ function BoardView() {
   const rawGroupBy = searchParams.get('groupBy');
   const groupBy =
     rawGroupBy === 'assignee' || rawGroupBy === 'story' ? rawGroupBy : null;
-
   const openAddColumnModal = (columnId: string) => {
     setNewColumnName('');
     setInsertAfterColumn(columnId);
@@ -206,31 +215,17 @@ function BoardView() {
     }
   };
 
-  const sprintTaskIds = useMemo(() => {
-    if (!isScrum) {
-      return null;
-    }
-
-    const activeSprint = sprints.find(
-      (sprint) => sprint.dueDate && !sprint.isCompleted
-    );
-
-    if (!activeSprint) {
-      return new Set<string>();
-    }
-
-    return new Set(activeSprint.tasks);
-  }, [isScrum, sprints]);
-
   const activeSprint = useMemo(() => {
-    if (!isScrum) {
-      return null;
-    }
-
+    if (!isScrum) return null;
     return (
       sprints.find((sprint) => sprint.dueDate && !sprint.isCompleted) ?? null
     );
   }, [isScrum, sprints]);
+
+  const activeSprintTaskIds = useMemo(
+    () => new Set(activeSprint?.tasks ?? []),
+    [activeSprint]
+  );
 
   const handleCompleteSprint = useCallback(async () => {
     if (!activeSprint || isCompletingSprint) {
@@ -247,15 +242,10 @@ function BoardView() {
   }, [activeSprint, completeSprint, isCompletingSprint]);
 
   const visibleTasks = useMemo(() => {
-    if (!isScrum) {
-      return tasks;
-    }
-    if (!sprintTaskIds || sprintTaskIds.size === 0) {
-      return [];
-    }
-
-    return tasks.filter((task) => sprintTaskIds.has(task._id));
-  }, [isScrum, sprintTaskIds, tasks]);
+    if (!isScrum) return tasks;
+    if (!activeSprint) return [];
+    return tasks.filter((task) => activeSprintTaskIds.has(task._id));
+  }, [activeSprint, activeSprintTaskIds, isScrum, tasks]);
 
   const filteredVisibleTasks = useMemo(() => {
     if (
@@ -343,6 +333,11 @@ function BoardView() {
 
     return map;
   }, [columns, filteredVisibleTasks]);
+
+  const activeTask = useMemo(
+    () => tasks.find((task) => task._id === activeTaskId),
+    [activeTaskId, tasks]
+  );
 
   const groupedTasksByColumn = useMemo(() => {
     if (!groupBy) {
@@ -493,26 +488,17 @@ function BoardView() {
       onDragEnd={({ active, over }) => {
         setActiveTaskId(null);
 
-        if (!over) {
-          return;
-        }
-        if (active.id === over.id) {
-          return;
-        }
+        if (!over || active.id === over.id) return;
 
         const activeColumn = active.data.current?.column as string | undefined;
         const overColumn =
           (over.data.current?.column as string | undefined) ??
-          (typeof over.id === 'string' && over.id.startsWith('column:')
-            ? over.id.replace('column:', '')
-            : undefined);
+          String(over.id).replace('column:', '');
 
-        if (!activeColumn || !overColumn) {
-          return;
-        }
+        if (!activeColumn || !overColumn) return;
 
         const isStatusChange = activeColumn !== overColumn;
-        let previousTasks: TaskPopulated[] | null = null;
+        let previousTasks: TaskPopulated[] = [];
 
         setTasks((prev) => {
           previousTasks = prev;
@@ -542,9 +528,7 @@ function BoardView() {
           void updateTask(String(active.id), {
             status: overColumn as TaskStatus,
           }).catch(() => {
-            if (previousTasks) {
-              setTasks(previousTasks);
-            }
+            setTasks(previousTasks);
             setError('Failed to update task status.');
           });
         }
@@ -704,24 +688,12 @@ function BoardView() {
         {activeTaskId ? (
           <div className="rounded-md border border-gray-200 bg-white p-3 shadow-md dark:border-slate-700 dark:bg-slate-800">
             <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
-              {tasks.find((task) => task._id === activeTaskId)?.title}
-              {tasks.find((task) => task._id === activeTaskId) ? (
+              {activeTask?.title}
+              {activeTask ? (
                 <span className="mt-1 flex items-center gap-1 text-xs text-gray-500 dark:text-slate-400">
-                  <TaskTypeIcon
-                    type={
-                      tasks.find((task) => task._id === activeTaskId)?.type ||
-                      'task'
-                    }
-                  />
-
-                  <TaskTypeColor
-                    type={
-                      tasks.find((task) => task._id === activeTaskId)?.type ||
-                      'task'
-                    }
-                  >
-                    {tasks.find((task) => task._id === activeTaskId)?.key ??
-                      activeTaskId}
+                  <TaskTypeIcon type={activeTask.type} />
+                  <TaskTypeColor type={activeTask.type}>
+                    {activeTask.key ?? activeTaskId}
                   </TaskTypeColor>
                 </span>
               ) : null}
