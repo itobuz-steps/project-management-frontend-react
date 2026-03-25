@@ -7,11 +7,13 @@ import type { Sprint } from '../services/types/sprints.types';
 import { createSprintService } from '../services/sprints.service';
 import { deleteProjectColumn } from '../services/projectService';
 import type { Project } from '../types/project.types';
+import type { BoardTaskFilters } from '../config/taskFilters';
 
 export function useBoard(
   projectId?: string,
   searchInput = '',
-  isScrum = false
+  isScrum = false,
+  filters: BoardTaskFilters = {}
 ) {
   const queryClient = useQueryClient();
 
@@ -28,8 +30,33 @@ export function useBoard(
     [projectId]
   );
   const tasksQueryKey = useMemo(
-    () => ['board', projectId, 'tasks', searchInput || ''] as const,
-    [projectId, searchInput]
+    () =>
+      [
+        'board',
+        projectId,
+        'tasks',
+        searchInput,
+        filters.type,
+        filters.status,
+        filters.priority,
+        filters.assignee,
+        filters.reporter,
+        filters.tags,
+        filters.sortBy,
+        filters.sortOrder,
+      ] as const,
+    [
+      projectId,
+      searchInput,
+      filters.type,
+      filters.status,
+      filters.priority,
+      filters.assignee,
+      filters.reporter,
+      filters.tags,
+      filters.sortBy,
+      filters.sortOrder,
+    ]
   );
   const sprintsQueryKey = useMemo(
     () => ['board', projectId, 'sprints'] as const,
@@ -44,7 +71,19 @@ export function useBoard(
 
   const tasksQuery = useQuery({
     queryKey: tasksQueryKey,
-    queryFn: () => getTasks({ projectId: projectId as string, searchInput }),
+    queryFn: () =>
+      getTasks({
+        projectId: projectId as string,
+        searchInput,
+        type: filters.type,
+        status: filters.status,
+        priority: filters.priority,
+        assignee: filters.assignee,
+        reporter: filters.reporter,
+        tags: filters.tags,
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder,
+      }),
     enabled: !!projectId,
   });
 

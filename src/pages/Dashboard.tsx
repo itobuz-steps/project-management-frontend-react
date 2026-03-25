@@ -10,6 +10,7 @@ import { getAllProjects } from '../services/projectService';
 import userService from '../services/userService';
 import { useAuthContext } from '../context/AuthContext';
 import { message } from 'antd';
+import { TASK_FILTER_QUERY_KEYS } from '../config/taskFilters';
 
 function Dashboard() {
   const { setProject } = useProject();
@@ -54,15 +55,14 @@ function Dashboard() {
   }, []);
 
   const [viewMode, setViewMode] = useState<ViewMode>('backlog');
-  const hasActiveFilters = Boolean(
-    searchParams.get('status') || searchParams.get('priority')
+  const hasActiveFilters = TASK_FILTER_QUERY_KEYS.some((key) =>
+    Boolean(searchParams.get(key))
   );
 
   const handleClearFilters = () => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      next.delete('status');
-      next.delete('priority');
+      TASK_FILTER_QUERY_KEYS.forEach((key) => next.delete(key));
       return next;
     });
   };
