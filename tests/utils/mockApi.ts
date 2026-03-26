@@ -132,24 +132,38 @@ export async function mockProfileApis(page: Page) {
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({
-          result: currentUser,
-        }),
+        body: JSON.stringify({ result: currentUser }),
       });
     }
 
     if (request.method() === 'PATCH') {
+      let name = currentUser.name;
+
+      const contentType = request.headers()['content-type'] || '';
+
+      try {
+        if (contentType.includes('application/json')) {
+          const body = request.postDataJSON();
+          name = body.name ?? name;
+        } else {
+          // handle multipart/form-data safely
+          const raw = request.postData() || '';
+          const match = raw.match(/name="name"\r\n\r\n(.+)\r\n/);
+          if (match) name = match[1];
+        }
+      } catch {
+        // do nothing → don't break test
+      }
+
       currentUser = {
         ...currentUser,
-        name: 'NewUser',
+        name,
       };
 
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({
-          result: currentUser,
-        }),
+        body: JSON.stringify({ result: currentUser }),
       });
     }
 

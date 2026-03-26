@@ -15,7 +15,6 @@ test.describe('Edit Profile Module', () => {
     const profile = new EditProfilePage(page);
 
     await mockProfileApis(page);
-    await mockProfileApis(page);
 
     await profile.goto();
 
@@ -31,7 +30,6 @@ test.describe('Edit Profile Module', () => {
     const profile = new EditProfilePage(page);
 
     await mockProfileApis(page);
-    await mockProfileApis(page);
 
     await profile.goto();
 
@@ -45,7 +43,6 @@ test.describe('Edit Profile Module', () => {
   test('TC_035 - Update Image Only', async ({ page }) => {
     const profile = new EditProfilePage(page);
 
-    await mockProfileApis(page);
     await mockProfileApis(page);
 
     await profile.goto();
@@ -110,7 +107,6 @@ test.describe('Edit Profile Module', () => {
     const profile = new EditProfilePage(page);
 
     await mockProfileApis(page);
-    await mockProfileApis(page);
 
     await profile.goto();
 
@@ -124,7 +120,6 @@ test.describe('Edit Profile Module', () => {
   test('TC_042 - Update Notification Preferences', async ({ page }) => {
     const profile = new EditProfilePage(page);
 
-    await mockProfileApis(page);
     await mockProfileApis(page);
 
     await profile.goto();
@@ -143,7 +138,10 @@ test.describe('Edit Profile Module', () => {
     await profile.goto();
 
     await profile.updateUsername('PersistUser');
-    await profile.submit();
+    await Promise.all([
+      page.waitForResponse('**/auth/profile'), // wait for PATCH
+      profile.submit(),
+    ]);
 
     await page.reload();
 
