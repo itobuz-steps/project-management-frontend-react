@@ -114,3 +114,45 @@ export async function mockResetPasswordInvalidOtp(page: Page) {
     })
   );
 }
+
+export async function mockProfileApis(page: Page) {
+  let currentUser = {
+    name: 'OldUser',
+    email: 'test@example.com',
+    profileImage: '/profile.png',
+    notificationPreferences: {
+      push: true,
+      email: true,
+      inApp: true,
+    },
+  };
+
+  await page.route('**/auth/profile', async (route, request) => {
+    if (request.method() === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          result: currentUser,
+        }),
+      });
+    }
+
+    if (request.method() === 'PATCH') {
+      currentUser = {
+        ...currentUser,
+        name: 'NewUser',
+      };
+
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          result: currentUser,
+        }),
+      });
+    }
+
+    return route.continue();
+  });
+}
