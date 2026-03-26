@@ -67,3 +67,42 @@ export const errorResponses = {
     },
   },
 };
+
+// Forgot Password mock data
+export const otpSentSuccess = {
+  statusCode: 200,
+  body: {
+    message: 'OTP sent successfully',
+  },
+};
+
+export const otpSendFailure = {
+  statusCode: 500,
+  body: {
+    message: 'Failed to send otp',
+  },
+};
+
+export const passwordResetSuccess = {
+  statusCode: 200,
+  body: {
+    message: 'Password reset successful',
+    result: {
+      email: 'test@example.com',
+    },
+  },
+};
+
+export const invalidOtpError = {
+  statusCode: 400,
+  body: {
+    message: 'Invalid OTP',
+  },
+};
+
+export const passwordResetFailure = {
+  statusCode: 500,
+  body: {
+    message: 'Password reset failed',
+  },
+};
