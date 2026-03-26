@@ -9,7 +9,7 @@ import {
   closestCorners,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { message, Skeleton, Tooltip } from 'antd';
+import { message, Select, Skeleton, Tooltip } from 'antd';
 import { updateTask } from '../../../services/taskService';
 import type {
   TaskPopulated,
@@ -22,10 +22,13 @@ import { useSearchParams } from 'react-router-dom';
 import useBoard from '../../../hooks/useBoard';
 import Column from './Column';
 import { AddColumnModal, DeleteColumnModal } from './ColumnModals';
-import { Minimize2, Maximize2 } from 'lucide-react';
+import { Minimize2, Maximize2, ChevronRight, User, Tag } from 'lucide-react';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../../hooks/useSprintActions';
 import SprintModal from '../../sprintModal/SprintModal';
+import { parseBoardTaskFilters } from '../../../config/taskFilters';
+
+const { Option } = Select;
 
 function BoardView() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -46,6 +49,38 @@ function BoardView() {
 
   const type = project?.projectType;
   const isScrum = type === 'scrum';
+  const boardFilters = useMemo(
+    () => parseBoardTaskFilters(searchParams),
+    [searchParams]
+  );
+
+  const [collapsedLanes, setCollapsedLanes] = useState<Set<string>>(() => {
+    try {
+      const stored = sessionStorage.getItem('boardCollapsedLanes');
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+  const toggleLane = (key: string) => {
+    setCollapsedLanes((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      try {
+        sessionStorage.setItem(
+          'boardCollapsedLanes',
+          JSON.stringify(Array.from(next))
+        );
+      } catch (error) {
+        console.log('error', error);
+      }
+      return next;
+    });
+  };
 
   const {
     tasks,
@@ -60,13 +95,27 @@ function BoardView() {
     handleAddColumn,
     handleDeleteColumn,
     setError,
-  } = useBoard(projectId, searchParams.get('searchInput') || '', isScrum);
+  } = useBoard(
+    projectId,
+    searchParams.get('searchInput') || '',
+    isScrum,
+    boardFilters
+  );
 
   const { completeSprint } = useSprintActions(projectId, setSprints);
   const [isCompletingSprint, setIsCompletingSprint] = useState(false);
   const [completedSprintId, setCompletedSprintId] = useState<string | null>(
     null
   );
+
+  const getParentTaskId = (task: TaskPopulated): string | null => {
+    if (!task.parentTask) return null;
+    if (typeof task.parentTask === 'string') return task.parentTask;
+    if (typeof task.parentTask === 'object' && '_id' in task.parentTask) {
+      return String((task.parentTask as { _id: string })._id);
+    }
+    return String(task.parentTask);
+  };
 
   const handleTaskUpdated = useCallback(
     (updated: TaskPopulated) => {
@@ -107,6 +156,16 @@ function BoardView() {
     [searchParams, normalize]
   );
 
+  const typeFilter = useMemo(() => {
+    return (searchParams.get('type') || '')
+      .split(',')
+      .filter(Boolean)
+      .map(normalize);
+  }, [searchParams, normalize]);
+
+  const rawGroupBy = searchParams.get('groupBy');
+  const groupBy =
+    rawGroupBy === 'assignee' || rawGroupBy === 'story' ? rawGroupBy : null;
   const openAddColumnModal = (columnId: string) => {
     setNewColumnName('');
     setInsertAfterColumn(columnId);
@@ -156,31 +215,17 @@ function BoardView() {
     }
   };
 
-  const sprintTaskIds = useMemo(() => {
-    if (!isScrum) {
-      return null;
-    }
-
-    const activeSprint = sprints.find(
-      (sprint) => sprint.dueDate && !sprint.isCompleted
-    );
-
-    if (!activeSprint) {
-      return new Set<string>();
-    }
-
-    return new Set(activeSprint.tasks);
-  }, [isScrum, sprints]);
-
   const activeSprint = useMemo(() => {
-    if (!isScrum) {
-      return null;
-    }
-
+    if (!isScrum) return null;
     return (
       sprints.find((sprint) => sprint.dueDate && !sprint.isCompleted) ?? null
     );
   }, [isScrum, sprints]);
+
+  const activeSprintTaskIds = useMemo(
+    () => new Set(activeSprint?.tasks ?? []),
+    [activeSprint]
+  );
 
   const handleCompleteSprint = useCallback(async () => {
     if (!activeSprint || isCompletingSprint) {
@@ -197,21 +242,17 @@ function BoardView() {
   }, [activeSprint, completeSprint, isCompletingSprint]);
 
   const visibleTasks = useMemo(() => {
-    if (!isScrum) {
-      return tasks;
-    }
-    if (!sprintTaskIds || sprintTaskIds.size === 0) {
-      return [];
-    }
-
-    return tasks.filter((task) => sprintTaskIds.has(task._id));
-  }, [isScrum, sprintTaskIds, tasks]);
+    if (!isScrum) return tasks;
+    if (!activeSprint) return [];
+    return tasks.filter((task) => activeSprintTaskIds.has(task._id));
+  }, [activeSprint, activeSprintTaskIds, isScrum, tasks]);
 
   const filteredVisibleTasks = useMemo(() => {
     if (
       !statusFilters.length &&
       !priorityFilters.length &&
-      !assigneeFilters.length
+      !assigneeFilters.length &&
+      !typeFilter.length
     ) {
       return visibleTasks;
     }
@@ -235,6 +276,12 @@ function BoardView() {
       ) {
         return false;
       }
+      if (
+        typeFilter.length &&
+        !typeFilter.includes(normalize(task.type || ''))
+      ) {
+        return false;
+      }
       return true;
     });
   }, [
@@ -243,7 +290,31 @@ function BoardView() {
     assigneeFilters,
     normalize,
     visibleTasks,
+    typeFilter,
   ]);
+
+  const storyMap = useMemo(() => {
+    const allStoryTitles = new Map<string, string>();
+    tasks.forEach((t) => {
+      if (t.type === 'story') allStoryTitles.set(t._id, t.title);
+    });
+
+    const map = new Map<string, string>();
+
+    filteredVisibleTasks.forEach((t) => {
+      if (t.type === 'story') {
+        map.set(t._id, t.title);
+      }
+
+      const parentId = getParentTaskId(t);
+      if (parentId) {
+        const title = allStoryTitles.get(parentId);
+        if (title) map.set(parentId, title);
+      }
+    });
+
+    return map;
+  }, [tasks, filteredVisibleTasks]);
 
   const tasksByColumn = useMemo(() => {
     const map: Record<string, TaskPopulated[]> = {};
@@ -256,13 +327,104 @@ function BoardView() {
       if (map[task.status]) {
         map[task.status].push(task);
       } else if (columns.length) {
-        // fallback to first column
         map[columns[0]].push(task);
       }
     });
 
     return map;
   }, [columns, filteredVisibleTasks]);
+
+  const activeTask = useMemo(
+    () => tasks.find((task) => task._id === activeTaskId),
+    [activeTaskId, tasks]
+  );
+
+  const groupedTasksByColumn = useMemo(() => {
+    if (!groupBy) {
+      return [{ key: 'all', label: null, tasksByColumn }];
+    }
+
+    const buildTasksByStatus = (tasks: TaskPopulated[]) => {
+      const tasksByStatus: Record<string, TaskPopulated[]> = Object.fromEntries(
+        columns.map((col) => [col, []])
+      );
+
+      for (const task of tasks) {
+        const col = tasksByStatus[task.status] ? task.status : columns[0];
+        if (col) tasksByStatus[col].push(task);
+      }
+
+      return tasksByStatus;
+    };
+
+    if (groupBy === 'assignee') {
+      const laneMap = new Map<
+        string,
+        { label: string; tasks: TaskPopulated[] }
+      >();
+
+      for (const task of filteredVisibleTasks) {
+        const key = task.assignee?._id ?? 'unassigned';
+        const label = task.assignee?.name ?? 'Unassigned';
+
+        if (!laneMap.has(key)) laneMap.set(key, { label, tasks: [] });
+        laneMap.get(key)!.tasks.push(task);
+      }
+
+      return Array.from(laneMap.entries())
+        .sort(([keyA, a], [keyB, b]) => {
+          if (keyA === 'unassigned') return 1;
+          if (keyB === 'unassigned') return -1;
+          return a.label.localeCompare(b.label);
+        })
+        .map(([key, lane]) => ({
+          key,
+          label: lane.label,
+          tasksByColumn: buildTasksByStatus(lane.tasks),
+        }));
+    }
+
+    if (groupBy === 'story') {
+      const laneMap = new Map<
+        string,
+        { label: string; tasks: TaskPopulated[] }
+      >(
+        Array.from(storyMap.entries()).map(([id, name]) => [
+          id,
+          { label: name, tasks: [] },
+        ])
+      );
+
+      for (const task of filteredVisibleTasks.filter(
+        (t) => t.type !== 'story'
+      )) {
+        const key = getParentTaskId(task) ?? 'no-story';
+
+        if (laneMap.has(key)) {
+          laneMap.get(key)!.tasks.push(task);
+        } else {
+          if (!laneMap.has('no-story')) {
+            laneMap.set('no-story', { label: 'No Story', tasks: [] });
+          }
+          laneMap.get('no-story')!.tasks.push(task);
+        }
+      }
+
+      return Array.from(laneMap.entries())
+        .sort(([keyA, a], [keyB, b]) => {
+          if (keyA === 'no-story') return 1;
+          if (keyB === 'no-story') return -1;
+          return a.label.localeCompare(b.label);
+        })
+        .map(([key, lane]) => ({
+          key,
+          label: lane.label,
+          tasksByColumn: buildTasksByStatus(lane.tasks),
+        }));
+    }
+
+    return [{ key: 'all', label: null, tasksByColumn }];
+  }, [groupBy, filteredVisibleTasks, columns, tasksByColumn, storyMap]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -271,7 +433,6 @@ function BoardView() {
       },
     })
   );
-  // hook handles loading/initial load and column add/delete
 
   if (!projectId) {
     return (
@@ -327,26 +488,17 @@ function BoardView() {
       onDragEnd={({ active, over }) => {
         setActiveTaskId(null);
 
-        if (!over) {
-          return;
-        }
-        if (active.id === over.id) {
-          return;
-        }
+        if (!over || active.id === over.id) return;
 
         const activeColumn = active.data.current?.column as string | undefined;
         const overColumn =
           (over.data.current?.column as string | undefined) ??
-          (typeof over.id === 'string' && over.id.startsWith('column:')
-            ? over.id.replace('column:', '')
-            : undefined);
+          String(over.id).replace('column:', '');
 
-        if (!activeColumn || !overColumn) {
-          return;
-        }
+        if (!activeColumn || !overColumn) return;
 
         const isStatusChange = activeColumn !== overColumn;
-        let previousTasks: TaskPopulated[] | null = null;
+        let previousTasks: TaskPopulated[] = [];
 
         setTasks((prev) => {
           previousTasks = prev;
@@ -376,15 +528,36 @@ function BoardView() {
           void updateTask(String(active.id), {
             status: overColumn as TaskStatus,
           }).catch(() => {
-            if (previousTasks) {
-              setTasks(previousTasks);
-            }
+            setTasks(previousTasks);
             setError('Failed to update task status.');
           });
         }
       }}
     >
       <div className="mb-3 flex justify-end gap-2">
+        <Select
+          placeholder={'Group'}
+          value={groupBy || undefined}
+          onChange={(val) => {
+            setSearchParams((prev) => {
+              const next = new URLSearchParams(prev);
+              if (val) {
+                next.set('groupBy', val);
+              } else {
+                next.delete('groupBy');
+              }
+              return next;
+            });
+          }}
+          allowClear
+          size="small"
+          className="min-w-[140px]"
+        >
+          <Option value="">None</Option>
+          <Option value="assignee">Assignee</Option>
+          <Option value="story">Story</Option>
+        </Select>
+
         {isScrum && activeSprint?.isStarted ? (
           <button
             type="button"
@@ -417,47 +590,110 @@ function BoardView() {
         </Tooltip>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-2 sm:gap-6">
-        {columns.map((col) => (
-          <Column
-            key={col}
-            col={col}
-            tasks={tasksByColumn[col] ?? []}
-            compactMode={isCompactMode}
-            loading={loading}
-            error={error}
-            onAdd={openAddColumnModal}
-            onDelete={openDeleteColumnModal}
-            onTaskOpen={(taskId: string) => setSearchParams({ taskId })}
-            onUpdated={handleTaskUpdated}
-            members={members}
-            loadingMembers={loadingMembers}
-          />
-        ))}
+      <div className="flex flex-col gap-6">
+        {groupedTasksByColumn.map(
+          ({ key, label, tasksByColumn: laneColumns }) => {
+            const isCollapsed = collapsedLanes.has(key);
+
+            return (
+              <div
+                key={key}
+                className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900"
+              >
+                {label && (
+                  <button
+                    onClick={() => toggleLane(key)}
+                    className="group flex w-full items-center gap-3 bg-gray-50/80 px-5 py-3.5 text-left transition-colors hover:bg-gray-100/80 dark:bg-slate-800/60 dark:hover:bg-slate-800"
+                  >
+                    <ChevronRight
+                      className={`h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200 group-hover:text-gray-600 dark:text-slate-500 dark:group-hover:text-slate-300 ${!isCollapsed ? 'rotate-90' : ''}`}
+                    />
+                    {groupBy === 'story' && (
+                      <Tag className="h-4 w-4 shrink-0 text-green-400 dark:text-green-500" />
+                    )}
+
+                    {groupBy === 'assignee' &&
+                      (key === 'unassigned' ? (
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-200 dark:bg-slate-700">
+                          <User className="h-3.5 w-3.5 text-gray-400 dark:text-slate-500" />
+                        </div>
+                      ) : (
+                        (() => {
+                          const member = members.find((m) => m._id === key);
+                          return member?.profileImage ? (
+                            <img
+                              src={member.profileImage}
+                              alt={label ?? ''}
+                              className="h-6 w-6 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-100 text-xs font-semibold text-violet-600 uppercase dark:bg-violet-900/40 dark:text-violet-400">
+                              {label?.charAt(0)}
+                            </div>
+                          );
+                        })()
+                      ))}
+
+                    <span className="text-sm font-semibold tracking-wide text-gray-800 dark:text-slate-100">
+                      {label}
+                    </span>
+
+                    <span className="text-gray-300 dark:text-slate-600">·</span>
+
+                    <span className="rounded-full bg-gray-200/80 px-2 py-0.5 text-xs font-medium text-gray-500 tabular-nums dark:bg-slate-700 dark:text-slate-400">
+                      {Object.values(laneColumns).flat().length} tasks
+                    </span>
+
+                    <span className="ml-auto text-xs text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-slate-500">
+                      {isCollapsed ? 'Expand' : 'Collapse'}
+                    </span>
+                  </button>
+                )}
+
+                {!isCollapsed && (
+                  <div className="border-t border-gray-200/80 bg-white p-5 dark:border-slate-700/60 dark:bg-slate-900">
+                    <div className="flex gap-4 overflow-x-auto pb-2 sm:gap-6">
+                      {columns.map((col) => (
+                        <Column
+                          key={col}
+                          col={col}
+                          tasks={laneColumns[col] ?? []}
+                          compactMode={isCompactMode}
+                          loading={loading}
+                          error={error}
+                          onAdd={openAddColumnModal}
+                          onDelete={openDeleteColumnModal}
+                          onTaskOpen={(taskId: string) =>
+                            setSearchParams((prev) => {
+                              const next = new URLSearchParams(prev);
+                              next.set('taskId', taskId);
+                              return next;
+                            })
+                          }
+                          onUpdated={handleTaskUpdated}
+                          members={members}
+                          loadingMembers={loadingMembers}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          }
+        )}
       </div>
 
       <DragOverlay>
         {activeTaskId ? (
           <div className="rounded-md border border-gray-200 bg-white p-3 shadow-md dark:border-slate-700 dark:bg-slate-800">
             <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
-              {tasks.find((task) => task._id === activeTaskId)?.title}
-              {tasks.find((task) => task._id === activeTaskId) ? (
+              {activeTask?.title}
+              {activeTask ? (
                 <span className="mt-1 flex items-center gap-1 text-xs text-gray-500 dark:text-slate-400">
-                  <TaskTypeIcon
-                    type={
-                      tasks.find((task) => task._id === activeTaskId)?.type ||
-                      'task'
-                    }
-                  />
-
-                  <TaskTypeColor
-                    type={
-                      tasks.find((task) => task._id === activeTaskId)?.type ||
-                      'task'
-                    }
-                  >
-                    {tasks.find((task) => task._id === activeTaskId)?.key ??
-                      activeTaskId}
+                  <TaskTypeIcon type={activeTask.type} />
+                  <TaskTypeColor type={activeTask.type}>
+                    {activeTask.key ?? activeTaskId}
                   </TaskTypeColor>
                 </span>
               ) : null}
