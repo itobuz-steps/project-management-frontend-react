@@ -30,3 +30,46 @@ export async function logout(page: Page) {
   await logoutBtn.click();
   await page.waitForURL('**/login', { timeout: 10000 });
 }
+
+export async function openFirstProject(page: Page) {
+  const projects = page.locator('#projectsMenu');
+  await projects.click();
+
+  const dropdown = page.locator('#projectsDropdown');
+  await dropdown.waitFor();
+
+  const project = dropdown.locator('li ul li').first();
+
+  // If project not visible → expand workspace
+  if (!(await project.isVisible())) {
+    const workspace = dropdown.locator('li > button').first();
+    await workspace.click();
+  }
+
+  await project.waitFor();
+  await project.click();
+
+  await page.waitForURL(/\/project\/.+/, { timeout: 10000 });
+}
+
+export async function openFirstProjectMobileView(page: Page) {
+  page.getByRole('button', { name: 'Open Sidebar' }).click();
+
+  const dropdown = page.locator('#projectsDropdown');
+  await dropdown.waitFor();
+
+  const project = dropdown.locator('li ul li').first();
+
+  // If project not visible → expand workspace
+  if (!(await project.isVisible())) {
+    const workspace = dropdown.locator('li > button').first();
+    await workspace.click();
+  }
+
+  await project.waitFor();
+  await project.click();
+
+  page.getByRole('button', { name: 'Close Sidebar' }).click();
+
+  await page.waitForURL(/\/project\/.+/, { timeout: 10000 });
+}

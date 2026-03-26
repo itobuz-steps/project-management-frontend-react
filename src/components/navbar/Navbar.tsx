@@ -82,7 +82,10 @@ export default function Navbar() {
 
   return (
     <div className="header border border-gray-50 bg-gray-100 dark:border-[#27272e] dark:bg-[#1b1b1f]">
-      <nav className="flex flex-row items-center justify-between px-3 py-2 shadow-sm sm:flex-row sm:items-center md:px-4 md:py-2">
+      <nav
+        data-testid="nav"
+        className="flex flex-row items-center justify-between px-3 py-2 shadow-sm sm:flex-row sm:items-center md:px-4 md:py-2"
+      >
         {/* TOP ROW */}
         <div className="flex flex-col gap-1 text-start sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-1.5">
