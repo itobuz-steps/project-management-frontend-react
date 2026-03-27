@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 
 export async function login(
   page: Page,
@@ -72,4 +72,24 @@ export async function openFirstProjectMobileView(page: Page) {
   page.getByRole('button', { name: 'Close Sidebar' }).click();
 
   await page.waitForURL(/\/project\/.+/, { timeout: 10000 });
+}
+
+export async function expandSidebarIfCollapsed(page: Page) {
+  const expandBtn = page.getByRole('button', {
+    name: /expand sidebar/i,
+  });
+
+  if (await expandBtn.isVisible()) {
+    await expandBtn.click();
+  }
+}
+
+export async function ensureWorkspaceSectionOpen(page: Page) {
+  const dropdown = page.locator('#projectsDropdown');
+
+  if (!(await dropdown.isVisible())) {
+    await page.getByText('Workspaces').click();
+  }
+
+  await expect(dropdown).toBeVisible();
 }
