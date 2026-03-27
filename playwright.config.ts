@@ -42,6 +42,13 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
+      name: 'public',
+      use: {
+        browserName: 'chromium',
+      },
+    },
+
+    {
       name: 'setup',
       testMatch: /auth\.setup\.ts/,
     },
@@ -52,6 +59,14 @@ export default defineConfig({
         storageState: 'storageState.json',
       },
       dependencies: ['setup'], // 🔥 run login first
+    },
+    {
+      name: 'private',
+      use: {
+        browserName: 'chromium',
+        storageState: 'storageState.json',
+      },
+      dependencies: ['setup'],
     },
 
     // {

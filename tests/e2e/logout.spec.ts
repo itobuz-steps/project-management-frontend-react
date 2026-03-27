@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login, openSidebar, logout } from '../utils/helpers';
+import { openSidebar, logout } from '../utils/helpers';
 import {
   logoutButton,
   collapseSidebarBtn,
@@ -8,7 +8,7 @@ import {
 
 test.describe('TS_Logout_006 - Logout Flow (Real Login)', () => {
   test.beforeEach(async ({ page }) => {
-    await login(page);
+    await page.goto('/for-you');
     await openSidebar(page);
   });
 
@@ -44,7 +44,7 @@ test.describe('TS_Logout_006 - Logout Flow (Real Login)', () => {
 
   test('TC_049: Access Protected Route After Logout', async ({ page }) => {
     await logout(page);
-    await page.goto('http://localhost:5173/for-you', {
+    await page.goto('/for-you', {
       waitUntil: 'networkidle',
     });
     await expect(page).toHaveURL(/\/login/);

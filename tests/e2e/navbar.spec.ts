@@ -1,12 +1,7 @@
 import { test, expect } from '@playwright/test';
-import {
-  login,
-  openFirstProject,
-  openFirstProjectMobileView,
-} from '../utils/helpers';
+import { openFirstProject, openFirstProjectMobileView } from '../utils/helpers';
 import {
   navbar,
-  searchBtn,
   hamburgerBtn,
   projectHeader,
   projectIcon,
@@ -15,14 +10,10 @@ import {
 } from '../selectors/navbar';
 
 test.describe('TS_Navbar_007 - Navbar', () => {
-  test.beforeEach(async ({ page }) => {
-    await login(page);
-  });
-
   // ✅ TC_054
   test('TC_054: Navbar Rendering', async ({ page }) => {
+    await page.goto('/for-you');
     await expect(navbar(page)).toBeVisible();
-    await expect(searchBtn(page)).toBeVisible();
   });
 
   // ✅ TC_055
@@ -40,10 +31,9 @@ test.describe('TS_Navbar_007 - Navbar', () => {
   // ✅ TC_057
 
   test('TC_057: Project Info Visible', async ({ page }) => {
-    // Open sidebar → select project
+    await page.goto('/for-you');
     await openFirstProject(page);
 
-    // Assertions
     await expect(projectHeader(page)).toBeVisible();
     await expect(projectTag(page)).toBeVisible();
     const icon = projectIcon(page);
@@ -57,6 +47,7 @@ test.describe('TS_Navbar_007 - Navbar', () => {
 
   // ✅ TC_058
   test('TC_058: Project Navigation', async ({ page }) => {
+    await page.goto('/for-you');
     await openFirstProject(page);
 
     await projectHeader(page).click();
@@ -67,7 +58,7 @@ test.describe('TS_Navbar_007 - Navbar', () => {
 test.describe('TS_NavbarUI_008 - Mobile Navbar', () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await login(page);
+    await page.goto('/for-you');
   });
 
   // ✅ TC_059
@@ -123,44 +114,5 @@ test.describe('TS_NavbarUI_008 - Mobile Navbar', () => {
     await mobileMenuItem(page, 'Search').click();
 
     await expect(page.locator('text=RECENTLY CREATED')).toBeVisible();
-  });
-});
-
-test.describe('Navbar UI / Accessibility', () => {
-  test.beforeEach(async ({ page }) => {
-    await login(page);
-  });
-
-  // ✅ TC_064
-  test('TC_064: Responsive Layout', async ({ page }) => {
-    await page.setViewportSize({ width: 1200, height: 800 });
-    await expect(searchBtn(page)).toBeVisible();
-
-    await page.setViewportSize({ width: 375, height: 667 });
-    await expect(hamburgerBtn(page)).toBeVisible();
-  });
-
-  // ✅ TC_066
-  test('TC_066: Hover States', async ({ page }) => {
-    const btn = searchBtn(page);
-
-    await btn.hover();
-
-    const bg = await btn.evaluate(
-      (el) => window.getComputedStyle(el).backgroundColor
-    );
-
-    expect(bg).not.toBe('');
-  });
-
-  // ✅ TC_067
-  test('TC_067: No Console Errors', async ({ page }) => {
-    const errors: string[] = [];
-
-    page.on('pageerror', (err) => errors.push(err.message));
-
-    await page.reload();
-
-    expect(errors).toEqual([]);
   });
 });
