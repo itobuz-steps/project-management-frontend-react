@@ -30,7 +30,7 @@ export type BoardTaskFilters = {
   sortOrder?: 'asc' | 'desc';
 };
 
-export const TASK_TYPE_OPTIONS = ['bug', 'story', 'task'] as const;
+export const TASK_TYPE_OPTIONS = ['bug', 'story', 'task', 'epic'] as const;
 
 export const SORT_FIELD_OPTIONS = [
   'title',

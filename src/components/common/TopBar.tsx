@@ -9,6 +9,7 @@ import { Tabs } from 'antd';
 import { TaskFiltersDropdown } from './TaskFiltersDropdown';
 import { InviteUserContainer } from './InviteUserContainer';
 import { ProjectMembersModal } from './ProjectMembersModal';
+import { usePermissions } from '../../hooks/usePermissions';
 
 function TopBar({
   onAddTask,
@@ -20,6 +21,7 @@ function TopBar({
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { project } = useProject();
+  const { can } = usePermissions();
   const { columns, members, loadingMembers } = useProjectMetaData(project?._id);
 
   const type = project?.projectType;
@@ -37,8 +39,12 @@ function TopBar({
       base.push({ label: 'Timeline', value: 'timeline' });
     }
 
+    if (can('PROJECT_AUDIT_LOG_VIEW')) {
+      base.push({ label: 'Audit Logs', value: 'logs' });
+    }
+
     return base;
-  }, [isScrum]);
+  }, [can, isScrum]);
 
   const isFilterableView = useMemo(() => {
     const path = location.pathname;
