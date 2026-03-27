@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   DndContext,
@@ -10,7 +10,7 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { message, Select, Skeleton, Tooltip } from 'antd';
-import { updateTask } from '../../../services/taskService';
+import getTaskbyId, { updateTask } from '../../../services/taskService';
 import type {
   TaskPopulated,
   TaskStatus,
@@ -107,15 +107,6 @@ function BoardView() {
   const [completedSprintId, setCompletedSprintId] = useState<string | null>(
     null
   );
-
-  const getParentTaskId = (task: TaskPopulated): string | null => {
-    if (!task.parentTask) return null;
-    if (typeof task.parentTask === 'string') return task.parentTask;
-    if (typeof task.parentTask === 'object' && '_id' in task.parentTask) {
-      return String((task.parentTask as { _id: string })._id);
-    }
-    return String(task.parentTask);
-  };
 
   const handleTaskUpdated = useCallback(
     (updated: TaskPopulated) => {
@@ -293,28 +284,93 @@ function BoardView() {
     typeFilter,
   ]);
 
-  const storyMap = useMemo(() => {
-    const allStoryTitles = new Map<string, string>();
-    tasks.forEach((t) => {
-      if (t.type === 'story') allStoryTitles.set(t._id, t.title);
-    });
+  const [storyGroupedTasks, setStoryGroupedTasks] = useState<
+    {
+      key: string;
+      label: string | null;
+      tasksByColumn: Record<string, TaskPopulated[]>;
+    }[]
+  >([]);
 
-    const map = new Map<string, string>();
+  useEffect(() => {
+    let isCancelled = false;
 
-    filteredVisibleTasks.forEach((t) => {
-      if (t.type === 'story') {
-        map.set(t._id, t.title);
+    if (groupBy !== 'story') {
+      setStoryGroupedTasks([]);
+      return () => {
+        isCancelled = true;
+      };
+    }
+
+    const fetchStoryGroups = async () => {
+      const buildTasksByStatus = (tasks: TaskPopulated[]) => {
+        const tasksByStatus: Record<string, TaskPopulated[]> =
+          Object.fromEntries(columns.map((col) => [col, []]));
+
+        for (const task of tasks) {
+          const col = tasksByStatus[task.status] ? task.status : columns[0];
+          if (col) tasksByStatus[col].push(task);
+        }
+
+        return tasksByStatus;
+      };
+
+      const storyTasks = filteredVisibleTasks.filter(
+        (task) => task.type === 'story'
+      );
+
+      const nonStoryTasks = filteredVisibleTasks.filter(
+        (task) => task.type !== 'story' && !task.parentTask
+      );
+
+      const result: {
+        key: string;
+        label: string | null;
+        tasksByColumn: Record<string, TaskPopulated[]>;
+      }[] = [];
+
+      for (const storyTask of storyTasks) {
+        const taskGroupedByStatus: Record<string, TaskPopulated[]> =
+          Object.fromEntries(columns.map((col) => [col, []]));
+
+        for (const subTaskId of storyTask.subTasks || []) {
+          try {
+            const subTask = await getTaskbyId(subTaskId);
+            const columnKey = taskGroupedByStatus[subTask.status]
+              ? subTask.status
+              : columns[0];
+            if (columnKey) {
+              taskGroupedByStatus[columnKey].push(subTask);
+            }
+          } catch {
+            // Ignore failed subtask fetches to keep lane rendering resilient.
+          }
+        }
+
+        result.push({
+          key: storyTask._id,
+          label: storyTask.title,
+          tasksByColumn: taskGroupedByStatus,
+        });
       }
 
-      const parentId = getParentTaskId(t);
-      if (parentId) {
-        const title = allStoryTitles.get(parentId);
-        if (title) map.set(parentId, title);
-      }
-    });
+      result.push({
+        key: 'no-story',
+        label: 'No Story',
+        tasksByColumn: buildTasksByStatus(nonStoryTasks),
+      });
 
-    return map;
-  }, [tasks, filteredVisibleTasks]);
+      if (!isCancelled) {
+        setStoryGroupedTasks(result);
+      }
+    };
+
+    void fetchStoryGroups();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [columns, filteredVisibleTasks, groupBy]);
 
   const tasksByColumn = useMemo(() => {
     const map: Record<string, TaskPopulated[]> = {};
@@ -371,7 +427,7 @@ function BoardView() {
         laneMap.get(key)!.tasks.push(task);
       }
 
-      return Array.from(laneMap.entries())
+      const result = Array.from(laneMap.entries())
         .sort(([keyA, a], [keyB, b]) => {
           if (keyA === 'unassigned') return 1;
           if (keyB === 'unassigned') return -1;
@@ -382,49 +438,24 @@ function BoardView() {
           label: lane.label,
           tasksByColumn: buildTasksByStatus(lane.tasks),
         }));
+
+      console.log('grouped by assignee', result);
+
+      return result;
     }
 
     if (groupBy === 'story') {
-      const laneMap = new Map<
-        string,
-        { label: string; tasks: TaskPopulated[] }
-      >(
-        Array.from(storyMap.entries()).map(([id, name]) => [
-          id,
-          { label: name, tasks: [] },
-        ])
-      );
-
-      for (const task of filteredVisibleTasks.filter(
-        (t) => t.type !== 'story'
-      )) {
-        const key = getParentTaskId(task) ?? 'no-story';
-
-        if (laneMap.has(key)) {
-          laneMap.get(key)!.tasks.push(task);
-        } else {
-          if (!laneMap.has('no-story')) {
-            laneMap.set('no-story', { label: 'No Story', tasks: [] });
-          }
-          laneMap.get('no-story')!.tasks.push(task);
-        }
-      }
-
-      return Array.from(laneMap.entries())
-        .sort(([keyA, a], [keyB, b]) => {
-          if (keyA === 'no-story') return 1;
-          if (keyB === 'no-story') return -1;
-          return a.label.localeCompare(b.label);
-        })
-        .map(([key, lane]) => ({
-          key,
-          label: lane.label,
-          tasksByColumn: buildTasksByStatus(lane.tasks),
-        }));
+      return storyGroupedTasks;
     }
 
     return [{ key: 'all', label: null, tasksByColumn }];
-  }, [groupBy, filteredVisibleTasks, columns, tasksByColumn, storyMap]);
+  }, [
+    groupBy,
+    filteredVisibleTasks,
+    columns,
+    storyGroupedTasks,
+    tasksByColumn,
+  ]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

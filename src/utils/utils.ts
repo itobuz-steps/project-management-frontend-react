@@ -21,6 +21,8 @@ export function getTypeBorder(type?: string) {
       return 'border-l-2 border-l-blue-500';
     case 'story':
       return 'border-l-2 border-l-green-500';
+    case 'epic':
+      return 'border-l-2 border-l-purple-500';
     default:
       return 'border-l-2 border-l-transparent';
   }

@@ -9,7 +9,8 @@ export type Permission =
   | 'PROJECT_SETTINGS'
   | 'DELETE_SPRINT'
   | 'EDIT_SPRINT'
-  | 'REPORTER_CHANGE';
+  | 'REPORTER_CHANGE'
+  | 'PROJECT_AUDIT_LOG_VIEW';
 
 const rolePermissions: Record<Role, Permission[]> = {
   member: [],
@@ -30,6 +31,7 @@ const rolePermissions: Record<Role, Permission[]> = {
     'DELETE_SPRINT',
     'EDIT_SPRINT',
     'REPORTER_CHANGE',
+    'PROJECT_AUDIT_LOG_VIEW',
   ],
 };
 

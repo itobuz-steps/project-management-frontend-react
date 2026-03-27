@@ -1,4 +1,4 @@
-import { Bug, FileText, Tag } from 'lucide-react';
+import { Book, Bug, FileText, Tag } from 'lucide-react';
 import type { TaskType } from '../services/types/tasks.types';
 
 export function TaskTypeIcon({ type }: { type: TaskType }) {
@@ -7,6 +7,8 @@ export function TaskTypeIcon({ type }: { type: TaskType }) {
       return <Bug className="h-4 w-4 items-center text-red-500" />;
     case 'story':
       return <Tag className="h-4 w-4 text-green-600" />;
+    case 'epic':
+      return <Book className="h-4 w-4 text-blue-500" />;
     default:
       return <FileText className="text-primary-600 h-4 w-4 self-center" />;
   }

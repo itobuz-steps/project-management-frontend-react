@@ -1,7 +1,7 @@
 import type { Project } from '../../types/project.types';
 import type { Role } from './user';
 
-export type TaskType = 'bug' | 'story' | 'task';
+export type TaskType = 'bug' | 'story' | 'task' | 'epic';
 export type TaskStatus = 'todo' | 'in-progress' | 'done';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
 
