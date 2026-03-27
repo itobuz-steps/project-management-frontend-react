@@ -19,6 +19,7 @@ import { ProtectedRoute } from '../common/ProtectedRoute';
 import { AuthRedirect } from '../../utils/AuthRedirect';
 import ProjectSettings from '../../pages/ProjectSettings';
 import PermissionGuard from './PermissionGuard';
+import AuditLogsPage from '../../pages/AuditLogsPage';
 
 export function MainRouter() {
   return (
@@ -87,6 +88,14 @@ export function MainRouter() {
                 <Route path="list" element={<ListView />} />
                 <Route path="sprints-overview" element={<SprintView />} />
                 <Route path="timeline" element={<Timeline />} />
+                <Route
+                  path="logs"
+                  element={
+                    <PermissionGuard permission="PROJECT_AUDIT_LOG_VIEW">
+                      <AuditLogsPage />
+                    </PermissionGuard>
+                  }
+                />
               </Route>
 
               {/* Settings OUTSIDE Dashboard */}
