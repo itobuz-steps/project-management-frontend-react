@@ -3,6 +3,37 @@ import { THEME_COLORS } from '../config/constants';
 import type { ColorMode } from './ThemeContext';
 import { ThemeContext } from './ThemeContext';
 
+const THEME_ALIASES: Record<string, string> = {
+  teal: 'green',
+  blue: 'digital-blue',
+  black: 'jet-black',
+  custom_2: 'jet-black',
+};
+
+function normalizeTheme(theme?: string | null): string | null {
+  if (!theme) {
+    return null;
+  }
+
+  if (THEME_COLORS[theme]) {
+    return theme;
+  }
+
+  const aliased = THEME_ALIASES[theme];
+  return aliased && THEME_COLORS[aliased] ? aliased : null;
+}
+
+function getThemeFromRoute(): string | null {
+  const match = window.location.pathname.match(/\/project\/([^/]+)/);
+  const projectId = match?.[1];
+
+  if (!projectId) {
+    return null;
+  }
+
+  return normalizeTheme(localStorage.getItem(`projectTheme:${projectId}`));
+}
+
 function applyTheme(theme: string) {
   const root = document.documentElement;
   let colors = THEME_COLORS[theme];
@@ -25,7 +56,11 @@ function applyColorMode(mode: ColorMode) {
 }
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<string>('indigo');
+  const [theme, setTheme] = useState<string>(() => {
+    const fromRoute = getThemeFromRoute();
+    const fromLast = normalizeTheme(localStorage.getItem('lastProjectTheme'));
+    return fromRoute ?? fromLast ?? 'indigo';
+  });
   const [colorMode, setColorMode] = useState<ColorMode>(() => {
     const saved = localStorage.getItem('color-mode');
     if (saved === 'dark' || saved === 'light') {
@@ -39,6 +74,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     applyTheme(theme);
+    localStorage.setItem('lastProjectTheme', theme);
   }, [theme]);
 
   useEffect(() => {

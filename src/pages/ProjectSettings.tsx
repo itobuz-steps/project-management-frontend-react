@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useProject } from '../context/ProjectContext';
 import { useProjectMetaData } from '../hooks/useProjectMetaData';
 import ProjectSettingsHeader from '../components/projectSettings/ProjectSettingsHeader';
@@ -14,6 +14,12 @@ function ProjectSettings() {
     project?.icon ?? null
   );
   const [theme, setTheme] = useState<string>(project?.theme ?? 'indigo');
+
+  useEffect(() => {
+    if (project?.theme) {
+      setTheme(project.theme);
+    }
+  }, [project?._id, project?.theme]);
 
   if (!project) {
     return null;
