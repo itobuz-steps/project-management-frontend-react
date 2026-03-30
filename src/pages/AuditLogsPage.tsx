@@ -34,9 +34,25 @@ const formatWhen = (dateLike: string) => {
 };
 
 const describeChanges = (entry: AuditLogEntry) => {
-  if (!entry.changes?.length) {
-    return '-';
+  const memberChange = entry.changes?.find((c) => c.field === 'member');
+
+  if (entry.action === 'MEMBER_ADDED' && memberChange?.to) {
+    return `member ${memberChange.to.toLowerCase()} is added`;
   }
+
+  if (entry.action === 'MEMBER_REMOVED' && memberChange?.to) {
+    return `member ${memberChange.to.toLowerCase()}is  removed`;
+  }
+
+  if (
+    entry.action === 'ROLE_CHANGED' &&
+    memberChange?.from &&
+    memberChange?.to
+  ) {
+    return `${memberChange.from.toLowerCase()} to ${memberChange.to.toLowerCase()}`;
+  }
+
+  if (!entry.changes?.length) return '-';
 
   return entry.changes
     .map((change) => {
