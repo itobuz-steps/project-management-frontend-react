@@ -12,21 +12,6 @@ import { THEME_COLORS } from '../config/constants';
 
 const ALL_FILTER_VALUE = 'all';
 
-const ACTION_COLORS: Record<string, string> = {
-  TASK_CREATED: 'green',
-  TASK_UPDATED: 'blue',
-  STATUS_CHANGED: 'geekblue',
-  ASSIGNEE_CHANGED: 'cyan',
-  COMMENT_ADDED: 'purple',
-  TASK_DELETED: 'red',
-  PROJECT_UPDATED: 'gold',
-  MEMBER_INVITED: 'magenta',
-  MEMBER_ADDED: 'violet',
-  MEMBER_REMOVED: 'yellow',
-  MEMBER_ROLE_CHANGED: 'volcano',
-  SPRINT_CREATED: 'lime',
-};
-
 export const ChangeValue = ({
   from,
   to,
@@ -208,6 +193,9 @@ function AuditLogsPage() {
               _id: entry.actor.id,
               name: entry.actor.name,
               profileImage: entry.actor.profileImage,
+              email: '',
+              notificationPreferences: { email: true, push: true, inApp: true },
+              role: 'member',
             }}
             emptyText="Unknown user"
           />
