@@ -42,10 +42,10 @@ export type NotificationPreferences = {
 export type User = {
   _id: string;
   name: string;
-  email: string;
+  email?: string;
   profileImage?: string;
-  notificationPreferences: NotificationPreferences;
-  role: Role;
+  notificationPreferences?: NotificationPreferences;
+  role?: Role;
 };
 
 export type BackendAttachment = {

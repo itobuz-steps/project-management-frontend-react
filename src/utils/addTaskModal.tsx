@@ -170,6 +170,7 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
                 { value: 'bug', label: 'Bug' },
                 { value: 'task', label: 'Task' },
                 { value: 'story', label: 'Story' },
+                { value: 'epic', label: 'Epic' },
               ]}
             />
           </Form.Item>
