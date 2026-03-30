@@ -17,10 +17,11 @@ export type AuditLogEntityType =
   | 'sprint'
   | 'comment';
 
-export interface AuditLogActor {
+export type AuditLogActor = {
   id: string;
   name: string;
-}
+  profileImage?: string;
+};
 
 export interface AuditLogChange {
   field: string;
@@ -44,6 +45,7 @@ export interface AuditLogEntry {
 export interface ActivityApiUser {
   _id: string;
   name: string;
+  profileImage?: string;
 }
 
 export interface ActivityApiTask {

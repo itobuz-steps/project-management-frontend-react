@@ -72,7 +72,6 @@ export function TaskItem({ task }: { task: TaskPopulated }) {
       ? 'Project'
       : ((task.projectId as Project).name ?? 'Project');
 
-  console.log(task.projectId);
   const linksCount =
     (task.blocks?.length ?? 0) +
     (task.blockedBy?.length ?? 0) +

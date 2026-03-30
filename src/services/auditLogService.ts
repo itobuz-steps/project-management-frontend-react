@@ -50,6 +50,7 @@ const mapActivityToAuditLog = (
     actor: {
       id: activity.byUser._id,
       name: activity.byUser.name,
+      profileImage: activity.byUser.profileImage,
     },
     message: activity.action.toLowerCase().replaceAll('_', ' '),
     createdAt: activity.createdAt,
