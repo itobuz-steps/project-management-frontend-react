@@ -1,4 +1,5 @@
 import { useTheme } from '../../hooks/useTheme';
+import { useProject } from '../../context/ProjectContext';
 import { THEME_COLORS } from '../../config/constants';
 import type {
   ThemeCircleProps,
@@ -7,10 +8,16 @@ import type {
 
 export function ThemePicker({ value, onChange }: ThemePickerProps) {
   const [, setTheme] = useTheme();
+  const { project } = useProject();
 
   const handleSelect = (theme: string) => {
     onChange?.(theme);
     setTheme(theme);
+    localStorage.setItem('lastProjectTheme', theme);
+
+    if (project?._id) {
+      localStorage.setItem(`projectTheme:${project._id}`, theme);
+    }
   };
 
   return (
@@ -29,7 +36,6 @@ export function ThemePicker({ value, onChange }: ThemePickerProps) {
 }
 
 function ThemeCircle({ theme, onSelect, value, selected }: ThemeCircleProps) {
-  console.log({ theme, value, selected });
   return (
     <div
       onClick={() => onSelect(theme)}

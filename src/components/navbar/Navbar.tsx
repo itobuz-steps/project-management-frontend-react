@@ -24,7 +24,7 @@ export default function Navbar() {
   };
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [, setNotifOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
   const [workspaceName, setWorkspaceName] = useState('');
@@ -214,6 +214,10 @@ export default function Navbar() {
           )}
         </div>
       )}
+
+      <div className="md:hidden">
+        <Notifications open={notifOpen} onOpenChange={setNotifOpen} />
+      </div>
 
       {isCommandPaletteOpen && (
         <CommandPalette

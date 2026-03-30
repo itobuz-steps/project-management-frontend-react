@@ -26,7 +26,7 @@ import { TaskTypeColor } from '../../../utils/TaskTypeColor';
 
 function BacklogView() {
   const { projectId } = useParams();
-  const { project, columns } = useProject();
+  const { project, columns, tasks, setTasks } = useProject();
   const sprintService = useMemo(
     () => (projectId ? createSprintService(projectId) : null),
     [projectId]
@@ -37,7 +37,6 @@ function BacklogView() {
   const type = project?.projectType;
   const isScrum = type === 'scrum';
 
-  const [tasks, setTasks] = useState<TaskPopulated[]>([]);
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);

@@ -131,7 +131,7 @@ function ProjectSettingsForm({
 
                     return {
                       value: member.user,
-                      label: <UserCell user={user} emptyText="Unknown" />,
+                      label: <UserCell user={user} emptyText="" />,
                     };
                   })}
               />
