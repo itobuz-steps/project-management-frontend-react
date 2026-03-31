@@ -15,11 +15,13 @@ export function ProjectContainer() {
   }, []);
 
   return (
-    <div id="forYouProjects" className="mb-4 flex flex-col gap-2">
-      <h2 className="font-semibold dark:text-slate-100">Your Projects</h2>
+    <div id="forYouProjects" className="mb-4 flex flex-col gap-2 py-5">
+      <h1 className="text-xl font-semibold dark:text-slate-100">
+        Your Projects
+      </h1>
       <div
         id="forYouProjectsContainer"
-        className="xs:flex-row flex flex-col flex-wrap gap-2"
+        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
       >
         {projects.length === 0 ? (
           <div className="flex w-full justify-center bg-gray-50 p-5 text-center font-semibold text-gray-400 dark:bg-slate-800 dark:text-slate-400">
