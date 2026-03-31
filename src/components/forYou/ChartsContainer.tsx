@@ -115,6 +115,19 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
   const gradientStart = themeColors[7];
   const gradientEnd = themeColors[3];
 
+  const renderChartTitle = (title: string) => {
+    const hasTimeText = title.includes('(Last 7 Days)');
+    if (!hasTimeText) return title;
+
+    const [mainText, timeText] = title.split('(');
+    return (
+      <div className="flex flex-col items-center gap-0.5">
+        <span className="text-sm font-semibold">{mainText.trim()}</span>
+        <span className="text-xs text-gray-400">({timeText}</span>
+      </div>
+    );
+  };
+
   return (
     <div className="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
@@ -148,8 +161,8 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
             background: `linear-gradient(to right, ${gradientStart}, ${gradientEnd})`,
           }}
         />
-        <h4 className="text-primary-500 mb-4 text-center text-sm font-semibold tracking-wide">
-          Completed Task By Date (Last 7 Days)
+        <h4 className="text-primary-500 mb-4 text-center font-semibold tracking-wide">
+          {renderChartTitle('Completed Task By Date (Last 7 Days)')}
         </h4>
         <Column {...columnConfig} data={completedTaskByDate} />
       </div>

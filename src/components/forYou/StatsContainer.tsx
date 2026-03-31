@@ -37,15 +37,15 @@ export function StatsContainer() {
     <>
       <div className="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <CustomStatistic
-          title="Total Task Assigned in Last 7 Days"
+          title="Total Task Assigned Last 7 Days"
           value={data?.totalAssignedTasks || 0}
         />
         <CustomStatistic
-          title="Task Completed in Last 7 Days"
+          title="Task Completed Last 7 Days"
           value={data?.tasksCompletedThisWeek || 0}
         />
         <CustomStatistic
-          title="Story Points Completed in Last 7 Days"
+          title="Story Points Completed Last 7 Days"
           value={data?.storyPointsCompletedThisWeek || 0}
         />
       </div>

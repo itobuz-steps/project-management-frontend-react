@@ -15,6 +15,11 @@ export function CustomStatistic({ title, value }: CustomStatisticProps) {
   const gradientStart = themeColors[4];
   const gradientEnd = themeColors[7];
 
+  // Split title at "Last" to separate main text from time period
+  const parts = title.split(' Last');
+  const mainTitle = parts[0];
+  const timeText = parts.length > 1 ? `Last${parts[1]}` : '';
+
   return (
     <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
       {/* Subtle accent line */}
@@ -26,16 +31,20 @@ export function CustomStatistic({ title, value }: CustomStatisticProps) {
       />
 
       <Statistic
-        title={title}
+        title={
+          <div className="flex flex-col items-center gap-0.5">
+            <div className="text-primary-500 text-center text-sm font-semibold">
+              {mainTitle}
+            </div>
+            {timeText && (
+              <div className="text-xs text-gray-400 dark:text-gray-500">
+                {timeText}
+              </div>
+            )}
+          </div>
+        }
         value={value}
         styles={{
-          title: {
-            color: 'var(--color-primary-500)',
-            fontWeight: 600,
-            fontSize: '12px',
-            letterSpacing: '0.5px',
-            textAlign: 'center',
-          },
           content: {
             fontSize: '36px',
             fontWeight: 700,
