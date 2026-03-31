@@ -5,6 +5,7 @@ import type {
   ActivityApiItem,
   AuditLogChange,
   AuditLogEntry,
+  GetAuditLogsParams,
   ProjectActivitiesApiResponse,
 } from './types/auditLog.types';
 
@@ -52,24 +53,45 @@ const mapActivityToAuditLog = (
       name: activity.byUser.name,
       profileImage: activity.byUser.profileImage,
     },
-    message: activity.action.toLowerCase().replaceAll('_', ' '),
     createdAt: activity.createdAt,
     changes: mapChanges(activity.updatedFields),
   };
 };
 
+export interface PaginatedAuditLogs {
+  activities: AuditLogEntry[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
 export async function getProjectAuditLogs(
   projectId: string,
-  page = 1,
-  limit = 100
-): Promise<AuditLogEntry[]> {
-  const response = await activityApi.get<ProjectActivitiesApiResponse>(
+  params: GetAuditLogsParams = {}
+): Promise<PaginatedAuditLogs> {
+  const response = await activityApi.post<ProjectActivitiesApiResponse>(
     `projects/${projectId}/activities`,
-    {
-      params: { page, limit },
-    }
+    { ...params }
   );
 
+  return {
+    activities: response.data.activities.map((activity) =>
+      mapActivityToAuditLog(projectId, activity)
+    ),
+    total: response.data.total,
+    page: response.data.page,
+    totalPages: response.data.totalPages,
+  };
+}
+
+export async function exportProjectAuditLogs(
+  projectId: string,
+  params: Omit<GetAuditLogsParams, 'page' | 'limit'> = {}
+): Promise<AuditLogEntry[]> {
+  const response = await activityApi.post<{ activities: ActivityApiItem[] }>(
+    `projects/${projectId}/activities/export`,
+    params
+  );
   return response.data.activities.map((activity) =>
     mapActivityToAuditLog(projectId, activity)
   );

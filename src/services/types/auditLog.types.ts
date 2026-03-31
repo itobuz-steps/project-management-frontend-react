@@ -37,7 +37,6 @@ export interface AuditLogEntry {
   entityId: string;
   entityLabel: string;
   actor: AuditLogActor;
-  message: string;
   createdAt: string;
   changes?: AuditLogChange[];
 }
@@ -69,4 +68,14 @@ export interface ProjectActivitiesApiResponse {
   total: number;
   page: number;
   totalPages: number;
+}
+
+export interface GetAuditLogsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  byUsers?: string[];
+  actions?: string[];
+  dateFrom?: string;
+  dateTo?: string;
 }
