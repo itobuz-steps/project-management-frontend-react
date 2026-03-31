@@ -23,7 +23,6 @@ export function TaskContainer() {
       });
       setGroupedTasks(groupedTasks);
       setTasks(tasks);
-      console.log('Grouped Tasks:', groupedTasks);
     }
     fetchTasks();
   }, []);

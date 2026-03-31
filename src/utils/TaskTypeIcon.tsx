@@ -8,8 +8,8 @@ export function TaskTypeIcon({ type }: { type: TaskType }) {
     case 'story':
       return <Tag className="h-4 w-4 text-green-600" />;
     case 'epic':
-      return <Book className="h-4 w-4 text-blue-500" />;
+      return <Book className="h-4 w-4 text-purple-400" />;
     default:
-      return <FileText className="text-primary-600 h-4 w-4 self-center" />;
+      return <FileText className="h-4 w-4 self-center text-blue-400" />;
   }
 }
