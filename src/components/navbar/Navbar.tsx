@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../../context/ProjectContext';
 import { normalizeAndCapitalize } from '../../utils/utils';
 import { getWorkspaces } from '../../services/workspaceService';
+import { UserProfile } from '../sidebar/UserProfile';
 
 export default function Navbar() {
   const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -39,7 +40,6 @@ export default function Navbar() {
   const actionButtonClass =
     'flex h-8 w-8 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600';
 
-  // Close on outside click
   useEffect(() => {
     if (!mobileMenuOpen) return;
     const handleClick = (e: MouseEvent) => {
@@ -57,9 +57,7 @@ export default function Navbar() {
   }, [mobileMenuOpen]);
 
   useEffect(() => {
-    if (!project?.workspaceId) {
-      return;
-    }
+    if (!project?.workspaceId) return;
 
     const resolveWorkspaceName = async () => {
       try {
@@ -67,7 +65,6 @@ export default function Navbar() {
         const matchedWorkspace = response.result?.find(
           (workspace) => workspace.workspaceId === project.workspaceId
         );
-
         setWorkspaceName(matchedWorkspace?.workspaceName || '');
       } catch (error) {
         console.error('Failed to resolve workspace name:', error);
@@ -76,14 +73,12 @@ export default function Navbar() {
     };
 
     resolveWorkspaceName();
-
-    return () => {};
   }, [project?.workspaceId]);
 
   return (
     <div className="header border border-gray-50 bg-gray-100 dark:border-[#27272e] dark:bg-[#1b1b1f]">
       <nav className="flex flex-row items-center justify-between px-3 py-2 shadow-sm sm:flex-row sm:items-center md:px-4 md:py-2">
-        {/* TOP ROW */}
+        {/* Left — project info */}
         <div className="flex flex-col gap-1 text-start sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-1.5">
             <div className="flex items-center gap-1.5">
@@ -123,7 +118,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Hamburger — mobile only */}
         <button
           ref={hamburgerRef}
           className="flex items-center justify-center rounded-md p-1.5 text-slate-700 md:hidden dark:text-slate-100"
@@ -138,8 +132,7 @@ export default function Navbar() {
           )}
         </button>
 
-        {/* Icon row — desktop only */}
-        <div className="hidden items-center md:flex md:justify-end md:gap-1 lg:gap-2">
+        <div className="hidden items-center gap-1 md:flex md:justify-end lg:gap-2">
           <button
             onClick={handleSearchClick}
             className={actionButtonClass}
@@ -161,15 +154,20 @@ export default function Navbar() {
               </button>
             </Can>
           )}
+
+          <UserProfile collapsed={true} mobileOpen={false} showTooltip={true} />
         </div>
       </nav>
 
-      {/* Floating mobile menu */}
       {mobileMenuOpen && (
         <div
           ref={menuRef}
           className="fixed top-12 right-3 z-100 flex w-max flex-col rounded-lg border border-gray-200 bg-white p-1.5 shadow-lg md:hidden dark:border-[#27272e] dark:bg-[#1b1b1f]"
         >
+          <UserProfile collapsed={false} mobileOpen={true} />
+
+          <div style={{ height: 1, background: '#f3f4f6', margin: '4px 0' }} />
+
           <button
             className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-gray-800 hover:bg-gray-100 dark:text-neutral-100 dark:hover:bg-[#27272e]"
             onClick={() => {
@@ -195,7 +193,6 @@ export default function Navbar() {
           {!projectInfoHidden && (
             <Can permission="PROJECT_SETTINGS">
               <>
-                {/* Divider before settings */}
                 <div
                   style={{ height: 1, background: '#f3f4f6', margin: '4px 0' }}
                 />
