@@ -101,7 +101,7 @@ export function EditProfileForm({
       )}
       <button
         type="submit"
-        className="btn btn-primary bg-primary-500 hover:bg-primary-600 w-full rounded-lg py-2 font-medium text-white transition-all duration-300"
+        className="btn btn-primary bg-primary-500 hover:bg-primary-600 w-full cursor-pointer rounded-lg py-2 font-medium text-white transition-all duration-300"
       >
         Save
       </button>

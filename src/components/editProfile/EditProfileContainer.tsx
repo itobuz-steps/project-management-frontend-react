@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { EditProfileForm } from './editProfileForm';
 import { Link } from 'react-router-dom';
 import userService from '../../services/userService';
+import LogoutButton from '../sidebar/LogoutButton';
 
 export default function EditProfileContainer() {
   const [profileImage, setProfileImage] = useState('/profile.png');
@@ -125,17 +126,22 @@ export default function EditProfileContainer() {
           />
         </div>
       </div>
-      <EditProfileForm
-        setSelectedFile={setProfileImage}
-        initialUsername={username}
-      />
-      <Link
-        to={'/for-you'}
-        id="profile-go-back-btn"
-        className="text-primary-400 hover:text-primary-500 text-center font-semibold transition-colors duration-300"
-      >
-        ← Go back
-      </Link>
+      <div className="flex w-full flex-col items-center gap-1">
+        <EditProfileForm
+          setSelectedFile={setProfileImage}
+          initialUsername={username}
+        />
+        <div className="w-full px-5">
+          <LogoutButton />
+        </div>
+        <Link
+          to={'/for-you'}
+          id="profile-go-back-btn"
+          className="text-primary-400 hover:text-primary-500 text-center font-semibold transition-colors duration-300"
+        >
+          ← Go back
+        </Link>
+      </div>
     </div>
   );
 }
