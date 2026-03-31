@@ -1,16 +1,31 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
-import { Card, Input, Select, Table, Tag, Typography } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+import {
+  Button,
+  Card,
+  DatePicker,
+  Input,
+  Select,
+  Table,
+  Tag,
+  Typography,
+} from 'antd';
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
+import type { Dayjs } from 'dayjs';
 import { DateTime } from 'luxon';
 import { DataLoader } from '../components/ui/DataLoader';
-import { getProjectAuditLogs } from '../services/auditLogService';
+import {
+  exportProjectAuditLogs,
+  getProjectAuditLogs,
+} from '../services/auditLogService';
 import type { AuditLogEntry } from '../services/types/auditLog.types';
 import { UserCell } from '../components/ui/UserCell';
 import { useTheme } from '../hooks/useTheme';
 import { THEME_COLORS } from '../config/constants';
+import * as XLSX from 'xlsx';
+import { FileX } from 'lucide-react';
 
-const ALL_FILTER_VALUE = 'all';
+const PAGE_SIZE = 10;
 
 export const ChangeValue = ({
   from,
@@ -42,7 +57,6 @@ export const ChangeValue = ({
 
 const formatWhen = (dateLike: string) => {
   const date = DateTime.fromISO(dateLike);
-
   return {
     relative: date.toRelative() ?? date.toLocaleString(DateTime.DATETIME_MED),
     absolute: date.toLocaleString(DateTime.DATETIME_MED),
@@ -50,37 +64,9 @@ const formatWhen = (dateLike: string) => {
 };
 
 const describeChanges = (entry: AuditLogEntry): ReactNode => {
-  const memberChange = entry.changes?.find((c) => c.field === 'member');
-
-  if (entry.action === 'MEMBER_ADDED' && memberChange?.to) {
-    return (
-      <span>
-        Member <ChangeValue to={memberChange.to} /> added
-      </span>
-    );
+  if (!entry.changes?.length) {
+    return <span className="text-gray-400">—</span>;
   }
-
-  if (entry.action === 'MEMBER_REMOVED' && memberChange?.to) {
-    return (
-      <span>
-        Member <ChangeValue to={memberChange.to} /> removed
-      </span>
-    );
-  }
-
-  if (
-    entry.action === 'ROLE_CHANGED' &&
-    memberChange?.from &&
-    memberChange?.to
-  ) {
-    return (
-      <span>
-        Role <ChangeValue from={memberChange.from} to={memberChange.to} />
-      </span>
-    );
-  }
-
-  if (!entry.changes?.length) return <span className="text-gray-400">—</span>;
 
   return (
     <div className="flex flex-col gap-1">
@@ -96,84 +82,144 @@ const describeChanges = (entry: AuditLogEntry): ReactNode => {
   );
 };
 
-const includesIgnoreCase = (value: string, search: string) =>
-  value.toLowerCase().includes(search);
-
-const matchesFilters = (
-  entry: AuditLogEntry,
-  userFilter: string,
-  normalizedSearch: string
-) => {
-  const matchesUser =
-    userFilter === ALL_FILTER_VALUE || entry.actor.name === userFilter;
-
-  if (!normalizedSearch) {
-    return matchesUser;
-  }
-
-  const matchesSearch =
-    includesIgnoreCase(entry.message, normalizedSearch) ||
-    includesIgnoreCase(entry.entityLabel, normalizedSearch) ||
-    includesIgnoreCase(entry.actor.name, normalizedSearch);
-
-  return matchesUser && matchesSearch;
-};
-
 function AuditLogsPage() {
   const { projectId } = useParams();
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+
   const [searchText, setSearchText] = useState('');
-  const [userFilter, setUserFilter] = useState<string>(ALL_FILTER_VALUE);
+  const [userFilter, setUserFilter] = useState<string[]>([]);
+  const [actionFilter, setActionFilter] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([
+    null,
+    null,
+  ]);
+
+  const [allActors, setAllActors] = useState<{ id: string; name: string }[]>(
+    []
+  );
+  const [allActions, setAllActions] = useState<string[]>([]);
 
   const [theme] = useTheme();
   const themeColors = THEME_COLORS[theme] ?? THEME_COLORS['indigo'];
 
-  useEffect(() => {
-    if (!projectId) {
-      return;
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    if (!projectId) return;
+    try {
+      setExporting(true);
+
+      const all = await exportProjectAuditLogs(projectId, {
+        search: searchText.trim() || undefined,
+        byUsers: userFilter.length ? userFilter : undefined,
+        actions: actionFilter.length ? actionFilter : undefined,
+        dateFrom: dateRange[0]?.toISOString() ?? undefined,
+        dateTo: dateRange[1]?.toISOString() ?? undefined,
+      });
+
+      const rows = all.map((entry) => ({
+        When: DateTime.fromISO(entry.createdAt).toLocaleString(
+          DateTime.DATETIME_MED
+        ),
+        'Performed By': entry.actor.name,
+        Action: entry.action.split('_').join(' '),
+        Details:
+          entry.changes
+            ?.map(({ field, from, to }) =>
+              from && to
+                ? `${field}: ${from} → ${to}`
+                : `${field}: ${to ?? from}`
+            )
+            .join('; ') ?? '—',
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Audit Logs');
+      XLSX.writeFile(workbook, `audit-logs-${projectId}.xlsx`);
+    } finally {
+      setExporting(false);
     }
+  };
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    const loadOptions = async () => {
+      const result = await getProjectAuditLogs(projectId, { limit: 500 });
+      const actors = Array.from(
+        new Map(
+          result.activities.map((e) => [
+            e.actor.id,
+            { id: e.actor.id, name: e.actor.name },
+          ])
+        ).values()
+      );
+      const actions = Array.from(
+        new Set(result.activities.map((e) => e.action))
+      );
+      setAllActors(actors);
+      setAllActions(actions);
+    };
+
+    loadOptions();
+  }, [projectId]);
+
+  useEffect(() => {
+    if (!projectId) return;
 
     const loadLogs = async () => {
       try {
         setLoading(true);
-        const result = await getProjectAuditLogs(projectId);
-        setLogs(result);
+        const result = await getProjectAuditLogs(projectId, {
+          page,
+          limit: PAGE_SIZE,
+          search: searchText.trim() || undefined,
+          byUsers: userFilter.length ? userFilter : undefined,
+          actions: actionFilter.length ? actionFilter : undefined,
+          dateFrom: dateRange[0]?.toISOString() ?? undefined,
+          dateTo: dateRange[1]?.toISOString() ?? undefined,
+        });
+        setLogs(result.activities);
+        setTotal(result.total);
       } finally {
         setLoading(false);
       }
     };
 
     loadLogs();
-  }, [projectId]);
+  }, [projectId, page, searchText, userFilter, actionFilter, dateRange]);
 
-  const userOptions = useMemo(() => {
-    const uniqueActors = Array.from(
-      new Set(logs.map((entry) => entry.actor.name))
-    );
+  useEffect(() => {
+    setPage(1);
+  }, [searchText, userFilter, actionFilter, dateRange]);
 
-    return [
-      { label: 'All users', value: ALL_FILTER_VALUE },
-      ...uniqueActors.map((name) => ({ label: name, value: name })),
-    ];
-  }, [logs]);
+  const userOptions = useMemo(
+    () => allActors.map(({ id, name }) => ({ label: name, value: id })),
+    [allActors]
+  );
 
-  const filteredLogs = useMemo(() => {
-    const normalizedSearch = searchText.trim().toLowerCase();
+  const actionOptions = useMemo(
+    () =>
+      allActions.map((action) => ({
+        label: action.split('_').join(' '),
+        value: action,
+      })),
+    [allActions]
+  );
 
-    return logs.filter((entry) =>
-      matchesFilters(entry, userFilter, normalizedSearch)
-    );
-  }, [logs, userFilter, searchText]);
+  const handleTableChange = (pagination: TablePaginationConfig) => {
+    if (pagination.current) setPage(pagination.current);
+  };
 
   const columns: ColumnsType<AuditLogEntry> = useMemo(
     () => [
       {
         title: 'When',
         key: 'createdAt',
-        sorter: (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-        defaultSortOrder: 'descend',
         render: (_, entry) => {
           const when = formatWhen(entry.createdAt);
           return (
@@ -210,12 +256,7 @@ function AuditLogsPage() {
           const border = themeColors[1];
 
           return (
-            <Tag
-              style={{
-                backgroundColor: border,
-                color: primary,
-              }}
-            >
+            <Tag style={{ backgroundColor: border, color: primary }}>
               {action}
             </Tag>
           );
@@ -227,7 +268,7 @@ function AuditLogsPage() {
         render: (_, entry) => describeChanges(entry),
       },
     ],
-    []
+    [themeColors]
   );
 
   if (!projectId) {
@@ -246,40 +287,87 @@ function AuditLogsPage() {
   return (
     <Card className="mt-2 border-gray-200 shadow-sm dark:border-slate-700">
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <Typography.Title level={4} className="mb-1!">
-            Project Audits
-          </Typography.Title>
+        <div className="w-full">
+          <div className="flex w-full items-center justify-between">
+            <Typography.Title level={4} className="mb-1!">
+              Project Audits
+            </Typography.Title>
+            <Button
+              loading={exporting}
+              onClick={handleExport}
+              style={{
+                color: themeColors[4],
+                borderColor: themeColors[4],
+              }}
+            >
+              <FileX className="size-4" />
+              <span className="hidden sm:inline">Export</span>
+            </Button>
+          </div>
           <Typography.Text type="secondary">
             Track key project events and permission-sensitive changes.
           </Typography.Text>
         </div>
       </div>
 
-      <div className="mb-4 grid gap-2 md:grid-cols-2">
+      <div className="mb-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
         <Input.Search
           allowClear
-          placeholder="Search by user, entity, or message"
+          placeholder="Search"
           value={searchText}
           onChange={(event) => setSearchText(event.target.value)}
         />
         <Select
+          mode="multiple"
+          allowClear
+          placeholder="Filter by user"
           value={userFilter}
           options={userOptions}
-          onChange={(value) => setUserFilter(value)}
+          onChange={(values) => setUserFilter(values)}
+          maxTagCount="responsive"
+        />
+        <Select
+          mode="multiple"
+          allowClear
+          placeholder="Filter by action"
+          value={actionFilter}
+          options={actionOptions}
+          onChange={(values) => setActionFilter(values)}
+          maxTagCount="responsive"
+        />
+        <DatePicker.RangePicker
+          className="w-full"
+          value={dateRange}
+          onChange={(range) => setDateRange(range ?? [null, null])}
         />
       </div>
 
       <DataLoader
         loading={loading}
-        isEmpty={!loading && filteredLogs.length === 0}
+        isEmpty={!loading && logs.length === 0}
         emptyText="No audit logs match your filters"
       >
         <Table<AuditLogEntry>
           rowKey="id"
           columns={columns}
-          dataSource={filteredLogs}
-          pagination={{ pageSize: 8, showSizeChanger: false }}
+          dataSource={logs}
+          onChange={handleTableChange}
+          loading={loading}
+          showSorterTooltip={{ target: 'sorter-icon' }}
+          size="small"
+          pagination={{
+            placement: ['bottomCenter'],
+            current: page,
+            pageSize: PAGE_SIZE,
+            total,
+            showSizeChanger: false,
+          }}
+          rowClassName={() =>
+            'whitespace-nowrap text-sm hover:bg-gray-50 dark:hover:bg-slate-800'
+          }
+          locale={{
+            emptyText: 'No audit logs match your filters',
+          }}
           scroll={{ x: 'max-content' }}
         />
       </DataLoader>
