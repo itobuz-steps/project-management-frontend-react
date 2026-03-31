@@ -58,14 +58,7 @@ export function MainRouter() {
             </AuthRedirect>
           }
         />
-        <Route
-          path="/invite/join"
-          element={
-            <AuthRedirect>
-              <AcceptInvitePage />
-            </AuthRedirect>
-          }
-        />
+        <Route path="/invite/join" element={<AcceptInvitePage />} />
         {/* Protected routes */}
         <Route element={<ProtectedRoute redirectPath="/login" />}>
           <Route path="/edit-profile" element={<EditProfilePage />} />

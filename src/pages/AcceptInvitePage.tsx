@@ -26,10 +26,23 @@ export function AcceptInvitePage() {
         return;
       }
 
+      const accessToken = localStorage.getItem('accessToken');
+
+      if (!accessToken) {
+        localStorage.setItem('invite_token', token);
+        navigate('/login');
+        return;
+      }
+
       try {
         await acceptInvite(token);
+
+        localStorage.removeItem('invite_token');
+
         setLoading(false);
       } catch (error) {
+        localStorage.removeItem('invite_token');
+
         if (error instanceof AxiosError) {
           setLoading(false);
           message.error(
@@ -43,7 +56,7 @@ export function AcceptInvitePage() {
     }
 
     fetchData();
-  }, [startCountdown, token]);
+  }, [token, navigate, startCountdown]);
 
   return (
     <div className="flex min-h-screen w-full flex-col items-center justify-center gap-3">
