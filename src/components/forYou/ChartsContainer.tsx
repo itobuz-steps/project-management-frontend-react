@@ -5,14 +5,13 @@ import {
   Pie,
 } from '@ant-design/plots';
 import { THEME_COLORS, GRAY_SHADES } from '../../config/constants';
-import { useTheme } from '../../hooks/useTheme';
 import { useColorMode } from '../../hooks/useColorMode';
 import type { TaskStats } from '../../services/types/tasks.types';
 import { Grid } from 'antd';
 import { DateTime } from 'luxon';
 
 export function ChartsContainer({ data }: { data: TaskStats | null }) {
-  const [theme] = useTheme();
+  const theme = localStorage.getItem('lastProjectTheme') || 'indigo';
   const [colorMode] = useColorMode();
   const screens = Grid.useBreakpoint();
   const isSmall = !screens.sm; // < 640px
@@ -113,22 +112,43 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
     height: chartSize,
   } satisfies ColumnConfig;
 
+  const gradientStart = themeColors[7];
+  const gradientEnd = themeColors[3];
+
   return (
-    <div className="flex w-full flex-1 flex-wrap items-center justify-center gap-2 sm:justify-start">
-      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto dark:border-slate-700 dark:bg-slate-800">
-        <h4 className="text-primary-500 m-2 font-semibold">
+    <div className="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
+        <div
+          className="absolute top-0 right-0 left-0 h-1 w-0 transition-all duration-300 group-hover:w-full"
+          style={{
+            background: `linear-gradient(to right, ${gradientStart}, ${gradientEnd})`,
+          }}
+        />
+        <h4 className="text-primary-500 mb-4 text-center text-sm font-semibold tracking-wide">
           Assigned Task By Project
         </h4>
         <Pie {...pieConfig} data={allAssignedTaskByProject} />
       </div>
-      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto dark:border-slate-700 dark:bg-slate-800">
-        <h4 className="text-primary-500 m-2 font-semibold">
+      <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
+        <div
+          className="absolute top-0 right-0 left-0 h-1 w-0 transition-all duration-300 group-hover:w-full"
+          style={{
+            background: `linear-gradient(to right, ${gradientStart}, ${gradientEnd})`,
+          }}
+        />
+        <h4 className="text-primary-500 mb-4 text-center text-sm font-semibold tracking-wide">
           Completed Task By Project
         </h4>
         <Pie {...pieConfig} data={completedTaskByProject} />
       </div>
-      <div className="flex w-full flex-1 flex-col items-center rounded-md border border-gray-50 bg-white p-2 shadow-sm sm:w-auto lg:col-span-2 lg:p-8 xl:col-span-1 xl:p-2 dark:border-slate-700 dark:bg-slate-800">
-        <h4 className="text-primary-500 m-2 font-semibold">
+      <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg sm:col-span-2 lg:col-span-1 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
+        <div
+          className="absolute top-0 right-0 left-0 h-1 w-0 transition-all duration-300 group-hover:w-full"
+          style={{
+            background: `linear-gradient(to right, ${gradientStart}, ${gradientEnd})`,
+          }}
+        />
+        <h4 className="text-primary-500 mb-4 text-center text-sm font-semibold tracking-wide">
           Completed Task By Date (Last 7 Days)
         </h4>
         <Column {...columnConfig} data={completedTaskByDate} />
