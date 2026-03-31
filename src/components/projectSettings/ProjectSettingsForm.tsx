@@ -91,15 +91,21 @@ function ProjectSettingsForm({
               <Select
                 options={projectMembers
                   .filter((member) => member.role === 'admin')
-                  .map((member) => {
+                  .flatMap((member) => {
                     const user = members.find(
                       (user) => user._id === member.user
                     );
 
-                    return {
-                      value: member.user,
-                      label: <UserCell user={user} emptyText="Unknown" />,
-                    };
+                    if (!user) {
+                      return [];
+                    }
+
+                    return [
+                      {
+                        value: member.user,
+                        label: <UserCell user={user} emptyText="Unknown" />,
+                      },
+                    ];
                   })}
               />
             </Form.Item>
@@ -124,15 +130,21 @@ function ProjectSettingsForm({
                 placeholder="Select members to remove"
                 options={projectMembers
                   .filter((member) => member.role === 'member')
-                  .map((member) => {
+                  .flatMap((member) => {
                     const user = members.find(
                       (user) => user._id === member.user
                     );
 
-                    return {
-                      value: member.user,
-                      label: <UserCell user={user} emptyText="Unknown" />,
-                    };
+                    if (!user) {
+                      return [];
+                    }
+
+                    return [
+                      {
+                        value: member.user,
+                        label: <UserCell user={user} emptyText="Unknown" />,
+                      },
+                    ];
                   })}
               />
             </Form.Item>

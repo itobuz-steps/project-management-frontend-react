@@ -22,7 +22,7 @@ interface Props {
 }
 
 export function AddTaskModal({ open, onClose, onCreate }: Props) {
-  const { columns, project } = useProject();
+  const { columns, project, addTask } = useProject();
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
   const [members, setMembers] = useState<User[]>([]);
@@ -76,6 +76,7 @@ export function AddTaskModal({ open, onClose, onCreate }: Props) {
       });
 
       message.success('Task created');
+      addTask(created);
       onCreate(created);
       form.resetFields();
       onClose();
