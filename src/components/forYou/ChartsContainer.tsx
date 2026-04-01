@@ -131,13 +131,12 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
   return (
     <div className="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
-        
         <h4 className="text-primary-500 mb-4 text-center text-sm font-semibold tracking-wide">
           Assigned Task By Project
         </h4>
         <Pie {...pieConfig} data={allAssignedTaskByProject} />
         <div
-          className="absolute bottom-0 right-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
+          className="absolute right-0 bottom-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
           style={{
             background: `linear-gradient(to right, ${gradientStart}, ${gradientEnd})`,
           }}
@@ -145,7 +144,7 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
       </div>
       <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
         <div
-          className="absolute bottom-0 right-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
+          className="absolute right-0 bottom-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
           style={{
             background: `linear-gradient(to right, ${gradientStart}, ${gradientEnd})`,
           }}
@@ -157,7 +156,7 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
       </div>
       <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg sm:col-span-2 lg:col-span-1 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
         <div
-          className="absolute bottom-0 right-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
+          className="absolute right-0 bottom-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
           style={{
             background: `linear-gradient(to right, ${gradientStart}, ${gradientEnd})`,
           }}

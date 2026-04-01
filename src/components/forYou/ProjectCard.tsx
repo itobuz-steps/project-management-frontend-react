@@ -38,7 +38,7 @@ export function ProjectCard({ project }: { project: Project }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleClick}
-      className="group relative min-w-0 w-full cursor-pointer overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-300 ease-out hover:shadow-xl dark:border-slate-700 dark:bg-slate-800"
+      className="group relative w-full min-w-0 cursor-pointer overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-300 ease-out hover:shadow-xl dark:border-slate-700 dark:bg-slate-800"
     >
       {/* Animated background gradient on hover */}
       <div

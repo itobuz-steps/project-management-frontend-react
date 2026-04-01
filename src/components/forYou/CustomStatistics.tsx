@@ -24,7 +24,7 @@ export function CustomStatistic({ title, value }: CustomStatisticProps) {
     <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
       {/* Subtle accent line */}
       <div
-        className="absolute bottom-0 right-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
+        className="absolute right-0 bottom-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
         style={{
           background: `linear-gradient(to right, ${gradientStart}, ${gradientEnd})`,
         }}
