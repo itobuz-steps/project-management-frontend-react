@@ -21,7 +21,7 @@ export function ProjectContainer() {
       </h1>
       <div
         id="forYouProjectsContainer"
-        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
+        className="grid grid-cols-1 gap-4 min-[900px]:grid-cols-2 xl:grid-cols-3"
       >
         {projects.length === 0 ? (
           <div className="flex w-full justify-center bg-gray-50 p-5 text-center font-semibold text-gray-400 dark:bg-slate-800 dark:text-slate-400">
