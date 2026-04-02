@@ -1,26 +1,25 @@
 import { useEffect, useState } from 'react';
 import TopBar from '../components/common/TopBar';
-import type { ViewMode } from '../types/TopBar.types';
 import type { Project } from '../types/project.types';
-import { Outlet, useParams, useSearchParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import { useProject } from '../context/ProjectContext';
 import { setupPushNotifications } from '../utils/setupNotification';
-import { AddTaskModal } from '../utils/addTaskModal';
 import { getAllProjects } from '../services/projectService';
 import userService from '../services/userService';
 import { useAuthContext } from '../context/AuthContext';
 import { message } from 'antd';
-import { TASK_FILTER_QUERY_KEYS } from '../config/taskFilters';
+import { Tag } from 'antd';
+import { getWorkspaces } from '../services/workspaceService';
+import { normalizeAndCapitalize } from '../utils/utils';
 
 function Dashboard() {
   const { setProject } = useProject();
   const { setRole } = useAuthContext();
 
   const { projectId } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [workspaceName, setWorkspaceName] = useState('');
   const activeProject = projects.find((p) => p._id === projectId);
-  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
 
   useEffect(() => {
     async function fetchProjects() {
@@ -54,37 +53,60 @@ function Dashboard() {
     setupPushNotifications();
   }, []);
 
-  const [viewMode, setViewMode] = useState<ViewMode>('backlog');
-  const hasActiveFilters = TASK_FILTER_QUERY_KEYS.some((key) =>
-    Boolean(searchParams.get(key))
-  );
+  useEffect(() => {
+    if (!activeProject?.workspaceId) {
+      return;
+    }
 
-  const handleClearFilters = () => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      TASK_FILTER_QUERY_KEYS.forEach((key) => next.delete(key));
-      return next;
-    });
-  };
+    const resolveWorkspaceName = async () => {
+      try {
+        const response = await getWorkspaces();
+        const matchedWorkspace = response.result?.find(
+          (workspace) => workspace.workspaceId === activeProject.workspaceId
+        );
+        setWorkspaceName(matchedWorkspace?.workspaceName || '');
+      } catch (error) {
+        console.error('Failed to resolve workspace name:', error);
+        setWorkspaceName('');
+      }
+    };
+
+    resolveWorkspaceName();
+  }, [activeProject?.workspaceId]);
 
   return (
     <div className="flex min-h-screen flex-col gap-1 md:gap-3">
-      <TopBar
-        projectName={activeProject?.name}
-        viewMode={viewMode}
-        onViewChange={setViewMode}
-        onAddTask={() => setIsAddTaskOpen(true)}
-        onOpenFilters={() => {}}
-        onClearFilters={handleClearFilters}
-        hasActiveFilters={hasActiveFilters}
-        activeUsers={[]}
-      />
-      <AddTaskModal
-        open={isAddTaskOpen}
-        task={{}}
-        onClose={() => setIsAddTaskOpen(false)}
-        onCreate={() => setIsAddTaskOpen(false)}
-      />
+      {activeProject && (
+        <div className="bg-gray-100 px-3 py-2 dark:bg-[#28282b]">
+          <div className="flex flex-wrap items-center gap-2">
+            {activeProject.icon && (
+              <img
+                src={activeProject.icon}
+                alt="project icon"
+                className="inline h-5 w-5 rounded object-cover"
+              />
+            )}
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-neutral-100">
+              <span className="text-gray-500 dark:text-gray-400">{workspaceName} /</span>{' '}
+              {activeProject.name}
+            </h1>
+            {activeProject.projectType && (
+              <Tag
+                style={{
+                  backgroundColor: 'var(--color-primary-400)',
+                  color: '#fff',
+                  textTransform: 'capitalize',
+                  paddingInline: '0.35rem',
+                  lineHeight: 1.5,
+                }}
+              >
+                {normalizeAndCapitalize(activeProject.projectType)}
+              </Tag>
+            )}
+          </div>
+        </div>
+      )}
+      <TopBar />
       <main>
         <Outlet />
       </main>

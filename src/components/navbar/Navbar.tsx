@@ -1,17 +1,16 @@
 import Notifications from './Notifications';
 import { CommandPalette } from '../common/CommandPalette';
+import { AddTaskModal } from '../../utils/addTaskModal';
 import { useState, useRef, useEffect } from 'react';
-import { Tag } from 'antd';
-import { Bell, Search, Settings, Menu, X } from 'lucide-react';
+import { Bell, Settings, Menu, X } from 'lucide-react';
 import { Can } from '../../utils/PermissionHoc';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../../context/ProjectContext';
-import { normalizeAndCapitalize } from '../../utils/utils';
-import { getWorkspaces } from '../../services/workspaceService';
 import { UserProfile } from '../sidebar/UserProfile';
 
 export default function Navbar() {
   const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
   const [paletteSearch, setPaletteSearch] = useState('');
   const navigate = useNavigate();
   const { project } = useProject();
@@ -28,20 +27,17 @@ export default function Navbar() {
   const [notifOpen, setNotifOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
-  const [workspaceName, setWorkspaceName] = useState('');
-
-  const projectHeader = (
-    <span>
-      <span className="text-gray-500">{workspaceName} /</span>{' '}
-      {project?.name || ''}
-    </span>
-  );
 
   const actionButtonClass =
-    'flex h-8 w-8 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600';
+    'flex h-10 w-10 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600';
+
+  const searchInputClass =
+    'h-10 w-150 rounded-lg border border-gray-200 bg-white px-4 text-sm text-slate-700 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100 dark:border-[#27272e] dark:bg-[#1b1b1f] dark:text-neutral-100 dark:placeholder:text-neutral-400 dark:focus:ring-primary-900/30';
 
   useEffect(() => {
-    if (!mobileMenuOpen) return;
+    if (!mobileMenuOpen) {
+      return;
+    }
     const handleClick = (e: MouseEvent) => {
       if (
         menuRef.current &&
@@ -56,68 +52,9 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [mobileMenuOpen]);
 
-  useEffect(() => {
-    if (!project?.workspaceId) return;
-
-    const resolveWorkspaceName = async () => {
-      try {
-        const response = await getWorkspaces();
-        const matchedWorkspace = response.result?.find(
-          (workspace) => workspace.workspaceId === project.workspaceId
-        );
-        setWorkspaceName(matchedWorkspace?.workspaceName || '');
-      } catch (error) {
-        console.error('Failed to resolve workspace name:', error);
-        setWorkspaceName('');
-      }
-    };
-
-    resolveWorkspaceName();
-  }, [project?.workspaceId]);
-
   return (
     <div className="header border border-gray-50 bg-gray-100 dark:border-[#27272e] dark:bg-[#1b1b1f]">
       <nav className="flex flex-row items-center justify-between px-3 py-2 shadow-sm sm:flex-row sm:items-center md:px-4 md:py-2">
-        {/* Left — project info */}
-        <div className="flex flex-col gap-1 text-start sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <div className="flex items-center gap-1.5">
-              {project?.icon && !projectInfoHidden && (
-                <img
-                  src={project.icon}
-                  alt="project icon"
-                  className="inline h-5 w-5 rounded object-cover"
-                />
-              )}
-              {!projectInfoHidden && (
-                <h2
-                  onClick={() => navigate(`/project/${project?._id}/backlog`)}
-                  role="button"
-                  tabIndex={0}
-                  className="topbar-project-header inline cursor-pointer items-center text-base! leading-tight font-semibold text-gray-900 hover:text-blue-500 sm:text-lg dark:text-neutral-100"
-                >
-                  {projectHeader}
-                </h2>
-              )}
-            </div>
-
-            {project?.projectType && !projectInfoHidden && (
-              <Tag
-                style={{
-                  backgroundColor: 'var(--color-primary-400)',
-                  color: '#fff',
-                  textTransform: 'capitalize',
-                  marginLeft: '0.25rem',
-                  paddingInline: '0.35rem',
-                  lineHeight: 1.5,
-                }}
-              >
-                {normalizeAndCapitalize(project.projectType)}
-              </Tag>
-            )}
-          </div>
-        </div>
-
         <button
           ref={hamburgerRef}
           className="flex items-center justify-center rounded-md p-1.5 text-slate-700 md:hidden dark:text-slate-100"
@@ -132,30 +69,53 @@ export default function Navbar() {
           )}
         </button>
 
-        <div className="hidden items-center gap-1 md:flex md:justify-end lg:gap-2">
-          <button
-            onClick={handleSearchClick}
-            className={actionButtonClass}
-            aria-label="Search"
-          >
-            <Search size={16} strokeWidth={1.9} />
-          </button>
+        <div className="relative hidden w-full items-center md:flex">
+          <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2">
+            <input
+              type="search"
+              role="searchbox"
+              aria-label="Search"
+              placeholder="Search tasks by key, title, or description…"
+              value={paletteSearch}
+              onFocus={handleSearchClick}
+              onClick={handleSearchClick}
+              onChange={(e) => {
+                setPaletteSearch(e.target.value);
+                setCommandPaletteOpen(true);
+              }}
+              className={searchInputClass}
+            />
 
-          <Notifications />
+            <button
+              onClick={() => setIsAddTaskOpen(true)}
+              className="rounded-lg bg-primary-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700"
+              aria-label="Create task"
+            >
+              Create
+            </button>
+          </div>
 
-          {!projectInfoHidden && (
-            <Can permission="PROJECT_SETTINGS">
-              <button
-                onClick={() => navigate(`project/${project?._id}/settings`)}
-                className={actionButtonClass}
-                aria-label="Settings"
-              >
-                <Settings size={16} strokeWidth={1.9} />
-              </button>
-            </Can>
-          )}
+          <div className="ml-auto flex items-center gap-2">
+            <Notifications />
 
-          <UserProfile collapsed={true} mobileOpen={false} showTooltip={true} />
+            {!projectInfoHidden && (
+              <Can permission="PROJECT_SETTINGS">
+                <button
+                  onClick={() => navigate(`project/${project?._id}/settings`)}
+                  className={actionButtonClass}
+                  aria-label="Settings"
+                >
+                  <Settings size={20} strokeWidth={2} />
+                </button>
+              </Can>
+            )}
+
+            <UserProfile
+              collapsed={true}
+              mobileOpen={false}
+              showTooltip={true}
+            />
+          </div>
         </div>
       </nav>
 
@@ -186,8 +146,17 @@ export default function Navbar() {
               handleSearchClick();
             }}
           >
-            <Search size={15} strokeWidth={1.9} />
             Search
+          </button>
+
+          <button
+            className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-gray-800 hover:bg-gray-100 dark:text-neutral-100 dark:hover:bg-[#27272e]"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              setIsAddTaskOpen(true);
+            }}
+          >
+            Create task
           </button>
 
           {!projectInfoHidden && (
@@ -224,6 +193,13 @@ export default function Navbar() {
           onClose={() => setCommandPaletteOpen(false)}
         />
       )}
+
+      <AddTaskModal
+        open={isAddTaskOpen}
+        task={{}}
+        onClose={() => setIsAddTaskOpen(false)}
+        onCreate={() => setIsAddTaskOpen(false)}
+      />
     </div>
   );
 }

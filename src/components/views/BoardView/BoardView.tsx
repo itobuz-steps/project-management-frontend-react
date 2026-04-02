@@ -22,11 +22,15 @@ import { useSearchParams } from 'react-router-dom';
 import useBoard from '../../../hooks/useBoard';
 import Column from './Column';
 import { AddColumnModal, DeleteColumnModal } from './ColumnModals';
-import { Minimize2, Maximize2, ChevronRight, User, Tag } from 'lucide-react';
+import { Minimize2, Maximize2, ChevronRight, User, Tag, Users } from 'lucide-react';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../../hooks/useSprintActions';
 import SprintModal from '../../sprintModal/SprintModal';
 import { parseBoardTaskFilters } from '../../../config/taskFilters';
+import SearchBar from '../../navbar/SearchBar';
+import { InviteUserContainer } from '../../common/InviteUserContainer';
+import { ProjectMembersModal } from '../../common/ProjectMembersModal';
+import { TaskFiltersDropdown } from '../../common/TaskFiltersDropdown';
 
 const { Option } = Select;
 
@@ -42,6 +46,7 @@ function BoardView() {
 
   const [isDeleteColumnOpen, setIsDeleteColumnOpen] = useState(false);
   const [columnToDelete, setColumnToDelete] = useState<string | null>(null);
+  const [isMembersOpen, setIsMembersOpen] = useState(false);
 
   const { projectId } = useParams();
   const { project } = useProject();
@@ -107,6 +112,13 @@ function BoardView() {
   const [completedSprintId, setCompletedSprintId] = useState<string | null>(
     null
   );
+
+  const statusOptions = useMemo(() => {
+    if (columns.length) {
+      return columns;
+    }
+    return ['todo', 'in-progress', 'done'];
+  }, [columns]);
 
   const handleTaskUpdated = useCallback(
     (updated: TaskPopulated) => {
@@ -465,54 +477,138 @@ function BoardView() {
     })
   );
 
-  if (!projectId) {
-    return (
-      <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
-        <h2 className="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-200">
-          No project selected
-        </h2>
-        <p className="text-sm">
-          Select a project from the sidebar to view its board.
-        </p>
-      </div>
-    );
-  }
+  return (
+    <>
+      {/* Toolbar - always mounted */}
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
+          <div className="min-w-70">
+            <SearchBar />
+          </div>
+          {project && (
+            <>
+              <button
+                onClick={() => setIsMembersOpen(true)}
+                className="flex h-8 w-8 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600"
+                aria-label="Show members"
+              >
+                <Users size={16} strokeWidth={1.9} />
+              </button>
+              <InviteUserContainer />
+            </>
+          )}
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <TaskFiltersDropdown
+            searchParams={searchParams}
+            setSearchParams={setSearchParams}
+            statusOptions={statusOptions}
+            members={members}
+            loadingMembers={loadingMembers}
+            onOpenFilters={() => {}}
+            onClearFilters={() => {}}
+          />
+          <Select
+            placeholder={'Group'}
+            value={groupBy || undefined}
+            onChange={(val) => {
+              setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                if (val) {
+                  next.set('groupBy', val);
+                } else {
+                  next.delete('groupBy');
+                }
+                return next;
+              });
+            }}
+            allowClear
+            size="small"
+            className="min-w-35"
+          >
+            <Option value="">None</Option>
+            <Option value="assignee">Assignee</Option>
+            <Option value="story">Story</Option>
+          </Select>
 
-  return loading ? (
-    <div className="flex gap-3 overflow-x-auto">
-      <div className="flex flex-col gap-1">
-        <Skeleton.Node
-          active={true}
-          style={{ width: '16rem', height: '40px' }}
-        />
-        <Skeleton.Node
-          active={true}
-          style={{ width: '16rem', height: '400px' }}
-        />
+          {isScrum && activeSprint?.isStarted ? (
+            <button
+              type="button"
+              onClick={handleCompleteSprint}
+              disabled={isCompletingSprint}
+              className="bg-primary-400 hover:bg-primary-500 inline-flex items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isCompletingSprint ? 'Completing...' : 'Complete Sprint'}
+            </button>
+          ) : null}
+
+          <Tooltip
+            title={
+              isCompactMode ? 'Switch to expanded view' : 'Switch to compact view'
+            }
+            placement="left"
+          >
+            <button
+              type="button"
+              onClick={() => setIsCompactMode((prev) => !prev)}
+              aria-label={
+                isCompactMode
+                  ? 'Switch to expanded view'
+                  : 'Switch to compact view'
+              }
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
+            >
+              {isCompactMode ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
+            </button>
+          </Tooltip>
+        </div>
       </div>
-      <div className="flex flex-col gap-1">
-        <Skeleton.Node
-          active={true}
-          style={{ width: '16rem', height: '40px' }}
-        />
-        <Skeleton.Node
-          active={true}
-          style={{ width: '16rem', height: '400px' }}
-        />
-      </div>
-      <div className="flex flex-col gap-1">
-        <Skeleton.Node
-          active={true}
-          style={{ width: '16rem', height: '40px' }}
-        />
-        <Skeleton.Node
-          active={true}
-          style={{ width: '16rem', height: '400px' }}
-        />
-      </div>
-    </div>
-  ) : (
-    <DndContext
+
+      {/* Content area - conditionally rendered */}
+      {!projectId ? (
+        <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+          <h2 className="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-200">
+            No project selected
+          </h2>
+          <p className="text-sm">
+            Select a project from the sidebar to view its board.
+          </p>
+        </div>
+      ) : loading ? (
+        <div className="flex gap-3 overflow-x-auto">
+          <div className="flex flex-col gap-1">
+            <Skeleton.Node
+              active={true}
+              style={{ width: '16rem', height: '40px' }}
+            />
+            <Skeleton.Node
+              active={true}
+              style={{ width: '16rem', height: '400px' }}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Skeleton.Node
+              active={true}
+              style={{ width: '16rem', height: '40px' }}
+            />
+            <Skeleton.Node
+              active={true}
+              style={{ width: '16rem', height: '400px' }}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Skeleton.Node
+              active={true}
+              style={{ width: '16rem', height: '40px' }}
+            />
+            <Skeleton.Node
+              active={true}
+              style={{ width: '16rem', height: '400px' }}
+            />
+          </div>
+        </div>
+      ) : (
+        <DndContext
       sensors={sensors}
       collisionDetection={closestCorners}
       onDragStart={(event) => setActiveTaskId(String(event.active.id))}
@@ -565,62 +661,6 @@ function BoardView() {
         }
       }}
     >
-      <div className="mb-3 flex justify-end gap-2">
-        <Select
-          placeholder={'Group'}
-          value={groupBy || undefined}
-          onChange={(val) => {
-            setSearchParams((prev) => {
-              const next = new URLSearchParams(prev);
-              if (val) {
-                next.set('groupBy', val);
-              } else {
-                next.delete('groupBy');
-              }
-              return next;
-            });
-          }}
-          allowClear
-          size="small"
-          className="min-w-[140px]"
-        >
-          <Option value="">None</Option>
-          <Option value="assignee">Assignee</Option>
-          <Option value="story">Story</Option>
-        </Select>
-
-        {isScrum && activeSprint?.isStarted ? (
-          <button
-            type="button"
-            onClick={handleCompleteSprint}
-            disabled={isCompletingSprint}
-            className="bg-primary-400 hover:bg-primary-500 inline-flex items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isCompletingSprint ? 'Completing...' : 'Complete Sprint'}
-          </button>
-        ) : null}
-
-        <Tooltip
-          title={
-            isCompactMode ? 'Switch to expanded view' : 'Switch to compact view'
-          }
-          placement="left"
-        >
-          <button
-            type="button"
-            onClick={() => setIsCompactMode((prev) => !prev)}
-            aria-label={
-              isCompactMode
-                ? 'Switch to expanded view'
-                : 'Switch to compact view'
-            }
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
-          >
-            {isCompactMode ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
-          </button>
-        </Tooltip>
-      </div>
-
       <div className="flex flex-col gap-6">
         {groupedTasksByColumn.map(
           ({ key, label, tasksByColumn: laneColumns }) => {
@@ -760,7 +800,15 @@ function BoardView() {
           projectId={projectId}
         />
       ) : null}
-    </DndContext>
+
+      </DndContext>
+      )}
+
+      <ProjectMembersModal
+        open={isMembersOpen}
+        onClose={() => setIsMembersOpen(false)}
+      />
+    </>
   );
 }
 

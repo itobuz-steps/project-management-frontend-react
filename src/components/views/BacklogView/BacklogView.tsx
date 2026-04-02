@@ -23,6 +23,10 @@ import { getTasks } from '../../../services/taskService';
 import { message, Skeleton } from 'antd';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
 import { TaskTypeColor } from '../../../utils/TaskTypeColor';
+import SearchBar from '../../navbar/SearchBar';
+import { Users } from 'lucide-react';
+import { InviteUserContainer } from '../../common/InviteUserContainer';
+import { ProjectMembersModal } from '../../common/ProjectMembersModal';
 
 function BacklogView() {
   const { projectId } = useParams();
@@ -43,6 +47,7 @@ function BacklogView() {
   const [completedSprintId, setCompletedSprintId] = useState<string | null>(
     null
   );
+  const [isMembersOpen, setIsMembersOpen] = useState(false);
 
   const handleSprintCompleted = useCallback((sprintId: string) => {
     setCompletedSprintId(sprintId);
@@ -142,41 +147,7 @@ function BacklogView() {
     loadData(projectId);
   }, [type, searchInput, projectId, sprintService]);
 
-  if (!projectId) {
-    return (
-      <div className="rounded-lg border bg-white p-6 text-center text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
-        <h2 className="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-200">
-          No project selected
-        </h2>
-        <p className="text-sm">
-          Select a project from the sidebar or create a new one to get started.
-        </p>
-      </div>
-    );
-  }
 
-  if (loading) {
-    return (
-      <div className="rounded-lg p-4">
-        <div className="flex flex-col gap-3">
-          <Skeleton.Input active={true} size="large" block={true} />
-          <div className="flex flex-col gap-2">
-            <Skeleton.Input active={true} size="default" block={true} />
-            <Skeleton.Input active={true} size="default" block={true} />
-            <Skeleton.Input active={true} size="default" block={true} />
-          </div>
-        </div>
-        <div className="mt-8 flex flex-col gap-3">
-          <Skeleton.Input active={true} size="large" block={true} />
-          <div className="flex flex-col gap-2">
-            <Skeleton.Input active={true} size="default" block={true} />
-            <Skeleton.Input active={true} size="default" block={true} />
-            <Skeleton.Input active={true} size="default" block={true} />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const sprintTaskIds = new Set(sprints.flatMap((s) => s.tasks));
 
@@ -203,8 +174,58 @@ function BacklogView() {
   };
 
   return (
-    <div className="rounded-lg bg-white p-1 dark:bg-slate-900">
-      <DndContext
+    <>
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
+          <div className="min-w-70">
+            <SearchBar />
+          </div>
+          {project && (
+            <>
+              <button
+                onClick={() => setIsMembersOpen(true)}
+                className="flex h-8 w-8 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600"
+                aria-label="Show members"
+              >
+                <Users size={16} strokeWidth={1.9} />
+              </button>
+              <InviteUserContainer />
+            </>
+          )}
+        </div>
+      </div>
+
+      {!projectId ? (
+        <div className="rounded-lg border bg-white p-6 text-center text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+          <h2 className="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-200">
+            No project selected
+          </h2>
+          <p className="text-sm">
+            Select a project from the sidebar or create a new one to get started.
+          </p>
+        </div>
+      ) : loading ? (
+        <div className="rounded-lg p-4">
+          <div className="flex flex-col gap-3">
+            <Skeleton.Input active={true} size="large" block={true} />
+            <div className="flex flex-col gap-2">
+              <Skeleton.Input active={true} size="default" block={true} />
+              <Skeleton.Input active={true} size="default" block={true} />
+              <Skeleton.Input active={true} size="default" block={true} />
+            </div>
+          </div>
+          <div className="mt-8 flex flex-col gap-3">
+            <Skeleton.Input active={true} size="large" block={true} />
+            <div className="flex flex-col gap-2">
+              <Skeleton.Input active={true} size="default" block={true} />
+              <Skeleton.Input active={true} size="default" block={true} />
+              <Skeleton.Input active={true} size="default" block={true} />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-lg bg-white p-1 dark:bg-slate-900">
+          <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
         onDragStart={(event) => setActiveTaskId(String(event.active.id))}
@@ -214,7 +235,9 @@ function BacklogView() {
           }
 
           setActiveTaskId(null);
-          if (!over) return;
+          if (!over) {
+            return;
+          } 
 
           const activeContainer = active.data.current?.containerId as
             | string
@@ -392,7 +415,13 @@ function BacklogView() {
           ) : null}
         </DragOverlay>
       </DndContext>
-    </div>
+        </div>
+      )}
+      <ProjectMembersModal
+        open={isMembersOpen}
+        onClose={() => setIsMembersOpen(false)}
+      />
+    </>
   );
 }
 
