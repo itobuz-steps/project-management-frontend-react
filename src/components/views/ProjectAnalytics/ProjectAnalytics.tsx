@@ -11,6 +11,7 @@ import { StatusOverview } from './StatusOverview';
 import { PriorityBreakdown } from './PriorityBreakdown';
 import { TypesOfWork } from './TypesOfWork';
 import { TeamWorkload } from './TeamWorkload';
+import { EpicProgress } from './EpicProgess';
 
 export default function ProjectAnalyticsPage() {
   const { projectId } = useParams();
@@ -112,6 +113,9 @@ export default function ProjectAnalyticsPage() {
                   data={analytics.teamWorkload}
                   themeColors={themeColors}
                 />
+              </SectionCard>
+              <SectionCard title="Epic Progress">
+                <EpicProgress data={analytics.epicProgress} />
               </SectionCard>
             </div>
           </>

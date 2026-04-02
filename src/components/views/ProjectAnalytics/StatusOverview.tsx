@@ -19,9 +19,10 @@ export function StatusOverview({
 }) {
   const [colorMode] = useColorMode();
   const textColor = colorMode === 'dark' ? '#f5f5f5' : '#374151';
+  // const total = data.reduce((sum, item) => sum + item.count, 0);
 
   return (
-    <div style={{ height: 320, width: '100%' }}>
+    <div style={{ height: 320, width: '100%', position: 'relative' }}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -30,10 +31,7 @@ export function StatusOverview({
             nameKey="status"
             cx="50%"
             cy="50%"
-            innerRadius="40%"
             outerRadius="70%"
-            paddingAngle={3}
-            labelLine={true}
           >
             {data.map((entry, index) => (
               <Cell
