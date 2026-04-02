@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Project } from '../../types/project.types';
-import { Avatar } from 'antd';
+// import { Avatar } from 'antd';
 import { User, ChevronRight } from 'lucide-react';
 import { THEME_COLORS } from '../../config/constants';
 import { ProjectMembersModal } from '../common/ProjectMembersModal';
+
+const MAX_VISIBLE = 3;
 
 export function ProjectCard({ project }: { project: Project }) {
   const [showMembersModal, setShowMembersModal] = useState(false);
@@ -13,8 +15,11 @@ export function ProjectCard({ project }: { project: Project }) {
   const theme = localStorage.getItem('lastProjectTheme') || 'indigo';
   const themeColors = THEME_COLORS[theme] ?? THEME_COLORS['indigo'];
   const accentColor = themeColors[4];
+  const visible = project.members.slice(0, MAX_VISIBLE);
+  const overflow = project.members.length - MAX_VISIBLE;
 
-  function handleClick() {
+  function handleClick(e: React.MouseEvent<HTMLDivElement>) {
+    if ((e.target as HTMLElement).closest('button')) return;
     navigate(`/project/${project._id}`);
   }
 
@@ -53,7 +58,7 @@ export function ProjectCard({ project }: { project: Project }) {
         {/* Header Section - Icon + Title + Badge */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 flex-1 items-start gap-3">
-            <div className="flex-shrink-0">{iconElement}</div>
+            <div className="shrink-0">{iconElement}</div>
             <div className="min-w-0 flex-1">
               <h3 className="truncate text-base leading-tight font-semibold text-gray-900 dark:text-slate-100">
                 {project.name}
@@ -67,7 +72,7 @@ export function ProjectCard({ project }: { project: Project }) {
           </div>
 
           {/* Type Badge - Repositioned */}
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <span
               className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-white"
               style={{
@@ -81,44 +86,43 @@ export function ProjectCard({ project }: { project: Project }) {
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-gradient-to-r from-gray-200 via-gray-100 to-transparent dark:from-slate-700 dark:via-slate-600 dark:to-transparent" />
+        <div className="h-px bg-linear-to-r from-gray-200 via-gray-100 to-transparent dark:from-slate-700 dark:via-slate-600 dark:to-transparent" />
 
         {/* Members Section */}
         <button
+          onClickCapture={(e) => {
+            e.stopPropagation();
+          }}
           onClick={(e) => {
+            console.log('button click');
             e.stopPropagation();
             setShowMembersModal(true);
           }}
           className="group/btn flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-slate-700/50"
         >
-          <Avatar.Group
-            max={{
-              count: 3,
-              style: {
-                color: '#fff',
-                backgroundColor: accentColor,
-                height: '28px',
-                width: '28px',
-                fontSize: '11px',
-                fontWeight: '600',
-              },
-            }}
-          >
-            {project.members.slice(0, 5).map((member, index) => (
-              <Avatar
+          <div className="flex items-center">
+            {visible.map((member, index) => (
+              <div
                 key={member._id}
+                className="-ml-2 flex h-7 w-7 items-center justify-center rounded-full ring-2 ring-white first:ml-0 dark:ring-slate-800"
                 style={{
                   backgroundColor: themeColors[index % themeColors.length],
-                  height: '28px',
-                  width: '28px',
-                  fontSize: '11px',
-                  fontWeight: '600',
                 }}
               >
                 <User size={14} color="#fff" />
-              </Avatar>
+              </div>
             ))}
-          </Avatar.Group>
+
+            {overflow > 0 && (
+              <div
+                className="-ml-2 flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-semibold text-white ring-2 ring-white dark:ring-slate-800"
+                style={{ backgroundColor: accentColor }}
+              >
+                +{overflow}
+              </div>
+            )}
+          </div>
+
           <span className="flex-1 text-left text-sm text-gray-600 dark:text-slate-400">
             {project.members.length === 1
               ? '1 member'
