@@ -73,7 +73,7 @@ export default function ProjectAnalyticsPage() {
         {analytics && (
           <>
             {/* Row 1 — Status Overview + Priority Breakdown */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <SectionCard
                 title="Status Overview"
                 subtitle="Distribution of tasks by current status"

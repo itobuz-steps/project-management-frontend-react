@@ -1,4 +1,11 @@
-import { Bar } from '@ant-design/plots';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { useColorMode } from '../../../hooks/useColorMode';
 import type { ProjectAnalytics } from '../../../services/types/analytics.type';
 
@@ -11,32 +18,44 @@ export function TeamWorkload({
 }) {
   const [colorMode] = useColorMode();
   const textColor = colorMode === 'dark' ? '#f5f5f5' : '#374151';
+  const sorted = [...data].sort((a, b) => a.count - b.count);
 
-  const config = {
-    data: [...data].sort((a, b) => a.count - b.count),
-    yField: 'name',
-    xField: 'count',
-    colorField: 'name',
-    color: themeColors[5],
-    label: {
-      position: 'middle' as const,
-      style: {
-        fill: textColor,
-      },
-    },
-    tooltip: {
-      items: [{ channel: 'x' as const, name: 'Open Tasks' }],
-    },
-    axis: {
-      y: false,
-      x: { labelFill: textColor },
-    },
-    legend: false,
-    style: {
-      minWidth: 20,
-      maxWidth: 30,
-    },
-  };
-
-  return <Bar {...config} />;
+  return (
+    <div style={{ height: 350, width: '100%' }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={sorted}
+          layout="vertical"
+          margin={{ left: 40, bottom: 20 }}
+        >
+          <XAxis
+            type="number"
+            tick={{ fill: textColor }}
+            label={{
+              value: 'Open Tasks',
+              fill: textColor,
+              angle: 0,
+              offset: 10,
+              position: 'bottom',
+            }}
+          />
+          <YAxis
+            type="category"
+            dataKey="name"
+            tick={{ fill: textColor }}
+            width={100}
+            label={{
+              value: 'Team Members',
+              fill: textColor,
+              angle: -90,
+              position: 'left',
+              width: 140,
+            }}
+          />
+          <Tooltip />
+          <Bar dataKey="count" name="Open Tasks" fill={themeColors[5]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }
