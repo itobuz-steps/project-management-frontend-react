@@ -24,7 +24,7 @@ export default function ProjectAnalyticsPage() {
   useEffect(() => {
     if (!projectId) {
       return;
-    } 
+    }
     const load = async () => {
       try {
         setLoading(true);

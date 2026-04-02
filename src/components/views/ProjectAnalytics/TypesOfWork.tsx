@@ -1,25 +1,42 @@
-import { Bar } from '@ant-design/plots';
+import { Rose } from '@ant-design/plots';
+import { useColorMode } from '../../../hooks/useColorMode';
 import type { ProjectAnalytics } from '../../../services/types/analytics.type';
 
 export function TypesOfWork({
   data,
+  themeColors,
 }: {
   data: ProjectAnalytics['typesOfWork'];
   themeColors: string[];
 }) {
+  const [colorMode] = useColorMode();
+  const textColor = colorMode === 'dark' ? '#f5f5f5' : '#374151';
+
   const config = {
     data,
-    yField: 'type',
-    xField: 'count',
+    xField: 'type',
+    yField: 'count',
     colorField: 'type',
-    tooltip: {
-      items: [{ channel: 'x' as const, name: 'Tasks' }],
+    seriesField: 'type',
+    label: {
+      position: 'outside' as const,
+      text: (d: { count: number }) => `${d.count}`,
+      style: {
+        fill: textColor,
+      },
     },
-    style: {
-      minWidth: 30,
-      maxWidth: 30,
+    tooltip: {
+      items: [{ channel: 'y' as const, name: 'Tasks' }],
+    },
+    legend: {
+      color: {
+        itemLabelFill: textColor,
+      },
+    },
+    scale: {
+      color: { range: themeColors },
     },
   };
 
-  return <Bar {...config} height={Math.max(160, data.length * 50)} />;
+  return <Rose {...config} height={320} />;
 }
