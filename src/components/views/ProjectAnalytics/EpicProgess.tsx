@@ -1,132 +1,67 @@
-import { useColorMode } from '../../../hooks/useColorMode';
+import {
+  EPIC_PROGRESS_LEGEND,
+  getProgressColorClass,
+  getProgressLabel,
+} from '../../../config/constants';
+
 import type { ProjectAnalytics } from '../../../services/types/analytics.type';
-
-function getProgressColor(percentage: number): string {
-  if (percentage === 0) return '#94a3b8';
-  if (percentage < 40) return '#f87171';
-  if (percentage < 70) return '#3b82f6';
-  return '#4ade80';
-}
-
-function getProgressLabel(percentage: number): string {
-  if (percentage === 0) return 'To do';
-  if (percentage === 100) return 'Done';
-  return 'In progress';
-}
 
 export function EpicProgress({
   data,
 }: {
   data: ProjectAnalytics['epicProgress'];
 }) {
-  const [colorMode] = useColorMode();
-  const isDark = colorMode === 'dark';
-  const textColor = isDark ? '#f1f5f9' : '#111827';
-  const mutedColor = isDark ? '#94a3b8' : '#6b7280';
-  const trackColor = isDark ? 'rgba(255,255,255,0.08)' : '#f3f4f6';
-
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 24,
-        width: '100%',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        {[
-          { label: 'Done', color: '#4ade80' },
-          { label: 'In progress', color: '#3b82f6' },
-          { label: 'To do', color: '#94a3b8' },
-        ].map(({ label, color }) => (
-          <div
-            key={label}
-            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
-          >
-            <div
-              style={{
-                width: 12,
-                height: 12,
-                borderRadius: 3,
-                background: color,
-                flexShrink: 0,
-              }}
-            />
-            <span style={{ fontSize: 13, color: mutedColor }}>{label}</span>
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex items-center gap-4">
+        {EPIC_PROGRESS_LEGEND.map(({ label, className }) => (
+          <div key={label} className="flex items-center gap-1.5">
+            <div className={`h-3 w-3 shrink-0 rounded-sm ${className}`} />
+            <span className="text-[13px] text-gray-500 dark:text-slate-400">
+              {label}
+            </span>
           </div>
         ))}
       </div>
 
       {data.map((epic) => {
-        const color = getProgressColor(epic.percentage);
+        const colorClass = getProgressColorClass(epic.percentage);
+        const labelIsOverBar = epic.percentage > 15;
+
         return (
-          <div
-            key={String(epic.epicId)}
-            style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
-          >
-            {/* Epic key + title */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: mutedColor,
-                  fontFamily: 'monospace',
-                }}
-              >
+          <div key={String(epic.epicId)} className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[13px] font-semibold text-gray-500 dark:text-slate-400">
                 {epic.key}
               </span>
-              <span style={{ fontSize: 14, fontWeight: 500, color: textColor }}>
+              <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
                 {epic.title}
               </span>
             </div>
 
-            <div
-              style={{
-                position: 'relative',
-                height: 32,
-                borderRadius: 6,
-                background: trackColor,
-                overflow: 'hidden',
-              }}
-            >
+            <div className="relative h-8 overflow-hidden rounded-md bg-gray-100 dark:bg-white/8">
               <div
+                className={`h-full rounded-md transition-[width] duration-600 ease-in-out ${colorClass}`}
                 style={{
-                  height: '100%',
                   width: `${epic.percentage}%`,
-                  background: color,
-                  borderRadius: 6,
-                  transition: 'width 0.6s cubic-bezier(0.4,0,0.2,1)',
                   minWidth: epic.percentage > 0 ? 40 : 0,
                 }}
               />
+
               <span
-                style={{
-                  position: 'absolute',
-                  left: 12,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: epic.percentage > 15 ? '#fff' : textColor,
-                }}
+                className={`absolute top-1/2 left-3 -translate-y-1/2 text-[13px] font-bold ${
+                  labelIsOverBar
+                    ? 'text-white'
+                    : 'text-gray-900 dark:text-slate-100'
+                }`}
               >
                 {epic.percentage > 0
                   ? `${epic.percentage}%`
                   : getProgressLabel(epic.percentage)}
               </span>
+
               {epic.total > 0 && (
-                <span
-                  style={{
-                    position: 'absolute',
-                    right: 12,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    fontSize: 12,
-                    color: mutedColor,
-                  }}
-                >
+                <span className="absolute top-1/2 right-3 -translate-y-1/2 text-xs text-gray-500 dark:text-slate-400">
                   {epic.completed}/{epic.total}
                 </span>
               )}

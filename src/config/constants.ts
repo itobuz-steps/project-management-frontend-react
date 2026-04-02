@@ -161,3 +161,22 @@ export const taskTableColumns = [
   { label: 'Updated', className: 'p-3 px-6' },
   { label: 'Reporter', className: 'p-3 px-6 truncate w-[200px]' },
 ];
+
+export const EPIC_PROGRESS_LEGEND = [
+  { label: 'Done', className: 'bg-green-400' },
+  { label: 'In progress', className: 'bg-blue-500' },
+  { label: 'To do', className: 'bg-slate-400' },
+] as const;
+
+export function getProgressColorClass(percentage: number): string {
+  if (percentage === 0) return 'bg-slate-400';
+  if (percentage < 40) return 'bg-red-400';
+  if (percentage < 70) return 'bg-blue-500';
+  return 'bg-green-400';
+}
+
+export function getProgressLabel(percentage: number): string {
+  if (percentage === 0) return 'To do';
+  if (percentage === 100) return 'Done';
+  return 'In progress';
+}
