@@ -1,5 +1,5 @@
 import type { ViewMode } from '../../types/TopBar.types';
-import { NavLink, useLocation  } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useMemo } from 'react';
 import { useProject } from '../../context/ProjectContext';
 import { Tabs } from 'antd';

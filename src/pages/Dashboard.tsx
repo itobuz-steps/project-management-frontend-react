@@ -87,7 +87,9 @@ function Dashboard() {
               />
             )}
             <h1 className="text-lg font-semibold text-gray-900 dark:text-neutral-100">
-              <span className="text-gray-500 dark:text-gray-400">{workspaceName} /</span>{' '}
+              <span className="text-gray-500 dark:text-gray-400">
+                {workspaceName} /
+              </span>{' '}
               {activeProject.name}
             </h1>
             {activeProject.projectType && (

@@ -208,50 +208,50 @@ function ListView() {
       <div className="relative w-full rounded-md border border-gray-200 dark:border-slate-700 dark:bg-slate-900">
         <div className="sticky top-0 z-10 flex items-center justify-end gap-2 border-b border-gray-200 bg-gray-50 px-2 py-1 dark:border-slate-700 dark:bg-slate-800">
           <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={handleResetFilters}
-          disabled={!hasActiveFilters}
-          aria-label="Reset filters"
-          title="Reset filters"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
-        >
-          <FilterX size={14} />
-        </button>
-        <button
-          type="button"
-          onClick={handleResetTableLayout}
-          aria-label="Reset table layout"
-          title="Reset table layout"
-          className="border-primary-500 text-primary-600 hover:bg-primary-500 inline-flex h-7 w-7 items-center justify-center rounded-md border transition hover:text-white"
-        >
-          <LayoutPanelTop size={14} />
-        </button>
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              disabled={!hasActiveFilters}
+              aria-label="Reset filters"
+              title="Reset filters"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
+            >
+              <FilterX size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={handleResetTableLayout}
+              aria-label="Reset table layout"
+              title="Reset table layout"
+              className="border-primary-500 text-primary-600 hover:bg-primary-500 inline-flex h-7 w-7 items-center justify-center rounded-md border transition hover:text-white"
+            >
+              <LayoutPanelTop size={14} />
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="no-scrollbar max-h-150 overflow-auto border border-gray-200 dark:border-slate-700">
-        <TaskTable
-          key={tableRenderKey}
-          tasks={tasks}
-          statusColumns={columns}
-          members={members}
-          loadingMembers={loadingMembers}
-          onTaskUpdated={handleTaskUpdated}
-          pagination={pagination}
-          filters={tableFilters}
-          sorting={sorting}
-          onTableChange={handleTableChange}
-          loading={loading}
-          error={error}
+        <div className="no-scrollbar max-h-150 overflow-auto border border-gray-200 dark:border-slate-700">
+          <TaskTable
+            key={tableRenderKey}
+            tasks={tasks}
+            statusColumns={columns}
+            members={members}
+            loadingMembers={loadingMembers}
+            onTaskUpdated={handleTaskUpdated}
+            pagination={pagination}
+            filters={tableFilters}
+            sorting={sorting}
+            onTableChange={handleTableChange}
+            loading={loading}
+            error={error}
+          />
+        </div>
+
+        <ProjectMembersModal
+          open={isMembersOpen}
+          onClose={() => setIsMembersOpen(false)}
         />
       </div>
-
-      <ProjectMembersModal
-        open={isMembersOpen}
-        onClose={() => setIsMembersOpen(false)}
-      />
-    </div>
     </>
   );
 }
