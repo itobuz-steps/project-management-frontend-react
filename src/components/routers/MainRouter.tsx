@@ -20,6 +20,7 @@ import { AuthRedirect } from '../../utils/AuthRedirect';
 import ProjectSettings from '../../pages/ProjectSettings';
 import PermissionGuard from './PermissionGuard';
 import AuditLogsPage from '../../pages/AuditLogsPage';
+import ProjectAnalyticsPage from '../views/ProjectAnalytics/ProjectAnalytics';
 
 export function MainRouter() {
   return (
@@ -86,6 +87,14 @@ export function MainRouter() {
                   element={
                     <PermissionGuard permission="PROJECT_AUDIT_LOG_VIEW">
                       <AuditLogsPage />
+                    </PermissionGuard>
+                  }
+                />
+                <Route
+                  path="analytics"
+                  element={
+                    <PermissionGuard permission="PROJECT_AUDIT_LOG_VIEW">
+                      <ProjectAnalyticsPage />
                     </PermissionGuard>
                   }
                 />

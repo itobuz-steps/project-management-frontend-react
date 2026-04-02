@@ -41,7 +41,7 @@ export const ChangeValue = ({
           {from}
         </span>
         <span className="text-gray-400">→</span>
-        <span className="bg-green-100 px-0.5 font-medium text-gray-800 dark:text-slate-200">
+        <span className="bg-green-100 px-0.5 font-medium text-gray-800">
           {to}
         </span>
       </span>

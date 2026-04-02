@@ -5,7 +5,8 @@ export type ViewMode =
   | 'for-you'
   | 'sprints-overview'
   | 'timeline'
-  | 'logs';
+  | 'logs'
+  | 'analytics';
 
 export interface ActiveUser {
   id: string;

@@ -41,6 +41,7 @@ function TopBar({
 
     if (can('PROJECT_AUDIT_LOG_VIEW')) {
       base.push({ label: 'Audit Logs', value: 'logs' });
+      base.push({ label: 'Analytics', value: 'analytics' });
     }
 
     return base;
