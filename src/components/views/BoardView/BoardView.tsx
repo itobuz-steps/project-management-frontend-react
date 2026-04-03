@@ -22,11 +22,23 @@ import { useSearchParams } from 'react-router-dom';
 import useBoard from '../../../hooks/useBoard';
 import Column from './Column';
 import { AddColumnModal, DeleteColumnModal } from './ColumnModals';
-import { Minimize2, Maximize2, ChevronRight, User, Tag } from 'lucide-react';
+import {
+  Minimize2,
+  Maximize2,
+  ChevronRight,
+  User,
+  Tag,
+  Users,
+} from 'lucide-react';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../../hooks/useSprintActions';
 import SprintModal from '../../sprintModal/SprintModal';
 import { parseBoardTaskFilters } from '../../../config/taskFilters';
+import SearchBar from '../../navbar/SearchBar';
+import { InviteUserContainer } from '../../common/InviteUserContainer';
+import { ProjectMembersModal } from '../../common/ProjectMembersModal';
+import { TaskFiltersDropdown } from '../../common/TaskFiltersDropdown';
+import type { Project } from '../../../types/project.types';
 
 const { Option } = Select;
 
@@ -42,6 +54,7 @@ function BoardView() {
 
   const [isDeleteColumnOpen, setIsDeleteColumnOpen] = useState(false);
   const [columnToDelete, setColumnToDelete] = useState<string | null>(null);
+  const [isMembersOpen, setIsMembersOpen] = useState(false);
 
   const { projectId } = useParams();
   const { project } = useProject();
@@ -107,6 +120,13 @@ function BoardView() {
   const [completedSprintId, setCompletedSprintId] = useState<string | null>(
     null
   );
+
+  const statusOptions = useMemo(() => {
+    if (columns.length) {
+      return columns;
+    }
+    return ['todo', 'in-progress', 'done'];
+  }, [columns]);
 
   const handleTaskUpdated = useCallback(
     (updated: TaskPopulated) => {
@@ -465,302 +485,352 @@ function BoardView() {
     })
   );
 
-  if (!projectId) {
-    return (
-      <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
-        <h2 className="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-200">
-          No project selected
-        </h2>
-        <p className="text-sm">
-          Select a project from the sidebar to view its board.
-        </p>
-      </div>
-    );
-  }
-
-  return loading ? (
-    <div className="flex gap-3 overflow-x-auto">
-      <div className="flex flex-col gap-1">
-        <Skeleton.Node
-          active={true}
-          style={{ width: '16rem', height: '40px' }}
-        />
-        <Skeleton.Node
-          active={true}
-          style={{ width: '16rem', height: '400px' }}
-        />
-      </div>
-      <div className="flex flex-col gap-1">
-        <Skeleton.Node
-          active={true}
-          style={{ width: '16rem', height: '40px' }}
-        />
-        <Skeleton.Node
-          active={true}
-          style={{ width: '16rem', height: '400px' }}
-        />
-      </div>
-      <div className="flex flex-col gap-1">
-        <Skeleton.Node
-          active={true}
-          style={{ width: '16rem', height: '40px' }}
-        />
-        <Skeleton.Node
-          active={true}
-          style={{ width: '16rem', height: '400px' }}
-        />
-      </div>
-    </div>
-  ) : (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={(event) => setActiveTaskId(String(event.active.id))}
-      onDragEnd={({ active, over }) => {
-        setActiveTaskId(null);
-
-        if (!over || active.id === over.id) return;
-
-        const activeColumn = active.data.current?.column as string | undefined;
-        const overColumn =
-          (over.data.current?.column as string | undefined) ??
-          String(over.id).replace('column:', '');
-
-        if (!activeColumn || !overColumn) return;
-
-        const isStatusChange = activeColumn !== overColumn;
-        let previousTasks: TaskPopulated[] = [];
-
-        setTasks((prev) => {
-          previousTasks = prev;
-          const activeIndex = prev.findIndex((task) => task._id === active.id);
-          if (activeIndex === -1) {
-            return prev;
-          }
-
-          const updated = [...prev];
-          updated[activeIndex] = {
-            ...updated[activeIndex],
-            status: overColumn as TaskStatus,
-          };
-
-          if (!isStatusChange) {
-            const overIndex = updated.findIndex((task) => task._id === over.id);
-            if (overIndex === -1) {
-              return updated;
-            }
-            return arrayMove(updated, activeIndex, overIndex);
-          }
-
-          return updated;
-        });
-
-        if (isStatusChange) {
-          void updateTask(String(active.id), {
-            status: overColumn as TaskStatus,
-          }).catch(() => {
-            setTasks(previousTasks);
-            setError('Failed to update task status.');
-          });
-        }
-      }}
-    >
-      <div className="mb-3 flex justify-end gap-2">
-        <Select
-          placeholder={'Group'}
-          value={groupBy || undefined}
-          onChange={(val) => {
-            setSearchParams((prev) => {
-              const next = new URLSearchParams(prev);
-              if (val) {
-                next.set('groupBy', val);
-              } else {
-                next.delete('groupBy');
-              }
-              return next;
-            });
-          }}
-          allowClear
-          size="small"
-          className="min-w-[140px]"
-        >
-          <Option value="">None</Option>
-          <Option value="assignee">Assignee</Option>
-          <Option value="story">Story</Option>
-        </Select>
-
-        {isScrum && activeSprint?.isStarted ? (
-          <button
-            type="button"
-            onClick={handleCompleteSprint}
-            disabled={isCompletingSprint}
-            className="bg-primary-400 hover:bg-primary-500 inline-flex items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+  return (
+    <>
+      {/* Toolbar - always mounted */}
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
+          <div className="min-w-70">
+            <SearchBar />
+          </div>
+          {project && (
+            <>
+              <button
+                onClick={() => setIsMembersOpen(true)}
+                className="flex h-8 w-8 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600"
+                aria-label="Show members"
+              >
+                <Users size={16} strokeWidth={1.9} />
+              </button>
+              <InviteUserContainer />
+            </>
+          )}
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <TaskFiltersDropdown
+            searchParams={searchParams}
+            setSearchParams={setSearchParams}
+            statusOptions={statusOptions}
+            members={members}
+            loadingMembers={loadingMembers}
+            onOpenFilters={() => {}}
+            onClearFilters={() => {}}
+          />
+          <Select
+            placeholder={'Group'}
+            value={groupBy || undefined}
+            onChange={(val) => {
+              setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                if (val) {
+                  next.set('groupBy', val);
+                } else {
+                  next.delete('groupBy');
+                }
+                return next;
+              });
+            }}
+            allowClear
+            size="small"
+            className="min-w-35"
           >
-            {isCompletingSprint ? 'Completing...' : 'Complete Sprint'}
-          </button>
-        ) : null}
+            <Option value="">None</Option>
+            <Option value="assignee">Assignee</Option>
+            <Option value="story">Story</Option>
+          </Select>
 
-        <Tooltip
-          title={
-            isCompactMode ? 'Switch to expanded view' : 'Switch to compact view'
-          }
-          placement="left"
-        >
-          <button
-            type="button"
-            onClick={() => setIsCompactMode((prev) => !prev)}
-            aria-label={
+          {isScrum && activeSprint?.isStarted ? (
+            <button
+              type="button"
+              onClick={handleCompleteSprint}
+              disabled={isCompletingSprint}
+              className="bg-primary-400 hover:bg-primary-500 inline-flex items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isCompletingSprint ? 'Completing...' : 'Complete Sprint'}
+            </button>
+          ) : null}
+
+          <Tooltip
+            title={
               isCompactMode
                 ? 'Switch to expanded view'
                 : 'Switch to compact view'
             }
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
+            placement="left"
           >
-            {isCompactMode ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
-          </button>
-        </Tooltip>
+            <button
+              type="button"
+              onClick={() => setIsCompactMode((prev) => !prev)}
+              aria-label={
+                isCompactMode
+                  ? 'Switch to expanded view'
+                  : 'Switch to compact view'
+              }
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
+            >
+              {isCompactMode ? (
+                <Maximize2 size={14} />
+              ) : (
+                <Minimize2 size={14} />
+              )}
+            </button>
+          </Tooltip>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-6">
-        {groupedTasksByColumn.map(
-          ({ key, label, tasksByColumn: laneColumns }) => {
-            const isCollapsed = collapsedLanes.has(key);
+      {/* Content area - conditionally rendered */}
+      {!projectId ? (
+        <div className="bg-primary-50 rounded-lg border p-6 text-center text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+          <h2 className="mb-2 text-lg font-semibold text-gray-700 dark:text-slate-200">
+            No project selected
+          </h2>
+          <p className="text-sm">
+            Select a project from the sidebar to view its board.
+          </p>
+        </div>
+      ) : loading ? (
+        <div className="flex gap-3 overflow-x-auto">
+          <div className="flex flex-col gap-1">
+            <Skeleton.Node
+              active={true}
+              style={{ width: '16rem', height: '40px' }}
+            />
+            <Skeleton.Node
+              active={true}
+              style={{ width: '16rem', height: '400px' }}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Skeleton.Node
+              active={true}
+              style={{ width: '16rem', height: '40px' }}
+            />
+            <Skeleton.Node
+              active={true}
+              style={{ width: '16rem', height: '400px' }}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Skeleton.Node
+              active={true}
+              style={{ width: '16rem', height: '40px' }}
+            />
+            <Skeleton.Node
+              active={true}
+              style={{ width: '16rem', height: '400px' }}
+            />
+          </div>
+        </div>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={(event) => setActiveTaskId(String(event.active.id))}
+          onDragEnd={({ active, over }) => {
+            setActiveTaskId(null);
 
-            return (
-              <div
-                key={key}
-                className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900"
-              >
-                {label && (
-                  <button
-                    onClick={() => toggleLane(key)}
-                    className="group flex w-full items-center gap-3 bg-gray-50/80 px-5 py-3.5 text-left transition-colors hover:bg-gray-100/80 dark:bg-slate-800/60 dark:hover:bg-slate-800"
+            if (!over || active.id === over.id) return;
+
+            const activeColumn = active.data.current?.column as
+              | string
+              | undefined;
+            const overColumn =
+              (over.data.current?.column as string | undefined) ??
+              String(over.id).replace('column:', '');
+
+            if (!activeColumn || !overColumn) return;
+
+            const isStatusChange = activeColumn !== overColumn;
+            let previousTasks: TaskPopulated[] = [];
+
+            setTasks((prev) => {
+              previousTasks = prev;
+              const activeIndex = prev.findIndex(
+                (task) => task._id === active.id
+              );
+              if (activeIndex === -1) {
+                return prev;
+              }
+
+              const updated = [...prev];
+              updated[activeIndex] = {
+                ...updated[activeIndex],
+                status: overColumn as TaskStatus,
+              };
+
+              if (!isStatusChange) {
+                const overIndex = updated.findIndex(
+                  (task) => task._id === over.id
+                );
+                if (overIndex === -1) {
+                  return updated;
+                }
+                return arrayMove(updated, activeIndex, overIndex);
+              }
+
+              return updated;
+            });
+
+            if (isStatusChange) {
+              void updateTask(String(active.id), {
+                status: overColumn as TaskStatus,
+              }).catch(() => {
+                setTasks(previousTasks);
+                setError('Failed to update task status.');
+              });
+            }
+          }}
+        >
+          <div className="flex flex-col gap-6">
+            {groupedTasksByColumn.map(
+              ({ key, label, tasksByColumn: laneColumns }) => {
+                const isCollapsed = collapsedLanes.has(key);
+
+                return (
+                  <div
+                    key={key}
+                    className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900"
                   >
-                    <ChevronRight
-                      className={`h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200 group-hover:text-gray-600 dark:text-slate-500 dark:group-hover:text-slate-300 ${!isCollapsed ? 'rotate-90' : ''}`}
-                    />
-                    {groupBy === 'story' && (
-                      <Tag className="h-4 w-4 shrink-0 text-green-400 dark:text-green-500" />
+                    {label && (
+                      <button
+                        onClick={() => toggleLane(key)}
+                        className="group flex w-full items-center gap-3 bg-gray-50/80 px-5 py-3.5 text-left transition-colors hover:bg-gray-100/80 dark:bg-slate-800/60 dark:hover:bg-slate-800"
+                      >
+                        <ChevronRight
+                          className={`h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200 group-hover:text-gray-600 dark:text-slate-500 dark:group-hover:text-slate-300 ${!isCollapsed ? 'rotate-90' : ''}`}
+                        />
+                        {groupBy === 'story' && (
+                          <Tag className="h-4 w-4 shrink-0 text-green-400 dark:text-green-500" />
+                        )}
+
+                        {groupBy === 'assignee' &&
+                          (key === 'unassigned' ? (
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-200 dark:bg-slate-700">
+                              <User className="h-3.5 w-3.5 text-gray-400 dark:text-slate-500" />
+                            </div>
+                          ) : (
+                            (() => {
+                              const member = members.find((m) => m._id === key);
+                              return member?.profileImage ? (
+                                <img
+                                  src={member.profileImage}
+                                  alt={label ?? ''}
+                                  className="h-6 w-6 rounded-full object-cover"
+                                />
+                              ) : (
+                                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-100 text-xs font-semibold text-violet-600 uppercase dark:bg-violet-900/40 dark:text-violet-400">
+                                  {label?.charAt(0)}
+                                </div>
+                              );
+                            })()
+                          ))}
+
+                        <span className="text-sm font-semibold tracking-wide text-gray-800 dark:text-slate-100">
+                          {label}
+                        </span>
+
+                        <span className="text-gray-300 dark:text-slate-600">
+                          ·
+                        </span>
+
+                        <span className="rounded-full bg-gray-200/80 px-2 py-0.5 text-xs font-medium text-gray-500 tabular-nums dark:bg-slate-700 dark:text-slate-400">
+                          {Object.values(laneColumns).flat().length} tasks
+                        </span>
+
+                        <span className="ml-auto text-xs text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-slate-500">
+                          {isCollapsed ? 'Expand' : 'Collapse'}
+                        </span>
+                      </button>
                     )}
 
-                    {groupBy === 'assignee' &&
-                      (key === 'unassigned' ? (
-                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-200 dark:bg-slate-700">
-                          <User className="h-3.5 w-3.5 text-gray-400 dark:text-slate-500" />
-                        </div>
-                      ) : (
-                        (() => {
-                          const member = members.find((m) => m._id === key);
-                          return member?.profileImage ? (
-                            <img
-                              src={member.profileImage}
-                              alt={label ?? ''}
-                              className="h-6 w-6 rounded-full object-cover"
+                    {!isCollapsed && (
+                      <div className="border-t border-gray-200/80 bg-white p-5 dark:border-slate-700/60 dark:bg-slate-900">
+                        <div className="flex gap-4 overflow-x-auto pb-2 sm:gap-6">
+                          {columns.map((col) => (
+                            <Column
+                              key={col}
+                              col={col}
+                              tasks={laneColumns[col] ?? []}
+                              compactMode={isCompactMode}
+                              loading={loading}
+                              error={error}
+                              onAdd={openAddColumnModal}
+                              onDelete={openDeleteColumnModal}
+                              onTaskOpen={(taskId: string) =>
+                                setSearchParams((prev) => {
+                                  const next = new URLSearchParams(prev);
+                                  next.set('taskId', taskId);
+                                  return next;
+                                })
+                              }
+                              onUpdated={handleTaskUpdated}
+                              members={members}
+                              loadingMembers={loadingMembers}
                             />
-                          ) : (
-                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-100 text-xs font-semibold text-violet-600 uppercase dark:bg-violet-900/40 dark:text-violet-400">
-                              {label?.charAt(0)}
-                            </div>
-                          );
-                        })()
-                      ))}
-
-                    <span className="text-sm font-semibold tracking-wide text-gray-800 dark:text-slate-100">
-                      {label}
-                    </span>
-
-                    <span className="text-gray-300 dark:text-slate-600">·</span>
-
-                    <span className="rounded-full bg-gray-200/80 px-2 py-0.5 text-xs font-medium text-gray-500 tabular-nums dark:bg-slate-700 dark:text-slate-400">
-                      {Object.values(laneColumns).flat().length} tasks
-                    </span>
-
-                    <span className="ml-auto text-xs text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-slate-500">
-                      {isCollapsed ? 'Expand' : 'Collapse'}
-                    </span>
-                  </button>
-                )}
-
-                {!isCollapsed && (
-                  <div className="border-t border-gray-200/80 bg-white p-5 dark:border-slate-700/60 dark:bg-slate-900">
-                    <div className="flex gap-4 overflow-x-auto pb-2 sm:gap-6">
-                      {columns.map((col) => (
-                        <Column
-                          key={col}
-                          col={col}
-                          tasks={laneColumns[col] ?? []}
-                          compactMode={isCompactMode}
-                          loading={loading}
-                          error={error}
-                          onAdd={openAddColumnModal}
-                          onDelete={openDeleteColumnModal}
-                          onTaskOpen={(taskId: string) =>
-                            setSearchParams((prev) => {
-                              const next = new URLSearchParams(prev);
-                              next.set('taskId', taskId);
-                              return next;
-                            })
-                          }
-                          onUpdated={handleTaskUpdated}
-                          members={members}
-                          loadingMembers={loadingMembers}
-                        />
-                      ))}
-                    </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            );
-          }
-        )}
-      </div>
-
-      <DragOverlay>
-        {activeTaskId ? (
-          <div className="rounded-md border border-gray-200 bg-white p-3 shadow-md dark:border-slate-700 dark:bg-slate-800">
-            <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
-              {activeTask?.title}
-              {activeTask ? (
-                <span className="mt-1 flex items-center gap-1 text-xs text-gray-500 dark:text-slate-400">
-                  <TaskTypeIcon type={activeTask.type} />
-                  <TaskTypeColor type={activeTask.type}>
-                    {activeTask.key ?? activeTaskId}
-                  </TaskTypeColor>
-                </span>
-              ) : null}
-            </p>
+                );
+              }
+            )}
           </div>
-        ) : null}
-      </DragOverlay>
 
-      <AddColumnModal
-        open={isAddColumnOpen}
-        value={newColumnName}
-        onChange={(e) => setNewColumnName(e.target.value)}
-        onCancel={() => setIsAddColumnOpen(false)}
-        onOk={confirmAddColumn}
-        confirmLoading={isSavingColumn}
+          <DragOverlay>
+            {activeTaskId ? (
+              <div className="rounded-md border border-gray-200 bg-white p-3 shadow-md dark:border-slate-700 dark:bg-slate-800">
+                <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
+                  {activeTask?.title}
+                  {activeTask ? (
+                    <span className="mt-1 flex items-center gap-1 text-xs text-gray-500 dark:text-slate-400">
+                      <TaskTypeIcon type={activeTask.type} />
+                      <TaskTypeColor type={activeTask.type}>
+                        {activeTask.key ?? activeTaskId}
+                      </TaskTypeColor>
+                    </span>
+                  ) : null}
+                </p>
+              </div>
+            ) : null}
+          </DragOverlay>
+
+          <AddColumnModal
+            open={isAddColumnOpen}
+            value={newColumnName}
+            onChange={(e) => setNewColumnName(e.target.value)}
+            onCancel={() => setIsAddColumnOpen(false)}
+            onOk={confirmAddColumn}
+            confirmLoading={isSavingColumn}
+          />
+
+          <DeleteColumnModal
+            open={isDeleteColumnOpen}
+            columnName={columnToDelete}
+            onCancel={() => {
+              setIsDeleteColumnOpen(false);
+              setColumnToDelete(null);
+            }}
+            onOk={confirmDeleteColumn}
+          />
+
+          {completedSprintId && projectId ? (
+            <SprintModal
+              visible={!!completedSprintId}
+              onClose={() => setCompletedSprintId(null)}
+              sprintId={completedSprintId}
+              projectId={projectId}
+            />
+          ) : null}
+        </DndContext>
+      )}
+
+      <ProjectMembersModal
+        open={isMembersOpen}
+        onClose={() => setIsMembersOpen(false)}
+        project={project as Project}
       />
-
-      <DeleteColumnModal
-        open={isDeleteColumnOpen}
-        columnName={columnToDelete}
-        onCancel={() => {
-          setIsDeleteColumnOpen(false);
-          setColumnToDelete(null);
-        }}
-        onOk={confirmDeleteColumn}
-      />
-
-      {completedSprintId && projectId ? (
-        <SprintModal
-          visible={!!completedSprintId}
-          onClose={() => setCompletedSprintId(null)}
-          sprintId={completedSprintId}
-          projectId={projectId}
-        />
-      ) : null}
-    </DndContext>
+    </>
   );
 }
 
