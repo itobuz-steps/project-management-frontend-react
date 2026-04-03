@@ -11,6 +11,7 @@ import { StatusOverview } from './StatusOverview';
 import { PriorityBreakdown } from './PriorityBreakdown';
 import { TypesOfWork } from './TypesOfWork';
 import { TeamWorkload } from './TeamWorkload';
+import { EpicProgress } from './EpicProgess';
 
 export default function ProjectAnalyticsPage() {
   const { projectId } = useParams();
@@ -73,7 +74,7 @@ export default function ProjectAnalyticsPage() {
         {analytics && (
           <>
             {/* Row 1 — Status Overview + Priority Breakdown */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <SectionCard
                 title="Status Overview"
                 subtitle="Distribution of tasks by current status"
@@ -112,6 +113,9 @@ export default function ProjectAnalyticsPage() {
                   data={analytics.teamWorkload}
                   themeColors={themeColors}
                 />
+              </SectionCard>
+              <SectionCard title="Epic Progress">
+                <EpicProgress data={analytics.epicProgress} />
               </SectionCard>
             </div>
           </>

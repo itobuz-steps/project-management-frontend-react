@@ -9,6 +9,8 @@ export interface ProjectAnalytics {
     count: number;
   }[];
   epicProgress: {
+    percentage: number;
+    completed: number;
     epicId: string;
     title: string;
     key: string;
