@@ -20,10 +20,8 @@ export function ProjectMembersModal({
   onClose,
   project,
 }: ProjectMembersModalProps) {
-  // ✅ Always define safely
   const projectId = project?._id ?? '';
 
-  // ✅ Hooks MUST always run
   const { members, loadingMembers } = useProjectMetaData(projectId);
 
   const {
@@ -43,7 +41,7 @@ export function ProjectMembersModal({
   });
 
   const handleSave = async () => {
-    if (!projectId) return; // ✅ safe guard inside function (allowed)
+    if (!projectId) return;
 
     const values: ProjectSettingsFormValues = {
       name: project.name,
@@ -101,7 +99,6 @@ export function ProjectMembersModal({
         }
       >
         {!projectId ? (
-          // ✅ fallback UI instead of early return
           <div className="flex justify-center py-10 text-sm text-gray-400 dark:text-slate-400">
             Invalid project
           </div>

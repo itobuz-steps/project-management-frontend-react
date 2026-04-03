@@ -87,9 +87,7 @@ function TopBar({
 
   return (
     <header className="flex flex-col gap-1.5 sm:gap-2">
-      {/* BOTTOM ROW */}
       <div className="relative flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        {/* LEFT SIDE */}
         <div className="flex justify-stretch gap-2">
           <SearchBar />
           {project && (
@@ -106,7 +104,6 @@ function TopBar({
           )}
         </div>
 
-        {/* RIGHT SIDE */}
         <div className="flex w-full flex-col flex-wrap items-end gap-2 sm:w-auto sm:flex-row sm:items-center">
           {/* ADD TASK */}
           <button
@@ -117,7 +114,6 @@ function TopBar({
             Create
           </button>
 
-          {/* FILTERS */}
           {isFilterableView && (
             <>
               <TaskFiltersDropdown
@@ -139,8 +135,6 @@ function TopBar({
               </button>
             </>
           )}
-
-          {/* CLEAR FILTERS */}
         </div>
       </div>
       <div className="">

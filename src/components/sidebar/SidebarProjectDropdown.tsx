@@ -20,7 +20,6 @@ function SidebarProjectsDropdown({
 
   const navigate = useNavigate();
   const { projectId: activeProjectId } = useParams();
-  console.log(activeProjectId);
 
   useEffect(() => {
     async function loadWorkspaces() {
@@ -30,18 +29,14 @@ function SidebarProjectsDropdown({
 
         setWorkspaces(ws);
 
-        // ✅ Get saved workspace from localStorage
         const savedWorkspaceId = localStorage.getItem('activeWorkspace');
 
-        // ✅ If saved exists and valid → use it
         if (
           savedWorkspaceId &&
           ws.some((w) => w.workspaceId === savedWorkspaceId)
         ) {
           setSelectedWorkspaceId(savedWorkspaceId);
-        }
-        // ✅ Otherwise fallback to first workspace
-        else if (ws.length) {
+        } else if (ws.length) {
           setSelectedWorkspaceId(ws[0].workspaceId);
         }
       } catch (err) {
@@ -54,11 +49,9 @@ function SidebarProjectsDropdown({
   }, [refreshKey]);
 
   function handleProjectClick(projectId: string) {
-    console.log(projectId);
     navigate(`/project/${projectId}`);
   }
 
-  // ✅ Dropdown options
   const workspaceOptions = useMemo(
     () =>
       workspaces.map((ws) => ({
@@ -68,7 +61,6 @@ function SidebarProjectsDropdown({
     [workspaces]
   );
 
-  // ✅ Only selected workspace
   const selectedWorkspace = workspaces.find(
     (ws) => ws.workspaceId === selectedWorkspaceId
   );
@@ -101,7 +93,6 @@ function SidebarProjectsDropdown({
         />
       )}
 
-      {/* Empty state */}
       {!workspaces.length && !collapsed && (
         <li className="rounded-md border border-dashed border-slate-300 bg-white/70 px-2 py-2 text-xs font-medium text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
           No workspaces yet

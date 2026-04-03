@@ -64,7 +64,6 @@ export function ProjectCard({ project }: { project: Project }) {
             </div>
           </div>
 
-          {/* Type Badge - Repositioned */}
           <div className="shrink-0">
             <span
               className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-white"
@@ -78,10 +77,8 @@ export function ProjectCard({ project }: { project: Project }) {
           </div>
         </div>
 
-        {/* Divider */}
         <div className="h-px bg-linear-to-r from-gray-200 via-gray-100 to-transparent dark:from-slate-700 dark:via-slate-600 dark:to-transparent" />
 
-        {/* Members Section */}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -130,7 +127,6 @@ export function ProjectCard({ project }: { project: Project }) {
           />
         </button>
 
-        {/* Members Modal */}
         <ProjectMembersModal
           open={showMembersModal}
           onClose={() => setShowMembersModal(false)}
@@ -138,7 +134,6 @@ export function ProjectCard({ project }: { project: Project }) {
         />
       </div>
 
-      {/* Bottom accent line - animated on hover */}
       <div
         className="absolute bottom-0 left-0 h-0.5 transition-all duration-300 ease-out"
         style={{
