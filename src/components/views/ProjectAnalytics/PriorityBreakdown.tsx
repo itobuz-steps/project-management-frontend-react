@@ -1,6 +1,14 @@
-import { PRIORITY_COLORS } from '../../taskModal/constants';
-import { Column } from '@ant-design/plots';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Cell,
+  ResponsiveContainer,
+} from 'recharts';
 import { useColorMode } from '../../../hooks/useColorMode';
+import { PRIORITY_COLORS } from '../../taskModal/constants';
 import type { ProjectAnalytics } from '../../../services/types/analytics.type';
 
 export function PriorityBreakdown({
@@ -11,32 +19,39 @@ export function PriorityBreakdown({
   const [colorMode] = useColorMode();
   const textColor = colorMode === 'dark' ? '#f5f5f5' : '#374151';
 
-  const config = {
-    data,
-    xField: 'priority',
-    yField: 'count',
-    colorField: 'priority',
-    label: {
-      position: 'middle' as const,
-      style: {
-        fill: textColor,
-      },
-    },
-    color: ({ priority }: { priority: string }) =>
-      PRIORITY_COLORS[priority as keyof typeof PRIORITY_COLORS] ?? '#94a3b8',
-    tooltip: {
-      items: [{ channel: 'y' as const, name: 'Tasks' }],
-    },
-    legend: {
-      color: {
-        itemLabelFill: textColor,
-      },
-    },
-    axis: {
-      x: { labelTransform: 'capitalize', labelFill: textColor },
-      y: { labelFill: textColor },
-    },
-  };
+  return (
+    <div style={{ height: 320, width: '100%' }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={data}
+          margin={{ top: 16, right: 16, left: 0, bottom: 0 }}
+        >
+          <XAxis dataKey="priority" tick={{ fill: textColor }} />
 
-  return <Column {...config} height={320} />;
+          <YAxis
+            tick={{ fill: textColor }}
+            label={{
+              value: 'Tasks Count',
+              angle: -90,
+              position: 'insideLeft',
+              style: { fill: textColor },
+            }}
+          />
+          <Tooltip />
+          <Bar dataKey="count" name="Tasks">
+            {data.map((entry, index) => (
+              <Cell
+                key={index}
+                fill={
+                  PRIORITY_COLORS[
+                    entry.priority as keyof typeof PRIORITY_COLORS
+                  ] ?? '#94a3b8'
+                }
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }
