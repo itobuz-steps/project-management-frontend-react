@@ -114,9 +114,11 @@ export default function ProjectAnalyticsPage() {
                   themeColors={themeColors}
                 />
               </SectionCard>
-              <SectionCard title="Epic Progress">
-                <EpicProgress data={analytics.epicProgress} />
-              </SectionCard>
+              {analytics.epicProgress.length > 0 && (
+                <SectionCard title="Epic Progress">
+                  <EpicProgress data={analytics.epicProgress} />
+                </SectionCard>
+              )}
             </div>
           </>
         )}

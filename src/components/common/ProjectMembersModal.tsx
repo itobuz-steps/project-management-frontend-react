@@ -20,7 +20,11 @@ export function ProjectMembersModal({
   onClose,
   project,
 }: ProjectMembersModalProps) {
-  const { members, loadingMembers } = useProjectMetaData(project._id);
+  // ✅ Always define safely
+  const projectId = project?._id ?? '';
+
+  // ✅ Hooks MUST always run
+  const { members, loadingMembers } = useProjectMetaData(projectId);
 
   const {
     loading,
@@ -29,19 +33,17 @@ export function ProjectMembersModal({
     removeMember,
     handleSubmit,
   } = useProjectSettingsForm({
-    project,
+    project: project ?? ({} as Project),
     members: members ?? [],
     setProject: () => {},
     iconFile: null,
     setIconFile: () => {},
     setIconPreview: () => {},
-    theme: project.theme ?? '',
+    theme: project?.theme ?? '',
   });
 
   const handleSave = async () => {
-    if (!project) {
-      return;
-    }
+    if (!projectId) return; // ✅ safe guard inside function (allowed)
 
     const values: ProjectSettingsFormValues = {
       name: project.name,
@@ -59,27 +61,21 @@ export function ProjectMembersModal({
     onClose();
   };
 
-  const handleCancel = () => {
-    onClose();
-  };
-
-  console.log('projectMembers:', projectMembers);
-  console.log('members:', members);
-
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <Modal
+        destroyOnClose
         wrapClassName="project-members-modal"
         title={
           <div className="flex items-center gap-2">
             <span>Project Members</span>
             <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-500 dark:bg-slate-700 dark:text-slate-300">
-              {projectMembers?.length}
+              {loadingMembers ? '-' : projectMembers?.length || 0}
             </span>
           </div>
         }
         open={open}
-        onCancel={handleCancel}
+        onCancel={onClose}
         maskStyle={{
           backdropFilter: 'none',
           backgroundColor: 'rgba(0,0,0,0.45)',
@@ -87,7 +83,7 @@ export function ProjectMembersModal({
         width={480}
         footer={
           <div className="flex justify-end gap-2">
-            <Button onClick={handleCancel}>Close</Button>
+            <Button onClick={onClose}>Close</Button>
             <Can permission="PROJECT_SETTINGS">
               <Button
                 type="primary"
@@ -104,11 +100,16 @@ export function ProjectMembersModal({
           </div>
         }
       >
-        {loadingMembers ? (
+        {!projectId ? (
+          // ✅ fallback UI instead of early return
+          <div className="flex justify-center py-10 text-sm text-gray-400 dark:text-slate-400">
+            Invalid project
+          </div>
+        ) : loadingMembers ? (
           <div className="flex justify-center py-10">
             <Spin />
           </div>
-        ) : projectMembers.length === 0 ? (
+        ) : !projectMembers || projectMembers.length === 0 ? (
           <p className="py-6 text-center text-sm text-gray-400 dark:text-slate-400">
             No members found.
           </p>
@@ -118,7 +119,9 @@ export function ProjectMembersModal({
               const user = members?.find(
                 (u) => String(u._id) === String(localMember.user)
               );
-              const isProjectLead = project?.memberLead === localMember.user;
+
+              const isProjectLead =
+                String(project?.memberLead) === String(localMember.user);
 
               return (
                 <div
@@ -127,6 +130,7 @@ export function ProjectMembersModal({
                 >
                   <div className="flex min-w-0 items-center gap-2">
                     <UserCell user={user} emptyText="Unknown" />
+
                     {isProjectLead && (
                       <Tooltip title="Project Lead">
                         <Crown className="h-3.5 w-3.5 shrink-0 text-yellow-500" />

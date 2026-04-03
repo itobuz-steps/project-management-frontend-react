@@ -20,6 +20,7 @@ function SidebarProjectsDropdown({
 
   const navigate = useNavigate();
   const { projectId: activeProjectId } = useParams();
+  console.log(activeProjectId);
 
   useEffect(() => {
     async function loadWorkspaces() {
@@ -53,6 +54,7 @@ function SidebarProjectsDropdown({
   }, [refreshKey]);
 
   function handleProjectClick(projectId: string) {
+    console.log(projectId);
     navigate(`/project/${projectId}`);
   }
 
