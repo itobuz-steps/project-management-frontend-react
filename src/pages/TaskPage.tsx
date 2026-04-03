@@ -41,7 +41,7 @@ export default function TaskPage() {
   }
 
   return (
-    <div className="mx-auto w-full p-2 min-[1800px]:w-[1800px]">
+    <div className="mx-auto w-full p-2 min-[1800px]:w-450">
       {task && (
         <TaskModalHeader
           drawer={false}

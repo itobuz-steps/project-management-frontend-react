@@ -38,6 +38,7 @@ import SearchBar from '../../navbar/SearchBar';
 import { InviteUserContainer } from '../../common/InviteUserContainer';
 import { ProjectMembersModal } from '../../common/ProjectMembersModal';
 import { TaskFiltersDropdown } from '../../common/TaskFiltersDropdown';
+import type { Project } from '../../../types/project.types';
 
 const { Option } = Select;
 
@@ -827,6 +828,7 @@ function BoardView() {
       <ProjectMembersModal
         open={isMembersOpen}
         onClose={() => setIsMembersOpen(false)}
+        project={project as Project}
       />
     </>
   );

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Project } from '../../types/project.types';
-import { Avatar } from 'antd';
 import { User, ChevronRight } from 'lucide-react';
 import { THEME_COLORS } from '../../config/constants';
 import { ProjectMembersModal } from '../common/ProjectMembersModal';
+import { Avatar } from 'antd';
 
 export function ProjectCard({ project }: { project: Project }) {
   const [showMembersModal, setShowMembersModal] = useState(false);
@@ -40,7 +40,6 @@ export function ProjectCard({ project }: { project: Project }) {
       onClick={handleClick}
       className="group relative w-full min-w-0 cursor-pointer overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-300 ease-out hover:shadow-xl dark:border-slate-700 dark:bg-slate-800"
     >
-      {/* Animated background gradient on hover */}
       <div
         className="absolute inset-0 opacity-0 transition-opacity duration-300"
         style={{
@@ -50,10 +49,9 @@ export function ProjectCard({ project }: { project: Project }) {
       />
 
       <div className="relative flex flex-col gap-3.5 p-5 pb-4">
-        {/* Header Section - Icon + Title + Badge */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 flex-1 items-start gap-3">
-            <div className="flex-shrink-0">{iconElement}</div>
+            <div className="shrink-0">{iconElement}</div>
             <div className="min-w-0 flex-1">
               <h3 className="truncate text-base leading-tight font-semibold text-gray-900 dark:text-slate-100">
                 {project.name}
@@ -66,8 +64,7 @@ export function ProjectCard({ project }: { project: Project }) {
             </div>
           </div>
 
-          {/* Type Badge - Repositioned */}
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <span
               className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-white"
               style={{
@@ -80,10 +77,8 @@ export function ProjectCard({ project }: { project: Project }) {
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="h-px bg-gradient-to-r from-gray-200 via-gray-100 to-transparent dark:from-slate-700 dark:via-slate-600 dark:to-transparent" />
+        <div className="h-px bg-linear-to-r from-gray-200 via-gray-100 to-transparent dark:from-slate-700 dark:via-slate-600 dark:to-transparent" />
 
-        {/* Members Section */}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -104,20 +99,22 @@ export function ProjectCard({ project }: { project: Project }) {
               },
             }}
           >
-            {project.members.slice(0, 5).map((member, index) => (
-              <Avatar
-                key={member._id}
-                style={{
-                  backgroundColor: themeColors[index % themeColors.length],
-                  height: '28px',
-                  width: '28px',
-                  fontSize: '11px',
-                  fontWeight: '600',
-                }}
-              >
-                <User size={14} color="#fff" />
-              </Avatar>
-            ))}
+            {project.members
+              .slice(0, project.members.length)
+              .map((member, index) => (
+                <Avatar
+                  key={member._id}
+                  style={{
+                    backgroundColor: themeColors[index % themeColors.length],
+                    height: '28px',
+                    width: '28px',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                  }}
+                >
+                  <User size={14} color="#fff" />
+                </Avatar>
+              ))}
           </Avatar.Group>
           <span className="flex-1 text-left text-sm text-gray-600 dark:text-slate-400">
             {project.members.length === 1
@@ -130,14 +127,13 @@ export function ProjectCard({ project }: { project: Project }) {
           />
         </button>
 
-        {/* Members Modal */}
         <ProjectMembersModal
           open={showMembersModal}
           onClose={() => setShowMembersModal(false)}
+          project={project}
         />
       </div>
 
-      {/* Bottom accent line - animated on hover */}
       <div
         className="absolute bottom-0 left-0 h-0.5 transition-all duration-300 ease-out"
         style={{

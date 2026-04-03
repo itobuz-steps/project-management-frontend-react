@@ -17,6 +17,7 @@ import './style.scss';
 import SearchBar from '../../navbar/SearchBar';
 import { InviteUserContainer } from '../../common/InviteUserContainer';
 import { ProjectMembersModal } from '../../common/ProjectMembersModal';
+import type { Project } from '../../../types/project.types';
 
 const EMPTY_TABLE_FILTERS: TaskTableFilters = {
   type: null,
@@ -250,6 +251,7 @@ function ListView() {
         <ProjectMembersModal
           open={isMembersOpen}
           onClose={() => setIsMembersOpen(false)}
+          project={project as Project}
         />
       </div>
     </>
