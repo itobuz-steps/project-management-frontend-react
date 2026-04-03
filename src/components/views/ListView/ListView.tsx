@@ -7,13 +7,16 @@ import type {
 } from '../../../services/types/tasks.types';
 import { useProject } from '../../../context/ProjectContext';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
-import { FilterX, LayoutPanelTop } from 'lucide-react';
+import { FilterX, LayoutPanelTop, Users } from 'lucide-react';
 import TaskTable, {
   type TaskTableChangeParams,
   type TaskTableFilters,
   type TaskTableSort,
 } from '../../backlog/TaskTable/TaskTableNew';
 import './style.scss';
+import SearchBar from '../../navbar/SearchBar';
+import { InviteUserContainer } from '../../common/InviteUserContainer';
+import { ProjectMembersModal } from '../../common/ProjectMembersModal';
 
 const EMPTY_TABLE_FILTERS: TaskTableFilters = {
   type: null,
@@ -40,7 +43,7 @@ const toServerSortOrder = (order?: TaskTableSort['order']) => {
 function ListView() {
   const { projectId } = useParams();
   const [searchParams] = useSearchParams();
-  const { columns } = useProject();
+  const { columns, project } = useProject();
   const { members, loadingMembers } = useProjectMetaData(projectId);
 
   const [tasks, setTasks] = useState<TaskPopulated[]>([]);
@@ -63,6 +66,7 @@ function ListView() {
     hasPrevPage: false,
   });
   const [tableRenderKey, setTableRenderKey] = useState(0);
+  const [isMembersOpen, setIsMembersOpen] = useState(false);
 
   const searchInput = searchParams.get('searchInput') || '';
 
@@ -180,46 +184,75 @@ function ListView() {
   }
 
   return (
-    <div className="relative mt-2 w-full rounded-md border border-gray-200 dark:border-slate-700 dark:bg-slate-900">
-      <div className="sticky top-0 z-10 flex items-center justify-end gap-2 border-b border-gray-200 bg-gray-50 px-2 py-1 dark:border-slate-700 dark:bg-slate-800">
-        <button
-          type="button"
-          onClick={handleResetFilters}
-          disabled={!hasActiveFilters}
-          aria-label="Reset filters"
-          title="Reset filters"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
-        >
-          <FilterX size={14} />
-        </button>
-        <button
-          type="button"
-          onClick={handleResetTableLayout}
-          aria-label="Reset table layout"
-          title="Reset table layout"
-          className="border-primary-500 text-primary-600 hover:bg-primary-500 inline-flex h-7 w-7 items-center justify-center rounded-md border transition hover:text-white"
-        >
-          <LayoutPanelTop size={14} />
-        </button>
+    <>
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
+          <div className="min-w-70">
+            <SearchBar />
+          </div>
+          {project && (
+            <>
+              <button
+                onClick={() => setIsMembersOpen(true)}
+                className="flex h-8 w-8 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600"
+                aria-label="Show members"
+              >
+                <Users size={16} strokeWidth={1.9} />
+              </button>
+              <InviteUserContainer />
+            </>
+          )}
+        </div>
       </div>
 
-      <div className="no-scrollbar max-h-150 overflow-auto border border-gray-200 dark:border-slate-700">
-        <TaskTable
-          key={tableRenderKey}
-          tasks={tasks}
-          statusColumns={columns}
-          members={members}
-          loadingMembers={loadingMembers}
-          onTaskUpdated={handleTaskUpdated}
-          pagination={pagination}
-          filters={tableFilters}
-          sorting={sorting}
-          onTableChange={handleTableChange}
-          loading={loading}
-          error={error}
+      <div className="relative w-full rounded-md border border-gray-200 dark:border-slate-700 dark:bg-slate-900">
+        <div className="sticky top-0 z-10 flex items-center justify-end gap-2 border-b border-gray-200 bg-gray-50 px-2 py-1 dark:border-slate-700 dark:bg-slate-800">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              disabled={!hasActiveFilters}
+              aria-label="Reset filters"
+              title="Reset filters"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
+            >
+              <FilterX size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={handleResetTableLayout}
+              aria-label="Reset table layout"
+              title="Reset table layout"
+              className="border-primary-500 text-primary-600 hover:bg-primary-500 inline-flex h-7 w-7 items-center justify-center rounded-md border transition hover:text-white"
+            >
+              <LayoutPanelTop size={14} />
+            </button>
+          </div>
+        </div>
+
+        <div className="no-scrollbar max-h-150 overflow-auto border border-gray-200 dark:border-slate-700">
+          <TaskTable
+            key={tableRenderKey}
+            tasks={tasks}
+            statusColumns={columns}
+            members={members}
+            loadingMembers={loadingMembers}
+            onTaskUpdated={handleTaskUpdated}
+            pagination={pagination}
+            filters={tableFilters}
+            sorting={sorting}
+            onTableChange={handleTableChange}
+            loading={loading}
+            error={error}
+          />
+        </div>
+
+        <ProjectMembersModal
+          open={isMembersOpen}
+          onClose={() => setIsMembersOpen(false)}
         />
       </div>
-    </div>
+    </>
   );
 }
 
