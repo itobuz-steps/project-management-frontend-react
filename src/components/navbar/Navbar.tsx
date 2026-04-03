@@ -69,14 +69,14 @@ export default function Navbar() {
               setPaletteSearch(e.target.value);
               setCommandPaletteOpen(true);
             }}
-            className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100 dark:border-[#27272e] dark:bg-[#1b1b1f] dark:text-neutral-100 dark:placeholder:text-neutral-400 dark:focus:ring-primary-900/30"
+            className="focus:border-primary-400 focus:ring-primary-100 dark:focus:ring-primary-900/30 min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-colors outline-none placeholder:text-slate-400 focus:ring-2 dark:border-[#27272e] dark:bg-[#1b1b1f] dark:text-neutral-100 dark:placeholder:text-neutral-400"
           />
           <button
             onClick={() => setIsAddTaskOpen(true)}
             className="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700 flex h-auto w-auto flex-shrink-0 items-center justify-center rounded-md text-white shadow-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
             aria-label="Create task"
           >
-            <span className='font-medium p-1.5'>Create</span>
+            <span className="p-1.5 font-medium">Create</span>
           </button>
         </div>
 
@@ -167,17 +167,17 @@ export default function Navbar() {
 
           {!projectInfoHidden && (
             <Can permission="PROJECT_SETTINGS">
-                <button
-                  className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-gray-800 hover:bg-gray-100 dark:text-neutral-100 dark:hover:bg-[#27272e]"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigate(`project/${project?._id}/settings`);
-                  }}
-                >
-                  <Settings size={15} strokeWidth={1.9} />
-                  Settings
-                </button>
-              </Can>
+              <button
+                className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-gray-800 hover:bg-gray-100 dark:text-neutral-100 dark:hover:bg-[#27272e]"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigate(`project/${project?._id}/settings`);
+                }}
+              >
+                <Settings size={15} strokeWidth={1.9} />
+                Settings
+              </button>
+            </Can>
           )}
         </div>
       )}

@@ -505,7 +505,7 @@ function BoardView() {
             </>
           )}
         </div>
-        <div className="flex flex-nowrap items-center gap-1 sm:gap-1.5 md:gap-2 justify-center lg:ml-auto lg:justify-end">
+        <div className="flex flex-nowrap items-center justify-center gap-1 sm:gap-1.5 md:gap-2 lg:ml-auto lg:justify-end">
           <TaskFiltersDropdown
             searchParams={searchParams}
             setSearchParams={setSearchParams}
