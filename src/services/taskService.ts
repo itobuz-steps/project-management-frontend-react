@@ -19,7 +19,7 @@ const api = axios.create({
 });
 
 //TODO: Remove it after implementing pagination in board and backlog views
-const LEGACY_FETCH_LIMIT = 1000;
+const LEGACY_FETCH_LIMIT = 10;
 
 type GetTasksBaseParams = {
   projectId: string;
@@ -91,6 +91,17 @@ export async function getAllTasks(): Promise<TaskPopulated[]> {
   });
 
   return extractTasks(res.data.result);
+}
+
+export async function getTasksPaginated(params: {
+  page: number;
+  limit: number;
+}): Promise<PaginatedTasksResponse> {
+  const res = await api.get<{ result: PaginatedTasksResponse }>('', {
+    params,
+  });
+
+  return res.data.result as PaginatedTasksResponse;
 }
 
 export async function getTaskByProjectId(
