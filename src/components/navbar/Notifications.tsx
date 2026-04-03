@@ -106,14 +106,14 @@ export default function Notifications({
       {!isControlled && (
         <button
           type="button"
-          className="flex h-8 w-8 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600"
+          className="flex h-10 w-10 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600"
           onClick={() => {
             setNewNotificationCount(0);
             setOpen(!open);
           }}
         >
           <span className="relative inline-flex">
-            <Bell size={16} strokeWidth={1.9} />
+            <Bell size={20} strokeWidth={2} />
 
             {newNotificationCount > 0 && !open && (
               <span

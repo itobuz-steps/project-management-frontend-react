@@ -39,7 +39,7 @@ export function UserProfile({
     <img
       src={userImage || '/profile.png'}
       alt={userName}
-      className="aspect-square h-10 w-10 rounded-xl object-cover"
+      className="aspect-square h-8 w-8 rounded-xl object-cover"
     />
   );
 
@@ -53,7 +53,7 @@ export function UserProfile({
       }`}
     >
       <div className="flex cursor-pointer items-center gap-3">
-        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-slate-700">
+        <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl text-slate-700">
           {showTooltip ? (
             <Tooltip
               title={

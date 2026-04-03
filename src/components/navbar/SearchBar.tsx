@@ -18,10 +18,10 @@ export default function SearchBar() {
       }
 
       setSearchParams(next);
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(timer);
-  }, [value]);
+  }, [value, searchParams, setSearchParams]);
 
   return (
     <div className="search-icon flex items-center justify-between">

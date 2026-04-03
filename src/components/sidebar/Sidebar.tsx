@@ -147,7 +147,7 @@ export default function Sidebar({
                       : 'ml-3 max-w-xs opacity-100'
                   }`}
                 >
-                  For You
+                  Home
                 </span>
               </NavLink>
             </li>
