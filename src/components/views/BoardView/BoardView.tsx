@@ -486,10 +486,10 @@ function BoardView() {
 
   return (
     <>
-      {/* Toolbar - always mounted */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-2">
-          <div className="min-w-70">
+      {/* Toolbar - always mounted, responsive */}
+      <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 md:justify-start lg:gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 md:justify-start">
+          <div className="min-w-60 sm:min-w-70">
             <SearchBar />
           </div>
           {project && (
@@ -505,7 +505,7 @@ function BoardView() {
             </>
           )}
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex flex-nowrap items-center gap-1 sm:gap-1.5 md:gap-2 justify-center lg:ml-auto lg:justify-end">
           <TaskFiltersDropdown
             searchParams={searchParams}
             setSearchParams={setSearchParams}
