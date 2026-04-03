@@ -27,6 +27,7 @@ import SearchBar from '../../navbar/SearchBar';
 import { Users } from 'lucide-react';
 import { InviteUserContainer } from '../../common/InviteUserContainer';
 import { ProjectMembersModal } from '../../common/ProjectMembersModal';
+import type { Project } from '../../../types/project.types';
 
 function BacklogView() {
   const { projectId } = useParams();
@@ -420,6 +421,7 @@ function BacklogView() {
       <ProjectMembersModal
         open={isMembersOpen}
         onClose={() => setIsMembersOpen(false)}
+        project={project as Project}
       />
     </>
   );
