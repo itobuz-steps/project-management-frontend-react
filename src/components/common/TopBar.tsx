@@ -10,6 +10,7 @@ import { TaskFiltersDropdown } from './TaskFiltersDropdown';
 import { InviteUserContainer } from './InviteUserContainer';
 import { ProjectMembersModal } from './ProjectMembersModal';
 import { usePermissions } from '../../hooks/usePermissions';
+import type { Project } from '../../types/project.types';
 
 function TopBar({
   onAddTask,
@@ -149,6 +150,7 @@ function TopBar({
       <ProjectMembersModal
         open={isMembersOpen}
         onClose={() => setIsMembersOpen(false)}
+        project={project as Project}
       />
     </header>
   );

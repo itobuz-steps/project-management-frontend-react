@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Project } from '../../types/project.types';
-// import { Avatar } from 'antd';
 import { User, ChevronRight } from 'lucide-react';
 import { THEME_COLORS } from '../../config/constants';
 import { ProjectMembersModal } from '../common/ProjectMembersModal';
-
-const MAX_VISIBLE = 3;
+import { Avatar } from 'antd';
 
 export function ProjectCard({ project }: { project: Project }) {
   const [showMembersModal, setShowMembersModal] = useState(false);
@@ -15,11 +13,8 @@ export function ProjectCard({ project }: { project: Project }) {
   const theme = localStorage.getItem('lastProjectTheme') || 'indigo';
   const themeColors = THEME_COLORS[theme] ?? THEME_COLORS['indigo'];
   const accentColor = themeColors[4];
-  const visible = project.members.slice(0, MAX_VISIBLE);
-  const overflow = project.members.length - MAX_VISIBLE;
 
-  function handleClick(e: React.MouseEvent<HTMLDivElement>) {
-    if ((e.target as HTMLElement).closest('button')) return;
+  function handleClick() {
     navigate(`/project/${project._id}`);
   }
 
@@ -45,7 +40,6 @@ export function ProjectCard({ project }: { project: Project }) {
       onClick={handleClick}
       className="group relative w-full min-w-0 cursor-pointer overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-300 ease-out hover:shadow-xl dark:border-slate-700 dark:bg-slate-800"
     >
-      {/* Animated background gradient on hover */}
       <div
         className="absolute inset-0 opacity-0 transition-opacity duration-300"
         style={{
@@ -55,7 +49,6 @@ export function ProjectCard({ project }: { project: Project }) {
       />
 
       <div className="relative flex flex-col gap-3.5 p-5 pb-4">
-        {/* Header Section - Icon + Title + Badge */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 flex-1 items-start gap-3">
             <div className="shrink-0">{iconElement}</div>
@@ -90,39 +83,42 @@ export function ProjectCard({ project }: { project: Project }) {
 
         {/* Members Section */}
         <button
-          onClickCapture={(e) => {
-            e.stopPropagation();
-          }}
           onClick={(e) => {
-            console.log('button click');
             e.stopPropagation();
             setShowMembersModal(true);
           }}
           className="group/btn flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-slate-700/50"
         >
-          <div className="flex items-center">
-            {visible.map((member, index) => (
-              <div
-                key={member._id}
-                className="-ml-2 flex h-7 w-7 items-center justify-center rounded-full ring-2 ring-white first:ml-0 dark:ring-slate-800"
-                style={{
-                  backgroundColor: themeColors[index % themeColors.length],
-                }}
-              >
-                <User size={14} color="#fff" />
-              </div>
-            ))}
-
-            {overflow > 0 && (
-              <div
-                className="-ml-2 flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-semibold text-white ring-2 ring-white dark:ring-slate-800"
-                style={{ backgroundColor: accentColor }}
-              >
-                +{overflow}
-              </div>
-            )}
-          </div>
-
+          <Avatar.Group
+            max={{
+              count: 3,
+              style: {
+                color: '#fff',
+                backgroundColor: accentColor,
+                height: '28px',
+                width: '28px',
+                fontSize: '11px',
+                fontWeight: '600',
+              },
+            }}
+          >
+            {project.members
+              .slice(0, project.members.length)
+              .map((member, index) => (
+                <Avatar
+                  key={member._id}
+                  style={{
+                    backgroundColor: themeColors[index % themeColors.length],
+                    height: '28px',
+                    width: '28px',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                  }}
+                >
+                  <User size={14} color="#fff" />
+                </Avatar>
+              ))}
+          </Avatar.Group>
           <span className="flex-1 text-left text-sm text-gray-600 dark:text-slate-400">
             {project.members.length === 1
               ? '1 member'
@@ -138,6 +134,7 @@ export function ProjectCard({ project }: { project: Project }) {
         <ProjectMembersModal
           open={showMembersModal}
           onClose={() => setShowMembersModal(false)}
+          project={project}
         />
       </div>
 

@@ -1,30 +1,26 @@
-// react imports not required
 import { Modal, Select, Button, Spin, Tooltip } from 'antd';
 import type { FormInstance } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Crown } from 'lucide-react';
-import { useProject } from '../../context/ProjectContext';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { Can } from '../../utils/PermissionHoc';
 import { useProjectSettingsForm } from '../../hooks/useProjectSettingsForm';
 import { UserCell } from '../ui/UserCell';
-import type { User } from '../../services/types/tasks.types';
 import type { Project } from '../../types/project.types';
 import type { ProjectSettingsFormValues } from '../../components/projectSettings/projectSettings.type';
 
 interface ProjectMembersModalProps {
   open: boolean;
   onClose: () => void;
+  project: Project;
 }
 
 export function ProjectMembersModal({
   open,
   onClose,
+  project,
 }: ProjectMembersModalProps) {
-  const { project, setProject } = useProject();
-  const { members, loadingMembers } = useProjectMetaData(project?._id);
-
-  const setProjectStrict = (p: Project) => setProject(p);
+  const { members, loadingMembers } = useProjectMetaData(project._id);
 
   const {
     loading,
@@ -33,13 +29,13 @@ export function ProjectMembersModal({
     removeMember,
     handleSubmit,
   } = useProjectSettingsForm({
-    project: (project as Project) ?? ({} as Project),
-    members: (members as User[]) ?? [],
-    setProject: setProjectStrict,
+    project,
+    members: members ?? [],
+    setProject: () => {},
     iconFile: null,
     setIconFile: () => {},
     setIconPreview: () => {},
-    theme: project?.theme ?? '',
+    theme: project.theme ?? '',
   });
 
   const handleSave = async () => {
@@ -67,6 +63,9 @@ export function ProjectMembersModal({
     onClose();
   };
 
+  console.log('projectMembers:', projectMembers);
+  console.log('members:', members);
+
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <Modal
@@ -75,7 +74,7 @@ export function ProjectMembersModal({
           <div className="flex items-center gap-2">
             <span>Project Members</span>
             <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-500 dark:bg-slate-700 dark:text-slate-300">
-              {projectMembers.length}
+              {projectMembers?.length}
             </span>
           </div>
         }
@@ -116,8 +115,8 @@ export function ProjectMembersModal({
         ) : (
           <div className="flex max-h-105 flex-col gap-2 overflow-y-auto py-1 pr-1">
             {projectMembers.map((localMember) => {
-              const user = members.find(
-                (user) => user._id === localMember.user
+              const user = members?.find(
+                (u) => String(u._id) === String(localMember.user)
               );
               const isProjectLead = project?.memberLead === localMember.user;
 
