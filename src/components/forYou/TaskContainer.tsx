@@ -85,9 +85,8 @@ export function TaskContainer({ projectId }: TaskContainerProps) {
           </div>
         )}
 
-        {!loading && tasks.map((task) => (
-          <TaskItem key={task._id} task={task} />
-        ))}
+        {!loading &&
+          tasks.map((task) => <TaskItem key={task._id} task={task} />)}
 
         {totalPages > 1 && (
           <div className="flex items-center justify-between border-t border-gray-200 pt-3 dark:border-slate-700">
