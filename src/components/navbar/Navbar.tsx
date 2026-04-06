@@ -8,7 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../../context/ProjectContext';
 import { UserProfile } from '../sidebar/UserProfile';
 
-export default function Navbar() {
+export default function Navbar({ isDrawerOpen = false }: { isDrawerOpen?: boolean }) {
   const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
   const [paletteSearch, setPaletteSearch] = useState('');
@@ -32,7 +32,7 @@ export default function Navbar() {
     'flex h-10 w-10 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600';
 
   const searchInputClass =
-    'h-10 w-150 rounded-lg border border-gray-200 bg-white px-4 text-sm text-slate-700 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100 dark:border-[#27272e] dark:bg-[#1b1b1f] dark:text-neutral-100 dark:placeholder:text-neutral-400 dark:focus:ring-primary-900/30';
+    `h-10 ${isDrawerOpen ? 'w-80' : 'w-150'} rounded-lg border border-gray-200 bg-white px-4 text-sm text-slate-700 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100 dark:border-[#27272e] dark:bg-[#1b1b1f] dark:text-neutral-100 dark:placeholder:text-neutral-400 dark:focus:ring-primary-900/30`;
 
   useEffect(() => {
     if (!mobileMenuOpen) {
@@ -81,7 +81,7 @@ export default function Navbar() {
         </div>
 
         <div className="relative hidden w-full items-center xl:flex">
-          <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2">
+          <div className={`flex items-center gap-2 ${isDrawerOpen ? 'absolute left-4' : 'absolute left-1/2 -translate-x-1/2'}`}>
             <input
               type="search"
               role="searchbox"
