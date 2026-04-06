@@ -9,7 +9,7 @@ import {
   str,
 } from './formatter';
 
-export interface TaskSections {
+export interface TaskExportSections {
   core: [string, string][];
   people: [string, string][];
   dates: [string, string][];
@@ -24,7 +24,7 @@ export interface TaskSections {
 const toRefRows = (refs?: TaskPopulated['blocks']): string[][] =>
   (refs ?? []).map((r) => [r._id, r.key ?? '—', r.title, r.status, r.type]);
 
-export function buildSections(task: TaskPopulated): TaskSections {
+export function buildSections(task: TaskPopulated): TaskExportSections {
   return {
     core: [
       ['ID', str(task._id)],
@@ -40,7 +40,7 @@ export function buildSections(task: TaskPopulated): TaskSections {
       ['Due Date', fmt(task.dueDate)],
       ['Parent Task', str(task.parentTask)],
       ['Project ID', resolveProjectId(task.projectId)],
-      ['Project Name', resolveProjectName(task.projectId)],
+      ['Project Name', resolveProjectName(task.title)],
     ],
     people: [
       ['Assignee', resolveName(task.assignee)],

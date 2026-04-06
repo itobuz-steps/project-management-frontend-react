@@ -4,11 +4,7 @@ import type {
 } from '../../services/types/tasks.types';
 
 export const resolveName = (user?: { name?: string; email?: string } | null) =>
-  user
-    ? [user.name, user.email ? `<${user.email}>` : '']
-        .filter(Boolean)
-        .join(' ') || '—'
-    : '—';
+  user ? [user.name, ''].filter(Boolean).join(' ') || '—' : '—';
 
 export const resolveEmail = (user?: { email?: string } | null) =>
   user?.email ?? '—';
