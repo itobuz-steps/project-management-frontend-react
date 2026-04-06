@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Select, Tag, Collapse } from 'antd';
+import { Button, Select, Tag, Collapse, message } from 'antd';
 import { SidebarRow } from '../ui/SidebarRow';
 import { UserCell } from '../ui/UserCell';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
@@ -18,6 +18,7 @@ import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { DueDateCell } from '../ui/DueDateCell';
 import { usePermissions } from '../../hooks/usePermissions';
 import { formatDistanceToNow } from 'date-fns';
+import { Copy } from 'lucide-react';
 
 export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
   const { can } = usePermissions();
@@ -39,6 +40,14 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
       addSuffix: true,
     });
   };
+
+  const branchName = `${task.key}-${task.title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')}`;
+
+  const command = `git checkout -b ${branchName}`;
 
   return (
     <Collapse
@@ -254,6 +263,25 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                   <span className="text-sm text-gray-700 dark:text-slate-100">
                     {formatRelativeTime(task.updatedAt)}
                   </span>
+                </SidebarRow>
+              </div>
+              <div className="gap-1 pb-3">
+                <SidebarRow label="Development">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <span className="block h-6 min-w-0 flex-1 overflow-x-auto text-sm whitespace-nowrap">
+                      {command}
+                    </span>
+
+                    <span className="shrink-0 cursor-pointer">
+                      <Copy
+                        className="h-4 w-4"
+                        onClick={() => {
+                          navigator.clipboard.writeText(command);
+                          message.success('Branch Name Copied to Clipboard');
+                        }}
+                      />
+                    </span>
+                  </div>
                 </SidebarRow>
               </div>
             </div>

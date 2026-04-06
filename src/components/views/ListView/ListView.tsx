@@ -186,9 +186,9 @@ function ListView() {
 
   return (
     <>
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-2">
-          <div className="min-w-70">
+      <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 md:justify-start lg:gap-2">
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2 md:justify-start">
+          <div className="min-w-60 sm:min-w-70">
             <SearchBar />
           </div>
           {project && (

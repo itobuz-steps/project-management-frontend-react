@@ -91,7 +91,7 @@ export function TaskFiltersDropdown({
       </button>
 
       {isOpen ? (
-        <div className="absolute right-0 z-20 mt-2 w-88 rounded-md border border-gray-200 bg-white p-3 shadow-lg dark:border-[#27272e] dark:bg-[#1b1b1f]">
+        <div className="absolute top-full left-0 z-20 mt-2 w-66 rounded-md border border-gray-200 bg-white p-3 shadow-lg dark:border-[#27272e] dark:bg-[#1b1b1f]">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-slate-400">
               Filter tasks
