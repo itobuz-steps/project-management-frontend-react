@@ -99,7 +99,8 @@ export function ReplyItem({ task, comment }: CommentItemProps) {
         className="group flex gap-2 rounded-md px-2 py-2 hover:bg-gray-50 dark:hover:bg-neutral-800"
         ref={editorRef}
       >
-        <Avatar
+              <Avatar
+                  style={{}}
           size={28}
           src={
             comment.author.profileImage
@@ -108,125 +109,130 @@ export function ReplyItem({ task, comment }: CommentItemProps) {
           }
         >
           {comment.author.name?.[0]}
-      </Avatar>
+        </Avatar>
 
-      <div className="flex-1">
-        <Space orientation="vertical" size={0} className="w-full">
-          {/* Header */}
-          <Space className="w-full justify-between">
-            <div>
-              <Text className="text-xs font-medium text-gray-700 dark:text-neutral-200">
-                {comment.author.name || 'You'}
-              </Text>
-              <span className="ml-2 text-xs text-gray-400 dark:text-neutral-500">
-                {formatDistanceToNow(new Date(comment.createdAt), {
-                  addSuffix: true,
-                })}
-              </span>
-            </div>
-
-            <Space className="opacity-0 transition group-hover:opacity-100">
-              {comment.attachment && (
-                <Link to={comment.attachment} target="_blank">
-                  <Button type="text" icon={<PaperClipOutlined />} />
-                </Link>
-              )}
-
-              {!editor.isEditing && (
-                <Button
-                  type="text"
-                  icon={<EditOutlined />}
-                  onClick={() => {
-                    editor.setIsEditing(true);
-                  }}
-                  size="small"
-                />
-              )}
-
-              <Popconfirm
-                title="Delete reply?"
-                description="This action cannot be undone."
-                onConfirm={editor.remove}
-                okText="Delete"
-                cancelText="Cancel"
-                icon={null}
-                okButtonProps={{
-                  style: {
-                    backgroundColor: 'var(--color-primary-500)',
-                    color: 'white',
-                  },
-                }}
-                cancelButtonProps={{
-                  style: {
-                    border: 'var(--color-primary-500) solid 1px',
-                  },
-                  type: 'text',
-                }}
-              >
-                <Button danger type="text" icon={<DeleteOutlined />} size="small" />
-              </Popconfirm>
-            </Space>
-          </Space>
-
-          {/* Body */}
-          {!editor.isEditing ? (
-            <div className="prose prose-xs dark:prose-invert max-w-none dark:text-neutral-200 text-gray-800">
-              <ReactMarkdown
-                rehypePlugins={[rehypeRaw]}
-                components={markdownComponents}
-              >
-                {comment.message}
-              </ReactMarkdown>
-            </div>
-          ) : (
-            <div className="mt-2">
-              <TextEditor
-                comment
-                content={editor.content}
-                onChange={editor.setContent}
-                onAttachmentsChange={editor.setAttachments}
-                onSave={editor.save}
-                onCancel={editor.reset}
-                mentionItems={mentionItems}
-                onEditorJsonChange={editor.setEditorJson}
-                taskItems={projectTasks.map((task) => ({
-                  id: task._id,
-                  label: task.title,
-                  type: task.type,
-                  key: task.key,
-                }))}
-              />
-
-              {/* Action Buttons */}
-              <div className="mt-2 flex justify-end gap-2">
-                <Button
-                  style={{
-                    border: 'var(--color-primary-500) solid 1px',
-                  }}
-                  type="text"
-                  onClick={editor.reset}
-                  size="small"
-                >
-                  Cancel
-                </Button>
-
-                <Button
-                  style={{
-                    backgroundColor: 'var(--color-primary-500)',
-                    color: 'white',
-                  }}
-                  type="primary"
-                  onClick={editor.save}
-                  size="small"
-                >
-                  Save
-                </Button>
+        <div className="flex-1">
+          <Space orientation="vertical" size={0} className="w-full">
+            {/* Header */}
+            <Space className="w-full justify-between">
+              <div>
+                <Text className="text-xs font-medium text-gray-700 dark:text-neutral-200">
+                  {comment.author.name || 'You'}
+                </Text>
+                <span className="ml-2 text-xs text-gray-400 dark:text-neutral-500">
+                  {formatDistanceToNow(new Date(comment.createdAt), {
+                    addSuffix: true,
+                  })}
+                </span>
               </div>
-            </div>
-          )}
-        </Space>
+
+              <Space className="opacity-0 transition group-hover:opacity-100">
+                {comment.attachment && (
+                  <Link to={comment.attachment} target="_blank">
+                    <Button type="text" icon={<PaperClipOutlined />} />
+                  </Link>
+                )}
+
+                {!editor.isEditing && (
+                  <Button
+                    type="text"
+                    icon={<EditOutlined />}
+                    onClick={() => {
+                      editor.setIsEditing(true);
+                    }}
+                    size="small"
+                  />
+                )}
+
+                <Popconfirm
+                  title="Delete reply?"
+                  description="This action cannot be undone."
+                  onConfirm={editor.remove}
+                  okText="Delete"
+                  cancelText="Cancel"
+                  icon={null}
+                  okButtonProps={{
+                    style: {
+                      backgroundColor: 'var(--color-primary-500)',
+                      color: 'white',
+                    },
+                  }}
+                  cancelButtonProps={{
+                    style: {
+                      border: 'var(--color-primary-500) solid 1px',
+                    },
+                    type: 'text',
+                  }}
+                >
+                  <Button
+                    danger
+                    type="text"
+                    icon={<DeleteOutlined />}
+                    size="small"
+                  />
+                </Popconfirm>
+              </Space>
+            </Space>
+
+            {/* Body */}
+            {!editor.isEditing ? (
+              <div className="prose prose-xs dark:prose-invert max-w-none text-gray-800 dark:text-neutral-200">
+                <ReactMarkdown
+                  rehypePlugins={[rehypeRaw]}
+                  components={markdownComponents}
+                >
+                  {comment.message}
+                </ReactMarkdown>
+              </div>
+            ) : (
+              <div className="mt-2">
+                <TextEditor
+                  comment
+                  content={editor.content}
+                  onChange={editor.setContent}
+                  onAttachmentsChange={editor.setAttachments}
+                  onSave={editor.save}
+                  onCancel={editor.reset}
+                  mentionItems={mentionItems}
+                  onEditorJsonChange={editor.setEditorJson}
+                  taskItems={projectTasks.map((task) => ({
+                    id: task._id,
+                    label: task.title,
+                    type: task.type,
+                    key: task.key,
+                  }))}
+                />
+
+                {/* Action Buttons */}
+                <div className="mt-2 flex justify-end gap-2">
+                  <Button
+                    style={{
+                      border: 'var(--color-primary-500) solid 1px',
+                    }}
+                    type="text"
+                    onClick={editor.reset}
+                    size="small"
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    style={{
+                      backgroundColor: 'var(--color-primary-500)',
+                      color: 'white',
+                    }}
+                    type="primary"
+                    onClick={editor.save}
+                    size="small"
+                  >
+                    Save
+                  </Button>
+                </div>
+              </div>
+            )}
+          </Space>
+        </div>
       </div>
-    </div>
     </>
   );
 }

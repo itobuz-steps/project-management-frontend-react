@@ -3,7 +3,7 @@ import { Avatar, Button, Popconfirm, Space, Typography } from 'antd';
 import {
   DeleteOutlined,
   EditOutlined,
-  PaperClipOutlined,  
+  PaperClipOutlined,
   CommentOutlined,
 } from '@ant-design/icons';
 import type { CommentItemProps, MentionSpanProps } from './comment.type';
@@ -241,9 +241,9 @@ export function CommentItem({ task, comment }: CommentItemProps) {
       {isReplyMode && (
         <div className="mt-3 ml-10 border-l-2 border-gray-200 pl-4 dark:border-neutral-700">
           <div className="flex gap-2">
-            <img 
-              src="/profile.png" 
-              className="h-8 w-8 rounded-full flex-shrink-0" 
+            <img
+              src="/profile.png"
+              className="h-8 w-8 flex-shrink-0 rounded-full"
               alt="User avatar"
             />
             <div className="flex-1">
