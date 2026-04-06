@@ -112,9 +112,11 @@ export default function ProjectAnalyticsPage() {
                 />
               </SectionCard>
               {analytics.epicProgress.length > 0 && (
-                <SectionCard title="Epic Progress">
-                  <EpicProgress data={analytics.epicProgress} />
-                </SectionCard>
+                <div className="col-span-1 lg:col-span-2">
+                  <SectionCard title="Epic Progress">
+                    <EpicProgress data={analytics.epicProgress} />
+                  </SectionCard>
+                </div>
               )}
             </div>
           </>

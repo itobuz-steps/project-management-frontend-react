@@ -16,7 +16,7 @@ export function ForYouPage() {
         </div>
         <StatsContainer />
         <ProjectContainer />
-        <TaskContainer />
+        <TaskContainer projectId="" />
       </div>
     </div>
   );
