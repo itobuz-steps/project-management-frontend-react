@@ -1,9 +1,14 @@
-import { Button, Input, type InputRef } from 'antd';
+import { Button, Input, type InputRef, Dropdown, Tooltip } from 'antd';
+import type { MenuProps } from 'antd';
 import {
   ArrowsAltOutlined,
   CloseOutlined,
   FullscreenOutlined,
   ShrinkOutlined,
+  DownloadOutlined,
+  FilePdfOutlined,
+  FileExcelOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 import { useEffect, useRef, useState } from 'react';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
@@ -15,6 +20,7 @@ import { useParentTask } from '../../hooks/useParentTask';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 import { TaskTimerSection } from './TaskTimerSection';
+import { useTaskExport } from '../../hooks/useTaskExport';
 
 export function TaskModalHeader({
   task,
@@ -31,13 +37,11 @@ export function TaskModalHeader({
 
   const parentTask = useParentTask(task.parentTask);
   const { columns } = useProjectMetaData(task.projectId as string);
-
   const { update } = useTaskUpdate(task._id, onUpdated);
+  const { exportPDF, exportExcel, exportXML } = useTaskExport(task);
 
   useEffect(() => {
-    if (editing) {
-      inputRef.current?.focus();
-    }
+    if (editing) inputRef.current?.focus();
   }, [editing]);
 
   const saveTitle = async () => {
@@ -46,16 +50,36 @@ export function TaskModalHeader({
       setValue(task.title);
       return;
     }
-
     await update({ title: value }, 'Failed to update title');
-
     setEditing(false);
   };
+
+  const exportMenuItems: MenuProps['items'] = [
+    {
+      key: 'pdf',
+      icon: <FilePdfOutlined style={{ color: '#ef4444' }} />,
+      label: <span className="text-sm">Export as PDF</span>,
+      onClick: exportPDF,
+    },
+    {
+      key: 'excel',
+      icon: <FileExcelOutlined style={{ color: '#22c55e' }} />,
+      label: <span className="text-sm">Export as Excel</span>,
+      onClick: exportExcel,
+    },
+    {
+      key: 'xml',
+      icon: <FileTextOutlined style={{ color: '#3b82f6' }} />,
+      label: <span className="text-sm">Export as XML</span>,
+      onClick: exportXML,
+    },
+  ];
 
   return (
     <div className="flex flex-col sm:pr-1">
       {/* Top row */}
       <div className="flex items-center justify-between text-sm text-gray-500 dark:text-slate-400">
+        {/* Breadcrumb */}
         <div className="flex items-center gap-1">
           {parentTask && (
             <>
@@ -71,7 +95,6 @@ export function TaskModalHeader({
               <span>/</span>
             </>
           )}
-
           <TaskTypeIcon type={task.type} />
           <Link
             to={`/task/${task._id}`}
@@ -83,15 +106,30 @@ export function TaskModalHeader({
           </Link>
         </div>
 
+        {/* Action buttons */}
         <div
           className={`flex items-center gap-2 ${
             page ? 'pointer-events-none opacity-0' : 'opacity-100'
           }`}
         >
+          {/* Export dropdown */}
+          <Tooltip title="Export task">
+            <Dropdown
+              menu={{ items: exportMenuItems }}
+              trigger={['click']}
+              placement="bottomRight"
+            >
+              <Button
+                style={{ border: 'var(--color-primary-500) solid 1px' }}
+                type="text"
+                size="middle"
+                icon={<DownloadOutlined />}
+              />
+            </Dropdown>
+          </Tooltip>
+
           <Button
-            style={{
-              border: 'var(--color-primary-500) solid 1px',
-            }}
+            style={{ border: 'var(--color-primary-500) solid 1px' }}
             type="text"
             size="middle"
             icon={isDrawerView ? <ArrowsAltOutlined /> : <ShrinkOutlined />}
@@ -99,18 +137,14 @@ export function TaskModalHeader({
           />
           <Link to={`/task/${task._id}`} target="_blank">
             <Button
-              style={{
-                border: 'var(--color-primary-500) solid 1px',
-              }}
+              style={{ border: 'var(--color-primary-500) solid 1px' }}
               type="text"
               size="middle"
               icon={<FullscreenOutlined />}
             />
           </Link>
           <Button
-            style={{
-              border: 'var(--color-primary-500) solid 1px',
-            }}
+            style={{ border: 'var(--color-primary-500) solid 1px' }}
             type="text"
             size="middle"
             icon={<CloseOutlined />}
@@ -121,10 +155,10 @@ export function TaskModalHeader({
 
       <div className="h-4" />
 
-      {/* Title + status */}
       <div
         className={`flex gap-2 ${drawer ? 'flex-col' : 'flex-col md:flex-row'}`}
       >
+        {/* Editable title */}
         <div className="flex min-w-0 flex-1 items-center">
           {!editing ? (
             <h1
@@ -146,10 +180,7 @@ export function TaskModalHeader({
               onChange={(e) => setValue(e.target.value)}
               onBlur={saveTitle}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  saveTitle();
-                }
-
+                if (e.key === 'Enter' && !e.shiftKey) saveTitle();
                 if (e.key === 'Escape') {
                   setEditing(false);
                   setValue(task.title);
@@ -159,9 +190,10 @@ export function TaskModalHeader({
           )}
         </div>
 
+        {/* Status + timer */}
         <div
           className={`flex shrink-0 items-center self-end ${
-            drawer ? '' : 'md:w-[296px] lg:w-[396px] 2xl:w-[496px]'
+            drawer ? '' : 'md:w-74 lg:w-99 2xl:w-124'
           }`}
         >
           <SidebarRow>
@@ -174,7 +206,6 @@ export function TaskModalHeader({
               }
             />
           </SidebarRow>
-
           <TaskTimerSection
             taskId={task._id}
             assigneeId={task.assignee?._id}
