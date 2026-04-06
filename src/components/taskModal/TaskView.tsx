@@ -44,7 +44,7 @@ export function TaskView({ task, isMobile, onUpdated }: ViewProps) {
       </div>
 
       {!isMobile && (
-        <div className="shrink-0 p-2 pt-1 sm:w-[200px] md:w-[300px] lg:w-[400px] 2xl:w-[500px]">
+        <div className="shrink-0 p-2 pt-1 sm:w-50 md:w-75 lg:w-100 2xl:w-125">
           <div className="sticky max-h-[calc(100vh-160px)] overflow-auto">
             <TaskDetails task={task} onUpdated={onUpdated} />
           </div>

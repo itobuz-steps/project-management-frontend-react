@@ -67,116 +67,124 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                 </SidebarRow>
               </div>
 
-              {/* Labels */}
               <SidebarRow label="Labels">
-                {!editingLabels ? (
-                  <div
-                    className="flex cursor-pointer flex-wrap gap-1"
-                    onClick={() => setEditingLabels(true)}
-                  >
-                    {task.tags?.length ? (
-                      <>
-                        {task.tags.slice(0, 3).map((tag) => (
-                          <Tag key={tag} color="blue">
-                            {tag}
-                          </Tag>
-                        ))}
-                        {task.tags.length > 3 && (
-                          <Tag>+{task.tags.length - 3}</Tag>
-                        )}
-                      </>
-                    ) : (
-                      <span className="text-sm text-gray-400 dark:text-slate-400">
-                        Add labels
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <Select
-                    autoFocus
-                    mode="tags"
-                    className="w-full"
-                    value={task.tags}
-                    onBlur={() => setEditingLabels(false)}
-                    onChange={(tags) => {
-                      setEditingLabels(false);
-                      update({ tags }, 'Failed to update labels');
-                    }}
-                  />
-                )}
+                <div className="flex min-h-7 w-full items-center px-2">
+                  {!editingLabels ? (
+                    <div
+                      className="flex cursor-pointer flex-wrap gap-1 text-lg"
+                      onClick={() => setEditingLabels(true)}
+                    >
+                      {task.tags?.length ? (
+                        <>
+                          {task.tags.slice(0, 3).map((tag) => (
+                            <Tag key={tag} color="blue">
+                              {tag}
+                            </Tag>
+                          ))}
+                          {task.tags.length > 3 && (
+                            <Tag>+{task.tags.length - 3}</Tag>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-sm text-gray-400 dark:text-slate-400">
+                          Add labels
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <Select
+                      autoFocus
+                      mode="tags"
+                      className="w-full"
+                      size="small"
+                      value={task.tags}
+                      onBlur={() => setEditingLabels(false)}
+                      onChange={(tags) => {
+                        setEditingLabels(false);
+                        update({ tags }, 'Failed to update labels');
+                      }}
+                    />
+                  )}
+                </div>
               </SidebarRow>
 
-              {/* Priority */}
               <SidebarRow label="Priority">
-                {editing !== 'priority' ? (
-                  <Tag
-                    className="cursor-pointer capitalize"
-                    style={{
-                      border: 'none',
-                    }}
-                    color={
-                      PRIORITY_COLORS[
-                        task.priority as keyof typeof PRIORITY_COLORS
-                      ]
-                    }
-                    onClick={() => setEditing('priority')}
-                  >
-                    {task.priority}
-                  </Tag>
-                ) : (
-                  <Select
-                    autoFocus
-                    size="small"
-                    value={task.priority}
-                    className="w-full"
-                    onBlur={() => setEditing(null)}
-                    onChange={(priority) => {
-                      setEditing(null);
-                      update({ priority }, 'Failed to update priority');
-                    }}
-                    options={PRIORITIES.map((priority) => ({
-                      value: priority,
-                      label: <span className="capitalize">{priority}</span>,
-                    }))}
-                  />
-                )}
+                <div className="flex h-7 w-full items-center px-2">
+                  {editing !== 'priority' ? (
+                    <Tag
+                      className="cursor-pointer capitalize"
+                      style={{
+                        border: 'none',
+                        lineHeight: '26px',
+                        height: '26px',
+                        fontSize: '14px',
+                      }}
+                      color={
+                        PRIORITY_COLORS[
+                          task.priority as keyof typeof PRIORITY_COLORS
+                        ]
+                      }
+                      onClick={() => setEditing('priority')}
+                    >
+                      {task.priority}
+                    </Tag>
+                  ) : (
+                    <Select
+                      autoFocus
+                      size="small"
+                      value={task.priority}
+                      className="w-full"
+                      style={{ height: 28 }}
+                      onBlur={() => setEditing(null)}
+                      onChange={(priority) => {
+                        setEditing(null);
+                        update({ priority }, 'Failed to update priority');
+                      }}
+                      options={PRIORITIES.map((priority) => ({
+                        value: priority,
+                        label: <span className="capitalize">{priority}</span>,
+                      }))}
+                    />
+                  )}
+                </div>
               </SidebarRow>
 
-              {/* Type */}
               <SidebarRow label="Type">
-                {editing !== 'type' ? (
-                  <div
-                    className="flex cursor-pointer items-center gap-2"
-                    onClick={() => setEditing('type')}
-                  >
-                    <TaskTypeIcon type={task.type} />
-                    <span className="capitalize">{task.type}</span>
-                  </div>
-                ) : (
-                  <Select
-                    autoFocus
-                    size="small"
-                    value={task.type}
-                    className="w-full"
-                    onBlur={() => setEditing(null)}
-                    onChange={(type) => {
-                      setEditing(null);
-                      update({ type }, 'Failed to update type');
-                    }}
-                    options={TASK_TYPES.map((type) => ({
-                      value: type,
-                      label: (
-                        <div className="flex items-center gap-2 capitalize">
-                          <TaskTypeIcon type={type} />
-                          {type}
-                        </div>
-                      ),
-                    }))}
-                  />
-                )}
+                <div className="flex h-7 w-full items-center">
+                  {editing !== 'type' ? (
+                    <div
+                      className="flex cursor-pointer items-center gap-2 px-2"
+                      onClick={() => setEditing('type')}
+                    >
+                      <TaskTypeIcon type={task.type} />
+                      <span className="capitalize">{task.type}</span>
+                    </div>
+                  ) : (
+                    <Select
+                      autoFocus
+                      size="small"
+                      value={task.type}
+                      className="w-full"
+                      style={{ height: 28 }}
+                      onBlur={() => setEditing(null)}
+                      onChange={(type) => {
+                        setEditing(null);
+                        update({ type }, 'Failed to update type');
+                      }}
+                      options={TASK_TYPES.map((type) => ({
+                        value: type,
+                        label: (
+                          <div className="flex items-center gap-2 capitalize">
+                            <TaskTypeIcon type={type} />
+                            {type}
+                          </div>
+                        ),
+                      }))}
+                    />
+                  )}
+                </div>
               </SidebarRow>
 
-              {/* Story Points */}
               <SidebarRow label="Story Points">
                 <Space.Compact className="w-full">
                   <InputNumber
@@ -210,7 +218,6 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                 </Space.Compact>
               </SidebarRow>
 
-              {/* Due Date */}
               <SidebarRow label="Due Date">
                 <DueDateCell
                   dueDate={task.dueDate}
