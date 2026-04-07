@@ -27,7 +27,7 @@ export function AssigneeCell({
   // raw _id string. Prepending `currentUser` prevents that fallback.
   const memberOptions = (() => {
     const list = [...members];
-    if (currentUser && !list.some((m) => m._id === currentUser._id)) {
+    if (currentUser && !list.some((m) => m?._id === currentUser._id)) {
       list.unshift(currentUser);
     }
     return list;
