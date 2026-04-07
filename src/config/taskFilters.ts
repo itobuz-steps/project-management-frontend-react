@@ -20,11 +20,11 @@ export type MultiTaskFilterKey =
 export type SingleTaskFilterKey = 'sortBy' | 'sortOrder';
 
 export type BoardTaskFilters = {
-  type?: string;
-  status?: string;
-  priority?: string;
-  assignee?: string;
-  reporter?: string;
+  type?: string[];
+  status?: string[];
+  priority?: string[];
+  assignee?: string[];
+  reporter?: string[];
   tags?: string[];
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
@@ -60,9 +60,6 @@ export const formatFilterLabel = (value: string) =>
 const parseList = (params: URLSearchParams, key: MultiTaskFilterKey) =>
   (params.get(key) ?? '').split(',').filter(Boolean);
 
-const toCsvOrUndefined = (values: string[]) =>
-  values.length ? values.join(',') : undefined;
-
 export const parseBoardTaskFilters = (
   params: URLSearchParams
 ): BoardTaskFilters => {
@@ -76,11 +73,11 @@ export const parseBoardTaskFilters = (
   const sortOrder = params.get('sortOrder');
 
   return {
-    type: toCsvOrUndefined(type),
-    status: toCsvOrUndefined(status),
-    priority: toCsvOrUndefined(priority),
-    assignee: toCsvOrUndefined(assignee),
-    reporter: toCsvOrUndefined(reporter),
+    type: type.length ? type : undefined,
+    status: status.length ? status : undefined,
+    priority: priority.length ? priority : undefined,
+    assignee: assignee.length ? assignee : undefined,
+    reporter: reporter.length ? reporter : undefined,
     tags: tags.length ? tags : undefined,
     sortBy,
     sortOrder:

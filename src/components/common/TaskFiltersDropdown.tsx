@@ -14,6 +14,7 @@ import {
   SORT_ORDER_OPTIONS,
   type SingleTaskFilterKey,
   TASK_TYPE_OPTIONS,
+  TASK_FILTER_QUERY_KEYS,
 } from '../../config/taskFilters';
 
 type TaskFiltersDropdownProps = {
@@ -33,7 +34,6 @@ export function TaskFiltersDropdown({
   members,
   loadingMembers,
   onOpenFilters,
-  onClearFilters,
 }: TaskFiltersDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -72,6 +72,16 @@ export function TaskFiltersDropdown({
     [searchParams]
   );
 
+  const handleClearFilters = () => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      TASK_FILTER_QUERY_KEYS.forEach((key) => {
+        next.delete(key);
+      });
+      return next;
+    });
+  };
+
   return (
     <div className="relative w-full sm:w-auto">
       <button
@@ -98,7 +108,7 @@ export function TaskFiltersDropdown({
             </p>
             <button
               type="button"
-              onClick={onClearFilters}
+              onClick={handleClearFilters}
               className="text-primary-600 hover:text-primary-500 text-xs font-semibold"
             >
               Clear all
