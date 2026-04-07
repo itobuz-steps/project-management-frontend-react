@@ -99,8 +99,8 @@ export function ReplyItem({ task, comment }: CommentItemProps) {
         className="group flex gap-2 rounded-md px-2 py-2 hover:bg-gray-50 dark:hover:bg-neutral-800"
         ref={editorRef}
       >
-              <Avatar
-                  style={{}}
+        <Avatar
+          style={{}}
           size={28}
           src={
             comment.author.profileImage

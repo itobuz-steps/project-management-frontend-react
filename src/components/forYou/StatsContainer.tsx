@@ -35,7 +35,7 @@ export function StatsContainer() {
     </div>
   ) : (
     <>
-     <div className="w-full">
+      <div className="w-full">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3">
           <CustomStatistic
             title="Total Task Assigned Last 7 Days"
