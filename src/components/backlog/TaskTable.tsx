@@ -55,7 +55,9 @@ const buildMemberFilters = (
   fallbackLabel: string,
   fallbackValue: string
 ): SelectFilterOption[] => {
-  const names = members.map((member) => member.name);
+  const names = members
+    .filter((member) => member != null)
+    .map((member) => member.name);
 
   return uniqueFilters([...names, fallbackLabel]).map((option) => ({
     ...option,
