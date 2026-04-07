@@ -114,7 +114,7 @@ export function ProjectMembersModal({
           <div className="flex max-h-105 flex-col gap-2 overflow-y-auto py-1 pr-1">
             {projectMembers.map((localMember) => {
               const user = members?.find(
-                (u) => String(u._id) === String(localMember.user)
+                (user) => user && String(user._id) === String(localMember.user)
               );
 
               const isProjectLead =

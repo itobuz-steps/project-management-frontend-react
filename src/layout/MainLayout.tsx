@@ -91,7 +91,7 @@ export default function MainLayout() {
         onSidebarOpen={handleSidebarOpen}
       />
       <div className="flex w-full flex-1 flex-col overflow-x-auto pl-0 md:pl-0">
-        <Navbar />
+        <Navbar isDrawerOpen={isTaskDrawerOpen} />
         <main className="flex-1 overflow-y-auto rounded-lg p-2 md:p-4">
           <Outlet />
         </main>

@@ -10,6 +10,7 @@ export interface Comment {
   message: string;
   author: CommentAuthor;
   attachment?: string | null;
+  replies: Comment[];
   createdAt: string;
   updatedAt: string;
 }

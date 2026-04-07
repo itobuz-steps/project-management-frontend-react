@@ -1,31 +1,26 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import { Avatar, Button, Popconfirm, Space, Typography } from 'antd';
 import {
   DeleteOutlined,
   EditOutlined,
   PaperClipOutlined,
-  CommentOutlined,
 } from '@ant-design/icons';
 import type { CommentItemProps, MentionSpanProps } from './comment.type';
 import { formatDistanceToNow } from 'date-fns';
 import { TextEditor } from '../textEditor/TextEditor';
 import { Link } from 'react-router-dom';
 import { useCommentEditor } from '../../hooks/useCommentEditor';
-import { useReplyComposer } from '../../hooks/useReplyComposer';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import type { Components } from 'react-markdown';
 import { useProjectTasks } from '../../hooks/useProjectTasks';
-import { ReplyItem } from './ReplyItem';
 
 const { Text } = Typography;
 
-export function CommentItem({ task, comment }: CommentItemProps) {
+export function ReplyItem({ task, comment }: CommentItemProps) {
   const editorRef = useRef<HTMLDivElement | null>(null);
   const editor = useCommentEditor({ comment });
-  const replyComposer = useReplyComposer(task._id, comment._id);
-  const [isReplyMode, setIsReplyMode] = useState(false);
 
   const { members } = useProjectMetaData(task.projectId as string);
   const { tasks: projectTasks } = useProjectTasks(task.projectId as string);
@@ -99,13 +94,14 @@ export function CommentItem({ task, comment }: CommentItemProps) {
   };
 
   return (
-    <div>
-      {/* Main Comment */}
+    <>
       <div
         className="group flex gap-2 rounded-md px-2 py-2 hover:bg-gray-50 dark:hover:bg-neutral-800"
         ref={editorRef}
       >
         <Avatar
+          style={{}}
+          size={28}
           src={
             comment.author.profileImage
               ? `${comment.author.profileImage}`
@@ -117,13 +113,13 @@ export function CommentItem({ task, comment }: CommentItemProps) {
 
         <div className="flex-1">
           <Space orientation="vertical" size={0} className="w-full">
-            {/* Header with Author and Actions */}
+            {/* Header */}
             <Space className="w-full justify-between">
               <div>
-                <Text className="text-sm font-medium text-gray-900 dark:text-neutral-100">
+                <Text className="text-xs font-medium text-gray-700 dark:text-neutral-200">
                   {comment.author.name || 'You'}
                 </Text>
-                <span className="ml-2 text-xs text-gray-400 dark:text-neutral-400">
+                <span className="ml-2 text-xs text-gray-400 dark:text-neutral-500">
                   {formatDistanceToNow(new Date(comment.createdAt), {
                     addSuffix: true,
                   })}
@@ -138,24 +134,18 @@ export function CommentItem({ task, comment }: CommentItemProps) {
                 )}
 
                 {!editor.isEditing && (
-                  <>
-                    <Button
-                      type="text"
-                      icon={<CommentOutlined />}
-                      onClick={() => setIsReplyMode(!isReplyMode)}
-                    />
-                    <Button
-                      type="text"
-                      icon={<EditOutlined />}
-                      onClick={() => {
-                        editor.setIsEditing(true);
-                      }}
-                    />
-                  </>
+                  <Button
+                    type="text"
+                    icon={<EditOutlined />}
+                    onClick={() => {
+                      editor.setIsEditing(true);
+                    }}
+                    size="small"
+                  />
                 )}
 
                 <Popconfirm
-                  title="Delete comment?"
+                  title="Delete reply?"
                   description="This action cannot be undone."
                   onConfirm={editor.remove}
                   okText="Delete"
@@ -174,14 +164,19 @@ export function CommentItem({ task, comment }: CommentItemProps) {
                     type: 'text',
                   }}
                 >
-                  <Button danger type="text" icon={<DeleteOutlined />} />
+                  <Button
+                    danger
+                    type="text"
+                    icon={<DeleteOutlined />}
+                    size="small"
+                  />
                 </Popconfirm>
               </Space>
             </Space>
 
-            {/* Comment Body - View or Edit Mode */}
+            {/* Body */}
             {!editor.isEditing ? (
-              <div className="prose prose-sm dark:prose-invert max-w-none dark:text-neutral-100">
+              <div className="prose prose-xs dark:prose-invert max-w-none text-gray-800 dark:text-neutral-200">
                 <ReactMarkdown
                   rehypePlugins={[rehypeRaw]}
                   components={markdownComponents}
@@ -208,7 +203,7 @@ export function CommentItem({ task, comment }: CommentItemProps) {
                   }))}
                 />
 
-                {/* Edit Action Buttons */}
+                {/* Action Buttons */}
                 <div className="mt-2 flex justify-end gap-2">
                   <Button
                     style={{
@@ -216,6 +211,7 @@ export function CommentItem({ task, comment }: CommentItemProps) {
                     }}
                     type="text"
                     onClick={editor.reset}
+                    size="small"
                   >
                     Cancel
                   </Button>
@@ -227,6 +223,7 @@ export function CommentItem({ task, comment }: CommentItemProps) {
                     }}
                     type="primary"
                     onClick={editor.save}
+                    size="small"
                   >
                     Save
                   </Button>
@@ -236,87 +233,6 @@ export function CommentItem({ task, comment }: CommentItemProps) {
           </Space>
         </div>
       </div>
-
-      {/* Reply Composer */}
-      {isReplyMode && (
-        <div className="mt-3 ml-10 border-l-2 border-gray-200 pl-4 dark:border-neutral-700">
-          <div className="flex gap-2">
-            <img
-              src="/profile.png"
-              className="h-8 w-8 flex-shrink-0 rounded-full"
-              alt="User avatar"
-            />
-            <div className="flex-1">
-              <TextEditor
-                comment
-                content={replyComposer.content}
-                onChange={replyComposer.setContent}
-                onAttachmentsChange={replyComposer.setAttachments}
-                onSave={async () => {
-                  await replyComposer.submit();
-                  setIsReplyMode(false);
-                }}
-                onCancel={() => {
-                  replyComposer.reset();
-                  setIsReplyMode(false);
-                }}
-                mentionItems={mentionItems}
-                onEditorJsonChange={replyComposer.setEditorJson}
-                taskItems={projectTasks.map((task) => ({
-                  id: task._id,
-                  label: task.title,
-                  type: task.type,
-                  key: task.key,
-                }))}
-              />
-
-              {/* Reply Action Buttons */}
-              <div className="mt-2 flex justify-end gap-2">
-                <Button
-                  style={{
-                    border: 'var(--color-primary-500) solid 1px',
-                  }}
-                  type="text"
-                  onClick={() => {
-                    replyComposer.reset();
-                    setIsReplyMode(false);
-                  }}
-                  size="small"
-                  disabled={replyComposer.submitting}
-                >
-                  Cancel
-                </Button>
-
-                <Button
-                  style={{
-                    backgroundColor: 'var(--color-primary-500)',
-                    color: 'white',
-                  }}
-                  type="primary"
-                  onClick={async () => {
-                    await replyComposer.submit();
-                    setIsReplyMode(false);
-                  }}
-                  size="small"
-                  loading={replyComposer.submitting}
-                  disabled={!replyComposer.content.trim()}
-                >
-                  Reply
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Replies List */}
-      {comment.replies && comment.replies.length > 0 && (
-        <div className="mt-3 ml-10 border-l-2 border-gray-200 dark:border-neutral-700">
-          {comment.replies.map((reply) => (
-            <ReplyItem key={reply._id} task={task} comment={reply} />
-          ))}
-        </div>
-      )}
-    </div>
+    </>
   );
 }
