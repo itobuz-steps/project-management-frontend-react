@@ -121,61 +121,27 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
         <h4 className="text-primary-500 mb-4 text-center text-sm font-semibold tracking-wide">
           Completed Task By Project
         </h4>
-        <ResponsiveContainer width={300} height={300}>
-          <PieChart>
-            <Pie
-              data={completedTaskByProject}
-              dataKey="value"
-              nameKey="type"
-              cx="50%"
-              cy="50%"
-              outerRadius={90}
-              labelLine={false}
-            >
-              {completedTaskByProject?.map((_, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={primaryColors[index % primaryColors.length]}
-                />
-              ))}
-            </Pie>
 
-            <Legend
-              formatter={(value) => (
-                <span style={{ color: textColor, fontSize: 12 }}>{value}</span>
-              )}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-        <div
-          className="absolute right-0 bottom-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
-          style={{
-            background: `linear-gradient(to right, ${gradientStart}, ${gradientEnd})`,
-          }}
-        />
-      </div>
-
-      {/* Completed Task By Date (Last 7 Days) */}
-      <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg sm:col-span-2 lg:col-span-1 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
-        <h4 className="text-primary-500 mb-4 text-center font-semibold tracking-wide">
-          {renderChartTitle('Completed Task By Date (Last 7 Days)')}
-        </h4>
         <ResponsiveContainer width={chartSize * 1.5} height={chartSize}>
           <BarChart
             data={completedTaskByDate}
-            margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+            margin={{ top: 20, right: 20, left: 0, bottom: 10 }}
+            barCategoryGap="30%"
+            barSize={32}
           >
             <XAxis
               dataKey="date"
               tick={{ fill: textColor, fontSize: 12 }}
               axisLine={false}
               tickLine={false}
+              padding={{ left: 10, right: 10 }}
             />
             <YAxis
               tick={{ fill: textColor, fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               allowDecimals={false}
+              width={30}
             />
             <Tooltip
               labelFormatter={(label) => `Date: ${label}`}
@@ -201,6 +167,47 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
               ))}
             </Bar>
           </BarChart>
+        </ResponsiveContainer>
+        <div
+          className="absolute right-0 bottom-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
+          style={{
+            background: `linear-gradient(to right, ${gradientStart}, ${gradientEnd})`,
+          }}
+        />
+      </div>
+
+      {/* Completed Task By Date (Last 7 Days) */}
+      <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg sm:col-span-2 lg:col-span-1 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
+        <h4 className="text-primary-500 mb-4 text-center font-semibold tracking-wide">
+          {renderChartTitle('Completed Task By Date (Last 7 Days)')}
+        </h4>
+        <ResponsiveContainer width={300} height={300}>
+          <PieChart>
+            <Pie
+              data={completedTaskByProject}
+              dataKey="value"
+              nameKey="type"
+              cx="50%"
+              cy="50%"
+              outerRadius={90}
+              labelLine={false}
+            >
+              {completedTaskByProject?.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={primaryColors[index % primaryColors.length]}
+                />
+              ))}
+            </Pie>
+
+            <Legend
+              formatter={(value) => (
+                <span className="text-sm" style={{ color: textColor }}>
+                  {value}
+                </span>
+              )}
+            />
+          </PieChart>
         </ResponsiveContainer>
         <div
           className="absolute right-0 bottom-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
