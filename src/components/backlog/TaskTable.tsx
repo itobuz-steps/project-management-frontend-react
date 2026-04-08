@@ -6,7 +6,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { TableColumnsType } from 'antd';
-import { message, Table } from 'antd';
+import { Button, Checkbox, message, Table } from 'antd';
 import dayjs from 'dayjs';
 import { ChevronDown } from 'lucide-react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
@@ -106,8 +106,38 @@ const buildTaskColumns = ({
       key: 'type',
       dataIndex: 'type',
       width: 72,
-      filters: uniqueFilters(['bug', 'story', 'task']),
-      filterSearch: true,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div style={{ padding: 8, width: 180 }}>
+          <Checkbox.Group
+            className="flex flex-col gap-2"
+            options={uniqueFilters(['bug', 'story', 'task', 'epic']).map(
+              (f) => ({
+                label: f.text,
+                value: f.value,
+              })
+            )}
+            value={selectedKeys as string[]}
+            onChange={(values) => {
+              setSelectedKeys(values);
+              confirm({ closeDropdown: false });
+            }}
+          />
+
+          <div className="mt-2 flex justify-end">
+            <Button
+              size="small"
+              type="link"
+              disabled={!selectedKeys || selectedKeys.length === 0}
+              onClick={() => {
+                setSelectedKeys([]);
+                confirm({ closeDropdown: false });
+              }}
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
+      ),
       onFilter: (value, record) =>
         normalize(record.type) === normalize(String(value)),
       sorter: (a, b) => compareText(a.type, b.type),
@@ -156,8 +186,36 @@ const buildTaskColumns = ({
       title: 'Status',
       key: 'status',
       dataIndex: 'status',
-      filters: uniqueFilters(columns),
-      filterSearch: true,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div style={{ padding: 8, width: 200 }}>
+          <Checkbox.Group
+            className="flex flex-col gap-2"
+            options={uniqueFilters(columns).map((f) => ({
+              label: f.text,
+              value: f.value,
+            }))}
+            value={selectedKeys as string[]}
+            onChange={(values) => {
+              setSelectedKeys(values);
+              confirm({ closeDropdown: false });
+            }}
+          />
+
+          <div className="mt-2 flex justify-end">
+            <Button
+              size="small"
+              type="link"
+              disabled={!selectedKeys || selectedKeys.length === 0}
+              onClick={() => {
+                setSelectedKeys([]);
+                confirm({ closeDropdown: false });
+              }}
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
+      ),
       onFilter: (value, record) =>
         normalize(record.status) === normalize(String(value)),
       sorter: (a, b) => compareText(a.status, b.status),
@@ -178,8 +236,36 @@ const buildTaskColumns = ({
     {
       title: 'Assignee',
       key: 'assignee',
-      filters: assigneeFilters,
-      filterSearch: true,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div style={{ padding: 8, width: 200 }}>
+          <Checkbox.Group
+            className="flex flex-col gap-2"
+            options={assigneeFilters.map((f) => ({
+              label: f.text,
+              value: f.value,
+            }))}
+            value={selectedKeys as string[]}
+            onChange={(values) => {
+              setSelectedKeys(values);
+              confirm({ closeDropdown: false });
+            }}
+          />
+
+          <div className="mt-2 flex justify-end">
+            <Button
+              size="small"
+              type="link"
+              disabled={!selectedKeys || selectedKeys.length === 0}
+              onClick={() => {
+                setSelectedKeys([]);
+                confirm({ closeDropdown: false });
+              }}
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
+      ),
       onFilter: (value, record) => {
         const selected = String(value);
         if (selected === 'unassigned') {
@@ -220,8 +306,49 @@ const buildTaskColumns = ({
       title: 'Tags',
       key: 'tags',
       dataIndex: 'tags',
-      filters: uniqueFilters(localTasks.flatMap((task) => task.tags ?? [])),
-      filterSearch: true,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
+        const tagFilters = uniqueFilters(
+          localTasks.flatMap((task) => task.tags ?? [])
+        );
+
+        return (
+          <div
+            style={{
+              padding: 8,
+              width: 200,
+              maxHeight: 220,
+              overflowY: 'auto',
+            }}
+          >
+            <Checkbox.Group
+              className="flex flex-col gap-2"
+              options={tagFilters.map((f) => ({
+                label: f.text,
+                value: f.value,
+              }))}
+              value={selectedKeys as string[]}
+              onChange={(values) => {
+                setSelectedKeys(values);
+                confirm({ closeDropdown: false });
+              }}
+            />
+
+            <div className="mt-2 flex justify-end">
+              <Button
+                size="small"
+                type="link"
+                disabled={!selectedKeys || selectedKeys.length === 0}
+                onClick={() => {
+                  setSelectedKeys([]);
+                  confirm({ closeDropdown: false });
+                }}
+              >
+                Reset
+              </Button>
+            </div>
+          </div>
+        );
+      },
       onFilter: (value, record) => (record.tags ?? []).includes(String(value)),
       render: (_, record) => (
         <div className="flex gap-1">
