@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
-import { getTasks } from '../../services/taskService';
+import { getTasks, getTasksPaginated } from '../../services/taskService';
 import type { TaskPopulated } from '../../services/types/tasks.types';
 
 interface CommandPaletteProps {
@@ -25,6 +25,7 @@ export function CommandPalette({
   const type = searchParams.get('type');
 
   const [recentTasks, setRecentTasks] = useState<TaskPopulated[]>([]);
+  const [globalTasks, setGlobalTasks] = useState<TaskPopulated[]>([]);
   const [searchResults, setSearchResults] = useState<TaskPopulated[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -40,15 +41,21 @@ export function CommandPalette({
 
   // fetch recently created tasks when palette opens
   useEffect(() => {
-    if (!open || !projectId) return;
+    if (!open) return;
 
     let ignore = false;
 
     const fetchRecentTasks = async () => {
       setLoading(true);
       try {
-        const tasks = await getTasks({ projectId });
+        const tasks = projectId
+          ? await getTasks({ projectId })
+          : (await getTasksPaginated({ page: 1, limit: 100 })).data;
         if (ignore) return;
+
+        if (!projectId) {
+          setGlobalTasks(tasks);
+        }
 
         const recent = [...tasks]
           .filter((t) => t.createdAt)
@@ -76,7 +83,7 @@ export function CommandPalette({
 
   // search tasks when value changes (debounced)
   useEffect(() => {
-    if (!open || !projectId || !value.trim()) {
+    if (!open || !value.trim()) {
       setSearchResults([]);
       return;
     }
@@ -86,7 +93,29 @@ export function CommandPalette({
     const fetchSearchResults = async () => {
       setSearchLoading(true);
       try {
-        const tasks = await getTasks({ projectId, searchInput: value.trim() });
+        if (projectId) {
+          const tasks = await getTasks({
+            projectId,
+            searchInput: value.trim(),
+          });
+          if (!ignore) {
+            setSearchResults(tasks);
+          }
+          return;
+        }
+
+        const needle = value.trim().toLowerCase();
+        const tasks = globalTasks.filter((task) => {
+          const key = task.key?.toLowerCase() ?? '';
+          const title = task.title?.toLowerCase() ?? '';
+          const description = task.description?.toLowerCase() ?? '';
+          return (
+            key.includes(needle) ||
+            title.includes(needle) ||
+            description.includes(needle)
+          );
+        });
+
         if (!ignore) {
           setSearchResults(tasks);
         }
@@ -103,7 +132,7 @@ export function CommandPalette({
       ignore = true;
       clearTimeout(timer);
     };
-  }, [open, projectId, value]);
+  }, [open, projectId, value, globalTasks]);
 
   // esc to close
   useEffect(() => {
@@ -159,7 +188,6 @@ export function CommandPalette({
                   <button
                     key={task._id}
                     onClick={() => {
-                      if (!projectId) return;
                       const next = new URLSearchParams(searchParams);
                       if (type) {
                         next.set('type', type);
@@ -202,7 +230,6 @@ export function CommandPalette({
                   <button
                     key={task._id}
                     onClick={() => {
-                      if (!projectId) return;
                       const next = new URLSearchParams(searchParams);
                       if (type) {
                         next.set('type', type);
