@@ -6,7 +6,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { TableColumnsType } from 'antd';
-import { Button, Checkbox, message, Table } from 'antd';
+import { message, Table } from 'antd';
 import dayjs from 'dayjs';
 import { ChevronDown } from 'lucide-react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
@@ -27,6 +27,8 @@ import { UserCell } from '../ui/UserCell';
 import { CreateSprintForm } from './CreateSprintForm';
 import { SprintMenu } from './SprintMenu';
 import type { TaskTableProps } from './type';
+import { getTableFilterDropdown } from '../../utils/getTableFilterDropdown';
+import { TYPE_FILTERS } from './TaskTable/taskTable.utils';
 
 const normalize = (value?: string | null) => (value ?? '').toLowerCase().trim();
 
@@ -106,38 +108,12 @@ const buildTaskColumns = ({
       key: 'type',
       dataIndex: 'type',
       width: 72,
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
-        <div style={{ padding: 8, width: 180 }}>
-          <Checkbox.Group
-            className="flex flex-col gap-2"
-            options={uniqueFilters(['bug', 'story', 'task', 'epic']).map(
-              (f) => ({
-                label: f.text,
-                value: f.value,
-              })
-            )}
-            value={selectedKeys as string[]}
-            onChange={(values) => {
-              setSelectedKeys(values);
-              confirm({ closeDropdown: false });
-            }}
-          />
-
-          <div className="mt-2 flex justify-end">
-            <Button
-              size="small"
-              type="link"
-              disabled={!selectedKeys || selectedKeys.length === 0}
-              onClick={() => {
-                setSelectedKeys([]);
-                confirm({ closeDropdown: false });
-              }}
-            >
-              Reset
-            </Button>
-          </div>
-        </div>
-      ),
+      filterDropdown: getTableFilterDropdown({
+        options: TYPE_FILTERS.map((f) => ({
+          label: f.text,
+          value: f.value,
+        })),
+      }),
       onFilter: (value, record) =>
         normalize(record.type) === normalize(String(value)),
       sorter: (a, b) => compareText(a.type, b.type),
@@ -147,6 +123,7 @@ const buildTaskColumns = ({
         </div>
       ),
     },
+
     {
       title: 'Key',
       key: 'key',
@@ -163,6 +140,7 @@ const buildTaskColumns = ({
         </Link>
       ),
     },
+
     {
       title: 'Summary',
       key: 'title',
@@ -182,40 +160,17 @@ const buildTaskColumns = ({
         </button>
       ),
     },
+
     {
       title: 'Status',
       key: 'status',
       dataIndex: 'status',
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
-        <div style={{ padding: 8, width: 200 }}>
-          <Checkbox.Group
-            className="flex flex-col gap-2"
-            options={uniqueFilters(columns).map((f) => ({
-              label: f.text,
-              value: f.value,
-            }))}
-            value={selectedKeys as string[]}
-            onChange={(values) => {
-              setSelectedKeys(values);
-              confirm({ closeDropdown: false });
-            }}
-          />
-
-          <div className="mt-2 flex justify-end">
-            <Button
-              size="small"
-              type="link"
-              disabled={!selectedKeys || selectedKeys.length === 0}
-              onClick={() => {
-                setSelectedKeys([]);
-                confirm({ closeDropdown: false });
-              }}
-            >
-              Reset
-            </Button>
-          </div>
-        </div>
-      ),
+      filterDropdown: getTableFilterDropdown({
+        options: uniqueFilters(columns).map((f) => ({
+          label: f.text,
+          value: f.value,
+        })),
+      }),
       onFilter: (value, record) =>
         normalize(record.status) === normalize(String(value)),
       sorter: (a, b) => compareText(a.status, b.status),
@@ -233,39 +188,16 @@ const buildTaskColumns = ({
         />
       ),
     },
+
     {
       title: 'Assignee',
       key: 'assignee',
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
-        <div style={{ padding: 8, width: 200 }}>
-          <Checkbox.Group
-            className="flex flex-col gap-2"
-            options={assigneeFilters.map((f) => ({
-              label: f.text,
-              value: f.value,
-            }))}
-            value={selectedKeys as string[]}
-            onChange={(values) => {
-              setSelectedKeys(values);
-              confirm({ closeDropdown: false });
-            }}
-          />
-
-          <div className="mt-2 flex justify-end">
-            <Button
-              size="small"
-              type="link"
-              disabled={!selectedKeys || selectedKeys.length === 0}
-              onClick={() => {
-                setSelectedKeys([]);
-                confirm({ closeDropdown: false });
-              }}
-            >
-              Reset
-            </Button>
-          </div>
-        </div>
-      ),
+      filterDropdown: getTableFilterDropdown({
+        options: assigneeFilters.map((f) => ({
+          label: f.text,
+          value: f.value,
+        })),
+      }),
       onFilter: (value, record) => {
         const selected = String(value);
         if (selected === 'unassigned') {
@@ -284,6 +216,7 @@ const buildTaskColumns = ({
         </div>
       ),
     },
+
     {
       title: 'Due Date',
       key: 'dueDate',
@@ -302,53 +235,20 @@ const buildTaskColumns = ({
         />
       ),
     },
+
     {
       title: 'Tags',
       key: 'tags',
       dataIndex: 'tags',
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-        const tagFilters = uniqueFilters(
+      filterDropdown: getTableFilterDropdown({
+        options: uniqueFilters(
           localTasks.flatMap((task) => task.tags ?? [])
-        );
-
-        return (
-          <div
-            style={{
-              padding: 8,
-              width: 200,
-              maxHeight: 220,
-              overflowY: 'auto',
-            }}
-          >
-            <Checkbox.Group
-              className="flex flex-col gap-2"
-              options={tagFilters.map((f) => ({
-                label: f.text,
-                value: f.value,
-              }))}
-              value={selectedKeys as string[]}
-              onChange={(values) => {
-                setSelectedKeys(values);
-                confirm({ closeDropdown: false });
-              }}
-            />
-
-            <div className="mt-2 flex justify-end">
-              <Button
-                size="small"
-                type="link"
-                disabled={!selectedKeys || selectedKeys.length === 0}
-                onClick={() => {
-                  setSelectedKeys([]);
-                  confirm({ closeDropdown: false });
-                }}
-              >
-                Reset
-              </Button>
-            </div>
-          </div>
-        );
-      },
+        ).map((f) => ({
+          label: f.text,
+          value: f.value,
+        })),
+        maxHeight: 220,
+      }),
       onFilter: (value, record) => (record.tags ?? []).includes(String(value)),
       render: (_, record) => (
         <div className="flex gap-1">
@@ -374,57 +274,34 @@ const buildTaskColumns = ({
         </div>
       ),
     },
+
     {
       title: 'Created',
       key: 'createdAt',
       dataIndex: 'createdAt',
       sorter: (a, b) => compareDate(a.createdAt, b.createdAt),
-      render: (value: string | undefined) =>
+      render: (value?: string) =>
         value ? dayjs(value).format('DD-MM-YYYY') : '-',
     },
+
     {
       title: 'Updated',
       key: 'updatedAt',
       dataIndex: 'updatedAt',
       sorter: (a, b) => compareDate(a.updatedAt, b.updatedAt),
-      render: (value: string | undefined) =>
+      render: (value?: string) =>
         value ? dayjs(value).format('DD-MM-YYYY') : '-',
     },
+
     {
       title: 'Reporter',
       key: 'reporter',
-      filters: reporterFilters,
-      filterSearch: true,
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
-        <div style={{ padding: 8, width: 200 }}>
-          <Checkbox.Group
-            className="flex flex-col gap-2"
-            options={reporterFilters.map((f) => ({
-              label: f.text,
-              value: f.value,
-            }))}
-            value={selectedKeys as string[]}
-            onChange={(values) => {
-              setSelectedKeys(values);
-              confirm({ closeDropdown: false });
-            }}
-          />
-
-          <div className="mt-2 flex justify-end">
-            <Button
-              size="small"
-              type="link"
-              disabled={!selectedKeys || selectedKeys.length === 0}
-              onClick={() => {
-                setSelectedKeys([]);
-                confirm({ closeDropdown: false });
-              }}
-            >
-              Reset
-            </Button>
-          </div>
-        </div>
-      ),
+      filterDropdown: getTableFilterDropdown({
+        options: reporterFilters.map((f) => ({
+          label: f.text,
+          value: f.value,
+        })),
+      }),
       onFilter: (value, record) => {
         const selected = String(value);
         if (selected === 'unknown') {
@@ -515,7 +392,6 @@ export function TaskTable({
     setLocalTasks(tasks);
   }, [tasks]);
 
-  // Listen for global task updates (e.g., from TaskDrawer) and update localTasks
   useEffect(() => {
     const handler = (event: Event) => {
       const custom = event as CustomEvent;
@@ -642,7 +518,6 @@ export function TaskTable({
 
   return (
     <div className="rounded-lg bg-white shadow-sm dark:bg-slate-900">
-      {/* Sprint Header */}
       <div className="flex w-full items-center justify-between rounded-t-lg bg-gray-100 px-1 py-2 text-left hover:bg-gray-100 sm:px-4 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-800">
         <div
           onClick={() => setOpen(!open)}
@@ -679,7 +554,6 @@ export function TaskTable({
         </div>
       </div>
 
-      {/* Table */}
       {open && (
         <div
           ref={setNodeRef}
