@@ -78,7 +78,7 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
   return (
     <div className="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {/* Assigned Task By Project */}
-      <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
+      <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800">
         <h4 className="text-primary-500 mb-4 text-center text-sm font-semibold tracking-wide">
           Assigned Task By Project
         </h4>
@@ -117,7 +117,7 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
       </div>
 
       {/* Completed Task By Project */}
-      <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
+      <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800">
         <h4 className="text-primary-500 mb-4 text-center text-sm font-semibold tracking-wide">
           Completed Task By Project
         </h4>
@@ -177,7 +177,7 @@ export function ChartsContainer({ data }: { data: TaskStats | null }) {
       </div>
 
       {/* Completed Task By Date (Last 7 Days) */}
-      <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg sm:col-span-2 lg:col-span-1 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600">
+      <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg sm:col-span-2 lg:col-span-1 dark:border-slate-700 dark:bg-slate-800">
         <h4 className="text-primary-500 mb-4 text-center font-semibold tracking-wide">
           {renderChartTitle('Completed Task By Date (Last 7 Days)')}
         </h4>

@@ -65,9 +65,9 @@ export function TaskContainer({ projectId }: TaskContainerProps) {
 
   return (
     <div ref={containerRef} className="flex flex-col">
-      <h2 className="flex w-full items-center gap-1.5 border-b border-b-gray-400 pb-2 text-xl font-semibold dark:border-b-slate-700 dark:text-slate-100">
+      <h2 className="mb-2 flex w-full items-center gap-1.5 border-b border-b-gray-300 pb-2 text-xl font-semibold dark:border-b-slate-700 dark:text-slate-100">
         Your Tasks
-        <div className="h-5 w-5 rounded-full bg-gray-200 text-center text-sm text-black dark:bg-slate-700 dark:text-slate-100">
+        <div className="w-content h-5 rounded-full bg-gray-200 px-2 text-center text-sm text-black dark:bg-slate-700 dark:text-slate-100">
           {total}
         </div>
       </h2>

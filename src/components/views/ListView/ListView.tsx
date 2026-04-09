@@ -20,10 +20,10 @@ import { ProjectMembersModal } from '../../common/ProjectMembersModal';
 import type { Project } from '../../../types/project.types';
 
 const EMPTY_TABLE_FILTERS: TaskTableFilters = {
-  type: null,
-  status: null,
-  assignee: null,
-  reporter: null,
+  type: [],
+  status: [],
+  assignee: [],
+  reporter: [],
   tags: [],
 };
 
@@ -91,10 +91,14 @@ function ListView() {
         const result = await getTasks({
           projectId,
           searchInput,
-          type: tableFilters.type || undefined,
-          status: tableFilters.status || undefined,
-          assignee: tableFilters.assignee || undefined,
-          reporter: tableFilters.reporter || undefined,
+          type: tableFilters.type.length ? tableFilters.type : undefined,
+          status: tableFilters.status.length ? tableFilters.status : undefined,
+          assignee: tableFilters.assignee.length
+            ? tableFilters.assignee
+            : undefined,
+          reporter: tableFilters.reporter.length
+            ? tableFilters.reporter
+            : undefined,
           tags:
             tableFilters.tags && tableFilters.tags.length
               ? tableFilters.tags
@@ -150,11 +154,11 @@ function ListView() {
   };
 
   const hasActiveFilters =
-    Boolean(tableFilters.type) ||
-    Boolean(tableFilters.status) ||
-    Boolean(tableFilters.assignee) ||
-    Boolean(tableFilters.reporter) ||
-    Boolean(tableFilters.tags?.length) ||
+    tableFilters.type.length > 0 ||
+    tableFilters.status.length > 0 ||
+    tableFilters.assignee.length > 0 ||
+    tableFilters.reporter.length > 0 ||
+    tableFilters.tags.length > 0 ||
     Boolean(sorting.field) ||
     Boolean(sorting.order);
 

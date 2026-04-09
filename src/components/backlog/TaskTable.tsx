@@ -395,6 +395,36 @@ const buildTaskColumns = ({
       key: 'reporter',
       filters: reporterFilters,
       filterSearch: true,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div style={{ padding: 8, width: 200 }}>
+          <Checkbox.Group
+            className="flex flex-col gap-2"
+            options={reporterFilters.map((f) => ({
+              label: f.text,
+              value: f.value,
+            }))}
+            value={selectedKeys as string[]}
+            onChange={(values) => {
+              setSelectedKeys(values);
+              confirm({ closeDropdown: false });
+            }}
+          />
+
+          <div className="mt-2 flex justify-end">
+            <Button
+              size="small"
+              type="link"
+              disabled={!selectedKeys || selectedKeys.length === 0}
+              onClick={() => {
+                setSelectedKeys([]);
+                confirm({ closeDropdown: false });
+              }}
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
+      ),
       onFilter: (value, record) => {
         const selected = String(value);
         if (selected === 'unknown') {

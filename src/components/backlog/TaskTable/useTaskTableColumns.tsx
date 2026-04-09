@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { message } from 'antd';
+import { Button, Checkbox, message } from 'antd';
 import type { TableColumnsType } from 'antd';
 import type { TaskPopulated, User } from '../../../services/types/tasks.types';
 import { TaskTypeIcon } from '../../../utils/TaskTypeIcon';
@@ -142,8 +142,36 @@ function typeColumn(
     title: 'Type',
     dataIndex: 'type',
     key: 'type',
-    filters: TYPE_FILTERS,
-    filterMultiple: false,
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+      <div style={{ padding: 8, width: 200 }}>
+        <Checkbox.Group
+          className="flex flex-col gap-2"
+          options={TYPE_FILTERS.map((f) => ({
+            label: f.text,
+            value: f.value,
+          }))}
+          value={selectedKeys as string[]}
+          onChange={(values) => {
+            setSelectedKeys(values);
+            confirm({ closeDropdown: false });
+          }}
+        />
+
+        <div className="mt-2 flex justify-end">
+          <Button
+            size="small"
+            type="link"
+            disabled={!selectedKeys?.length}
+            onClick={() => {
+              setSelectedKeys([]);
+              confirm({ closeDropdown: false });
+            }}
+          >
+            Reset
+          </Button>
+        </div>
+      </div>
+    ),
     sorter: true,
     sortOrder: sortOrderFor('type'),
     onHeaderCell: () => ({ className: headerClass('Type') }),
@@ -215,8 +243,36 @@ function statusColumn(
     title: 'Status',
     dataIndex: 'status',
     key: 'status',
-    filters: statusFilters,
-    filterMultiple: false,
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+      <div style={{ padding: 8, width: 200 }}>
+        <Checkbox.Group
+          className="flex flex-col gap-2"
+          options={statusFilters.map((f) => ({
+            label: f.text,
+            value: f.value,
+          }))}
+          value={selectedKeys as string[]}
+          onChange={(values) => {
+            setSelectedKeys(values);
+            confirm({ closeDropdown: false });
+          }}
+        />
+
+        <div className="mt-2 flex justify-end">
+          <Button
+            size="small"
+            type="link"
+            disabled={!selectedKeys?.length}
+            onClick={() => {
+              setSelectedKeys([]);
+              confirm({ closeDropdown: false });
+            }}
+          >
+            Reset
+          </Button>
+        </div>
+      </div>
+    ),
     sorter: true,
     sortOrder: sortOrderFor('status'),
     onHeaderCell: () => ({ className: headerClass('Status') }),
@@ -242,8 +298,36 @@ function assigneeColumn(
   return {
     title: 'Assignee',
     key: 'assignee',
-    filters: assigneeSelectFilters,
-    filterMultiple: false,
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+      <div style={{ padding: 8, width: 200 }}>
+        <Checkbox.Group
+          className="flex flex-col gap-2"
+          options={assigneeSelectFilters.map((f) => ({
+            label: f.text,
+            value: f.value,
+          }))}
+          value={selectedKeys as string[]}
+          onChange={(values) => {
+            setSelectedKeys(values);
+            confirm({ closeDropdown: false });
+          }}
+        />
+
+        <div className="mt-2 flex justify-end">
+          <Button
+            size="small"
+            type="link"
+            disabled={!selectedKeys?.length}
+            onClick={() => {
+              setSelectedKeys([]);
+              confirm({ closeDropdown: false });
+            }}
+          >
+            Reset
+          </Button>
+        </div>
+      </div>
+    ),
     onHeaderCell: () => ({ className: headerClass('Assignee') }),
     onCell: () => ({
       className: bodyClass(
@@ -296,8 +380,36 @@ function tagsColumn(
     title: 'Tags',
     dataIndex: 'labels',
     key: 'tags',
-    filters: tagFilters,
-    filterMultiple: true,
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+      <div style={{ padding: 8, width: 200 }}>
+        <Checkbox.Group
+          className="flex flex-col gap-2"
+          options={tagFilters.map((f) => ({
+            label: f.text,
+            value: f.value,
+          }))}
+          value={selectedKeys as string[]}
+          onChange={(values) => {
+            setSelectedKeys(values);
+            confirm({ closeDropdown: false });
+          }}
+        />
+
+        <div className="mt-2 flex justify-end">
+          <Button
+            size="small"
+            type="link"
+            disabled={!selectedKeys?.length}
+            onClick={() => {
+              setSelectedKeys([]);
+              confirm({ closeDropdown: false });
+            }}
+          >
+            Reset
+          </Button>
+        </div>
+      </div>
+    ),
     onHeaderCell: () => ({ className: headerClass('Tags') }),
     onCell: () => ({ className: bodyClass('Tags', 'whitespace-nowrap') }),
     render: (_, record) => (
@@ -353,8 +465,36 @@ function reporterColumn(
   return {
     title: 'Reporter',
     key: 'reporter',
-    filters: reporterSelectFilters,
-    filterMultiple: false,
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+      <div style={{ padding: 8, width: 200 }}>
+        <Checkbox.Group
+          className="flex flex-col gap-2"
+          options={reporterSelectFilters.map((f) => ({
+            label: f.text,
+            value: f.value,
+          }))}
+          value={selectedKeys as string[]}
+          onChange={(values) => {
+            setSelectedKeys(values);
+            confirm({ closeDropdown: false });
+          }}
+        />
+
+        <div className="mt-2 flex justify-end">
+          <Button
+            size="small"
+            type="link"
+            disabled={!selectedKeys?.length}
+            onClick={() => {
+              setSelectedKeys([]);
+              confirm({ closeDropdown: false });
+            }}
+          >
+            Reset
+          </Button>
+        </div>
+      </div>
+    ),
     onHeaderCell: () => ({ className: headerClass('Reporter') }),
     onCell: () => ({
       className: bodyClass(
@@ -386,13 +526,13 @@ function getFilteredValue(
   if (!filters) return null;
   switch (key) {
     case 'type':
-      return filters.type ? [filters.type] : null;
+      return filters.type ? filters.type : null;
     case 'status':
-      return filters.status ? [filters.status] : null;
+      return filters.status ? filters.status : null;
     case 'assignee':
-      return filters.assignee ? [filters.assignee] : null;
+      return filters.assignee ? filters.assignee : null;
     case 'reporter':
-      return filters.reporter ? [filters.reporter] : null;
+      return filters.reporter ? filters.reporter : null;
     case 'tags':
       return filters.tags && filters.tags.length ? filters.tags : null;
     default:

@@ -24,11 +24,11 @@ const LEGACY_FETCH_LIMIT = 10;
 type GetTasksBaseParams = {
   projectId: string;
   searchInput?: string;
-  type?: string;
-  status?: string;
-  priority?: string;
-  assignee?: string;
-  reporter?: string;
+  type?: string[];
+  status?: string[];
+  priority?: string[];
+  assignee?: string[];
+  reporter?: string[];
   tags?: string[];
   sortBy?: string;
   sortOrder?: 'asc' | 'desc' | 'ascend' | 'descend';
@@ -142,7 +142,9 @@ export async function getUserTasks(): Promise<TaskPopulated[]> {
 export function getTasks(
   params: GetTasksPaginatedParams
 ): Promise<PaginatedTasksResponse>;
+
 export function getTasks(params: GetTasksListParams): Promise<TaskPopulated[]>;
+
 export async function getTasks(
   params: GetTasksPaginatedParams | GetTasksListParams
 ): Promise<TaskPopulated[] | PaginatedTasksResponse> {
@@ -160,14 +162,20 @@ export async function getTasks(
     projectId: params.projectId,
     page: shouldPaginate ? params.page : 1,
     limit: shouldPaginate ? params.limit : LEGACY_FETCH_LIMIT,
+
     ...(params.searchInput && { searchQuery: params.searchInput }),
-    ...(params.type && { type: params.type }),
-    ...(params.status && { status: params.status }),
+
+    ...(params.type?.length && { type: params.type.join(',') }),
+    ...(params.status?.length && { status: params.status.join(',') }),
     ...(params.priority && { priority: params.priority }),
-    ...(params.assignee && { assignee: params.assignee }),
-    ...(params.reporter && { reporter: params.reporter }),
-    ...(params.tags &&
-      params.tags.length > 0 && { tags: params.tags.join(',') }),
+    ...(params.assignee?.length && {
+      assignee: params.assignee.join(','),
+    }),
+    ...(params.reporter?.length && {
+      reporter: params.reporter.join(','),
+    }),
+    ...(params.tags?.length && { tags: params.tags.join(',') }),
+
     ...(params.sortBy && { sortBy: params.sortBy }),
     ...(normalizedSortOrder && { sortOrder: normalizedSortOrder }),
   };

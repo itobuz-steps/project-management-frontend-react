@@ -5,11 +5,11 @@ import type {
 } from '../../../services/types/tasks.types';
 
 export type TaskTableFilters = {
-  type?: string | null;
-  status?: string | null;
-  assignee?: string | null;
-  reporter?: string | null;
-  tags?: string[];
+  type: string[];
+  status: string[];
+  assignee: string[];
+  reporter: string[];
+  tags: string[];
 };
 
 export type TaskTableSortOrder = 'ascend' | 'descend' | null;
