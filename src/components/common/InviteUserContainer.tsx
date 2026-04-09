@@ -95,7 +95,13 @@ export function InviteUserContainer({
             backgroundColor: 'rgba(0,0,0,0.45)',
           }}
         >
-          <InviteUserForm submitHandler={handleFinish} />
+          <div
+            style={{
+              marginTop: '20px',
+            }}
+          >
+            <InviteUserForm submitHandler={handleFinish} />
+          </div>
         </Modal>
       </>
     </Can>
