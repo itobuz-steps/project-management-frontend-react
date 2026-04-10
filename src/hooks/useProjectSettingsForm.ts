@@ -176,18 +176,14 @@ export function useProjectSettingsForm({
     );
   };
 
-  // Add this new function inside useProjectSettingsForm, after changeMemberRole
-
   const changeMemberRoleAndSave = async (
     userId: string,
     role: ProjectMemberRole
   ) => {
-    // 1. Compute the updated members list before setState (which is async)
     const updatedMembers = projectMembers.map((member) =>
       member.user === userId ? { ...member, role } : member
     );
 
-    // 2. Update local state optimistically
     setProjectMembers(updatedMembers);
     setVisibleMembers((prev) =>
       prev.map((member) =>
@@ -195,7 +191,6 @@ export function useProjectSettingsForm({
       )
     );
 
-    // 3. Build FormData with the updated members and existing project values
     const formData = new FormData();
 
     formData.append('name', project.name);
@@ -214,7 +209,6 @@ export function useProjectSettingsForm({
 
     formData.append('theme', theme);
 
-    // 4. Fire the mutation
     updateProjectMutation.mutate({ projectId: project._id, formData });
   };
 

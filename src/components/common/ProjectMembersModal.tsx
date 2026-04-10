@@ -62,7 +62,7 @@ export function ProjectMembersModal({
           backgroundColor: 'rgba(0,0,0,0.45)',
         }}
         width={480}
-        footer={null} // 👈 no footer at all
+        footer={null}
       >
         {!projectId ? (
           <div className="flex justify-center py-10 text-sm text-gray-400 dark:text-slate-400">
@@ -77,7 +77,6 @@ export function ProjectMembersModal({
             No members found.
           </p>
         ) : (
-          // 👇 minHeight prevents modal from shrinking during loading
           <div
             className="flex max-h-105 flex-col gap-2 overflow-y-auto py-1 pr-1"
             style={{ minHeight: '120px' }}
@@ -93,7 +92,6 @@ export function ProjectMembersModal({
               const isSaving = savingUserId === localMember.user;
 
               return (
-                // 👇 h-10 locks each row's height so the Select spinner doesn't cause reflow
                 <div
                   key={localMember.user}
                   className="flex h-10 items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800"
