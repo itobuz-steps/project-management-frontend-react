@@ -1,13 +1,12 @@
+import { useState } from 'react';
 import { Modal, Select, Button, Spin, Tooltip } from 'antd';
-import type { FormInstance } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Crown } from 'lucide-react';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { Can } from '../../utils/PermissionHoc';
 import { useProjectSettingsForm } from '../../hooks/useProjectSettingsForm';
 import { UserCell } from '../ui/UserCell';
-import type { Project } from '../../types/project.types';
-import type { ProjectSettingsFormValues } from '../../components/projectSettings/projectSettings.type';
+import type { Project, ProjectMemberRole } from '../../types/project.types';
 
 interface ProjectMembersModalProps {
   open: boolean;
@@ -24,39 +23,23 @@ export function ProjectMembersModal({
 
   const { members, loadingMembers } = useProjectMetaData(projectId);
 
-  const {
-    loading,
-    projectMembers,
-    changeMemberRole,
-    removeMember,
-    handleSubmit,
-  } = useProjectSettingsForm({
-    project: project ?? ({} as Project),
-    members: members ?? [],
-    setProject: () => {},
-    iconFile: null,
-    setIconFile: () => {},
-    setIconPreview: () => {},
-    theme: project?.theme ?? '',
-  });
+  const [savingUserId, setSavingUserId] = useState<string | null>(null);
 
-  const handleSave = async () => {
-    if (!projectId) return;
+  const { projectMembers, changeMemberRoleAndSave, removeMember } =
+    useProjectSettingsForm({
+      project: project ?? ({} as Project),
+      members: members ?? [],
+      setProject: () => {},
+      iconFile: null,
+      setIconFile: () => {},
+      setIconPreview: () => {},
+      theme: project?.theme ?? '',
+    });
 
-    const values: ProjectSettingsFormValues = {
-      name: project.name,
-      prefix: project.prefix ?? null,
-      projectType: project.projectType,
-      defaultAssignee: project.defaultAssignee ?? null,
-      memberLead: project.memberLead,
-      theme: project.theme,
-      removeMembers: [],
-    };
-
-    const dummyForm = { resetFields: () => {} } as unknown as FormInstance;
-
-    await handleSubmit(values, dummyForm);
-    onClose();
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    setSavingUserId(userId);
+    await changeMemberRoleAndSave(userId, newRole as ProjectMemberRole);
+    setSavingUserId(null);
   };
 
   return (
@@ -79,24 +62,7 @@ export function ProjectMembersModal({
           backgroundColor: 'rgba(0,0,0,0.45)',
         }}
         width={480}
-        footer={
-          <div className="flex justify-end gap-2">
-            <Button onClick={onClose}>Close</Button>
-            <Can permission="PROJECT_SETTINGS">
-              <Button
-                type="primary"
-                loading={loading}
-                onClick={handleSave}
-                style={{
-                  background: 'var(--color-primary-500)',
-                  borderColor: 'var(--color-primary-500)',
-                }}
-              >
-                Save Changes
-              </Button>
-            </Can>
-          </div>
-        }
+        footer={null} // 👈 no footer at all
       >
         {!projectId ? (
           <div className="flex justify-center py-10 text-sm text-gray-400 dark:text-slate-400">
@@ -111,23 +77,29 @@ export function ProjectMembersModal({
             No members found.
           </p>
         ) : (
-          <div className="flex max-h-105 flex-col gap-2 overflow-y-auto py-1 pr-1">
+          // 👇 minHeight prevents modal from shrinking during loading
+          <div
+            className="flex max-h-105 flex-col gap-2 overflow-y-auto py-1 pr-1"
+            style={{ minHeight: '120px' }}
+          >
             {projectMembers.map((localMember) => {
               const user = members?.find(
-                (user) => user && String(user._id) === String(localMember.user)
+                (u) => u && String(u._id) === String(localMember.user)
               );
 
               const isProjectLead =
                 String(project?.memberLead) === String(localMember.user);
 
+              const isSaving = savingUserId === localMember.user;
+
               return (
+                // 👇 h-10 locks each row's height so the Select spinner doesn't cause reflow
                 <div
                   key={localMember.user}
-                  className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800"
+                  className="flex h-10 items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800"
                 >
                   <div className="flex min-w-0 items-center gap-2">
                     <UserCell user={user} emptyText="Unknown" />
-
                     {isProjectLead && (
                       <Tooltip title="Project Lead">
                         <Crown className="h-3.5 w-3.5 shrink-0 text-yellow-500" />
@@ -140,15 +112,16 @@ export function ProjectMembersModal({
                       <Select
                         size="small"
                         value={localMember.role}
+                        loading={isSaving}
+                        disabled={isProjectLead || isSaving}
                         onChange={(newRole) =>
-                          changeMemberRole(localMember.user, newRole)
+                          handleRoleChange(localMember.user, newRole)
                         }
                         options={[
                           { label: 'Admin', value: 'admin' },
                           { label: 'Member', value: 'member' },
                         ]}
                         style={{ width: 90 }}
-                        disabled={isProjectLead}
                       />
 
                       <Tooltip

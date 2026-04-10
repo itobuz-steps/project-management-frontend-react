@@ -72,14 +72,14 @@ export default function Navbar({
               setPaletteSearch(e.target.value);
               setCommandPaletteOpen(true);
             }}
-            className="focus:border-primary-400 focus:ring-primary-100 dark:focus:ring-primary-900/30 min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-colors outline-none placeholder:text-slate-400 focus:ring-2 dark:border-[#27272e] dark:bg-[#1b1b1f] dark:text-neutral-100 dark:placeholder:text-neutral-400"
+            className="focus:border-primary-400 focus:ring-primary-100 dark:focus:ring-primary-900/30 h-10 min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 text-sm text-slate-700 shadow-sm transition-colors outline-none placeholder:text-slate-400 focus:ring-2 dark:border-[#27272e] dark:bg-[#1b1b1f] dark:text-neutral-100 dark:placeholder:text-neutral-400"
           />
           <button
             onClick={() => setIsAddTaskOpen(true)}
-            className="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700 flex h-auto w-auto flex-shrink-0 items-center justify-center rounded-md text-white shadow-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
+            className="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700 flex h-10 flex-shrink-0 items-center justify-center rounded-md px-3 text-sm font-medium text-white shadow-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
             aria-label="Create task"
           >
-            <span className="p-1.5 font-medium">Create</span>
+            <span>Create</span>
           </button>
         </div>
 
@@ -104,7 +104,7 @@ export default function Navbar({
 
             <button
               onClick={() => setIsAddTaskOpen(true)}
-              className="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700 rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
+              className="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700 h-10 rounded-lg px-4 text-sm font-medium text-white shadow-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
               aria-label="Create task"
             >
               <span>Create</span>

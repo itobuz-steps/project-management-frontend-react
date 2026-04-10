@@ -176,6 +176,48 @@ export function useProjectSettingsForm({
     );
   };
 
+  // Add this new function inside useProjectSettingsForm, after changeMemberRole
+
+  const changeMemberRoleAndSave = async (
+    userId: string,
+    role: ProjectMemberRole
+  ) => {
+    // 1. Compute the updated members list before setState (which is async)
+    const updatedMembers = projectMembers.map((member) =>
+      member.user === userId ? { ...member, role } : member
+    );
+
+    // 2. Update local state optimistically
+    setProjectMembers(updatedMembers);
+    setVisibleMembers((prev) =>
+      prev.map((member) =>
+        member.user === userId ? { ...member, role } : member
+      )
+    );
+
+    // 3. Build FormData with the updated members and existing project values
+    const formData = new FormData();
+
+    formData.append('name', project.name);
+    formData.append('projectType', project.projectType);
+    formData.append('memberLead', project.memberLead);
+    formData.append('defaultAssignee', project.defaultAssignee ?? 'null');
+
+    if (project.prefix) {
+      formData.append('prefix', project.prefix);
+    }
+
+    updatedMembers.forEach((member, index) => {
+      formData.append(`members[${index}][user]`, member.user);
+      formData.append(`members[${index}][role]`, member.role);
+    });
+
+    formData.append('theme', theme);
+
+    // 4. Fire the mutation
+    updateProjectMutation.mutate({ projectId: project._id, formData });
+  };
+
   const removeMember = (userId: string) => {
     setProjectMembers((prev) =>
       prev.filter((member) => member.user !== userId)
@@ -197,6 +239,7 @@ export function useProjectSettingsForm({
     handleSubmit,
     addMemberRole,
     changeMemberRole,
+    changeMemberRoleAndSave,
     removeMember,
   };
 }
