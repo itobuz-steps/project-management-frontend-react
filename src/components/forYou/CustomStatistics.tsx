@@ -15,7 +15,6 @@ export function CustomStatistic({ title, value }: CustomStatisticProps) {
   const gradientStart = themeColors[4];
   const gradientEnd = themeColors[7];
 
-  // Split title at "Last" to separate main text from time period
   const parts = title.split(' Last');
   const mainTitle = parts[0];
   const timeText = parts.length > 1 ? `Last${parts[1]}` : '';
