@@ -23,11 +23,7 @@ import { CSS } from '@dnd-kit/utilities';
 import type { TaskPopulated } from '../../../services/types/tasks.types';
 import { getPriorityBorder } from '../../../utils/utils';
 import { useTaskTableColumns } from './useTaskTableColumns';
-import {
-  asSingleFilter,
-  asMultiFilter,
-  DEFAULT_STATUSES,
-} from './taskTable.utils';
+import { asMultiFilter, DEFAULT_STATUSES } from './taskTable.utils';
 import type { TaskTableProps } from './taskTable.types';
 import { GripVertical } from 'lucide-react';
 
@@ -347,10 +343,10 @@ export function TaskTable({
               page: nextPagination.current ?? 1,
               pageSize: nextPagination.pageSize ?? pagination?.limit ?? 10,
               filters: {
-                type: asSingleFilter(nextFilters.type),
-                status: asSingleFilter(nextFilters.status),
-                assignee: asSingleFilter(nextFilters.assignee),
-                reporter: asSingleFilter(nextFilters.reporter),
+                type: asMultiFilter(nextFilters.type),
+                status: asMultiFilter(nextFilters.status),
+                assignee: asMultiFilter(nextFilters.assignee),
+                reporter: asMultiFilter(nextFilters.reporter),
                 tags: asMultiFilter(nextFilters.tags),
               },
               sorting: {

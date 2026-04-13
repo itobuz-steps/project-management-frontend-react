@@ -176,6 +176,42 @@ export function useProjectSettingsForm({
     );
   };
 
+  const changeMemberRoleAndSave = async (
+    userId: string,
+    role: ProjectMemberRole
+  ) => {
+    const updatedMembers = projectMembers.map((member) =>
+      member.user === userId ? { ...member, role } : member
+    );
+
+    setProjectMembers(updatedMembers);
+    setVisibleMembers((prev) =>
+      prev.map((member) =>
+        member.user === userId ? { ...member, role } : member
+      )
+    );
+
+    const formData = new FormData();
+
+    formData.append('name', project.name);
+    formData.append('projectType', project.projectType);
+    formData.append('memberLead', project.memberLead);
+    formData.append('defaultAssignee', project.defaultAssignee ?? 'null');
+
+    if (project.prefix) {
+      formData.append('prefix', project.prefix);
+    }
+
+    updatedMembers.forEach((member, index) => {
+      formData.append(`members[${index}][user]`, member.user);
+      formData.append(`members[${index}][role]`, member.role);
+    });
+
+    formData.append('theme', theme);
+
+    updateProjectMutation.mutate({ projectId: project._id, formData });
+  };
+
   const removeMember = (userId: string) => {
     setProjectMembers((prev) =>
       prev.filter((member) => member.user !== userId)
@@ -197,6 +233,7 @@ export function useProjectSettingsForm({
     handleSubmit,
     addMemberRole,
     changeMemberRole,
+    changeMemberRoleAndSave,
     removeMember,
   };
 }

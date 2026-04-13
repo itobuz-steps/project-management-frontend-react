@@ -459,8 +459,6 @@ function BoardView() {
           tasksByColumn: buildTasksByStatus(lane.tasks),
         }));
 
-      console.log('grouped by assignee', result);
-
       return result;
     }
 
@@ -531,7 +529,7 @@ function BoardView() {
               });
             }}
             allowClear
-            size="small"
+            size="middle"
             className="min-w-35"
           >
             <Option value="">None</Option>
@@ -566,7 +564,7 @@ function BoardView() {
                   ? 'Switch to expanded view'
                   : 'Switch to compact view'
               }
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
             >
               {isCompactMode ? (
                 <Maximize2 size={14} />

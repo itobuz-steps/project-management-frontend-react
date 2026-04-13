@@ -26,7 +26,7 @@ export const asMultiFilter = (value?: FilterValue | null): string[] => {
   return value.map((item) => String(item)).filter(Boolean);
 };
 
-export const TYPE_FILTERS = toFilters(['bug', 'story', 'task']);
+export const TYPE_FILTERS = toFilters(['bug', 'story', 'task', 'epic']);
 
 const columnClassMap: Record<string, string> = {};
 taskTableColumns.forEach(({ label, className }) => {

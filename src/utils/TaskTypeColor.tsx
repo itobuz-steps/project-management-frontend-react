@@ -26,6 +26,15 @@ export function TaskTypeColor({
           {children}
         </Tag>
       );
+    case 'epic':
+      return (
+        <Tag
+          color="purple"
+          className="cursor-pointer rounded-xl bg-purple-500 px-1.5 py-0.5 text-white hover:underline"
+        >
+          {children}
+        </Tag>
+      );
     default:
       return (
         <Tag

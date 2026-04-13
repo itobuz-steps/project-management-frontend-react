@@ -77,7 +77,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
               </div>
 
               <SidebarRow label="Labels">
-                <div className="flex min-h-7 w-full items-center px-2">
+                <div className="flex min-h-7 w-full items-center">
                   {!editingLabels ? (
                     <div
                       className="flex cursor-pointer flex-wrap gap-1 text-lg"
@@ -104,7 +104,6 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                     <Select
                       autoFocus
                       mode="tags"
-                      className="w-full"
                       size="small"
                       value={task.tags}
                       onBlur={() => setEditingLabels(false)}
@@ -118,14 +117,13 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
               </SidebarRow>
 
               <SidebarRow label="Priority">
-                <div className="flex h-7 w-full items-center px-2">
+                <div className="flex h-7 w-full items-center">
                   {editing !== 'priority' ? (
                     <Tag
-                      className="cursor-pointer capitalize"
+                      className="cursor-pointer p-1 capitalize"
                       style={{
-                        border: 'none',
                         lineHeight: '26px',
-                        height: '26px',
+                        height: '27px',
                         fontSize: '14px',
                       }}
                       color={
@@ -142,7 +140,6 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                       autoFocus
                       size="small"
                       value={task.priority}
-                      className="w-full"
                       style={{ height: 28 }}
                       onBlur={() => setEditing(null)}
                       onChange={(priority) => {
@@ -173,7 +170,6 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                       autoFocus
                       size="small"
                       value={task.type}
-                      className="w-full"
                       style={{ height: 28 }}
                       onBlur={() => setEditing(null)}
                       onChange={(type) => {

@@ -27,6 +27,8 @@ import { UserCell } from '../ui/UserCell';
 import { CreateSprintForm } from './CreateSprintForm';
 import { SprintMenu } from './SprintMenu';
 import type { TaskTableProps } from './type';
+import { getTableFilterDropdown } from '../../utils/getTableFilterDropdown';
+import { TYPE_FILTERS } from './TaskTable/taskTable.utils';
 
 const normalize = (value?: string | null) => (value ?? '').toLowerCase().trim();
 
@@ -106,8 +108,12 @@ const buildTaskColumns = ({
       key: 'type',
       dataIndex: 'type',
       width: 72,
-      filters: uniqueFilters(['bug', 'story', 'task']),
-      filterSearch: true,
+      filterDropdown: getTableFilterDropdown({
+        options: TYPE_FILTERS.map((f) => ({
+          label: f.text,
+          value: f.value,
+        })),
+      }),
       onFilter: (value, record) =>
         normalize(record.type) === normalize(String(value)),
       sorter: (a, b) => compareText(a.type, b.type),
@@ -117,6 +123,7 @@ const buildTaskColumns = ({
         </div>
       ),
     },
+
     {
       title: 'Key',
       key: 'key',
@@ -133,6 +140,7 @@ const buildTaskColumns = ({
         </Link>
       ),
     },
+
     {
       title: 'Summary',
       key: 'title',
@@ -152,12 +160,17 @@ const buildTaskColumns = ({
         </button>
       ),
     },
+
     {
       title: 'Status',
       key: 'status',
       dataIndex: 'status',
-      filters: uniqueFilters(columns),
-      filterSearch: true,
+      filterDropdown: getTableFilterDropdown({
+        options: uniqueFilters(columns).map((f) => ({
+          label: f.text,
+          value: f.value,
+        })),
+      }),
       onFilter: (value, record) =>
         normalize(record.status) === normalize(String(value)),
       sorter: (a, b) => compareText(a.status, b.status),
@@ -175,11 +188,16 @@ const buildTaskColumns = ({
         />
       ),
     },
+
     {
       title: 'Assignee',
       key: 'assignee',
-      filters: assigneeFilters,
-      filterSearch: true,
+      filterDropdown: getTableFilterDropdown({
+        options: assigneeFilters.map((f) => ({
+          label: f.text,
+          value: f.value,
+        })),
+      }),
       onFilter: (value, record) => {
         const selected = String(value);
         if (selected === 'unassigned') {
@@ -198,6 +216,7 @@ const buildTaskColumns = ({
         </div>
       ),
     },
+
     {
       title: 'Due Date',
       key: 'dueDate',
@@ -216,12 +235,20 @@ const buildTaskColumns = ({
         />
       ),
     },
+
     {
       title: 'Tags',
       key: 'tags',
       dataIndex: 'tags',
-      filters: uniqueFilters(localTasks.flatMap((task) => task.tags ?? [])),
-      filterSearch: true,
+      filterDropdown: getTableFilterDropdown({
+        options: uniqueFilters(
+          localTasks.flatMap((task) => task.tags ?? [])
+        ).map((f) => ({
+          label: f.text,
+          value: f.value,
+        })),
+        maxHeight: 220,
+      }),
       onFilter: (value, record) => (record.tags ?? []).includes(String(value)),
       render: (_, record) => (
         <div className="flex gap-1">
@@ -247,27 +274,34 @@ const buildTaskColumns = ({
         </div>
       ),
     },
+
     {
       title: 'Created',
       key: 'createdAt',
       dataIndex: 'createdAt',
       sorter: (a, b) => compareDate(a.createdAt, b.createdAt),
-      render: (value: string | undefined) =>
+      render: (value?: string) =>
         value ? dayjs(value).format('DD-MM-YYYY') : '-',
     },
+
     {
       title: 'Updated',
       key: 'updatedAt',
       dataIndex: 'updatedAt',
       sorter: (a, b) => compareDate(a.updatedAt, b.updatedAt),
-      render: (value: string | undefined) =>
+      render: (value?: string) =>
         value ? dayjs(value).format('DD-MM-YYYY') : '-',
     },
+
     {
       title: 'Reporter',
       key: 'reporter',
-      filters: reporterFilters,
-      filterSearch: true,
+      filterDropdown: getTableFilterDropdown({
+        options: reporterFilters.map((f) => ({
+          label: f.text,
+          value: f.value,
+        })),
+      }),
       onFilter: (value, record) => {
         const selected = String(value);
         if (selected === 'unknown') {
@@ -358,7 +392,6 @@ export function TaskTable({
     setLocalTasks(tasks);
   }, [tasks]);
 
-  // Listen for global task updates (e.g., from TaskDrawer) and update localTasks
   useEffect(() => {
     const handler = (event: Event) => {
       const custom = event as CustomEvent;
@@ -485,7 +518,6 @@ export function TaskTable({
 
   return (
     <div className="rounded-lg bg-white shadow-sm dark:bg-slate-900">
-      {/* Sprint Header */}
       <div className="flex w-full items-center justify-between rounded-t-lg bg-gray-100 px-1 py-2 text-left hover:bg-gray-100 sm:px-4 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-800">
         <div
           onClick={() => setOpen(!open)}
@@ -522,7 +554,6 @@ export function TaskTable({
         </div>
       </div>
 
-      {/* Table */}
       {open && (
         <div
           ref={setNodeRef}
