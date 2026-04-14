@@ -212,14 +212,38 @@ export function useProjectSettingsForm({
     updateProjectMutation.mutate({ projectId: project._id, formData });
   };
 
-  const removeMember = (userId: string) => {
-    setProjectMembers((prev) =>
-      prev.filter((member) => member.user !== userId)
+  const removeMember = async (userId: string) => {
+    const updatedMembers = projectMembers.filter(
+      (member) => member.user !== userId
     );
 
+    setProjectMembers(updatedMembers);
     setVisibleMembers((prev) =>
       prev.filter((member) => member.user !== userId)
     );
+
+    const formData = new FormData();
+
+    formData.append('name', project.name);
+    formData.append('projectType', project.projectType);
+    formData.append('memberLead', project.memberLead);
+    formData.append('defaultAssignee', project.defaultAssignee ?? 'null');
+
+    if (project.prefix) {
+      formData.append('prefix', project.prefix);
+    }
+
+    updatedMembers.forEach((member, index) => {
+      formData.append(`members[${index}][user]`, member.user);
+      formData.append(`members[${index}][role]`, member.role);
+    });
+
+    formData.append('theme', theme);
+
+    updateProjectMutation.mutate({
+      projectId: project._id,
+      formData,
+    });
   };
 
   return {

@@ -26,23 +26,20 @@ export function AcceptInvitePage() {
         return;
       }
 
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = localStorage.getItem('access_token');
 
       if (!accessToken) {
-        localStorage.setItem('invite_token', token);
-        navigate('/login');
+        navigate('/login', {
+          state: { from: `/invite/join?token=${token}` },
+        });
         return;
       }
 
       try {
         await acceptInvite(token);
 
-        localStorage.removeItem('invite_token');
-
         setLoading(false);
       } catch (error) {
-        localStorage.removeItem('invite_token');
-
         if (error instanceof AxiosError) {
           setLoading(false);
           message.error(
