@@ -1,10 +1,20 @@
 import { Button, Checkbox } from 'antd';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { createTask } from '../../services/taskService';
 import type { ManageSubtasksProps } from './subtask.types';
 import { Input, Select } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
+
+const SUBTASK_TYPE_RULES: Record<string, string[]> = {
+  epic: ['story', 'task', 'bug'],
+  story: ['task', 'bug'],
+  bug: ['task'],
+  task: [],
+};
+
+const toLabel = (value: string) =>
+  value.charAt(0).toUpperCase() + value.slice(1);
 
 export function ManageSubtasks({
   parentTask,
@@ -22,12 +32,32 @@ export function ManageSubtasks({
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
 
+  const allowedTypes = useMemo(() => {
+    const parentType = (parentTask.type ?? '').toLowerCase();
+    return SUBTASK_TYPE_RULES[parentType] ?? ['task'];
+  }, [parentTask.type]);
+
+  const typeOptions = useMemo(
+    () => allowedTypes.map((type) => ({ label: toLabel(type), value: type })),
+    [allowedTypes]
+  );
+
+  const effectiveTypeFilter =
+    typeFilter && allowedTypes.includes(typeFilter) ? typeFilter : null;
+
   const filteredTasks = projectTasks.filter((task) => {
+    const allowedByParentType = allowedTypes.includes(task.type);
+    if (!allowedByParentType) {
+      return false;
+    }
+
     const matchesSearch =
       task.title.toLowerCase().includes(search.toLowerCase()) ||
       task.key!.toLowerCase().includes(search.toLowerCase());
 
-    const matchesType = typeFilter ? task.type === typeFilter : true;
+    const matchesType = effectiveTypeFilter
+      ? task.type === effectiveTypeFilter
+      : true;
     return matchesSearch && matchesType;
   });
 
@@ -77,18 +107,15 @@ export function ManageSubtasks({
         <Select
           placeholder="Type"
           allowClear
-          value={typeFilter ?? undefined}
+          value={effectiveTypeFilter ?? undefined}
           onChange={(value) => setTypeFilter(value ?? null)}
-          className="w-[120px]"
-          options={[
-            { label: 'Task', value: 'task' },
-            { label: 'Bug', value: 'bug' },
-            { label: 'Story', value: 'story' },
-          ]}
+          className="w-30"
+          options={typeOptions}
+          disabled={typeOptions.length === 0}
         />
       </div>
 
-      <div className="max-h-[200px] overflow-y-auto">
+      <div className="max-h-50 overflow-y-auto">
         {filteredTasks.length === 0 && (
           <div className="py-4 text-center text-sm text-gray-500">
             No tasks found
@@ -151,14 +178,15 @@ export function ManageSubtasks({
               if (e.key === 'Enter' && newTitle.trim()) {
                 const newTask = await createTask({
                   title: newTitle,
-                  parentTask: parentTask._id,
                   projectId,
                   type: 'task',
                   status: columns[0],
                 });
 
                 setProjectTasks((project) => [...project, newTask]);
-                setDraftIds((ids) => [...ids, newTask._id]);
+                setDraftIds((ids) =>
+                  ids.includes(newTask._id) ? ids : [...ids, newTask._id]
+                );
 
                 setNewTitle('');
                 setCreating(false);
