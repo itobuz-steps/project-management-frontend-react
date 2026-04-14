@@ -7,7 +7,7 @@ import { Input, Select } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
 const SUBTASK_TYPE_RULES: Record<string, string[]> = {
-  epic: ['story', 'task'],
+  epic: ['story', 'task', 'bug'],
   story: ['task', 'bug'],
   bug: ['task'],
   task: [],
@@ -178,14 +178,15 @@ export function ManageSubtasks({
               if (e.key === 'Enter' && newTitle.trim()) {
                 const newTask = await createTask({
                   title: newTitle,
-                  parentTask: parentTask._id,
                   projectId,
                   type: 'task',
                   status: columns[0],
                 });
 
                 setProjectTasks((project) => [...project, newTask]);
-                setDraftIds((ids) => [...ids, newTask._id]);
+                setDraftIds((ids) =>
+                  ids.includes(newTask._id) ? ids : [...ids, newTask._id]
+                );
 
                 setNewTitle('');
                 setCreating(false);
