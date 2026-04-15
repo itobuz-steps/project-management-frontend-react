@@ -81,7 +81,7 @@ export function TaskContainer({ projectId }: TaskContainerProps) {
 
         {!loading && tasks.length === 0 && (
           <div className="flex w-full justify-center bg-gray-50 p-5 text-center font-semibold text-gray-400 dark:bg-slate-800 dark:text-slate-400">
-            No tasks found!
+            No tasks to show!
           </div>
         )}
 
