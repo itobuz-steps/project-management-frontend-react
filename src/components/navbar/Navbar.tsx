@@ -76,7 +76,7 @@ export default function Navbar({
           />
           <button
             onClick={() => setIsAddTaskOpen(true)}
-            className="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700 flex h-10 flex-shrink-0 items-center justify-center rounded-md px-3 text-sm font-medium text-white shadow-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
+            className="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700 flex h-10 shrink-0 items-center justify-center rounded-md px-3 text-sm font-medium text-white shadow-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
             aria-label="Create task"
           >
             <span>Create</span>
