@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Project } from '../../types/project.types';
 import { User, ChevronRight } from 'lucide-react';
 import { THEME_COLORS } from '../../config/constants';
+import { useColorMode } from '../../hooks/useColorMode';
 import { ProjectMembersModal } from '../common/ProjectMembersModal';
 import { Avatar } from 'antd';
 
@@ -10,9 +11,11 @@ export function ProjectCard({ project }: { project: Project }) {
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
-  const theme = localStorage.getItem('lastProjectTheme') || 'indigo';
-  const themeColors = THEME_COLORS[theme] ?? THEME_COLORS['indigo'];
-  const accentColor = themeColors[4];
+  const [colorMode] = useColorMode();
+  const isDark = colorMode === 'dark';
+  const themeColors = THEME_COLORS[project.theme] ?? THEME_COLORS['indigo'];
+  const accentColor = isDark ? themeColors[5] : themeColors[4];
+  const backgroundColor = isDark ? themeColors[10] : themeColors[0];
 
   function handleClick() {
     navigate(`/project/${project._id}`);
@@ -38,12 +41,18 @@ export function ProjectCard({ project }: { project: Project }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleClick}
-      className="group relative w-full min-w-0 cursor-pointer overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-300 ease-out hover:shadow-xl dark:border-slate-700 dark:bg-slate-800"
+      className="group relative w-full min-w-0 cursor-pointer overflow-hidden rounded-xl border transition-all duration-300 ease-out hover:shadow-xl"
+      style={{
+        backgroundColor,
+        borderColor: isDark ? themeColors[7] : '#e5e7eb',
+      }}
     >
       <div
         className="absolute inset-0 opacity-0 transition-opacity duration-300"
         style={{
-          background: `radial-gradient(circle at 100% 0%, ${accentColor}08, transparent 80%)`,
+          background: isDark
+            ? `radial-gradient(circle at 100% 0%, ${accentColor}22, transparent 70%)`
+            : `radial-gradient(circle at 100% 0%, ${accentColor}08, transparent 80%)`,
           opacity: isHovered ? 1 : 0,
         }}
       />
@@ -53,10 +62,18 @@ export function ProjectCard({ project }: { project: Project }) {
           <div className="flex min-w-0 flex-1 items-start gap-3">
             <div className="shrink-0">{iconElement}</div>
             <div className="min-w-0 flex-1">
-              <h3 className="truncate text-base leading-tight font-semibold text-gray-900 dark:text-slate-100">
+              <h3
+                className="truncate text-base leading-tight font-semibold"
+                style={{
+                  color: isDark ? '#f1f5f9' : '#111827',
+                }}
+              >
                 {project.name}
               </h3>
-              <p className="mt-0.5 text-xs text-gray-500 dark:text-slate-400">
+              <p
+                className="mt-0.5 text-xs"
+                style={{ color: isDark ? '#9ca3b8' : '#6b7280' }}
+              >
                 {project.projectType.charAt(0).toUpperCase() +
                   project.projectType.slice(1)}{' '}
                 Project
@@ -84,7 +101,14 @@ export function ProjectCard({ project }: { project: Project }) {
             e.stopPropagation();
             setShowMembersModal(true);
           }}
-          className="group/btn flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-slate-700/50"
+          className="group/btn flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors duration-200"
+          style={{
+            backgroundColor: isHovered
+              ? isDark
+                ? themeColors[8]
+                : themeColors[2]
+              : 'transparent',
+          }}
         >
           <Avatar.Group
             max={{
