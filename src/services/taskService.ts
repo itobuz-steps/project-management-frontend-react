@@ -258,3 +258,21 @@ export async function getTaskWorklogs(taskId: string): Promise<Worklog[]> {
   const res = await api.get<{ result: Worklog[] }>(`/${taskId}/worklogs`);
   return res.data.result;
 }
+
+export interface TotalTimeTracked {
+  taskId: string;
+  totalTrackedMs: number;
+  totalTrackedSeconds: number;
+  totalTrackedMinutes: number;
+  totalEntries: number;
+  completedEntries: number;
+}
+
+export async function getTotalTimeTracked(
+  taskId: string
+): Promise<TotalTimeTracked> {
+  const res = await api.get<{ result: TotalTimeTracked }>(
+    `/${taskId}/total-time-tracked`
+  );
+  return res.data.result;
+}

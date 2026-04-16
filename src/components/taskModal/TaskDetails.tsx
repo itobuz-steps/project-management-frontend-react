@@ -17,8 +17,13 @@ import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { DueDateCell } from '../ui/DueDateCell';
 import { usePermissions } from '../../hooks/usePermissions';
+import { useTaskTotalTracked } from '../../hooks/useTask';
 import { formatDistanceToNow } from 'date-fns';
-import { Copy } from 'lucide-react';
+import { Copy, Clock } from 'lucide-react';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
 
 export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
   const { can } = usePermissions();
@@ -30,6 +35,13 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
   const { members, loadingMembers } = useProjectMetaData(
     task.projectId as string
   );
+
+  const { liveTrackedMs } = useTaskTotalTracked(task._id);
+
+  const formatTimeTracked = (ms: number) => {
+    const d = dayjs.duration(ms);
+    return d.format('H[h] m[m] s[s]');
+  };
 
   const formatRelativeTime = (date?: string | Date) => {
     if (!date) {
@@ -190,6 +202,18 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                   )}
                 </div>
               </SidebarRow>
+              <div>
+                <SidebarRow label="Time Tracked">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2 pl-1">
+                      <Clock className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+                      <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
+                        {formatTimeTracked(liveTrackedMs)}
+                      </span>
+                    </div>
+                  </div>
+                </SidebarRow>
+              </div>
 
               <SidebarRow label="Story Points">
                 <Space.Compact className="w-full">
