@@ -205,7 +205,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
               <div>
                 <SidebarRow label="Time Tracked">
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 pl-1">
                       <Clock className="h-4 w-4 text-gray-500 dark:text-slate-400" />
                       <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
                         {formatTimeTracked(liveTrackedMs)}
