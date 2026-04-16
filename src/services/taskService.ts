@@ -268,7 +268,9 @@ export interface TotalTimeTracked {
   completedEntries: number;
 }
 
-export async function getTotalTimeTracked(taskId: string): Promise<TotalTimeTracked> {
+export async function getTotalTimeTracked(
+  taskId: string
+): Promise<TotalTimeTracked> {
   const res = await api.get<{ result: TotalTimeTracked }>(
     `/${taskId}/total-time-tracked`
   );

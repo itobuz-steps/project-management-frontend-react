@@ -21,7 +21,10 @@ import { formatDistanceToNow } from 'date-fns';
 import { Copy } from 'lucide-react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { getTotalTimeTracked, type TotalTimeTracked } from '../../services/taskService';
+import {
+  getTotalTimeTracked,
+  type TotalTimeTracked,
+} from '../../services/taskService';
 
 dayjs.extend(duration);
 
@@ -36,7 +39,8 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
     task.projectId as string
   );
 
-  const [totalTimeTracked, setTotalTimeTracked] = useState<TotalTimeTracked | null>(null);
+  const [totalTimeTracked, setTotalTimeTracked] =
+    useState<TotalTimeTracked | null>(null);
 
   useEffect(() => {
     getTotalTimeTracked(task._id)
