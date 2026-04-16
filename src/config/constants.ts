@@ -10,7 +10,7 @@ export const THEME_COLORS: Record<string, string[]> = {
     'oklch(45.7% 0.24 277.023)',
     'oklch(39.8% 0.195 277.366)',
     'oklch(35.9% 0.144 278.697)',
-    'oklch(25.7% 0.09 281.288)',
+    'oklch(20.7% 0.09 281.288)',
   ],
 
   rose: [
