@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Select, Tag, Collapse, message } from 'antd';
 import { SidebarRow } from '../ui/SidebarRow';
 import { UserCell } from '../ui/UserCell';
@@ -19,6 +19,11 @@ import { DueDateCell } from '../ui/DueDateCell';
 import { usePermissions } from '../../hooks/usePermissions';
 import { formatDistanceToNow } from 'date-fns';
 import { Copy } from 'lucide-react';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import { getTotalTimeTracked, type TotalTimeTracked } from '../../services/taskService';
+
+dayjs.extend(duration);
 
 export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
   const { can } = usePermissions();
@@ -30,6 +35,19 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
   const { members, loadingMembers } = useProjectMetaData(
     task.projectId as string
   );
+
+  const [totalTimeTracked, setTotalTimeTracked] = useState<TotalTimeTracked | null>(null);
+
+  useEffect(() => {
+    getTotalTimeTracked(task._id)
+      .then(setTotalTimeTracked)
+      .catch(() => setTotalTimeTracked(null));
+  }, [task._id]);
+
+  const formatTimeTracked = (ms: number) => {
+    const d = dayjs.duration(ms);
+    return d.format('H[h] m[m] s[s]');
+  };
 
   const formatRelativeTime = (date?: string | Date) => {
     if (!date) {
@@ -279,6 +297,15 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                       />
                     </span>
                   </div>
+                </SidebarRow>
+              </div>
+              <div>
+                <SidebarRow label="Time Tracked">
+                  <span className="text-sm text-gray-700 dark:text-slate-100">
+                    {totalTimeTracked
+                      ? formatTimeTracked(totalTimeTracked.totalTrackedMs)
+                      : '0h 0m 0s'}
+                  </span>
                 </SidebarRow>
               </div>
             </div>
