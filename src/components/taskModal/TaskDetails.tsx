@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button, Select, Tag, Collapse, message } from 'antd';
 import { SidebarRow } from '../ui/SidebarRow';
 import { UserCell } from '../ui/UserCell';
@@ -17,14 +17,11 @@ import { useTaskUpdate } from '../../hooks/useTaskUpdate';
 import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { DueDateCell } from '../ui/DueDateCell';
 import { usePermissions } from '../../hooks/usePermissions';
+import { useTaskTotalTracked } from '../../hooks/useTask';
 import { formatDistanceToNow } from 'date-fns';
-import { Copy } from 'lucide-react';
+import { Copy, Clock } from 'lucide-react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import {
-  getTotalTimeTracked,
-  type TotalTimeTracked,
-} from '../../services/taskService';
 
 dayjs.extend(duration);
 
@@ -39,14 +36,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
     task.projectId as string
   );
 
-  const [totalTimeTracked, setTotalTimeTracked] =
-    useState<TotalTimeTracked | null>(null);
-
-  useEffect(() => {
-    getTotalTimeTracked(task._id)
-      .then(setTotalTimeTracked)
-      .catch(() => setTotalTimeTracked(null));
-  }, [task._id]);
+  const { liveTrackedMs } = useTaskTotalTracked(task._id);
 
   const formatTimeTracked = (ms: number) => {
     const d = dayjs.duration(ms);
@@ -212,6 +202,18 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                   )}
                 </div>
               </SidebarRow>
+              <div>
+                <SidebarRow label="Time Tracked">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+                      <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
+                        {formatTimeTracked(liveTrackedMs)}
+                      </span>
+                    </div>
+                  </div>
+                </SidebarRow>
+              </div>
 
               <SidebarRow label="Story Points">
                 <Space.Compact className="w-full">
@@ -301,15 +303,6 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                       />
                     </span>
                   </div>
-                </SidebarRow>
-              </div>
-              <div>
-                <SidebarRow label="Time Tracked">
-                  <span className="text-sm text-gray-700 dark:text-slate-100">
-                    {totalTimeTracked
-                      ? formatTimeTracked(totalTimeTracked.totalTrackedMs)
-                      : '0h 0m 0s'}
-                  </span>
                 </SidebarRow>
               </div>
             </div>
