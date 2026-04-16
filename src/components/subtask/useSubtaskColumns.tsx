@@ -21,7 +21,7 @@ export function useSubtaskColumns({
     {
       title: 'Type',
       dataIndex: 'type',
-      width: 60,
+      width: 100,
       ellipsis: true,
       filters: [
         { text: 'Task', value: 'task' },
@@ -31,8 +31,12 @@ export function useSubtaskColumns({
       onFilter: (value, record) => record.type === value,
       sorter: (a, b) => a.type.localeCompare(b.type),
       render: (_, task) => (
-        <div className="flex justify-center">
+        <div
+          className="flex cursor-pointer justify-center gap-1"
+          onClick={() => openTask(task._id)}
+        >
           <TaskTypeIcon type={task.type} />
+          <Tag color="blue">{task.key}</Tag>
         </div>
       ),
     },
@@ -45,13 +49,9 @@ export function useSubtaskColumns({
         const isDone = task.status === columns[columns.length - 1];
 
         return (
-          <div
-            className="flex w-full cursor-pointer items-center gap-2"
-            onClick={() => openTask(task._id)}
-          >
-            <Tag color="blue">{task.key}</Tag>
+          <div className="flex w-full cursor-pointer items-center gap-2">
             <span
-              className={`block max-w-[200px] truncate hover:underline ${
+              className={`block max-w-50 truncate hover:underline ${
                 isDone ? 'text-gray-400 line-through' : ''
               }`}
             >
@@ -64,7 +64,7 @@ export function useSubtaskColumns({
     {
       title: 'Status',
       dataIndex: 'status',
-      width: 140,
+      width: 110,
       filters: columns.map((col) => ({
         text: col,
         value: col,
@@ -86,7 +86,7 @@ export function useSubtaskColumns({
     {
       title: 'Priority',
       dataIndex: 'priority',
-      width: 90,
+      width: 120,
       ellipsis: true,
       filters: [
         { text: 'Low', value: 'low' },
@@ -135,7 +135,7 @@ export function useSubtaskColumns({
       ),
     },
     {
-      title: 'Delete',
+      title: 'Action',
       width: 65,
       render: (_, task) => (
         <Button type="text" danger onClick={() => removeSubtask(task._id)}>

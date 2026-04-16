@@ -75,23 +75,25 @@ export function TaskItem({ task }: { task: TaskPopulated }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 sm:flex-row sm:flex-nowrap sm:items-end sm:justify-end sm:gap-3">
+      <div className="xs:justify-start flex flex-wrap items-center justify-center gap-2 sm:flex-nowrap sm:justify-end">
         {linksCount > 0 && (
-          <span className="hidden items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 py-1 text-sm text-gray-700 sm:inline-flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+          <span className="inline-flex h-7 items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 text-xs text-gray-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
             <Link2 size={14} />
             {linksCount}
           </span>
         )}
 
         <span
-          className={`inline-flex items-center justify-center rounded-sm px-2.5 py-1 text-xs font-semibold sm:w-18 ${getPriorityBadgeClass(task.priority || 'low')}`}
+          className={`inline-flex h-7 items-center justify-center rounded-md px-2.5 text-xs font-semibold sm:w-18 ${getPriorityBadgeClass(
+            task.priority || 'low'
+          )}`}
         >
           {priorityLabel}
         </span>
 
-        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 sm:w-24 dark:text-slate-300">
+        <span className="inline-flex h-7 items-center gap-1.5 text-xs text-gray-700 sm:w-24 dark:border-slate-700 dark:text-slate-300">
           <Clock3 size={14} className="shrink-0" />
-          <span className="text-xs whitespace-nowrap">{daysLeft}</span>
+          <span className="whitespace-nowrap">{daysLeft}</span>
         </span>
       </div>
     </li>

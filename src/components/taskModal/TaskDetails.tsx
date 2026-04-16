@@ -76,7 +76,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                 </SidebarRow>
               </div>
 
-              <SidebarRow label="Labels">
+              <SidebarRow label="Tags">
                 <div className="flex min-h-7 w-full items-center">
                   {!editingLabels ? (
                     <div
@@ -96,7 +96,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                         </>
                       ) : (
                         <span className="text-sm text-gray-400 dark:text-slate-400">
-                          Add labels
+                          Add tags
                         </span>
                       )}
                     </div>
@@ -111,6 +111,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                         setEditingLabels(false);
                         update({ tags }, 'Failed to update labels');
                       }}
+                      style={{ minWidth: '100px' }}
                     />
                   )}
                 </div>

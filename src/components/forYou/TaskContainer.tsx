@@ -3,6 +3,7 @@ import type { TaskPopulated } from '../../services/types/tasks.types';
 import { getTasksPaginated } from '../../services/taskService';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TaskItem } from './TaskItem'; // replace with your actual task card component
+import { Skeleton } from 'antd';
 
 interface TaskContainerProps {
   projectId: string;
@@ -74,14 +75,52 @@ export function TaskContainer({ projectId }: TaskContainerProps) {
 
       <div className="flex h-full w-full flex-col gap-2 rounded-md">
         {loading && (
-          <div className="flex w-full justify-center p-5 text-gray-400 dark:text-slate-400">
-            Loading...
+          <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+            <div className="flex flex-col gap-3">
+              {/* Title */}
+              <Skeleton.Input active style={{ width: '60%', height: 18 }} />
+
+              {/* Description */}
+              <div className="flex flex-col gap-2">
+                <Skeleton.Input active style={{ width: '90%', height: 14 }} />
+                <Skeleton.Input active style={{ width: '75%', height: 14 }} />
+              </div>
+
+              {/* Bottom row */}
+              <div className="mt-2 flex items-center justify-between">
+                {/* Left side (avatars / assignee) */}
+                <div className="flex items-center gap-2">
+                  <Skeleton.Avatar active size={24} shape="circle" />
+                  <Skeleton.Input active size="small" style={{ width: 80 }} />
+                </div>
+
+                {/* Right side (your meta section) */}
+                <div className="flex items-center gap-2">
+                  <Skeleton.Button
+                    active
+                    size="small"
+                    className="hidden sm:block"
+                    style={{ width: 40, height: 28 }}
+                  />
+                  <Skeleton.Button
+                    active
+                    size="small"
+                    style={{ width: 70, height: 28 }}
+                  />
+                  <Skeleton.Button
+                    active
+                    size="small"
+                    style={{ width: 90, height: 28 }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
         {!loading && tasks.length === 0 && (
           <div className="flex w-full justify-center bg-gray-50 p-5 text-center font-semibold text-gray-400 dark:bg-slate-800 dark:text-slate-400">
-            No tasks found!
+            No tasks to show!
           </div>
         )}
 

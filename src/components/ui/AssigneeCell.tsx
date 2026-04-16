@@ -5,6 +5,7 @@ import { UserCell } from './UserCell';
 import type { AssigneeCellType } from './ui.types';
 import { useAuthContext } from '../../context/AuthContext';
 import { useTaskUpdate } from '../../hooks/useTaskUpdate';
+import { THEME_COLORS } from '../../config/constants';
 
 export function AssigneeCell({
   task,
@@ -21,10 +22,10 @@ export function AssigneeCell({
 
   const currentUser = task[field] as User | undefined;
 
-  // Always include the current user in the options list.
-  // If `members` hasn't loaded yet (still fetching), Ant Design can't match
-  // the Select's `value` to any option label and falls back to rendering the
-  // raw _id string. Prepending `currentUser` prevents that fallback.
+  const theme = localStorage.getItem('lastProjectTheme') || 'indigo';
+  const themeColors = THEME_COLORS[theme] ?? THEME_COLORS['indigo'];
+  const accentColor = themeColors[4];
+
   const memberOptions = (() => {
     const list = [...members];
     if (currentUser && !list.some((m) => m?._id === currentUser._id)) {
@@ -50,7 +51,7 @@ export function AssigneeCell({
 
   if (!editing) {
     return (
-      <div className="flex h-7 w-25 items-center gap-1 truncate rounded-md px-1 hover:bg-gray-100 lg:w-full dark:hover:bg-slate-700">
+      <div className="flex h-7 w-25 items-center gap-1 truncate rounded-md hover:bg-gray-100 lg:w-full dark:hover:bg-slate-700">
         <div
           className="cursor-pointer truncate"
           onClick={() => {
@@ -60,22 +61,6 @@ export function AssigneeCell({
         >
           <UserCell user={currentUser} emptyText="Unassigned" />
         </div>
-
-        {!currentUser && userId && (
-          <>
-            <span className="text-gray-300 dark:text-slate-500">·</span>
-
-            <button
-              className="text-primary-600 text-xs hover:underline"
-              onClick={(e) => {
-                e.stopPropagation();
-                updateAssignee(userId);
-              }}
-            >
-              Assign me
-            </button>
-          </>
-        )}
       </div>
     );
   }
@@ -91,18 +76,44 @@ export function AssigneeCell({
       allowClear
       onBlur={() => setEditing(false)}
       onChange={(id) => {
-        updateAssignee(id ?? null);
+        if (id === '__assign_me__') {
+          updateAssignee(userId ?? null);
+        } else {
+          updateAssignee(id ?? null);
+        }
         setEditing(false);
       }}
-      // Plain string label → shown in the trigger (never a raw ID)
-      // optionRender → rich UserCell avatar+name shown inside the dropdown
-      options={memberOptions.map((member) => ({
-        value: member._id,
-        label: member.name ?? member.email ?? member._id,
-      }))}
+      options={[
+        ...(userId
+          ? [
+              {
+                value: '__assign_me__',
+                label: 'Assign to me',
+              },
+            ]
+          : []),
+
+        ...memberOptions.map((member) => ({
+          value: member._id,
+          label: member.name ?? member.email ?? member._id,
+        })),
+      ]}
       optionRender={(option) => {
+        if (option.value === '__assign_me__') {
+          return (
+            <div
+              className="flex items-center gap-2 rounded-md text-sm"
+              style={{
+                color: accentColor,
+              }}
+            >
+              Assign Me
+            </div>
+          );
+        }
+
         const member = memberOptions.find((m) => m._id === option.value);
-        return <UserCell user={member} emptyText="Unassigned" />;
+        return <UserCell user={member} emptyText="Assign Me" />;
       }}
     />
   );
