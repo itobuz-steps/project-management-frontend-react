@@ -27,7 +27,7 @@ export default function SearchBar() {
     <div className="search-icon flex items-center justify-between">
       <form
         autoComplete="off"
-        className="search-input-form bg-gray w-full rounded-md text-black sm:w-50 md:w-100 dark:text-neutral-100"
+        className="search-input-form bg-gray w-full rounded-md text-black md:w-100 dark:text-neutral-100"
         onSubmit={(e) => e.preventDefault()}
       >
         <div className="relative">

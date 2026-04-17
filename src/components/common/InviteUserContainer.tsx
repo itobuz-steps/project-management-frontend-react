@@ -85,11 +85,11 @@ export function InviteUserContainer({
         )}
 
         <Modal
-          title="Invite users"
+          title="Invite Members"
           open={formOpen}
           onCancel={() => setFormOpen(false)}
           footer={null}
-          destroyOnClose
+          destroyOnHidden
           maskStyle={{
             backdropFilter: 'none',
             backgroundColor: 'rgba(0,0,0,0.45)',

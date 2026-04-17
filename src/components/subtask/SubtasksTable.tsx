@@ -13,16 +13,16 @@ export function SubtasksTable({
       isEmpty={!subtasks.length}
       emptyText="No subtasks"
     >
-      <div className="rounded-lg border border-gray-200 dark:border-slate-700">
+      <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-700">
         <Table
-          className="subtasks-table"
+          className="subtasks-table min-w-175"
           tableLayout="fixed"
           columns={columns}
           dataSource={subtasks}
           rowKey="_id"
           size="small"
           pagination={false}
-          scroll={{ x: 700 }}
+          scroll={{ x: true }}
           styles={{ content: { padding: 0 } }}
         />
       </div>

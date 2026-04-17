@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Project } from '../../types/project.types';
-import { User, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { THEME_COLORS } from '../../config/constants';
 import { useColorMode } from '../../hooks/useColorMode';
 import { ProjectMembersModal } from '../common/ProjectMembersModal';
 import { fallbackProjectIcons } from '../../config/constants';
 import { Avatar } from 'antd';
+import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 
 export function ProjectCard({ project }: { project: Project }) {
+  const { members: users = [] } = useProjectMetaData(project._id);
+
+  const resolvedMembers = project.members
+    .map((m) => users.find((u) => String(u._id) === String(m.user)))
+    .filter((user): user is NonNullable<typeof user> => Boolean(user));
+
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [imageSrc, setImageSrc] = useState(() => {
@@ -31,6 +38,7 @@ export function ProjectCard({ project }: { project: Project }) {
     localStorage.setItem(`fallback-icon-${project._id}`, randomFallback);
     return randomFallback;
   });
+
   const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
   const [colorMode] = useColorMode();
@@ -151,22 +159,31 @@ export function ProjectCard({ project }: { project: Project }) {
               },
             }}
           >
-            {project.members
+            {resolvedMembers
               .slice(0, project.members.length)
-              .map((member, index) => (
-                <Avatar
-                  key={member._id}
-                  style={{
-                    backgroundColor: themeColors[index % themeColors.length],
-                    height: '28px',
-                    width: '28px',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                  }}
-                >
-                  <User size={14} color="#fff" />
-                </Avatar>
-              ))}
+              .map((user, index) => {
+                const hasImage = user?.profileImage;
+
+                return (
+                  <Avatar
+                    key={user._id}
+                    src={hasImage}
+                    style={{
+                      backgroundColor: hasImage
+                        ? undefined
+                        : themeColors[index % themeColors.length],
+                      height: '28px',
+                      width: '28px',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                    }}
+                  >
+                    {!hasImage &&
+                      (user.name?.charAt(0)?.toUpperCase() ||
+                        user.email?.charAt(0)?.toUpperCase())}
+                  </Avatar>
+                );
+              })}
           </Avatar.Group>
           <span className="flex-1 text-left text-sm text-gray-600 dark:text-slate-400">
             {project.members.length === 1

@@ -9,7 +9,7 @@ import {
   closestCorners,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { message, Select, Skeleton, Tooltip } from 'antd';
+import { Avatar, message, Select, Skeleton, Tooltip } from 'antd';
 import getTaskbyId, { updateTask } from '../../../services/taskService';
 import type {
   TaskPopulated,
@@ -22,14 +22,7 @@ import { useSearchParams } from 'react-router-dom';
 import useBoard from '../../../hooks/useBoard';
 import Column from './Column';
 import { AddColumnModal, DeleteColumnModal } from './ColumnModals';
-import {
-  Minimize2,
-  Maximize2,
-  ChevronRight,
-  User,
-  Tag,
-  Users,
-} from 'lucide-react';
+import { Minimize2, Maximize2, ChevronRight, User, Tag } from 'lucide-react';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
 import { useSprintActions } from '../../../hooks/useSprintActions';
 import SprintModal from '../../sprintModal/SprintModal';
@@ -485,23 +478,61 @@ function BoardView() {
 
   return (
     <>
-      {/* Toolbar - always mounted, responsive */}
-      <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 md:justify-start lg:gap-2">
-        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 md:justify-start">
-          <div className="min-w-60 sm:min-w-70">
+      <div className="mb-3 flex flex-wrap items-center justify-start gap-1.5 sm:gap-2 md:justify-start lg:gap-2">
+        <div className="flex items-center justify-start gap-1.5 sm:gap-2">
+          <div className="w-full">
             <SearchBar />
           </div>
           {project && (
-            <>
-              <button
+            <div className="flex items-center gap-2">
+              <div
                 onClick={() => setIsMembersOpen(true)}
-                className="flex h-8 w-8 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600"
-                aria-label="Show members"
+                className="cursor-pointer"
               >
-                <Users size={16} strokeWidth={1.9} />
-              </button>
+                <Avatar.Group
+                  max={{
+                    count: 3,
+                    style: {
+                      backgroundColor: 'gray',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      display: 'flex',
+                    },
+                  }}
+                  size={30}
+                >
+                  {project.members.map((member) => {
+                    const user = members?.find(
+                      (u) => String(u._id) === String(member.user)
+                    );
+
+                    return (
+                      <Tooltip
+                        key={member._id}
+                        title={user?.name || user?.email}
+                      >
+                        <Avatar
+                          src={
+                            user?.profileImage
+                              ? user?.profileImage
+                              : '/profile.png'
+                          }
+                        >
+                          {!user?.profileImage &&
+                            (user?.name?.charAt(0)?.toUpperCase() ||
+                              user?.email?.charAt(0)?.toUpperCase() ||
+                              'U')}
+                        </Avatar>
+                      </Tooltip>
+                    );
+                  })}
+                </Avatar.Group>
+              </div>
+
+              {/* Invite Modal */}
               <InviteUserContainer />
-            </>
+            </div>
           )}
         </div>
         <div className="flex flex-nowrap items-center justify-center gap-1 sm:gap-1.5 md:gap-2 lg:ml-auto lg:justify-end">
@@ -564,7 +595,7 @@ function BoardView() {
                   ? 'Switch to expanded view'
                   : 'Switch to compact view'
               }
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
             >
               {isCompactMode ? (
                 <Maximize2 size={14} />

@@ -1,4 +1,5 @@
-import { UserPlus } from 'lucide-react';
+import { Tooltip } from 'antd';
+import { Plus } from 'lucide-react';
 
 interface InviteUserButtonProps {
   onClick: () => void;
@@ -6,11 +7,13 @@ interface InviteUserButtonProps {
 
 export function InviteUserButton({ onClick }: InviteUserButtonProps) {
   return (
-    <button
-      onClick={onClick}
-      className="flex h-8 w-8 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600"
-    >
-      <UserPlus size={16} strokeWidth={1.9} />
-    </button>
+    <Tooltip title="Invite members">
+      <button
+        onClick={onClick}
+        className="hover:border-primary-500 hover:text-primary-600 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-dashed border-slate-300 text-slate-500 transition dark:border-slate-600 dark:text-slate-400"
+      >
+        <Plus size={16} />
+      </button>
+    </Tooltip>
   );
 }
