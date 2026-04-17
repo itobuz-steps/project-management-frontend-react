@@ -36,7 +36,9 @@ export function useSubtaskColumns({
           onClick={() => openTask(task._id)}
         >
           <TaskTypeIcon type={task.type} />
-          <Tag color="blue">{task.key}</Tag>
+          <Tag color="blue" className="hover:underline">
+            {task.key}
+          </Tag>
         </div>
       ),
     },
@@ -51,7 +53,7 @@ export function useSubtaskColumns({
         return (
           <div className="flex w-full cursor-pointer items-center gap-2">
             <span
-              className={`block max-w-50 truncate hover:underline ${
+              className={`block max-w-50 truncate ${
                 isDone ? 'text-gray-400 line-through' : ''
               }`}
             >
@@ -64,7 +66,6 @@ export function useSubtaskColumns({
     {
       title: 'Status',
       dataIndex: 'status',
-      width: 110,
       filters: columns.map((col) => ({
         text: col,
         value: col,
@@ -117,7 +118,7 @@ export function useSubtaskColumns({
     {
       title: 'Assignee',
       dataIndex: ['assignee', '_id'],
-      width: 120,
+      width: 160,
       filters: members.map((member) => ({
         text: member.name,
         value: member._id,

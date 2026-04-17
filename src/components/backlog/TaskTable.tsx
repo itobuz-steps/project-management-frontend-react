@@ -380,17 +380,13 @@ export function TaskTable({
   onSprintCompleted,
 }: TaskTableProps) {
   const [open, setOpen] = useState(true);
-  const [localTasks, setLocalTasks] = useState(tasks);
+  const [localTasks, setLocalTasks] = useState<TaskPopulated[]>(() => tasks);
   const { project } = useProject();
   const [, setSearchParams] = useSearchParams();
 
   const { can } = usePermissions();
   const canEditDueDate = can('EDIT_SPRINT');
   const canChangeReporter = can('REPORTER_CHANGE');
-
-  useEffect(() => {
-    setLocalTasks(tasks);
-  }, [tasks]);
 
   useEffect(() => {
     const handler = (event: Event) => {

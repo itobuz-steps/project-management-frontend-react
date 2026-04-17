@@ -7,7 +7,7 @@ import type {
 } from '../../../services/types/tasks.types';
 import { useProject } from '../../../context/ProjectContext';
 import { useProjectMetaData } from '../../../hooks/useProjectMetaData';
-import { FilterX, LayoutPanelTop, Users } from 'lucide-react';
+import { FilterX, LayoutPanelTop } from 'lucide-react';
 import TaskTable, {
   type TaskTableChangeParams,
   type TaskTableFilters,
@@ -18,6 +18,7 @@ import SearchBar from '../../navbar/SearchBar';
 import { InviteUserContainer } from '../../common/InviteUserContainer';
 import { ProjectMembersModal } from '../../common/ProjectMembersModal';
 import type { Project } from '../../../types/project.types';
+import { Avatar, Tooltip } from 'antd';
 
 const EMPTY_TABLE_FILTERS: TaskTableFilters = {
   type: [],
@@ -190,22 +191,61 @@ function ListView() {
 
   return (
     <>
-      <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 md:justify-start lg:gap-2">
-        <div className="flex items-center justify-center gap-1.5 sm:gap-2 md:justify-start">
-          <div className="min-w-60 sm:min-w-70">
+      <div className="mb-3 flex flex-wrap items-center gap-1.5 sm:gap-2 md:justify-start lg:gap-2">
+        <div className="flex items-center justify-start gap-1.5 sm:gap-2">
+          <div className="w-full">
             <SearchBar />
           </div>
           {project && (
-            <>
-              <button
+            <div className="flex items-center gap-2">
+              <div
                 onClick={() => setIsMembersOpen(true)}
-                className="flex h-8 w-8 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600"
-                aria-label="Show members"
+                className="cursor-pointer"
               >
-                <Users size={16} strokeWidth={1.9} />
-              </button>
+                <Avatar.Group
+                  max={{
+                    count: 3,
+                    style: {
+                      backgroundColor: 'gray',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      display: 'flex',
+                    },
+                  }}
+                  size={30}
+                >
+                  {project.members.map((member) => {
+                    const user = members?.find(
+                      (u) => String(u._id) === String(member.user)
+                    );
+
+                    return (
+                      <Tooltip
+                        key={member._id}
+                        title={user?.name || user?.email}
+                      >
+                        <Avatar
+                          src={
+                            user?.profileImage
+                              ? user?.profileImage
+                              : '/profile.png'
+                          }
+                        >
+                          {!user?.profileImage &&
+                            (user?.name?.charAt(0)?.toUpperCase() ||
+                              user?.email?.charAt(0)?.toUpperCase() ||
+                              'U')}
+                        </Avatar>
+                      </Tooltip>
+                    );
+                  })}
+                </Avatar.Group>
+              </div>
+
+              {/* Invite Modal */}
               <InviteUserContainer />
-            </>
+            </div>
           )}
         </div>
       </div>
