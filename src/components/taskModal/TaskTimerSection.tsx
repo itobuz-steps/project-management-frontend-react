@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { PlayCircleFilled, PauseOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 import {
   getTaskWorklogs,
   startTaskTimer,
@@ -9,6 +11,8 @@ import {
 } from '../../services/taskService';
 import { useAuthContext } from '../../context/AuthContext';
 import { useProject } from '../../context/ProjectContext';
+
+dayjs.extend(duration);
 
 type TaskTimerSectionProps = {
   taskId: string;
@@ -153,7 +157,7 @@ export function TaskTimerSection({
             />
           </motion.span>
 
-          <span className="relative z-10 inline-block text-inherit transition-colors duration-200 group-hover:text-white">
+          <span className="relative z-10 inline-block text-inherit transition-colors duration-200 dark:group-hover:text-neutral-100">
             {isPending ? 'Starting...' : 'Start Timer'}
           </span>
         </motion.button>
@@ -256,9 +260,10 @@ export function TaskTimerSection({
 }
 
 function formatDurationParts(totalSeconds: number) {
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
+  const dur = dayjs.duration(totalSeconds, 'seconds');
+  const hours = Math.floor(dur.asHours());
+  const minutes = dur.minutes();
+  const seconds = dur.seconds();
   const pad = (n: number) => String(n).padStart(2, '0');
   return {
     hhmm: `${pad(hours)}:${pad(minutes)}`,

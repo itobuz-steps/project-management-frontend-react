@@ -5,11 +5,33 @@ import { User, ChevronRight } from 'lucide-react';
 import { THEME_COLORS } from '../../config/constants';
 import { useColorMode } from '../../hooks/useColorMode';
 import { ProjectMembersModal } from '../common/ProjectMembersModal';
+import { fallbackProjectIcons } from '../../config/constants';
 import { Avatar } from 'antd';
 
 export function ProjectCard({ project }: { project: Project }) {
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [imageSrc, setImageSrc] = useState(() => {
+    // Set random fallback image on mount if no project icon
+    if (project.icon) {
+      return project.icon;
+    }
+
+    // Check if we already have a stored fallback for this project
+    const storedFallback = localStorage.getItem(`fallback-icon-${project._id}`);
+    if (storedFallback) {
+      return storedFallback;
+    }
+
+    // Pick a random fallback and save it
+    const randomFallback =
+      fallbackProjectIcons[
+        Math.floor(Math.random() * fallbackProjectIcons.length)
+      ];
+    localStorage.setItem(`fallback-icon-${project._id}`, randomFallback);
+    return randomFallback;
+  });
+  const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
   const [colorMode] = useColorMode();
   const isDark = colorMode === 'dark';
@@ -21,19 +43,25 @@ export function ProjectCard({ project }: { project: Project }) {
     navigate(`/project/${project._id}`);
   }
 
-  const iconElement = project.icon ? (
+  const handleImageError = () => {
+    if (!imageError) {
+      // Load different random fallback image on error
+      const randomFallback =
+        fallbackProjectIcons[
+          Math.floor(Math.random() * fallbackProjectIcons.length)
+        ];
+      setImageSrc(randomFallback);
+      setImageError(true);
+    }
+  };
+
+  const iconElement = (
     <img
-      src={project.icon}
+      src={imageSrc}
       alt={project.name}
       className="h-12 w-12 rounded-lg object-cover shadow-sm"
+      onError={handleImageError}
     />
-  ) : (
-    <div
-      className="flex h-12 w-12 items-center justify-center rounded-lg text-base font-bold text-white shadow-sm"
-      style={{ backgroundColor: accentColor }}
-    >
-      {project.name.charAt(0).toUpperCase()}
-    </div>
   );
 
   return (

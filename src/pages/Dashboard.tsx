@@ -11,6 +11,7 @@ import { message } from 'antd';
 import { Tag } from 'antd';
 import { getWorkspaces } from '../services/workspaceService';
 import { normalizeAndCapitalize } from '../utils/utils';
+import { fallbackProjectIcons } from '../config/constants';
 
 function Dashboard() {
   const { setProject } = useProject();
@@ -19,6 +20,7 @@ function Dashboard() {
   const { projectId } = useParams();
   const [projects, setProjects] = useState<Project[]>([]);
   const [workspaceName, setWorkspaceName] = useState('');
+  const [projectIcon, setProjectIcon] = useState<string>('');
   const activeProject = projects.find((p) => p._id === projectId);
 
   useEffect(() => {
@@ -54,6 +56,43 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
+    const loadProjectIcon = async () => {
+      if (!activeProject) {
+        setProjectIcon('');
+        return;
+      }
+
+      // If project has an icon, use it
+      if (activeProject.icon) {
+        setProjectIcon(activeProject.icon);
+        return;
+      }
+
+      // Check if we already have a stored fallback for this project
+      const storedFallback = localStorage.getItem(
+        `fallback-icon-${activeProject._id}`
+      );
+      if (storedFallback) {
+        setProjectIcon(storedFallback);
+        return;
+      }
+
+      // Pick a random fallback and save it
+      const randomFallback =
+        fallbackProjectIcons[
+          Math.floor(Math.random() * fallbackProjectIcons.length)
+        ];
+      localStorage.setItem(
+        `fallback-icon-${activeProject._id}`,
+        randomFallback
+      );
+      setProjectIcon(randomFallback);
+    };
+
+    loadProjectIcon();
+  }, [activeProject]);
+
+  useEffect(() => {
     if (!activeProject?.workspaceId) {
       return;
     }
@@ -79,9 +118,9 @@ function Dashboard() {
       {activeProject && (
         <div className="bg-gray-100 px-3 py-2 dark:bg-[#28282b]">
           <div className="flex flex-wrap items-center gap-2">
-            {activeProject.icon && (
+            {projectIcon && (
               <img
-                src={activeProject.icon}
+                src={projectIcon}
                 alt="project icon"
                 className="inline h-5 w-5 rounded object-cover"
               />
