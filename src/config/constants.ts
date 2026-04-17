@@ -180,3 +180,11 @@ export function getProgressLabel(percentage: number): string {
   if (percentage === 100) return 'Done';
   return 'In progress';
 }
+
+export const fallbackProjectIcons = [
+  'https://i.pinimg.com/474x/2a/f4/f6/2af4f64dcbbbfef799bc779b5e8f6abe.jpg',
+  'https://art.ngfiles.com/images/5776000/5776936_880853_spiggyg_untitled-5776936.99da4f4e3bc92130077bdd45ea83b581.webp?f1718074328',
+  'https://images.amcnetworks.com/ifccenter.com/wp-content/uploads/2017/11/2.-WORLDOFTOMORROW-EPISODETWO.jpg',
+  'https://austinfilm.s3.us-east-2.amazonaws.com/wp-content/uploads/2018/11/29120929/19AFS_Rejected_2.jpg',
+  'https://assets.mubicdn.net/images/film/119357/image-w856_two_one.jpg?1745492153',
+];
