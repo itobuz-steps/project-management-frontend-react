@@ -3,15 +3,10 @@ import { useMemo, useState } from 'react';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { createTask } from '../../services/taskService';
 import type { ManageSubtasksProps } from './subtask.types';
+import type { TaskType } from '../../services/types/tasks.types';
 import { Input, Select } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-
-const SUBTASK_TYPE_RULES: Record<string, string[]> = {
-  epic: ['story', 'task', 'bug'],
-  story: ['task', 'bug'],
-  bug: ['task'],
-  task: [],
-};
+import { getAllowedChildTaskTypes } from '../../utils/taskTypeRules';
 
 const toLabel = (value: string) =>
   value.charAt(0).toUpperCase() + value.slice(1);
@@ -30,11 +25,10 @@ export function ManageSubtasks({
   const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<TaskType | null>(null);
 
   const allowedTypes = useMemo(() => {
-    const parentType = (parentTask.type ?? '').toLowerCase();
-    return SUBTASK_TYPE_RULES[parentType] ?? ['task'];
+    return getAllowedChildTaskTypes(parentTask.type);
   }, [parentTask.type]);
 
   const typeOptions = useMemo(

@@ -30,6 +30,7 @@ export type SubtasksTableProps = {
 
 export type Args = {
   columns: string[];
+  parentTaskType?: string;
   openTask: (id: string) => void;
   updateStatus: (id: string, status: string) => Promise<void>;
   removeSubtask: (id: string) => void;

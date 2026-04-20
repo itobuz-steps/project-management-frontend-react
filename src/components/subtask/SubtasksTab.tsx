@@ -36,6 +36,7 @@ export function SubtasksTab({ task }: { task: TaskPopulated }) {
 
   const columnsSubtask = useSubtaskColumns({
     columns,
+    parentTaskType: task.type,
     openTask: (id) => setSearchParams({ taskId: id }, { replace: true }),
     updateStatus,
     removeSubtask,
