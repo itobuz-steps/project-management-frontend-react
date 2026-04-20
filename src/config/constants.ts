@@ -181,6 +181,13 @@ export function getProgressLabel(percentage: number): string {
   return 'In progress';
 }
 
+export const ALLOWED_CHILD_TYPES: Record<string, string[]> = {
+  epic: ['story', 'task', 'bug'],
+  story: ['task', 'bug'],
+  task: ['task', 'bug'],
+  bug: ['task', 'bug'],
+};
+
 export const fallbackProjectIcons = [
   'https://i.pinimg.com/474x/2a/f4/f6/2af4f64dcbbbfef799bc779b5e8f6abe.jpg',
   'https://art.ngfiles.com/images/5776000/5776936_880853_spiggyg_untitled-5776936.99da4f4e3bc92130077bdd45ea83b581.webp?f1718074328',

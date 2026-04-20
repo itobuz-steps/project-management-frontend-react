@@ -5,12 +5,7 @@ import { UserCell } from '../ui/UserCell';
 import { TaskTypeIcon } from '../../utils/TaskTypeIcon';
 import { InputNumber, Dropdown, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
-import {
-  PRIORITIES,
-  PRIORITY_COLORS,
-  STORY_POINTS,
-  TASK_TYPES,
-} from './constants';
+import { PRIORITIES, PRIORITY_COLORS, STORY_POINTS } from './constants';
 import { AssigneeCell } from '../ui/AssigneeCell';
 import type { EditingField, TaskDetailsProps } from './taskModal.types';
 import { useTaskUpdate } from '../../hooks/useTaskUpdate';
@@ -18,6 +13,8 @@ import { useProjectMetaData } from '../../hooks/useProjectMetaData';
 import { DueDateCell } from '../ui/DueDateCell';
 import { usePermissions } from '../../hooks/usePermissions';
 import { useTaskTotalTracked } from '../../hooks/useTask';
+import { useParentTask } from '../../hooks/useParentTask';
+import { getAllowedChildTaskTypes } from '../../utils/taskTypeRules';
 import { formatDistanceToNow } from 'date-fns';
 import { Copy, Clock } from 'lucide-react';
 import dayjs from 'dayjs';
@@ -37,6 +34,10 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
   );
 
   const { liveTrackedMs } = useTaskTotalTracked(task._id);
+
+  const parentTask = useParentTask(task.parentTask);
+
+  const allowedTaskTypes = getAllowedChildTaskTypes(parentTask?.type);
 
   const formatTimeTracked = (ms: number) => {
     const d = dayjs.duration(ms);
@@ -189,7 +190,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
                         setEditing(null);
                         update({ type }, 'Failed to update type');
                       }}
-                      options={TASK_TYPES.map((type) => ({
+                      options={allowedTaskTypes.map((type) => ({
                         value: type,
                         label: (
                           <div className="flex items-center gap-2 capitalize">
