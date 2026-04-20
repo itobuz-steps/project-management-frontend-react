@@ -2,6 +2,7 @@ import Notifications from './Notifications';
 import { CommandPalette } from '../common/CommandPalette';
 import { AddTaskModal } from '../../utils/addTaskModal';
 import { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Bell, Settings, Menu, X } from 'lucide-react';
 import { Can } from '../../utils/PermissionHoc';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -29,6 +30,7 @@ export default function Navbar({
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [isCreateHovered, setIsCreateHovered] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
 
@@ -74,13 +76,26 @@ export default function Navbar({
             }}
             className="focus:border-primary-400 focus:ring-primary-100 dark:focus:ring-primary-900/30 h-10 min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 text-sm text-slate-700 shadow-sm transition-colors outline-none placeholder:text-slate-400 focus:ring-2 dark:border-[#27272e] dark:bg-[#1b1b1f] dark:text-neutral-100 dark:placeholder:text-neutral-400"
           />
-          <button
+          <motion.button
             onClick={() => setIsAddTaskOpen(true)}
-            className="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700 flex h-10 shrink-0 items-center justify-center rounded-md px-3 text-sm font-medium text-white shadow-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
+            className="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700 relative flex h-10 shrink-0 items-center justify-center overflow-hidden rounded-md px-3 text-sm font-medium text-white shadow-sm focus-visible:ring-2 focus-visible:outline-none"
             aria-label="Create task"
+            onHoverStart={() => setIsCreateHovered(true)}
+            onHoverEnd={() => setIsCreateHovered(false)}
+            whileTap={{ scale: 0.95 }}
           >
-            <span>Create</span>
-          </button>
+            <motion.div
+              className="bg-primary-600 absolute inset-0"
+              initial={{ clipPath: 'inset(100% 0 0 0)' }}
+              animate={
+                isCreateHovered
+                  ? { clipPath: 'inset(0% 0 0 0)' }
+                  : { clipPath: 'inset(100% 0 0 0)' }
+              }
+              transition={{ duration: 0.6, ease: 'easeInOut' }}
+            />
+            <span className="relative z-10">Create</span>
+          </motion.button>
         </div>
 
         <div className="relative hidden w-full items-center xl:flex">
@@ -102,13 +117,26 @@ export default function Navbar({
               className={searchInputClass}
             />
 
-            <button
+            <motion.button
               onClick={() => setIsAddTaskOpen(true)}
-              className="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700 h-10 rounded-lg px-4 text-sm font-medium text-white shadow-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
+              className="border-primary-600 focus-visible:ring-primary-400 dark: text-primary-700 dark:text-primary-500 relative h-10 overflow-hidden rounded-lg border border-double px-4 text-sm font-medium shadow-sm hover:text-white focus-visible:ring-2 focus-visible:outline-none dark:hover:text-white"
               aria-label="Create task"
+              onHoverStart={() => setIsCreateHovered(true)}
+              onHoverEnd={() => setIsCreateHovered(false)}
+              whileTap={{ scale: 0.95 }}
             >
-              <span>Create</span>
-            </button>
+              <motion.div
+                className="bg-primary-600 absolute inset-0"
+                initial={{ clipPath: 'inset(100% 0 0 0)' }}
+                animate={
+                  isCreateHovered
+                    ? { clipPath: 'inset(0% 0 0 0)' }
+                    : { clipPath: 'inset(100% 0 0 0)' }
+                }
+                transition={{ duration: 0.6, ease: 'easeInOut' }}
+              />
+              <span className="relative z-10">Create</span>
+            </motion.button>
           </div>
 
           <div className="ml-auto flex items-center gap-2">
@@ -119,7 +147,7 @@ export default function Navbar({
                 <button
                   onClick={() => navigate(`project/${project?._id}/settings`)}
                   className={actionButtonClass}
-                  aria-label="Settings"
+                  aria-label="Project settings"
                 >
                   <Settings size={20} strokeWidth={2} />
                 </button>
