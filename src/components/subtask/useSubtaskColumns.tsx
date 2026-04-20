@@ -7,9 +7,11 @@ import { StatusSelect } from '../ui/StatusSelect';
 import { PRIORITY_COLORS } from '../taskModal/constants';
 import type { Args } from './subtask.types';
 import { AssigneeCell } from '../ui/AssigneeCell';
+import { getAllowedChildTaskTypes } from '../../utils/taskTypeRules';
 
 export function useSubtaskColumns({
   columns,
+  parentTaskType,
   openTask,
   updateStatus,
   removeSubtask,
@@ -17,17 +19,18 @@ export function useSubtaskColumns({
   loadingMembers,
   onUpdated,
 }: Args): ColumnsType<TaskPopulated> {
+  const allowedTypes = getAllowedChildTaskTypes(parentTaskType);
+
   return [
     {
       title: 'Type',
       dataIndex: 'type',
       width: 100,
       ellipsis: true,
-      filters: [
-        { text: 'Task', value: 'task' },
-        { text: 'Bug', value: 'bug' },
-        { text: 'Story', value: 'story' },
-      ],
+      filters: allowedTypes.map((type) => ({
+        text: type.charAt(0).toUpperCase() + type.slice(1),
+        value: type,
+      })),
       onFilter: (value, record) => record.type === value,
       sorter: (a, b) => a.type.localeCompare(b.type),
       render: (_, task) => (
