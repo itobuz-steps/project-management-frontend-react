@@ -35,7 +35,7 @@ export default function Navbar({
   const hamburgerRef = useRef<HTMLButtonElement>(null);
 
   const actionButtonClass =
-    'flex h-10 w-10 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600';
+    'flex h-10 w-10 items-center cursor-pointer justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none dark:text-slate-200 dark:hover:bg-[#2a2a33] dark:hover:text-white dark:focus-visible:ring-slate-600';
 
   const searchInputClass = `h-10 ${isDrawerOpen ? 'w-80' : 'w-150'} rounded-lg border border-gray-200 bg-white px-4 text-sm text-slate-700 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100 dark:border-[#27272e] dark:bg-[#1b1b1f] dark:text-neutral-100 dark:placeholder:text-neutral-400 dark:focus:ring-primary-900/30`;
 
@@ -78,7 +78,7 @@ export default function Navbar({
           />
           <motion.button
             onClick={() => setIsAddTaskOpen(true)}
-            className="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700 relative flex h-10 shrink-0 items-center justify-center overflow-hidden rounded-md px-3 text-sm font-medium text-white shadow-sm focus-visible:ring-2 focus-visible:outline-none"
+            className="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-400 dark:bg-primary-600 dark:hover:bg-primary-700 relative flex h-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md px-3 text-sm font-medium text-white shadow-sm focus-visible:ring-2 focus-visible:outline-none"
             aria-label="Create task"
             onHoverStart={() => setIsCreateHovered(true)}
             onHoverEnd={() => setIsCreateHovered(false)}
@@ -119,7 +119,7 @@ export default function Navbar({
 
             <motion.button
               onClick={() => setIsAddTaskOpen(true)}
-              className="border-primary-600 focus-visible:ring-primary-400 dark: text-primary-700 dark:text-primary-500 relative h-10 overflow-hidden rounded-lg border border-double px-4 text-sm font-medium shadow-sm hover:text-white focus-visible:ring-2 focus-visible:outline-none dark:hover:text-white"
+              className="border-primary-600 focus-visible:ring-primary-400 dark: text-primary-700 dark:text-primary-500 relative h-10 cursor-pointer overflow-hidden rounded-lg border border-double px-4 text-sm font-medium shadow-sm hover:text-white focus-visible:ring-2 focus-visible:outline-none dark:hover:text-white"
               aria-label="Create task"
               onHoverStart={() => setIsCreateHovered(true)}
               onHoverEnd={() => setIsCreateHovered(false)}
@@ -154,18 +154,20 @@ export default function Navbar({
               </Can>
             )}
 
-            <UserProfile
-              collapsed={true}
-              mobileOpen={false}
-              showTooltip={true}
-            />
+            <div className="px-2">
+              <UserProfile
+                collapsed={true}
+                mobileOpen={false}
+                showTooltip={true}
+              />
+            </div>
           </div>
         </div>
 
         {/* Mobile: Hamburger menu on the right */}
         <button
           ref={hamburgerRef}
-          className="flex items-center justify-center rounded-md p-1.5 text-slate-700 xl:hidden dark:text-slate-100"
+          className="flex cursor-pointer items-center justify-center rounded-md p-1.5 text-slate-700 xl:hidden dark:text-slate-100"
           aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileMenuOpen}
           onClick={() => setMobileMenuOpen((open) => !open)}

@@ -89,7 +89,7 @@ export function TaskFiltersDropdown({
           setIsOpen((prev) => !prev);
           onOpenFilters();
         }}
-        className="inline-flex w-full items-center justify-center rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 sm:w-auto dark:border-[#27272e] dark:text-slate-200 dark:hover:bg-[#27272e]"
+        className="inline-flex h-9 w-full cursor-pointer items-center justify-center rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 sm:w-auto dark:border-[#27272e] dark:text-slate-200 dark:hover:bg-[#27272e]"
       >
         <SlidersHorizontal className="mr-1.5 h-4 w-4" />
         Filters

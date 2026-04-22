@@ -38,7 +38,7 @@ export function CompactTaskCard({
     : 'No due date';
 
   return (
-    <>
+    <div className="cursor-pointer">
       <div className="flex items-start justify-between gap-2">
         <span className="mt-2 flex items-center gap-1 text-xs text-gray-500 dark:text-slate-400">
           <Tooltip title={task.type} placement="top">
@@ -50,7 +50,7 @@ export function CompactTaskCard({
             to={`/task/${task._id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded px-1 py-0.5 whitespace-nowrap hover:bg-gray-50 dark:hover:bg-slate-700"
+            className="rounded px-1 py-0.5 whitespace-nowrap dark:hover:bg-slate-700"
             onClick={(event) => event.stopPropagation()}
           >
             <TaskTypeColor type={task.type}>{task.key}</TaskTypeColor>
@@ -125,6 +125,6 @@ export function CompactTaskCard({
           />
         </div>
       </div>
-    </>
+    </div>
   );
 }

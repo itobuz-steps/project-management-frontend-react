@@ -37,7 +37,7 @@ const { Option } = Select;
 
 function BoardView() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isCompactMode, setIsCompactMode] = useState(false);
+  const [isCompactMode, setIsCompactMode] = useState(true);
   const [newColumnName, setNewColumnName] = useState('');
   const [isAddColumnOpen, setIsAddColumnOpen] = useState(false);
   const [isSavingColumn, setIsSavingColumn] = useState(false);
@@ -561,7 +561,8 @@ function BoardView() {
             }}
             allowClear
             size="middle"
-            className="min-w-35"
+            className="min-w-35 cursor-pointer rounded-lg"
+            style={{ borderRadius: '8px' }}
           >
             <Option value="">None</Option>
             <Option value="assignee">Assignee</Option>
@@ -573,7 +574,7 @@ function BoardView() {
               type="button"
               onClick={handleCompleteSprint}
               disabled={isCompletingSprint}
-              className="bg-primary-400 hover:bg-primary-500 inline-flex items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+              className="bg-primary-400 hover:bg-primary-500 inline-flex cursor-pointer items-center justify-center rounded-lg px-3 py-1.5 text-xs font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isCompletingSprint ? 'Completing...' : 'Complete Sprint'}
             </button>
@@ -595,7 +596,7 @@ function BoardView() {
                   ? 'Switch to expanded view'
                   : 'Switch to compact view'
               }
-              className="inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="inline-flex h-9 min-w-9 cursor-pointer items-center justify-center rounded-lg border border-gray-300 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
             >
               {isCompactMode ? (
                 <Maximize2 size={14} />
@@ -718,7 +719,7 @@ function BoardView() {
                 return (
                   <div
                     key={key}
-                    className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900"
+                    className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900"
                   >
                     {label && (
                       <button
@@ -808,7 +809,7 @@ function BoardView() {
 
           <DragOverlay>
             {activeTaskId ? (
-              <div className="rounded-md border border-gray-200 bg-white p-3 shadow-md dark:border-slate-700 dark:bg-slate-800">
+              <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-md dark:border-slate-700 dark:bg-slate-800">
                 <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
                   {activeTask?.title}
                   {activeTask ? (

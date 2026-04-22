@@ -12,10 +12,9 @@ function ProjectDeleteSection({ projectId }: ProjectSettingsDeleteProps) {
   const handleDelete = async () => {
     try {
       await deleteProject(projectId);
-
       message.success('Project deleted successfully');
-
-      navigate('/project/undefined');
+      window.dispatchEvent(new CustomEvent('project-list-changed'));
+      navigate('/for-you');
     } catch {
       message.error('Failed to delete project');
     }
