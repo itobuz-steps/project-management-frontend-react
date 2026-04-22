@@ -116,7 +116,7 @@ function Dashboard() {
   return (
     <div className="flex min-h-screen flex-col gap-1 md:gap-3">
       {activeProject && (
-        <div className="bg-gray-100 px-3 py-2 dark:bg-[#28282b]">
+        <div className="px-3 py-2 dark:bg-[#28282b]">
           <div className="flex flex-wrap items-center gap-2">
             {projectIcon && (
               <img

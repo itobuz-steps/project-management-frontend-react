@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Select } from 'antd';
-import { getWorkspaces, type Workspace } from '../../services/workspaceService';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getWorkspaces } from '../../services/workspaceService';
 import SidebarWorkspaceItem from './SidebarWorkspaceItem';
 
 type SidebarProjectsDropdownProps = {
@@ -13,40 +14,37 @@ function SidebarProjectsDropdown({
   collapsed,
   refreshKey = 0,
 }: SidebarProjectsDropdownProps) {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(
-    null
-  );
-
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { projectId: activeProjectId } = useParams();
 
+  // Tracks only explicit user selections in the dropdown
+  const [manualSelection, setManualSelection] = useState<string | null>(null);
+
+  const { data: workspaces = [] } = useQuery({
+    queryKey: ['workspaces', refreshKey],
+    queryFn: async () => {
+      const res = await getWorkspaces();
+      return res.result ?? [];
+    },
+  });
+
+  // Derived — no setState, no effect
+  const selectedWorkspaceId = useMemo(() => {
+    if (!workspaces.length) return null;
+    const target = manualSelection ?? localStorage.getItem('activeWorkspace');
+    if (target && workspaces.some((w) => w.workspaceId === target))
+      return target;
+    return workspaces[0].workspaceId;
+  }, [workspaces, manualSelection]);
+
+  // Invalidate query (not setState) when a project mutation fires
   useEffect(() => {
-    async function loadWorkspaces() {
-      try {
-        const res = await getWorkspaces();
-        const ws = res.result ?? [];
-
-        setWorkspaces(ws);
-
-        const savedWorkspaceId = localStorage.getItem('activeWorkspace');
-
-        if (
-          savedWorkspaceId &&
-          ws.some((w) => w.workspaceId === savedWorkspaceId)
-        ) {
-          setSelectedWorkspaceId(savedWorkspaceId);
-        } else if (ws.length) {
-          setSelectedWorkspaceId(ws[0].workspaceId);
-        }
-      } catch (err) {
-        console.error(err);
-        setWorkspaces([]);
-      }
-    }
-
-    loadWorkspaces();
-  }, [refreshKey]);
+    const handler = () =>
+      queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+    window.addEventListener('project-list-changed', handler);
+    return () => window.removeEventListener('project-list-changed', handler);
+  }, [queryClient]);
 
   function handleProjectClick(projectId: string) {
     navigate(`/project/${projectId}`);
@@ -74,7 +72,7 @@ function SidebarProjectsDropdown({
           options={workspaceOptions}
           value={selectedWorkspaceId}
           onChange={(val) => {
-            setSelectedWorkspaceId(val);
+            setManualSelection(val);
             localStorage.setItem('activeWorkspace', val);
           }}
           className="mb-3 w-full"

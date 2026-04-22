@@ -39,14 +39,14 @@ export function UserProfile({
     <img
       src={userImage || '/profile.png'}
       alt={userName}
-      className="aspect-square h-8 w-8 rounded-xl object-cover"
+      className="h-7 w-7 rounded-xl object-cover"
     />
   );
 
   return (
     <Link
       to="/edit-profile"
-      className={`flex flex-col gap-3 rounded-xl p-2 ${
+      className={`flex flex-col gap-3 rounded-lg ${
         collapsed && !mobileOpen
           ? 'justify-center md:w-auto'
           : 'border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800'

@@ -52,7 +52,7 @@ export default function SidebarWorkspaceCreate({
       {!workspaceInputOpen ? (
         <button
           type="button"
-          className="hover:border-primary-200 hover:bg-primary-50 flex w-full items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white/80 px-2 py-1.5 text-xs font-semibold text-slate-700 transition-colors dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-700"
+          className="hover:border-primary-200 hover:bg-primary-50 flex w-full cursor-pointer items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white/80 px-2 py-1.5 text-xs font-semibold text-slate-700 transition-colors dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-700"
           onClick={() => setWorkspaceInputOpen(true)}
         >
           <Plus size={14} />

@@ -202,7 +202,7 @@ export default function Sidebar({
             <motion.button
               type="button"
               onClick={toggleColorMode}
-              className={`group flex w-full items-center rounded-lg border px-2.5 py-2.5 transition-colors ${
+              className={`group flex w-full cursor-pointer items-center rounded-lg border px-2.5 py-2.5 transition-colors ${
                 isCompactSidebar ? 'justify-center' : 'gap-3'
               } ${
                 colorMode === 'dark'
@@ -219,7 +219,7 @@ export default function Sidebar({
             >
               <motion.span
                 animate={{ rotate: colorMode === 'light' ? 0 : 180 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
               >
                 {colorMode === 'light' ? (
                   <Moon size={16} className="shrink-0" />
@@ -244,6 +244,10 @@ export default function Sidebar({
       <CreateProjectModal
         open={projectModalOpen}
         onClose={() => setProjectModalOpen(false)}
+        onCreated={() => {
+          setProjectModalOpen(false);
+          setWorkspaceRefreshKey((prev) => prev + 1);
+        }}
       />
     </>
   );

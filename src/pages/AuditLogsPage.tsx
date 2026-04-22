@@ -23,7 +23,7 @@ import { UserCell } from '../components/ui/UserCell';
 import { useTheme } from '../hooks/useTheme';
 import { THEME_COLORS } from '../config/constants';
 import * as XLSX from 'xlsx';
-import { FileX } from 'lucide-react';
+import { FileX, Search } from 'lucide-react';
 
 const PAGE_SIZE = 10;
 
@@ -311,11 +311,14 @@ function AuditLogsPage() {
       </div>
 
       <div className="mb-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-        <Input.Search
+        <Input
           allowClear
           placeholder="Search"
           value={searchText}
           onChange={(event) => setSearchText(event.target.value)}
+          prefix={
+            <Search className="w-4 text-gray-500 dark:text-neutral-400" />
+          }
         />
         <Select
           mode="multiple"

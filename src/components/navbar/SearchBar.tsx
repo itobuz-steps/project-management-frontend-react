@@ -37,7 +37,7 @@ export default function SearchBar() {
             placeholder="Search tasks..."
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="focus:border-primary-400 block h-9 w-full rounded-md border border-gray-200 bg-white px-2 py-2 ps-10 text-sm placeholder:text-gray-500 focus:outline-none dark:border-[#27272e] dark:bg-[#1b1b1f] dark:text-neutral-100 dark:placeholder:text-neutral-400"
+            className="focus:border-primary-400 block h-9 w-full rounded-lg border border-gray-200 bg-white px-2 py-2 ps-10 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none dark:border-[#27272e] dark:bg-[#1b1b1f] dark:text-neutral-100 dark:placeholder:text-neutral-400"
           />
         </div>
       </form>

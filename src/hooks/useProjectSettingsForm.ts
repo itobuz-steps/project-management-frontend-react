@@ -56,6 +56,8 @@ export function useProjectSettingsForm({
         queryKey: ['project', project._id],
       });
 
+      window.dispatchEvent(new CustomEvent('project-list-changed'));
+
       message.success('Project updated successfully');
     },
 
