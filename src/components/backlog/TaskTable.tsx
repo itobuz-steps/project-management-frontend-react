@@ -389,6 +389,10 @@ export function TaskTable({
   const canChangeReporter = can('REPORTER_CHANGE');
 
   useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
+
+  useEffect(() => {
     const handler = (event: Event) => {
       const custom = event as CustomEvent;
       const updated = custom.detail as TaskPopulated;
