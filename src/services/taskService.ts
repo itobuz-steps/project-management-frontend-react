@@ -18,7 +18,6 @@ const api = axios.create({
   baseURL: API_URL,
 });
 
-//TODO: Remove it after implementing pagination in board and backlog views
 const LEGACY_FETCH_LIMIT = 10;
 
 type GetTasksBaseParams = {
@@ -275,4 +274,31 @@ export async function getTotalTimeTracked(
     `/${taskId}/total-time-tracked`
   );
   return res.data.result;
+}
+
+export interface ImportTasksResult {
+  projectId: string;
+  totalRows: number;
+  importedCount: number;
+  keys: string[];
+}
+
+export interface ImportTasksErrorBody {
+  message: string;
+  errors?: string[];
+}
+
+export async function importTasksFromCsv(
+  projectId: string,
+  file: File
+): Promise<ImportTasksResult> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const { data } = await api.post<{
+    success: boolean;
+    result: ImportTasksResult;
+  }>(`/import/${projectId}`, formData);
+
+  return data.result;
 }
