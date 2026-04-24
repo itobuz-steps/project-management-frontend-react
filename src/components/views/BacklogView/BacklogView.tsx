@@ -148,7 +148,7 @@ function BacklogView() {
     }
 
     loadData(projectId);
-  }, [type, searchInput, projectId, sprintService]);
+  }, [type, searchInput, projectId, sprintService, setTasks]);
 
   const sprintTaskIds = new Set(sprints.flatMap((s) => s.tasks));
 

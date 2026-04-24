@@ -6,6 +6,8 @@ import ProjectSettingsForm from '../components/projectSettings/ProjectSettingsFo
 import ProjectDeleteSection from '../components/projectSettings/ProjectDeleteSection';
 import type { Project } from '../types/project.types';
 import type { User } from '../services/types/tasks.types';
+import CsvImportSection from '../components/projectSettings/csvImport/CsvImportSection';
+import { message } from 'antd';
 
 function ProjectSettings() {
   const { project, setProject } = useProject();
@@ -62,6 +64,13 @@ function ProjectSettingsContent({
         setIconFile={setIconFile}
         setIconPreview={setIconPreview}
         theme={theme}
+      />
+
+      <CsvImportSection
+        projectId={project._id}
+        onSuccess={(count, keys) => {
+          message.success(`${count} tasks imported — ${keys.join(', ')}`);
+        }}
       />
 
       <ProjectDeleteSection projectId={project._id} />

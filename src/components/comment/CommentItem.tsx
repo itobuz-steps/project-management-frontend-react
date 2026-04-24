@@ -243,7 +243,7 @@ export function CommentItem({ task, comment }: CommentItemProps) {
           <div className="flex gap-2">
             <img
               src="/profile.png"
-              className="h-8 w-8 flex-shrink-0 rounded-full"
+              className="h-8 w-8 shrink-0 rounded-full"
               alt="User avatar"
             />
             <div className="flex-1">
