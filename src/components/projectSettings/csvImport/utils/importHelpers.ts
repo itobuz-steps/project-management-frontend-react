@@ -43,12 +43,80 @@ function toCanonicalHeader(normalizedHeader: string): string {
   return normalizedHeader;
 }
 
+function splitCsvRecords(text: string): string[] {
+  const records: string[] = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+
+    if (char === '"') {
+      // Preserve escaped quotes within quoted fields.
+      if (inQuotes && text[i + 1] === '"') {
+        current += '""';
+        i += 1;
+        continue;
+      }
+
+      inQuotes = !inQuotes;
+      current += char;
+      continue;
+    }
+
+    if ((char === '\n' || char === '\r') && !inQuotes) {
+      if (char === '\r' && text[i + 1] === '\n') {
+        i += 1;
+      }
+      records.push(current);
+      current = '';
+      continue;
+    }
+
+    current += char;
+  }
+
+  if (current || text.endsWith('\n') || text.endsWith('\r')) {
+    records.push(current);
+  }
+
+  return records;
+}
+
 function splitCsvLine(line: string): string[] {
-  return line.match(/(".*?"|[^,]+)(?=,|$)/g) ?? line.split(',');
+  const values: string[] = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i += 1) {
+    const char = line[i];
+
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i += 1;
+        continue;
+      }
+
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (char === ',' && !inQuotes) {
+      values.push(current);
+      current = '';
+      continue;
+    }
+
+    current += char;
+  }
+
+  values.push(current);
+  return values;
 }
 
 function unquoteCsv(value: string): string {
-  return value.trim().replace(/^"|"$/g, '');
+  return value.trim().replace(/^"|"$/g, '').replace(/""/g, '"');
 }
 
 function escapeCsv(value: string): string {
@@ -168,10 +236,12 @@ export function sanitizeCsvForImport(text: string): {
     return { csvText: '', droppedHeaders: [], cleanupWarnings: [] };
   }
 
-  const lines = trimmed.split(/\r?\n/);
-  const rawHeaders = lines[0]
-    .split(',')
-    .map((h) => h.trim().replace(/^"|"$/g, ''));
+  const lines = splitCsvRecords(trimmed);
+  if (lines.length === 0) {
+    return { csvText: '', droppedHeaders: [], cleanupWarnings: [] };
+  }
+
+  const rawHeaders = splitCsvLine(lines[0]).map(unquoteCsv);
   const normalizedHeaders = rawHeaders.map((header) =>
     toCanonicalHeader(normalizeHeader(header))
   );
@@ -279,7 +349,7 @@ export function sanitizeCsvForImport(text: string): {
 }
 
 export default function parseCsvPreview(text: string): ParsedPreview {
-  const lines = text.trim().split(/\r?\n/);
+  const lines = splitCsvRecords(text.trim());
   if (lines.length < 2) {
     return {
       tasks: [],
