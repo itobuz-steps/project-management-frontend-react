@@ -15,6 +15,7 @@ export type AssigneeCellType = {
 export type DueDateCellType = {
   dueDate?: string;
   onChange: (date: string) => void;
+  isCompleted?: boolean;
 };
 
 export type SidebarRowType = {

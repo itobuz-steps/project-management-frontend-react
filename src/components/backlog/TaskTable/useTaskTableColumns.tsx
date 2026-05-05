@@ -101,7 +101,7 @@ export function useTaskTableColumns({
         loadingMembers,
         onTaskUpdated
       ),
-      dueDateColumn(sortOrderFor, updateTaskField),
+      dueDateColumn(sortOrderFor, doneStatus, updateTaskField),
       tagsColumn(tagFilters),
       dateColumn('Created', 'createdAt', sortOrderFor),
       dateColumn('Updated', 'updatedAt', sortOrderFor),
@@ -277,6 +277,7 @@ function assigneeColumn(
 
 function dueDateColumn(
   sortOrderFor: SortOrderFn,
+  doneStatus: string,
   updateTaskField: (
     id: string,
     payload: InlineEditablePayload,
@@ -294,6 +295,7 @@ function dueDateColumn(
     render: (_, record) => (
       <DueDateCell
         dueDate={record.dueDate}
+        isCompleted={record.status === doneStatus}
         onChange={(dueDate) =>
           updateTaskField(record._id, { dueDate }, 'Failed to update due date')
         }
