@@ -3,7 +3,7 @@ import { CommandPalette } from '../common/CommandPalette';
 import { AddTaskModal } from '../../utils/addTaskModal';
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, Settings, Menu, X } from 'lucide-react';
+import { Bell, Settings, Menu, X, Plus } from 'lucide-react';
 import { Can } from '../../utils/PermissionHoc';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProject } from '../../context/ProjectContext';
@@ -127,15 +127,26 @@ export default function Navbar({
             >
               <motion.div
                 className="bg-primary-600 absolute inset-0"
-                initial={{ clipPath: 'inset(100% 0 0 0)' }}
+                initial={{ clipPath: 'inset(0 100% 0 0)' }}
                 animate={
                   isCreateHovered
-                    ? { clipPath: 'inset(0% 0 0 0)' }
-                    : { clipPath: 'inset(100% 0 0 0)' }
+                    ? { clipPath: 'inset(0 0 0 0)' }
+                    : { clipPath: 'inset(0 100% 0 0)' }
                 }
-                transition={{ duration: 0.6, ease: 'easeInOut' }}
+                transition={{ duration: 0.35, ease: 'easeInOut' }}
               />
-              <span className="relative z-10">Create</span>
+              <span className="relative z-10 inline-flex items-center justify-center">
+                <span className={isCreateHovered ? 'invisible' : 'visible'}>
+                  Create
+                </span>
+                <span
+                  className={`absolute inset-0 flex items-center justify-center transition-opacity duration-150 ${
+                    isCreateHovered ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  <Plus size={16} strokeWidth={2.5} />
+                </span>
+              </span>
             </motion.button>
           </div>
 
