@@ -252,6 +252,7 @@ export function TaskDetails({ task, onUpdated }: TaskDetailsProps) {
               <SidebarRow label="Due Date">
                 <DueDateCell
                   dueDate={task.dueDate}
+                  isCompleted={task.status?.toLowerCase() === 'done'}
                   onChange={(dueDate) =>
                     update({ dueDate }, 'Failed to update due date')
                   }

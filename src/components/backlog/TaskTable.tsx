@@ -225,6 +225,7 @@ const buildTaskColumns = ({
       render: (_, record) => (
         <DueDateCell
           dueDate={record.dueDate}
+          isCompleted={record.status === doneStatus}
           onChange={(dueDate) =>
             void updateTaskField(
               record._id,

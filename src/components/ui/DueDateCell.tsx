@@ -8,20 +8,24 @@ import dayjs from 'dayjs';
 import { useRef } from 'react';
 import type { DueDateCellType } from './ui.types';
 
-export function DueDateCell({ dueDate, onChange }: DueDateCellType) {
+export function DueDateCell({
+  dueDate,
+  onChange,
+  isCompleted = false,
+}: DueDateCellType) {
   const value = dueDate ? dayjs(dueDate) : null;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const today = dayjs().startOf('day');
 
-  const isYesterday = value?.isSame(today.subtract(1, 'day'), 'day');
   const isToday = value?.isSame(today, 'day');
   const isTomorrow = value?.isSame(today.add(1, 'day'), 'day');
   const isOverdue = value ? value.isBefore(today, 'day') : false;
+  const showOverdueState = isOverdue && !isCompleted;
 
   const renderIcon = () => {
-    if (isOverdue) {
+    if (showOverdueState) {
       return <WarningOutlined style={{ color: '#ef4444' }} />;
     }
     if (isToday || isTomorrow) {
@@ -34,7 +38,14 @@ export function DueDateCell({ dueDate, onChange }: DueDateCellType) {
   let color = 'text-gray-500';
 
   if (isOverdue) {
-    label = isYesterday ? 'Yesterday' : value?.format('DD-MM-YYYY') || '';
+    const overdueDays = value ? today.diff(value, 'day') : 0;
+    label =
+      overdueDays <= 1
+        ? 'Yesterday'
+        : `${overdueDays} day${overdueDays > 1 ? 's' : ''} ago`;
+  }
+
+  if (showOverdueState) {
     color = 'text-red-500';
   } else if (isToday) {
     label = 'Today';
@@ -65,7 +76,7 @@ export function DueDateCell({ dueDate, onChange }: DueDateCellType) {
           suffixIcon={null}
           format="DD-MM-YYYY"
           onChange={(date) => onChange(date ? dayjs(date).toISOString() : '')}
-          status={isOverdue ? 'error' : undefined}
+          status={showOverdueState ? 'error' : undefined}
         />
       </div>
     </div>

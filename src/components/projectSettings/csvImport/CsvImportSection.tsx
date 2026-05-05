@@ -11,7 +11,7 @@ import {
 import { message } from 'antd';
 import { useImportTasks } from '../../../hooks/useImportTasks';
 import type { ParsedPreview } from './importTypes';
-import parseCsvPreview from './utils/importHelpers';
+import parseCsvPreview, { sanitizeCsvForImport } from './utils/importHelpers';
 import ResultCard from './components/ResultCard';
 
 interface CsvImportSectionProps {
@@ -52,7 +52,29 @@ export default function CsvImportSection({
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = e.target?.result as string;
-        setPreview(parseCsvPreview(text));
+        const { csvText, droppedHeaders, cleanupWarnings } =
+          sanitizeCsvForImport(text);
+        const parsed = parseCsvPreview(csvText);
+
+        const droppedMessage = droppedHeaders.length
+          ? `Ignored extra CSV column${droppedHeaders.length !== 1 ? 's' : ''}: ${droppedHeaders.join(', ')}`
+          : null;
+
+        const transformedMessages = cleanupWarnings;
+
+        setPreview({
+          ...parsed,
+          clientErrors: [
+            ...(droppedMessage ? [droppedMessage] : []),
+            ...transformedMessages,
+            ...parsed.clientErrors,
+          ],
+        });
+
+        const sanitizedFile = new File([csvText], file.name, {
+          type: 'text/csv;charset=utf-8',
+        });
+        setRawFile(sanitizedFile);
       };
       reader.readAsText(file);
     },
@@ -169,10 +191,10 @@ export default function CsvImportSection({
                     Spaces, underscores, and dashes inside the keyword are
                     stripped automatically, but the{' '}
                     <strong>word itself must be present</strong> — no
-                    abbreviations or aliases. Unknown columns cause a rejection.
-                    Only title is required. The <strong>assignee</strong> column
-                    must be a member's <strong>email address</strong> (not
-                    display name).
+                    abbreviations or aliases. Extra columns are ignored
+                    automatically. Only title is required. The{' '}
+                    <strong>assignee</strong> column must be a member's{' '}
+                    <strong>email address</strong> (not display name).
                   </div>
 
                   <div className="mb-2.5 overflow-x-auto rounded-md border border-gray-300 bg-gray-50 px-2 py-2 dark:border-gray-700 dark:bg-gray-800">

@@ -90,6 +90,7 @@ export function TaskRow({
       <td className="p-3 px-6 whitespace-nowrap">
         <DueDateCell
           dueDate={task.dueDate}
+          isCompleted={isCompleted}
           onChange={(dueDate) =>
             update({ dueDate }, 'Failed to update due date')
           }
