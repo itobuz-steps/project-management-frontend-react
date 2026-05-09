@@ -11,7 +11,16 @@ export function UserCell({ user, emptyText }: UserCellType) {
       <Avatar
         size="small"
         className="h-6 w-6 shrink-0"
-        src={user.profileImage ? user.profileImage : '/profile.png'}
+        src={
+          <img
+            src={user.profileImage || '/profile.png'}
+            alt={user.name || 'User avatar'}
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = '/profile.png';
+            }}
+          />
+        }
       />
 
       <span className="truncate">{user.name}</span>

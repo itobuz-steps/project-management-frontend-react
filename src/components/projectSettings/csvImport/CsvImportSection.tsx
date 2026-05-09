@@ -196,21 +196,6 @@ export default function CsvImportSection({
                     <strong>assignee</strong> column must be a member's{' '}
                     <strong>email address</strong> (not display name).
                   </div>
-
-                  <div className="mb-2.5 overflow-x-auto rounded-md border border-gray-300 bg-gray-50 px-2 py-2 dark:border-gray-700 dark:bg-gray-800">
-                    <div
-                      style={{ fontSize: 10.5 }}
-                      className="mb-1 text-xs font-semibold text-gray-500 uppercase dark:text-gray-300"
-                    >
-                      Example CSV
-                    </div>
-                    <pre
-                      style={{ fontSize: 11 }}
-                      className="m-0 font-mono text-xs text-gray-600 dark:text-gray-400"
-                    >
-                      {`title,description,type,status,priority,tags,duedate,assignee\nFix login bug,OAuth token expiry issue,bug,todo,high,auth|backend,2025-06-30,jane@acme.com\nUser dashboard,Redesign overview panel,story,in-progress,medium,frontend|ui,2025-07-15,john@acme.com`}
-                    </pre>
-                  </div>
                 </div>
               </div>
 

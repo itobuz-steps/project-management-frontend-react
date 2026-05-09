@@ -103,9 +103,14 @@ export function ReplyItem({ task, comment }: CommentItemProps) {
           style={{}}
           size={28}
           src={
-            comment.author.profileImage
-              ? `${comment.author.profileImage}`
-              : '/profile.png'
+            <img
+              src={comment.author.profileImage || '/profile.png'}
+              alt={comment.author.name || 'User avatar'}
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = '/profile.png';
+              }}
+            />
           }
         >
           {comment.author.name?.[0]}

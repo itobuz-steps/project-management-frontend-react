@@ -62,7 +62,19 @@ export function WorklogsTab({ taskId }: WorklogsTabProps) {
           <List.Item className="">
             <div className="flex w-full items-start justify-between gap-3">
               <div className="flex min-w-0 items-start gap-3">
-                <Avatar src={user?.profileImage} className="mt-0.5">
+                <Avatar
+                  src={
+                    <img
+                      src={user?.profileImage || '/profile.png'}
+                      alt={userName || 'User avatar'}
+                      onError={(event) => {
+                        event.currentTarget.onerror = null;
+                        event.currentTarget.src = '/profile.png';
+                      }}
+                    />
+                  }
+                  className="mt-0.5"
+                >
                   {userName.charAt(0).toUpperCase()}
                 </Avatar>
 

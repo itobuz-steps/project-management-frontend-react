@@ -107,9 +107,14 @@ export function CommentItem({ task, comment }: CommentItemProps) {
       >
         <Avatar
           src={
-            comment.author.profileImage
-              ? `${comment.author.profileImage}`
-              : '/profile.png'
+            <img
+              src={comment.author.profileImage || '/profile.png'}
+              alt={comment.author.name || 'User avatar'}
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = '/profile.png';
+              }}
+            />
           }
         >
           {comment.author.name?.[0]}
