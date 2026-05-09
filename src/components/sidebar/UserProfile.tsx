@@ -40,6 +40,10 @@ export function UserProfile({
       src={userImage || '/profile.png'}
       alt={userName}
       className="h-7 w-7 rounded-xl object-cover"
+      onError={(event) => {
+        event.currentTarget.onerror = null;
+        event.currentTarget.src = '/profile.png';
+      }}
     />
   );
 

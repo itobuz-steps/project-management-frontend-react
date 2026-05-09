@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Typography, Button } from 'antd';
 import {
   DeleteOutlined,
@@ -14,6 +15,7 @@ export function AttachmentItem({
   attachment,
   onRemove,
 }: AttachmentsItemProps) {
+  const [imagePreviewError, setImagePreviewError] = useState(false);
   const isFileAttachment = (a: unknown): a is File => a instanceof File;
   const isBackendAttachment = (a: unknown): a is BackendAttachment =>
     Boolean(
@@ -49,12 +51,13 @@ export function AttachmentItem({
   const isPdf = mimeType === 'application/pdf' || extension === 'pdf';
 
   const renderPreview = () => {
-    if (isImage) {
+    if (isImage && !imagePreviewError) {
       return (
         <img
           src={url}
           alt={name}
           className="hover: h-10 w-10 transform rounded border object-cover hover:scale-150"
+          onError={() => setImagePreviewError(true)}
         />
       );
     }

@@ -208,7 +208,7 @@ export default function CsvImportSection({
                       style={{ fontSize: 11 }}
                       className="m-0 font-mono text-xs text-gray-600 dark:text-gray-400"
                     >
-                      {`title,description,type,status,priority,tags,duedate,assignee\nFix login bug,OAuth token expiry issue,bug,todo,high,auth|backend,2025-06-30,jane@acme.com\nUser dashboard,Redesign overview panel,story,in-progress,medium,frontend|ui,2025-07-15,john@acme.com`}
+                      ' '{' '}
                     </pre>
                   </div>
                 </div>

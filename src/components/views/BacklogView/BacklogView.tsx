@@ -212,9 +212,14 @@ function BacklogView() {
                       >
                         <Avatar
                           src={
-                            user?.profileImage
-                              ? user?.profileImage
-                              : '/profile.png'
+                            <img
+                              src={user?.profileImage || '/profile.png'}
+                              alt={user?.name || user?.email || 'User avatar'}
+                              onError={(event) => {
+                                event.currentTarget.onerror = null;
+                                event.currentTarget.src = '/profile.png';
+                              }}
+                            />
                           }
                         >
                           {!user?.profileImage &&

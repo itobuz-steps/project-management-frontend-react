@@ -76,6 +76,10 @@ export default function EditProfileContainer() {
           src={profileImage}
           alt="Profile Preview"
           className="border-primary-300 aspect-square h-24 w-24 rounded-full border-4 object-cover shadow-md"
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = '/profile.png';
+          }}
         />
       </div>
       {email && (

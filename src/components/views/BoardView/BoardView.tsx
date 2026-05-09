@@ -514,9 +514,14 @@ function BoardView() {
                       >
                         <Avatar
                           src={
-                            user?.profileImage
-                              ? user?.profileImage
-                              : '/profile.png'
+                            <img
+                              src={user?.profileImage || '/profile.png'}
+                              alt={user?.name || user?.email || 'User avatar'}
+                              onError={(event) => {
+                                event.currentTarget.onerror = null;
+                                event.currentTarget.src = '/profile.png';
+                              }}
+                            />
                           }
                         >
                           {!user?.profileImage &&
@@ -746,6 +751,10 @@ function BoardView() {
                                   src={member.profileImage}
                                   alt={label ?? ''}
                                   className="h-6 w-6 rounded-full object-cover"
+                                  onError={(event) => {
+                                    event.currentTarget.onerror = null;
+                                    event.currentTarget.src = '/profile.png';
+                                  }}
                                 />
                               ) : (
                                 <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-100 text-xs font-semibold text-violet-600 uppercase dark:bg-violet-900/40 dark:text-violet-400">

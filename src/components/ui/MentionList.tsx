@@ -45,7 +45,19 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
               onClick={() => command(item)}
             >
               <div className="flex items-center gap-2">
-                <Avatar size={20} src={item.avatar || '/profile.png'} />
+                <Avatar
+                  size={20}
+                  src={
+                    <img
+                      src={item.avatar || '/profile.png'}
+                      alt={item.label || 'User avatar'}
+                      onError={(event) => {
+                        event.currentTarget.onerror = null;
+                        event.currentTarget.src = '/profile.png';
+                      }}
+                    />
+                  }
+                />
                 <span>{item.label}</span>
               </div>
             </List.Item>

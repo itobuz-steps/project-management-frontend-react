@@ -50,6 +50,10 @@ export default function ProfileMenu() {
             src={profileImage}
             alt="Profile Preview"
             className="size-full rounded-full object-cover"
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = '/profile.png';
+            }}
           />
         </div>
       </button>
