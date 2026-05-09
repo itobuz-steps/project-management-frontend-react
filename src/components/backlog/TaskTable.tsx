@@ -419,6 +419,7 @@ export function TaskTable({
     completeSprint,
     updateSprintDates,
     createSprint,
+    deleteSprint,
   } = useSprintActions(project?._id, setSprints);
 
   const { setNodeRef, isOver } = useDroppable({
@@ -546,6 +547,7 @@ export function TaskTable({
                 updateSprintDates(sprint, startDate, endDate)
               }
               completeSprint={() => handleCompleteSprint()}
+              deleteSprint={() => deleteSprint(sprint)}
             />
           )}
 

@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 
 interface CreateSprintFormProps {
   sprint?: Sprint | null;
-  createSprintHandler: (storyPoint: number) => void;
+  createSprintHandler: (storyPoint: number) => void | Promise<void>;
 }
 
 export function CreateSprintForm({
@@ -15,6 +15,7 @@ export function CreateSprintForm({
 }: CreateSprintFormProps) {
   const [showForm, setShowForm] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   return (
     <>
@@ -26,9 +27,14 @@ export function CreateSprintForm({
 
       {showForm && (
         <Form
-          onFinish={(values) => {
-            createSprintHandler(values.storyPoint);
-            setShowForm(false);
+          onFinish={async (values) => {
+            setIsCreating(true);
+            try {
+              await Promise.resolve(createSprintHandler(values.storyPoint));
+              setShowForm(false);
+            } finally {
+              setIsCreating(false);
+            }
           }}
           onFinishFailed={() => {
             message.error('Please enter a valid integer for story points');
@@ -43,7 +49,11 @@ export function CreateSprintForm({
           <div className="flex items-center gap-4">
             <X
               className="-mr-2 size-4 cursor-pointer"
-              onClick={() => setShowForm(false)}
+              onClick={() => {
+                if (!isCreating) {
+                  setShowForm(false);
+                }
+              }}
             />
             <Form.Item
               name={'storyPoint'}
@@ -70,6 +80,8 @@ export function CreateSprintForm({
             <Button
               type="primary"
               htmlType="submit"
+              loading={isCreating}
+              disabled={isCreating}
               style={{
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: hovered

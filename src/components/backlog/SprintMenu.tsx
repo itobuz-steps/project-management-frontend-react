@@ -1,14 +1,12 @@
 import { message, DatePicker, Modal, Tooltip, Popconfirm } from 'antd';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Loader2 } from 'lucide-react';
 import { SprintButton } from './SprintButton';
 import type { Sprint } from '../../services/types/sprints.types';
 import { useIsMobile } from '../../utils/isMobile';
 import { Can } from '../../utils/PermissionHoc';
 import { DeleteOutlined } from '@ant-design/icons';
-import { useSprintActions } from '../../hooks/useSprintActions';
-import { useProject } from '../../context/ProjectContext';
 
 interface SprintMenuProps {
   sprint: Sprint;
@@ -18,6 +16,7 @@ interface SprintMenuProps {
   startSprint: () => void;
   updateSprintDates: (startDate: Date, endDate: Date) => Promise<void>;
   completeSprint: () => void;
+  deleteSprint: () => void;
 }
 
 const toDateInputValue = (value?: Date) => {
@@ -39,15 +38,19 @@ export function SprintMenu({
   startSprint,
   updateSprintDates,
   completeSprint,
+  deleteSprint,
 }: SprintMenuProps) {
   const [dueDateInputHidden, setDueDateInputHidden] = useState(true);
   const [isEditingDates, setIsEditingDates] = useState(false);
   const [startDateInput, setStartDateInput] = useState('');
   const [endDateInput, setEndDateInput] = useState('');
   const [startSprintDueDateInput, setStartSprintDueDateInput] = useState('');
+  const [isStartingSprint, setIsStartingSprint] = useState(false);
   const [saving, setSaving] = useState(false);
+  const startSprintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
   const isMobile = useIsMobile(640);
-  const { project } = useProject();
 
   const datePickerFormat = 'DD-MM-YYYY';
 
@@ -71,8 +74,34 @@ export function SprintMenu({
     setIsEditingDates(true);
   };
 
-  const { deleteSprint } = useSprintActions(project?._id);
   const closeEditDates = () => setIsEditingDates(false);
+
+  useEffect(() => {
+    return () => {
+      if (startSprintTimerRef.current) {
+        clearTimeout(startSprintTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handlePrepareStartSprint = () => {
+    const initialDate = toDateInputValue(sprint.dueDate);
+    syncStartSprintDueDate(initialDate);
+    setDueDateInputHidden(false);
+  };
+
+  const handleStartSprintWithLoader = () => {
+    if (isStartingSprint) {
+      return;
+    }
+
+    setIsStartingSprint(true);
+    startSprintTimerRef.current = setTimeout(() => {
+      startSprint();
+      setIsStartingSprint(false);
+      startSprintTimerRef.current = null;
+    }, 450);
+  };
 
   const handleSaveDates = async () => {
     if (!startDateInput || !endDateInput) {
@@ -131,11 +160,7 @@ export function SprintMenu({
       {!sprintStarted && dueDateInputHidden && (
         <SprintButton
           type="button"
-          onClick={() => {
-            const initialDate = toDateInputValue(sprint.dueDate);
-            syncStartSprintDueDate(initialDate);
-            setDueDateInputHidden(false);
-          }}
+          onClick={handlePrepareStartSprint}
           className="bg-primary-400 hover:bg-primary-500 cursor-pointer rounded-sm px-2 py-1 text-xs font-medium text-white shadow-xs focus:outline-none"
         >
           Start Sprint
@@ -163,10 +188,19 @@ export function SprintMenu({
           />
           <SprintButton
             type="button"
-            onClick={startSprint}
+            onClick={handleStartSprintWithLoader}
+            disabled={isStartingSprint}
             className="bg-primary-400 hover:bg-primary-500 cursor-pointer rounded-sm px-2 py-1 text-xs font-medium text-white shadow-xs focus:outline-none"
           >
-            Start
+            <span className="inline-flex items-center gap-1">
+              {isStartingSprint && (
+                <Loader2
+                  className="h-3.5 w-3.5 animate-spin"
+                  aria-hidden="true"
+                />
+              )}
+              {isStartingSprint ? 'Starting...' : 'Start'}
+            </span>
           </SprintButton>
           <button
             type="button"
@@ -293,7 +327,7 @@ export function SprintMenu({
                   },
                   type: 'text',
                 }}
-                onConfirm={() => deleteSprint(sprint)}
+                onConfirm={deleteSprint}
               >
                 <button
                   title="Delete Sprint"
