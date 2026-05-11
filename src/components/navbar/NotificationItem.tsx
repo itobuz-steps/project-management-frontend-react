@@ -24,6 +24,13 @@ export function NotificationItem({
       <div className="flex items-start gap-4 bg-white p-2 transition hover:bg-gray-100 dark:bg-[#1b1b1f] dark:hover:bg-[#27272e]">
         <div className="relative shrink-0">
           <Bell className="text-primary-400 mt-0.5 h-5 w-5" />
+          {data.unread && (
+            <span
+              className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-green-500 ring-1 ring-white dark:ring-[#1b1b1f]"
+              aria-hidden="true"
+              title="Unread"
+            />
+          )}
         </div>
         <div className="flex flex-col gap-1">
           <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
