@@ -34,8 +34,13 @@ async function deleteNotification(notificationId: string): Promise<void> {
   await api.delete(`/${notificationId}`);
 }
 
+async function markAllAsRead(): Promise<void> {
+  await api.post('/mark-all-as-read');
+}
+
 export default {
   getAllNotification,
   subscribeToPushNotifications,
   deleteNotification,
+  markAllAsRead,
 };

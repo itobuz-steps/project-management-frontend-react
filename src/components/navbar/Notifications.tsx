@@ -101,6 +101,16 @@ export default function Notifications({
     }
   }
 
+  async function handleMarkAllAsRead() {
+    try {
+      await notificationService.markAllAsRead();
+      setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+      setNewNotificationCount(0);
+    } catch (err) {
+      console.error('Failed to mark all as read', err);
+    }
+  }
+
   return (
     <div className="relative mx-auto w-max" ref={containerRef}>
       {!isControlled && (
@@ -133,6 +143,7 @@ export default function Notifications({
           loadMore={loadMore}
           hasMore={hasMore}
           setOpen={setOpen}
+          onMarkAllRead={handleMarkAllAsRead}
           ref={dropdownRef}
         />
       )}
